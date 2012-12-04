@@ -1,0 +1,178 @@
+﻿#region Using
+
+using System;
+using System.IO;
+using System.Text;
+using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework.Storage;
+
+#endregion
+
+namespace Willcraftia.Xna.Blocks.Models
+{
+    public sealed class StorageChunkStore : IChunkStore
+    {
+        static readonly Logger logger = new Logger(typeof(StorageChunkStore).Name);
+
+        Uri regionUri;
+
+        string rootDirectory = "Chunks";
+
+        string regionDirectory;
+
+        public StorageChunkStore(Uri regionUri)
+        {
+            if (regionUri == null) throw new ArgumentNullException("regionUri");
+
+            this.regionUri = regionUri;
+
+            var b = new StringBuilder(rootDirectory);
+            b.Append('/');
+            foreach (var c in regionUri.OriginalString)
+            {
+                switch (c)
+                {
+                    case ':':
+                    case '/':
+                    case '!':
+                        b.Append('_');
+                        break;
+                    default:
+                        b.Append(c);
+                        break;
+                }
+            }
+            regionDirectory = b.ToString();
+
+            logger.Info("Constructor: regionDirectory={0}", regionDirectory);
+        }
+
+        public bool GetChunk(ref VectorI3 position, Chunk chunk)
+        {
+            logger.InfoBegin("GetChunk: {0}", position);
+
+            var storageContainer = StorageManager.Instance.StorageContainer;
+            var filePath = ResolveFilePath(position);
+
+            bool result;
+            if (!storageContainer.FileExists(filePath))
+            {
+                logger.Info("No file exists: ", filePath);
+                result = false;
+            }
+            else
+            {
+                logger.Info("File exists: {0}", filePath);
+
+                using (var stream = storageContainer.OpenFile(filePath, FileMode.Open))
+                using (var reader = new BinaryReader(stream))
+                {
+                    chunk.Read(reader);
+                }
+
+                result = true;
+            }
+
+            logger.InfoEnd("GetChunk: {0}", position);
+
+            return result;
+        }
+
+        public void AddChunk(Chunk chunk)
+        {
+            logger.InfoBegin("AddChunk: {0}", chunk.Position);
+
+            var storageContainer = StorageManager.Instance.StorageContainer;
+
+            if (!storageContainer.DirectoryExists(rootDirectory))
+                storageContainer.CreateDirectory(rootDirectory);
+
+            if (!storageContainer.DirectoryExists(regionDirectory))
+                storageContainer.CreateDirectory(regionDirectory);
+
+            if (!storageContainer.DirectoryExists(regionDirectory))
+                storageContainer.CreateDirectory(regionDirectory);
+            
+            var filePath = ResolveFilePath(chunk.Position);
+
+            logger.Info("File: {0}", filePath);
+
+            using (var stream = storageContainer.CreateFile(filePath))
+            using (var writer = new BinaryWriter(stream))
+            {
+                chunk.Write(writer);
+            }
+
+            logger.InfoEnd("AddChunk: {0}", chunk.Position);
+        }
+
+        public void DeleteChunk(Chunk chunk)
+        {
+            var storageContainer = StorageManager.Instance.StorageContainer;
+            var filePath = ResolveFilePath(chunk.Position);
+
+            storageContainer.DeleteFile(filePath);
+        }
+
+        public void ClearChunks()
+        {
+            var storageContainer = StorageManager.Instance.StorageContainer;
+            var filePaths = storageContainer.GetFileNames(regionDirectory + "/*.bin");
+
+            foreach (var filePath in filePaths)
+                storageContainer.DeleteFile(filePath);
+
+            storageContainer.DeleteDirectory(regionDirectory);
+        }
+
+        public void GetChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize)
+        {
+            var storageContainer = StorageManager.Instance.StorageContainer;
+
+            var filePaths = GetChunkFilePaths();
+            if (filePaths.Length == 0)
+                return;
+
+            // Chunk holder
+            var chunk = new Chunk(chunkSize);
+
+            using (var chunkBundleWriter = new ChunkBundleWriter(chunkBundleStream))
+            {
+                foreach (var filePath in filePaths)
+                {
+                    using (var chunkStream = storageContainer.OpenFile(filePath, FileMode.Open))
+                    using (var chunkReader = new BinaryReader(chunkStream))
+                    {
+                        chunk.Read(chunkReader);
+                        chunkBundleWriter.WriteChunk(chunk);
+                    }
+                }
+            }
+        }
+
+        public void AddChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize)
+        {
+            // Chunk holder
+            var chunk = new Chunk(chunkSize);
+
+            using (var chunkBundleReader = new ChunkBundleReader(chunkBundleStream))
+            {
+                while (chunkBundleReader.ReadChunk(chunk))
+                    AddChunk(chunk);
+            }
+        }
+
+        string[] GetChunkFilePaths()
+        {
+            var storageContainer = StorageManager.Instance.StorageContainer;
+            return storageContainer.GetFileNames(regionDirectory + "/*.bin");
+        }
+
+        string ResolveFilePath(VectorI3 position)
+        {
+            return regionDirectory + "/" + position.X + "_" + position.Y + "_" + position.Z + ".bin";
+        }
+    }
+}
