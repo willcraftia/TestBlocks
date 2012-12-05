@@ -30,7 +30,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
                 {
                     return Serializer.Deserialize(reader, type);
                 }
-                catch (JsonSerializationException e)
+                catch (JsonException e)
                 {
                     throw new SerializationException(
                         string.Format("Error json deserializing: uri={0}, type={1}", uri, type), e);
@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
                 {
                     Serializer.Serialize(writer, resource);
                 }
-                catch (JsonSerializationException e)
+                catch (JsonException e)
                 {
                     throw new SerializationException(
                         string.Format("Error json serializing: uri={0}, type={1}", uri, resource.GetType()), e);
