@@ -15,6 +15,8 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
     {
         public static readonly XmlSerializerAdapter Instance = new XmlSerializerAdapter();
 
+        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+
         Dictionary<Type, XmlSerializer> cache = new Dictionary<Type, XmlSerializer>();
 
         // I/F
@@ -29,6 +31,8 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
 
         XmlSerializerAdapter()
         {
+            namespaces.Add(string.Empty, string.Empty);
+
             WriterSettings = new XmlWriterSettings
             {
                 Indent = true,
@@ -74,7 +78,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
 
             using (var writer = CreateXmlWriter(stream))
             {
-                serializer.Serialize(writer, resource);
+                serializer.Serialize(writer, resource, namespaces);
             }
         }
 
