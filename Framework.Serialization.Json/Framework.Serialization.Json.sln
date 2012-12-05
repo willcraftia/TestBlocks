@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework.Serialization.Jso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework (x86)", "..\Framework\Framework\Framework (x86).csproj", "{2E15AFAD-6982-45D4-86B3-F5950139EFD8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework.Serialization.Json.Demo", "Framework.Serialization.Json.Demo\Framework.Serialization.Json.Demo.csproj", "{F72A0077-4719-49F5-B880-A5E9FD04820D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -39,6 +41,16 @@ Global
 		{2E15AFAD-6982-45D4-86B3-F5950139EFD8}.Release|x86.Build.0 = Release|x86
 		{2E15AFAD-6982-45D4-86B3-F5950139EFD8}.Release|Xbox 360.ActiveCfg = Release|x86
 		{2E15AFAD-6982-45D4-86B3-F5950139EFD8}.Release|Xbox 360.Build.0 = Release|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Debug|x86.ActiveCfg = Debug|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Debug|x86.Build.0 = Debug|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Release|Mixed Platforms.Build.0 = Release|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Release|x86.ActiveCfg = Release|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Release|x86.Build.0 = Release|x86
+		{F72A0077-4719-49F5-B880-A5E9FD04820D}.Release|Xbox 360.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

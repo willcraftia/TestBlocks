@@ -14,9 +14,13 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
     {
         public static readonly JsonResourceLoader Instance = new JsonResourceLoader();
 
-        JsonSerializer jsonSerializer = new JsonSerializer();
+        public JsonSerializer Serializer { get; private set; }
 
-        JsonResourceLoader() { }
+        JsonResourceLoader()
+        {
+            Serializer = new JsonSerializer();
+            Serializer.TypeNameHandling = TypeNameHandling.Auto;
+        }
 
         public object Load(Uri uri, Stream stream, Type type)
         {
@@ -24,7 +28,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
             {
                 try
                 {
-                    return jsonSerializer.Deserialize(reader, type);
+                    return Serializer.Deserialize(reader, type);
                 }
                 catch (JsonSerializationException e)
                 {
@@ -40,7 +44,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
             {
                 try
                 {
-                    jsonSerializer.Serialize(writer, resource);
+                    Serializer.Serialize(writer, resource);
                 }
                 catch (JsonSerializationException e)
                 {
