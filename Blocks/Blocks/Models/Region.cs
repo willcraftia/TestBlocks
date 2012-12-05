@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
@@ -36,6 +37,8 @@ namespace Willcraftia.Xna.Blocks.Models
         public BlockCatalog BlockCatalog { get; set; }
 
         public Uri ChunkBundleUri { get; set; }
+
+        public List<IChunkBuilder> ChunkGenerators { get; set; }
 
         public void Initialize()
         {

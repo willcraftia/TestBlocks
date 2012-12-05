@@ -143,7 +143,22 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 Name = "Default Region",
                 Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
                 TileCatalog = "title:Resources/DefaultTileCatalog.json",
-                BlockCatalog = "title:Resources/DefaultBlockCatalog.json"
+                BlockCatalog = "title:Resources/DefaultBlockCatalog.json",
+                ChunkBuilders = new ChunkBuilderDefinition[]
+                {
+                    new ChunkBuilderDefinition
+                    {
+                        Type = "Willcraftia.Xna.Blocks.Models.FlatTerrainChunkBuilder",
+                        Properties = new PropertyDefinition[]
+                        {
+                            new PropertyDefinition
+                            {
+                                Name = "Demo Parameter",
+                                Value = "1"
+                            }
+                        }
+                    }
+                }
             };
             {
                 var jsonUri = SerializeToJson<RegionDefinition>("DefaultRegion", region);

@@ -114,7 +114,12 @@ namespace Willcraftia.Xna.Blocks.Models
             if (chunk == null) throw new InvalidOperationException("Any new chunk can not be created.");
 
             if (!chunkStore.GetChunk(ref position, chunk))
+            {
                 chunk.Position = position;
+
+                foreach (var generator in region.ChunkGenerators)
+                    generator.Build(chunk);
+            }
 
             // Register
             lock (activeChunks)

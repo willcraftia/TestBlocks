@@ -63,6 +63,10 @@
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\MeshLoader.cs" />
     <Compile Include="Assets\RegionLoader.cs" />
+    <Compile Include="Models\FlatTerrainChunkBuilder.cs" />
+    <Compile Include="Models\IChunkBuilder.cs" />
+    <Compile Include="Serialization\ChunkBuilderDefinition.cs" />
+    <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Serialization\ResourceSerializer.cs" />
     <Compile Include="Assets\Texture2DLoader.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />

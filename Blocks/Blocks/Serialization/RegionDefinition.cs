@@ -33,5 +33,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         // URI
         public string ChunkBundle;
+
+        public ChunkBuilderDefinition[] ChunkBuilders;
     }
 }

@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blocks (x86)", "..\Blocks\B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blocks (Xbox 360)", "..\Blocks\Blocks\Blocks (Xbox 360).csproj", "{6F699127-8EF0-4697-BE6A-A8B8580C5D61}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blocks.Serialization.Demo", "..\Blocks\Blocks.Serialization.Demo\Blocks.Serialization.Demo.csproj", "{67990AA2-6073-4E21-9DFE-429F69828B91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -183,6 +185,16 @@ Global
 		{6F699127-8EF0-4697-BE6A-A8B8580C5D61}.Release|x86.ActiveCfg = Release|Xbox 360
 		{6F699127-8EF0-4697-BE6A-A8B8580C5D61}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
 		{6F699127-8EF0-4697-BE6A-A8B8580C5D61}.Release|Xbox 360.Build.0 = Release|Xbox 360
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Debug|x86.ActiveCfg = Debug|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Debug|x86.Build.0 = Debug|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Debug|Xbox 360.ActiveCfg = Debug|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Release|Mixed Platforms.Build.0 = Release|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Release|x86.ActiveCfg = Release|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Release|x86.Build.0 = Release|x86
+		{67990AA2-6073-4E21-9DFE-429F69828B91}.Release|Xbox 360.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

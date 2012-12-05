@@ -45,8 +45,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
             regionDirectory = b.ToString();
-
-            logger.Info("Constructor: regionDirectory={0}", regionDirectory);
         }
 
         public bool GetChunk(ref VectorI3 position, Chunk chunk)

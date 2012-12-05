@@ -113,6 +113,8 @@
     <Compile Include="Models\ChunkMesh.cs" />
     <Compile Include="Models\ChunkMeshPart.cs" />
     <Compile Include="Models\ChunkMeshUpdateManager.cs" />
+    <Compile Include="Models\FlatTerrainChunkBuilder.cs" />
+    <Compile Include="Models\IChunkBuilder.cs" />
     <Compile Include="Models\IChunkStore.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />
@@ -126,8 +128,10 @@
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
     <Compile Include="Serialization\BlockIndexDefinition.cs" />
+    <Compile Include="Serialization\ChunkBuilderDefinition.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
+    <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\ResourceSerializer.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />

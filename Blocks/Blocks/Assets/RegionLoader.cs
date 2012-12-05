@@ -1,6 +1,8 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Blocks.Models;
@@ -25,7 +27,33 @@ namespace Willcraftia.Xna.Blocks.Assets
             region.BlockCatalog = assetManager.Load<BlockCatalog>(resource.BlockCatalog);
             if (resource.ChunkBundle != null) region.ChunkBundleUri = new Uri(resource.ChunkBundle);
 
+            if (resource.ChunkBuilders == null)
+            {
+                region.ChunkGenerators = new List<IChunkBuilder>(0);
+            }
+            else
+            {
+                region.ChunkGenerators = new List<IChunkBuilder>(resource.ChunkBuilders.Length);
+                for (int i = 0; i < resource.ChunkBuilders.Length; i++)
+                {
+                    var chunkGenerator = CreateChunkGenerator(ref resource.ChunkBuilders[i]);
+                    region.ChunkGenerators.Add(chunkGenerator);
+                }
+            }
+
             return region;
+        }
+
+        IChunkBuilder CreateChunkGenerator(ref ChunkBuilderDefinition definition)
+        {
+            var type = Type.GetType(definition.Type);
+            var result = (IChunkBuilder) type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
+
+            if (definition.Properties != null)
+                foreach (var property in definition.Properties)
+                    result.PopulateProperty(property.Name, property.Value);
+
+            return result;
         }
 
         public void Unload(AssetManager assetManager, Uri uri, object asset)
