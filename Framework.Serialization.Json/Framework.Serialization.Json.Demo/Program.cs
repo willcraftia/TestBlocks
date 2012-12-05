@@ -11,6 +11,8 @@ namespace Willcraftia.Xna.Framework.Serialization.Json.Demo
 {
     class Program
     {
+        #region Demo Classes
+
         public interface IAnimal
         {
             string Name { get; set; }
@@ -61,6 +63,8 @@ namespace Willcraftia.Xna.Framework.Serialization.Json.Demo
                 return result.ToString();
             }
         }
+
+        #endregion
 
         static void Main(string[] args)
         {
