@@ -29,10 +29,10 @@ namespace Willcraftia.Xna.Framework.IO.Compression
             string entryPath;
             ParseUri(uri, out archiveUri, out entryPath);
 
-            if (!ResourceContainerManager.Instance.ResourceExists(archiveUri))
+            if (!ResourceContainerManager.Instance.Exists(archiveUri))
                 return false;
 
-            using (var stream = ResourceContainerManager.Instance.OpenResource(archiveUri))
+            using (var stream = ResourceContainerManager.Instance.Open(archiveUri))
             using (var zipFile = ZipFile.Read(stream))
             {
                 return zipFile.ContainsEntry(entryPath);
@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Framework.IO.Compression
             string entryPath;
             ParseUri(uri, out archiveUri, out entryPath);
 
-            var stream = ResourceContainerManager.Instance.OpenResource(archiveUri);
+            var stream = ResourceContainerManager.Instance.Open(archiveUri);
             return new ZipEntryStream(stream, entryPath);
         }
 

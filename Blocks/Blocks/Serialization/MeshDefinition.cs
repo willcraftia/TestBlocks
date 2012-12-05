@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public sealed class MeshDefinition
+    public struct MeshDefinition
     {
         //----------------------------
         // Editor/Debug

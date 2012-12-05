@@ -2,7 +2,6 @@
 
 using System;
 using System.IO;
-using Willcraftia.Xna.Framework.IO;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -76,7 +75,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml.Demo
 
                     var animalType = Type.GetType(typeString);
 
-                    var animalSerializer = XmlResourceLoader.Instance.GetSerializer(animalType);
+                    var animalSerializer = XmlSerializerAdapter.Instance.GetXmlSerializer(animalType);
                     var animal = animalSerializer.Deserialize(reader) as IAnimal;
 
                     list.Add(animal);
@@ -103,7 +102,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml.Demo
                     var animalType = animal.GetType();
                     writer.WriteAttributeString("Type", animalType.FullName);
 
-                    var animalSerializer = XmlResourceLoader.Instance.GetSerializer(animalType);
+                    var animalSerializer = XmlSerializerAdapter.Instance.GetXmlSerializer(animalType);
                     animalSerializer.Serialize(writer, animal, namespaces);
 
                     writer.WriteEndElement();
@@ -144,19 +143,18 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml.Demo
                 new Cat { Name = "Tama", CatProperty = "Nya nya" }
             };
 
-            // Register JsonResourceLoader.
-            ResourceManager.Instance.LoaderMap[".xml"] = XmlResourceLoader.Instance;
-
             // Output file path.
             var path = Path.Combine(Directory.GetCurrentDirectory(), "AnimalManager.xml");
-            var uri = new Uri(path);
 
-            // Save.
-            ResourceManager.Instance.Save(uri, animalManager);
-            Console.WriteLine("Save:");
-            Console.WriteLine(uri.LocalPath);
+            // Serialize.
+            using (var stream = File.Create(path))
+            {
+                XmlSerializerAdapter.Instance.Serialize(stream, animalManager);
+            }
+            Console.WriteLine("Serialize:");
+            Console.WriteLine(path);
 
-            using (var stream = ResourceContainerManager.Instance.OpenResource(uri))
+            using (var stream = File.Open(path, FileMode.Open))
             using (var reader = new StreamReader(stream))
             {
                 string line;
@@ -164,9 +162,13 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml.Demo
             }
             Console.WriteLine();
 
-            // Load.
-            var loadedObject = ResourceManager.Instance.Load<AnimalManager>(uri);
-            Console.WriteLine("Load:");
+            // Deserialize.
+            AnimalManager loadedObject;
+            using (var stream = File.Open(path, FileMode.Open))
+            {
+                loadedObject = XmlSerializerAdapter.Instance.Deserialize<AnimalManager>(stream);
+            }
+            Console.WriteLine("Deserialize:");
             Console.WriteLine(loadedObject);
             Console.WriteLine();
 

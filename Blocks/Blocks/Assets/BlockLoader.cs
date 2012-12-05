@@ -2,7 +2,6 @@
 
 using System;
 using Willcraftia.Xna.Framework.Assets;
-using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -14,7 +13,7 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         public object Load(AssetManager assetManager, Uri uri)
         {
-            var resource = ResourceManager.Instance.Load<BlockDefinition>(uri);
+            var resource = ResourceSerializer.Deserialize<BlockDefinition>(uri);
 
             var block = new Block();
 
@@ -92,7 +91,8 @@ namespace Willcraftia.Xna.Blocks.Assets
             resource.DynamicFriction = block.DynamicFriction;
             resource.Restitution = block.Restitution;
 
-            ResourceManager.Instance.Save(uri, resource);
+            ResourceSerializer.Serialize<BlockDefinition>(uri, resource);
+
             block.Uri = uri;
         }
     }

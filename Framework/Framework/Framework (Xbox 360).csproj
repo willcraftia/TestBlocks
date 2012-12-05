@@ -96,7 +96,6 @@
     <Compile Include="Assets\AssetManager.cs" />
     <Compile Include="Assets\IAssetLoader.cs" />
     <Compile Include="Assets\NoCacheContentManager.cs" />
-    <Compile Include="Assets\Texture2DLoader.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="Cameras\PerspectiveFov.cs" />
     <Compile Include="Cameras\ProjectionBase.cs" />
@@ -133,8 +132,10 @@
     <Compile Include="Pool.cs" />
     <Compile Include="Projection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\IResourceLoader.cs" />
-    <Compile Include="Serialization\ResourceManager.cs" />
+    <Compile Include="Serialization\ExtensionSerializerRegistory.cs" />
+    <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="Serialization\ISerializerRegistory.cs" />
+    <Compile Include="Serialization\SerializerManager.cs" />
     <Compile Include="ServiceProviderExtension.cs" />
     <Compile Include="Storage\StorageManager.cs" />
     <Compile Include="StringBuilderExtension.cs" />

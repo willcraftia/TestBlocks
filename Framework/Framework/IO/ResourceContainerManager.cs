@@ -30,28 +30,28 @@ namespace Willcraftia.Xna.Framework.IO
             return ResolveResourceContainer(uri.Scheme).ReadOnly;
         }
 
-        public bool ResourceExists(Uri uri)
+        public bool Exists(Uri uri)
         {
             if (uri == null) throw new ArgumentNullException("uri");
 
             return ResolveResourceContainer(uri.Scheme).Exists(uri);
         }
 
-        public Stream OpenResource(Uri uri)
+        public Stream Open(Uri uri)
         {
             if (uri == null) throw new ArgumentNullException("uri");
 
             return ResolveResourceContainer(uri.Scheme).Open(uri);
         }
 
-        public Stream CreateResource(Uri uri)
+        public Stream Create(Uri uri)
         {
             if (uri == null) throw new ArgumentNullException("uri");
 
             return ResolveResourceContainer(uri.Scheme).Create(uri);
         }
 
-        public void DeleteResource(Uri uri)
+        public void Delete(Uri uri)
         {
             if (uri == null) throw new ArgumentNullException("uri");
 
@@ -64,7 +64,7 @@ namespace Willcraftia.Xna.Framework.IO
             if (ResourceContainerMap.TryGetValue(scheme, out resourceContainer))
                 return resourceContainer;
 
-            throw new ArgumentException(string.Format("No resource container for '{0}' exists.", scheme));
+            throw new ArgumentException("Resource container not found: " + scheme);
         }
     }
 }

@@ -3,7 +3,6 @@
 using System;
 using System.IO;
 using Newtonsoft.Json;
-using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
@@ -79,21 +78,20 @@ namespace Willcraftia.Xna.Framework.Serialization.Json.Demo
             };
 
             // Test settings.
-            JsonResourceLoader.Instance.Serializer.Formatting = Formatting.Indented;
-
-            // Register JsonResourceLoader.
-            ResourceManager.Instance.LoaderMap[".json"] = JsonResourceLoader.Instance;
+            JsonSerializerAdapter.Instance.JsonSerializer.Formatting = Formatting.Indented;
             
             // Output file path.
             var path = Path.Combine(Directory.GetCurrentDirectory(), "AnimalManager.json");
-            var uri = new Uri(path);
 
-            // Save.
-            ResourceManager.Instance.Save(uri, animalManager);
-            Console.WriteLine("Save:");
-            Console.WriteLine(uri.LocalPath);
+            // Serialize.
+            using (var stream = File.Create(path))
+            {
+                JsonSerializerAdapter.Instance.Serialize(stream, animalManager);
+            }
+            Console.WriteLine("Serialize:");
+            Console.WriteLine(path);
 
-            using (var stream = ResourceContainerManager.Instance.OpenResource(uri))
+            using (var stream = File.Open(path, FileMode.Open))
             using (var reader = new StreamReader(stream))
             {
                 string line;
@@ -101,9 +99,13 @@ namespace Willcraftia.Xna.Framework.Serialization.Json.Demo
             }
             Console.WriteLine();
 
-            // Load.
-            var loadedObject = ResourceManager.Instance.Load<AnimalManager>(uri);
-            Console.WriteLine("Load:");
+            // Deserialize.
+            AnimalManager loadedObject;
+            using (var stream = File.Open(path, FileMode.Open))
+            {
+                loadedObject = JsonSerializerAdapter.Instance.Deserialize<AnimalManager>(stream);
+            }
+            Console.WriteLine("Deserialize:");
             Console.WriteLine(loadedObject);
             Console.WriteLine();
 

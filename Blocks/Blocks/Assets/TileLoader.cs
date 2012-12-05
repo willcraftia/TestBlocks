@@ -4,7 +4,6 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Assets;
-using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -16,7 +15,7 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         public object Load(AssetManager assetManager, Uri uri)
         {
-            var resource = ResourceManager.Instance.Load<TileDefinition>(uri);
+            var resource = ResourceSerializer.Deserialize<TileDefinition>(uri);
 
             var tile = new Tile();
 
@@ -71,7 +70,8 @@ namespace Willcraftia.Xna.Blocks.Assets
             resource.SpecularColor = tile.SpecularColor.PackedValue;
             resource.SpecularPower = tile.SpecularPower;
 
-            ResourceManager.Instance.Save(uri, resource);
+            ResourceSerializer.Serialize<TileDefinition>(uri, resource);
+
             tile.Uri = uri;
         }
 

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public sealed class MeshPartDefinition
+    public struct MeshPartDefinition
     {
         public VertexPositionNormalTexture[] Vertices;
 

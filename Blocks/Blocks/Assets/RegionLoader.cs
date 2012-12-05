@@ -3,7 +3,6 @@
 using System;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
-using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -15,7 +14,7 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         public object Load(AssetManager assetManager, Uri uri)
         {
-            var resource = ResourceManager.Instance.Load<RegionDefinition>(uri);
+            var resource = ResourceSerializer.Deserialize<RegionDefinition>(uri);
 
             var region = new Region();
 
@@ -48,7 +47,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 resource.BlockCatalog = region.BlockCatalog.Uri.OriginalString;
             resource.ChunkBundle = region.ChunkBundleUri.OriginalString;
 
-            ResourceManager.Instance.Save(uri, resource);
+            ResourceSerializer.Serialize<RegionDefinition>(uri, resource);
         }
     }
 }

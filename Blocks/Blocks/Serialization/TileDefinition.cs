@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public sealed class TileDefinition
+    public struct TileDefinition
     {
         //----------------------------
         // Editor/Debug

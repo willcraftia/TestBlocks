@@ -2,7 +2,6 @@
 
 using System;
 using Willcraftia.Xna.Framework.Assets;
-using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -14,7 +13,7 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         public object Load(AssetManager assetManager, Uri uri)
         {
-            var resource = ResourceManager.Instance.Load<BlockCatalogDefinition>(uri);
+            var resource = ResourceSerializer.Deserialize<BlockCatalogDefinition>(uri);
 
             var blockCatalog = new BlockCatalog(resource.Entries.Length);
 
@@ -59,7 +58,8 @@ namespace Willcraftia.Xna.Blocks.Assets
                 };
             }
 
-            ResourceManager.Instance.Save(uri, resource);
+            ResourceSerializer.Serialize<BlockCatalogDefinition>(uri, resource);
+
             blockCatalog.Uri = uri;
         }
     }

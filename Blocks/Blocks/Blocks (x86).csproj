@@ -63,6 +63,8 @@
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\MeshLoader.cs" />
     <Compile Include="Assets\RegionLoader.cs" />
+    <Compile Include="Serialization\ResourceSerializer.cs" />
+    <Compile Include="Assets\Texture2DLoader.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />
     <Compile Include="BlockShape.cs" />

@@ -2,7 +2,6 @@
 
 using System;
 using Willcraftia.Xna.Framework.Assets;
-using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -14,19 +13,25 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         public object Load(AssetManager assetManager, Uri uri)
         {
-            var resource = ResourceManager.Instance.Load<MeshDefinition>(uri);
+            var resource = ResourceSerializer.Deserialize<MeshDefinition>(uri);
 
             var mesh = new Mesh();
 
             mesh.Uri = uri;
             mesh.Name = resource.Name;
 
-            if (resource.Top != null) mesh.Top = CreateMeshPart(resource.Top);
-            if (resource.Bottom != null) mesh.Bottom = CreateMeshPart(resource.Bottom);
-            if (resource.Front != null) mesh.Front = CreateMeshPart(resource.Front);
-            if (resource.Back != null) mesh.Back = CreateMeshPart(resource.Back);
-            if (resource.Left != null) mesh.Left = CreateMeshPart(resource.Left);
-            if (resource.Right != null) mesh.Right = CreateMeshPart(resource.Right);
+            if (resource.Top.Vertices != null || resource.Top.Vertices.Length != 0)
+                mesh.Top = CreateMeshPart(resource.Top);
+            if (resource.Bottom.Vertices != null || resource.Bottom.Vertices.Length != 0)
+                mesh.Bottom = CreateMeshPart(resource.Bottom);
+            if (resource.Front.Vertices != null || resource.Front.Vertices.Length != 0)
+                mesh.Front = CreateMeshPart(resource.Front);
+            if (resource.Back.Vertices != null || resource.Back.Vertices.Length != 0)
+                mesh.Back = CreateMeshPart(resource.Back);
+            if (resource.Left.Vertices != null || resource.Left.Vertices.Length != 0)
+                mesh.Left = CreateMeshPart(resource.Left);
+            if (resource.Right.Vertices != null || resource.Right.Vertices.Length != 0)
+                mesh.Right = CreateMeshPart(resource.Right);
 
             return mesh;
         }
@@ -52,7 +57,8 @@ namespace Willcraftia.Xna.Blocks.Assets
             if (mesh.Left != null) resource.Left = CreateMeshPartDefinition(mesh.Left);
             if (mesh.Right != null) resource.Right = CreateMeshPartDefinition(mesh.Right);
 
-            ResourceManager.Instance.Save(uri, resource);
+            ResourceSerializer.Serialize<MeshDefinition>(uri, resource);
+
             mesh.Uri = uri;
         }
 

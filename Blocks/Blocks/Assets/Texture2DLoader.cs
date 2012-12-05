@@ -2,11 +2,12 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Assets
+namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class Texture2DLoader : IAssetLoader
     {
@@ -21,7 +22,7 @@ namespace Willcraftia.Xna.Framework.Assets
 
         public object Load(AssetManager assetManager, Uri uri)
         {
-            using (var stream = ResourceContainerManager.Instance.OpenResource(uri))
+            using (var stream = ResourceContainerManager.Instance.Open(uri))
             {
                 var result = Texture2D.FromStream(graphicsDevice, stream);
                 result.Name = uri.OriginalString;
@@ -44,7 +45,7 @@ namespace Willcraftia.Xna.Framework.Assets
             if (texture == null)
                 throw new ArgumentException(string.Format("The unexpected asset is specified: {0}", asset.GetType()));
 
-            using (var stream = ResourceContainerManager.Instance.CreateResource(uri))
+            using (var stream = ResourceContainerManager.Instance.Create(uri))
             {
                 // PNG format only.
                 texture.SaveAsPng(stream, texture.Width, texture.Height);

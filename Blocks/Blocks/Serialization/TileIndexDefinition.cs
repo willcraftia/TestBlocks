@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public sealed class TileIndexDefinition
+    public struct TileIndexDefinition
     {
         public byte Index;
 

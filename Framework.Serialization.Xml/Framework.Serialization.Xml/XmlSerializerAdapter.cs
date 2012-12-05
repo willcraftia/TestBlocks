@@ -11,17 +11,23 @@ using System.Xml.Serialization;
 
 namespace Willcraftia.Xna.Framework.Serialization.Xml
 {
-    public sealed class XmlResourceLoader : IResourceLoader
+    public sealed class XmlSerializerAdapter : ISerializer
     {
-        public static readonly XmlResourceLoader Instance = new XmlResourceLoader();
+        public static readonly XmlSerializerAdapter Instance = new XmlSerializerAdapter();
 
         Dictionary<Type, XmlSerializer> cache = new Dictionary<Type, XmlSerializer>();
+
+        // I/F
+        public bool CanDeserializeIntoExistingObject
+        {
+            get { return false; }
+        }
         
         public XmlWriterSettings WriterSettings { get; private set; }
 
         public XmlReaderSettings ReaderSettings { get; private set; }
 
-        XmlResourceLoader()
+        XmlSerializerAdapter()
         {
             WriterSettings = new XmlWriterSettings
             {
@@ -38,9 +44,22 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
             };
         }
 
-        public object Load(Uri uri, Stream stream, Type type)
+        // I/F
+        public T Deserialize<T>(Stream stream)
         {
-            var serializer = GetSerializer(type);
+            return (T) Deserialize(stream, typeof(T), null);
+        }
+
+        // I/F
+        public T Deserialize<T>(Stream stream, T existingInstance) where T : class
+        {
+            return Deserialize(stream, typeof(T), existingInstance) as T;
+        }
+
+        // I/F
+        public object Deserialize(Stream stream, Type type, object existingInstance)
+        {
+            var serializer = GetXmlSerializer(type);
 
             using (var reader = CreateXmlReader(stream))
             {
@@ -48,9 +67,10 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
             }
         }
 
-        public void Save(Uri uri, Stream stream, object resource)
+        // I/F
+        public void Serialize(Stream stream, object resource)
         {
-            var serializer = GetSerializer(resource.GetType());
+            var serializer = GetXmlSerializer(resource.GetType());
 
             using (var writer = CreateXmlWriter(stream))
             {
@@ -58,7 +78,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
             }
         }
 
-        public XmlSerializer GetSerializer(Type type)
+        public XmlSerializer GetXmlSerializer(Type type)
         {
             lock (cache)
             {

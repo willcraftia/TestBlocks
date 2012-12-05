@@ -3,7 +3,6 @@
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Assets;
-using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -24,7 +23,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         public object Load(AssetManager assetManager, Uri uri)
         {
-            var resource = ResourceManager.Instance.Load<TileCatalogDefinition>(uri);
+            var resource = ResourceSerializer.Deserialize<TileCatalogDefinition>(uri);
 
             var tileCatalog = new TileCatalog(graphicsDevice, resource.Entries.Length);
 
@@ -72,7 +71,8 @@ namespace Willcraftia.Xna.Blocks.Assets
                 };
             }
 
-            ResourceManager.Instance.Save(uri, resource);
+            ResourceSerializer.Serialize<TileCatalogDefinition>(uri, resource);
+
             tileCatalog.Uri = uri;
         }
     }

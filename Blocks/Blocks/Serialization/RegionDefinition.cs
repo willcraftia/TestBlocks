@@ -7,7 +7,7 @@ using Willcraftia.Xna.Framework;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public sealed class RegionDefinition
+    public struct RegionDefinition
     {
         //----------------------------
         // Editor/Debug

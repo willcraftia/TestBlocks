@@ -95,6 +95,7 @@
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\MeshLoader.cs" />
     <Compile Include="Assets\RegionLoader.cs" />
+    <Compile Include="Assets\Texture2DLoader.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />
     <Compile Include="BlockShape.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
+    <Compile Include="Serialization\ResourceSerializer.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
     <Compile Include="Serialization\TileIndexDefinition.cs" />
