@@ -126,9 +126,12 @@
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionCollection.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
+    <Compile Include="MathExtension.cs" />
     <Compile Include="Noise\Add.cs" />
     <Compile Include="Noise\Billow.cs" />
     <Compile Include="Noise\ClassicPerlin.cs" />
+    <Compile Include="Noise\FadeCurves.cs" />
+    <Compile Include="Noise\Gradient.cs" />
     <Compile Include="Noise\Heterofractal.cs" />
     <Compile Include="Noise\HybridMultifractal.cs" />
     <Compile Include="Noise\IModule.cs" />
@@ -139,7 +142,6 @@
     <Compile Include="Noise\Musgrave.cs" />
     <Compile Include="Noise\NoiseArray2.cs" />
     <Compile Include="Noise\NoiseArrayF2Extension.cs" />
-    <Compile Include="Noise\NoiseHelper.cs" />
     <Compile Include="Noise\NoiseMapBuilder.cs" />
     <Compile Include="Noise\Perlin.cs" />
     <Compile Include="Noise\PerlinFractal.cs" />

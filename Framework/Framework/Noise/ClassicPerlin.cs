@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int seed = Environment.TickCount;
 
-        Func<float, float> fadeCurve = NoiseHelper.SCurve3;
+        Func<float, float> fadeCurve = FadeCurves.SCurve3;
 
         Random random;
 

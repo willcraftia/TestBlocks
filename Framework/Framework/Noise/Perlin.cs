@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int seed = Environment.TickCount;
 
-        Func<float, float> fadeCurve = NoiseHelper.SCurve3;
+        Func<float, float> fadeCurve = FadeCurves.SCurve3;
 
         Random random;
 
@@ -62,9 +62,9 @@ namespace Willcraftia.Xna.Framework.Noise
         {
             if (!initialized) Reseed();
 
-            int fx = NoiseHelper.Floor(x);
-            int fy = NoiseHelper.Floor(y);
-            int fz = NoiseHelper.Floor(z);
+            int fx = MathExtension.Floor(x);
+            int fy = MathExtension.Floor(y);
+            int fz = MathExtension.Floor(z);
 
             // Find unit cube that contains point.
             int cx = fx & modMask;
@@ -90,14 +90,14 @@ namespace Willcraftia.Xna.Framework.Noise
             var bb = permutation[b + 1] + cz;
 
             // Gradients of the 8 cube corners.
-            var g0 = NoiseHelper.CalculateGradient(permutation[aa], rx, ry, rz);
-            var g1 = NoiseHelper.CalculateGradient(permutation[ba], rx - 1, ry, rz);
-            var g2 = NoiseHelper.CalculateGradient(permutation[ab], rx, ry - 1, rz);
-            var g3 = NoiseHelper.CalculateGradient(permutation[bb], rx - 1, ry - 1, rz);
-            var g4 = NoiseHelper.CalculateGradient(permutation[aa + 1], rx, ry, rz - 1);
-            var g5 = NoiseHelper.CalculateGradient(permutation[ba + 1], rx - 1, ry, rz - 1);
-            var g6 = NoiseHelper.CalculateGradient(permutation[ab + 1], rx, ry - 1, rz - 1);
-            var g7 = NoiseHelper.CalculateGradient(permutation[bb + 1], rx - 1, ry - 1, rz - 1);
+            var g0 = Gradients.Calculate(permutation[aa], rx, ry, rz);
+            var g1 = Gradients.Calculate(permutation[ba], rx - 1, ry, rz);
+            var g2 = Gradients.Calculate(permutation[ab], rx, ry - 1, rz);
+            var g3 = Gradients.Calculate(permutation[bb], rx - 1, ry - 1, rz);
+            var g4 = Gradients.Calculate(permutation[aa + 1], rx, ry, rz - 1);
+            var g5 = Gradients.Calculate(permutation[ba + 1], rx - 1, ry, rz - 1);
+            var g6 = Gradients.Calculate(permutation[ab + 1], rx, ry - 1, rz - 1);
+            var g7 = Gradients.Calculate(permutation[bb + 1], rx - 1, ry - 1, rz - 1);
 
             // Lerp.
             var l0 = MathHelper.Lerp(g0, g1, u);

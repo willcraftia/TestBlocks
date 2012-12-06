@@ -86,9 +86,9 @@ namespace Willcraftia.Xna.Framework.Noise
                     {
                         Calculate(x, y, z, out distanceResult);
 
-                        xci = NoiseHelper.Floor(distanceResult.Position0.X);
-                        yci = NoiseHelper.Floor(distanceResult.Position0.Y);
-                        zci = NoiseHelper.Floor(distanceResult.Position0.Z);
+                        xci = MathExtension.Floor(distanceResult.Position0.X);
+                        yci = MathExtension.Floor(distanceResult.Position0.Y);
+                        zci = MathExtension.Floor(distanceResult.Position0.Z);
 
                         if (distanceEnabled)
                             value = distanceResult.Distance0;
@@ -99,9 +99,9 @@ namespace Willcraftia.Xna.Framework.Noise
                     {
                         Calculate(x, y, z, out distanceResult);
 
-                        xci = NoiseHelper.Floor(distanceResult.Position1.X);
-                        yci = NoiseHelper.Floor(distanceResult.Position1.Y);
-                        zci = NoiseHelper.Floor(distanceResult.Position1.Z);
+                        xci = MathExtension.Floor(distanceResult.Position1.X);
+                        yci = MathExtension.Floor(distanceResult.Position1.Y);
+                        zci = MathExtension.Floor(distanceResult.Position1.Z);
 
                         if (distanceEnabled)
                             value = distanceResult.Distance1;
@@ -112,9 +112,9 @@ namespace Willcraftia.Xna.Framework.Noise
                     {
                         Calculate(x, y, z, out distanceResult);
 
-                        xci = NoiseHelper.Floor(distanceResult.Position2.X);
-                        yci = NoiseHelper.Floor(distanceResult.Position2.Y);
-                        zci = NoiseHelper.Floor(distanceResult.Position2.Z);
+                        xci = MathExtension.Floor(distanceResult.Position2.X);
+                        yci = MathExtension.Floor(distanceResult.Position2.Y);
+                        zci = MathExtension.Floor(distanceResult.Position2.Z);
 
                         if (distanceEnabled)
                             value = distanceResult.Distance2;
@@ -125,9 +125,9 @@ namespace Willcraftia.Xna.Framework.Noise
                     {
                         Calculate(x, y, z, out distanceResult);
 
-                        xci = NoiseHelper.Floor(distanceResult.Position3.X);
-                        yci = NoiseHelper.Floor(distanceResult.Position3.Y);
-                        zci = NoiseHelper.Floor(distanceResult.Position3.Z);
+                        xci = MathExtension.Floor(distanceResult.Position3.X);
+                        yci = MathExtension.Floor(distanceResult.Position3.Y);
+                        zci = MathExtension.Floor(distanceResult.Position3.Z);
 
                         if (distanceEnabled)
                             value = distanceResult.Distance3;
@@ -141,9 +141,9 @@ namespace Willcraftia.Xna.Framework.Noise
                         var p = distanceResult.Position1 - distanceResult.Position0;
                         p *= 0.5f;
 
-                        xci = NoiseHelper.Floor(p.X);
-                        yci = NoiseHelper.Floor(p.Y);
-                        zci = NoiseHelper.Floor(p.Z);
+                        xci = MathExtension.Floor(p.X);
+                        yci = MathExtension.Floor(p.Y);
+                        zci = MathExtension.Floor(p.Z);
 
                         if (distanceEnabled)
                             value = distanceResult.Distance1 - distanceResult.Distance0;
@@ -157,9 +157,9 @@ namespace Willcraftia.Xna.Framework.Noise
                         var p = distanceResult.Position2 - distanceResult.Position1;
                         p *= 0.5f;
 
-                        xci = NoiseHelper.Floor(p.X);
-                        yci = NoiseHelper.Floor(p.Y);
-                        zci = NoiseHelper.Floor(p.Z);
+                        xci = MathExtension.Floor(p.X);
+                        yci = MathExtension.Floor(p.Y);
+                        zci = MathExtension.Floor(p.Z);
 
                         if (distanceEnabled)
                             value = distanceResult.Distance2 - distanceResult.Distance1;
@@ -203,9 +203,9 @@ namespace Willcraftia.Xna.Framework.Noise
                 Distance3 = float.MaxValue
             };
 
-            int xi = NoiseHelper.Floor(x);
-            int yi = NoiseHelper.Floor(y);
-            int zi = NoiseHelper.Floor(z);
+            int xi = MathExtension.Floor(x);
+            int yi = MathExtension.Floor(y);
+            int zi = MathExtension.Floor(z);
 
             // NOTE:
             //
