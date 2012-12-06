@@ -33,19 +33,6 @@ Windows ‚Æ Xbox ‘Î‰ž‚Åì¬‚µ‚Ä‚¢‚é‚ªAXbox ‚ÉŠÖ‚µ‚Ä‚Íƒrƒ‹ƒhŠm”F‚ðs‚È‚Á‚Ä‚¢‚é‚Ì‚
 + Framework
 + DotNetZip
 
-## Framework.Noise
-ƒmƒCƒY¶¬‚ÉŠÖ‚·‚éƒNƒ‰ƒX‚ð‚Ü‚Æ‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠB
-
-### ˆË‘¶
-+ Framework
-
-## Framework.Plugins
-
-ƒvƒ‰ƒOƒCƒ“‚ÉŠÖ‚·‚éƒNƒ‰ƒX‚ð‚Ü‚Æ‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠBXbox ‚Å‚Í•s—v‚ÆŽv‚í‚ê‚éB
-
-### ˆË‘¶
-+ Framework
-
 ## Framework.Serialization.Json
 Framework ‚ÉŠÜ‚Ü‚ê‚é ISerializer ƒCƒ“ƒ^ƒtƒF[ƒX‚Ì JSON ŽÀ‘•‚ðŠÜ‚Þƒ‰ƒCƒuƒ‰ƒŠB
 Xbox ƒrƒ‹ƒh‚Å‚Í Mock ŽÀ‘•B

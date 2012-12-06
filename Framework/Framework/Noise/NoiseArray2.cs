@@ -7,9 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.Noise
 {
-    public class Map<T> : IMap<T>
+    public class NoiseArray2<T> : INoiseArray2<T>
     {
         public readonly T[] Values;
 
@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Framework
             set { Values[x + y * width] = value; }
         }
 
-        public Map(int width, int height)
+        public NoiseArray2(int width, int height)
         {
             if (width < 0) throw new ArgumentOutOfRangeException("width");
             if (height < 0) throw new ArgumentOutOfRangeException("height");

@@ -4,9 +4,9 @@ using System;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.Noise
 {
-    public interface IMap<T>
+    public interface INoiseArray2<T>
     {
         int Width { get; }
 

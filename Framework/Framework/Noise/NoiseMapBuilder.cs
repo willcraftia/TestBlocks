@@ -11,9 +11,9 @@ namespace Willcraftia.Xna.Framework.Noise
     {
         SampleSourceDelegate source;
 
-        IMap<float> destination;
+        INoiseArray2<float> destination;
 
-        Bounds bounds = Bounds.One;
+        RectangleF bounds = RectangleF.One;
 
         bool seamlessEnabled;
 
@@ -23,13 +23,13 @@ namespace Willcraftia.Xna.Framework.Noise
             set { source = value; }
         }
 
-        public IMap<float> Destination
+        public INoiseArray2<float> Destination
         {
             get { return destination; }
             set { destination = value; }
         }
 
-        public Bounds Bounds
+        public RectangleF Bounds
         {
             get { return bounds; }
             set { bounds = value; }
@@ -44,11 +44,11 @@ namespace Willcraftia.Xna.Framework.Noise
         public void Build()
         {
             if (destination == null)
-                throw new InvalidOperationException("NoiseMap is null.");
+                throw new InvalidOperationException("Destination is null.");
             if (bounds.Width <= 0)
-                throw new InvalidOperationException(string.Format("Bounds.Width <= 0: {0}", bounds.Width));
+                throw new InvalidOperationException("Bounds.Width <= 0");
             if (bounds.Height <= 0)
-                throw new InvalidOperationException(string.Format("Bounds.Height <= 0: {0}", bounds.Height));
+                throw new InvalidOperationException("Bounds.Height <= 0");
 
             var w = destination.Width;
             var h = destination.Height;

@@ -4,16 +4,16 @@ using System;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.Noise
 {
-    public static class FloatMapExtension
+    public static class NoiseArrayF2Extension
     {
-        public static float Min(this IMap<float> map)
+        public static float Min(this INoiseArray2<float> map)
         {
             return Min(map, 0, 0, map.Width, map.Height);
         }
 
-        public static float Min(this IMap<float> map, int startX, int startY, int sizeX, int sizeY)
+        public static float Min(this INoiseArray2<float> map, int startX, int startY, int sizeX, int sizeY)
         {
             float min = float.MaxValue;
 
@@ -24,12 +24,12 @@ namespace Willcraftia.Xna.Framework
             return min;
         }
 
-        public static float Max(this IMap<float> map)
+        public static float Max(this INoiseArray2<float> map)
         {
             return Max(map, 0, 0, map.Width, map.Height);
         }
 
-        public static float Max(this IMap<float> map, int startX, int startY, int sizeX, int sizeY)
+        public static float Max(this INoiseArray2<float> map, int startX, int startY, int sizeX, int sizeY)
         {
             float max = float.MinValue;
 
@@ -40,12 +40,12 @@ namespace Willcraftia.Xna.Framework
             return max;
         }
 
-        public static void MinMax(this IMap<float> map, out float min, out float max)
+        public static void MinMax(this INoiseArray2<float> map, out float min, out float max)
         {
             MinMax(map, 0, 0, map.Width, map.Height, out min, out max);
         }
 
-        public static void MinMax(this IMap<float> map, int startX, int startY, int sizeX, int sizeY, out float min, out float max)
+        public static void MinMax(this INoiseArray2<float> map, int startX, int startY, int sizeX, int sizeY, out float min, out float max)
         {
             min = float.MaxValue;
             max = float.MinValue;
@@ -70,7 +70,7 @@ namespace Willcraftia.Xna.Framework
         //    return map;
         //}
 
-        public static IMap<float> Fill(this IMap<float> map, float value)
+        public static INoiseArray2<float> Fill(this INoiseArray2<float> map, float value)
         {
             for (int y = 0; y < map.Height; y++)
                 for (int x = 0; x < map.Width; x++)
@@ -79,7 +79,7 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static IMap<float> Add(this IMap<float> map, IMap<float> other)
+        public static INoiseArray2<float> Add(this INoiseArray2<float> map, INoiseArray2<float> other)
         {
             for (int y = 0; y < map.Height; y++)
                 for (int x = 0; x < map.Width; x++)
@@ -88,7 +88,7 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static IMap<float> Subtract(this IMap<float> map, IMap<float> other)
+        public static INoiseArray2<float> Subtract(this INoiseArray2<float> map, INoiseArray2<float> other)
         {
             for (int y = 0; y < map.Height; y++)
                 for (int x = 0; x < map.Width; x++)
@@ -97,7 +97,7 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static IMap<float> Multiply(this IMap<float> map, IMap<float> other)
+        public static INoiseArray2<float> Multiply(this INoiseArray2<float> map, INoiseArray2<float> other)
         {
             for (int y = 0; y < map.Height; y++)
                 for (int x = 0; x < map.Width; x++)
@@ -106,7 +106,7 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static IMap<float> Divide(this IMap<float> map, IMap<float> other)
+        public static INoiseArray2<float> Divide(this INoiseArray2<float> map, INoiseArray2<float> other)
         {
             for (int y = 0; y < map.Height; y++)
                 for (int x = 0; x < map.Width; x++)
@@ -115,7 +115,7 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static IMap<float> Multiply(this IMap<float> map, float factor)
+        public static INoiseArray2<float> Multiply(this INoiseArray2<float> map, float factor)
         {
             if (factor == 1)
                 return map;
@@ -127,7 +127,7 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static IMap<float> Normalize(this IMap<float> map)
+        public static INoiseArray2<float> Normalize(this INoiseArray2<float> map)
         {
             float min;
             float max;
@@ -141,7 +141,7 @@ namespace Willcraftia.Xna.Framework
             return Multiply(map, factor);
         }
 
-        public static IMap<float> NormalizeSymmetric(this IMap<float> map)
+        public static INoiseArray2<float> NormalizeSymmetric(this INoiseArray2<float> map)
         {
             float min;
             float max;
@@ -164,12 +164,12 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static IMap<float> Clamp(this IMap<float> map)
+        public static INoiseArray2<float> Clamp(this INoiseArray2<float> map)
         {
             return Clamp(map, 0, 1);
         }
 
-        public static IMap<float> Clamp(this IMap<float> map, float min, float max)
+        public static INoiseArray2<float> Clamp(this INoiseArray2<float> map, float min, float max)
         {
             for (int y = 0; y < map.Height; y++)
             {
@@ -190,7 +190,7 @@ namespace Willcraftia.Xna.Framework
             return map;
         }
 
-        public static void CopyTo(this IMap<float> map, IMap<float> destination)
+        public static void CopyTo(this INoiseArray2<float> map, INoiseArray2<float> destination)
         {
             for (int y = 0; y < map.Height; y++)
                 for (int x = 0; x < map.Width; x++)
