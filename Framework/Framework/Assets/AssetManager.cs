@@ -34,6 +34,7 @@ namespace Willcraftia.Xna.Framework.Assets
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
 
             contentManager = new NoCacheContentManager(serviceProvider);
+            contentManager.RootDirectory = "Content";
             LoaderMap = new Dictionary<Type, IAssetLoader>();
         }
 
