@@ -12,8 +12,8 @@
 			<Z>1</Z>
 		</Max>
 	</Bounds>
-	<TileCatalog>title:Resources/DefaultTileCatalog.json</TileCatalog>
-	<BlockCatalog>title:Resources/DefaultBlockCatalog.json</BlockCatalog>
+	<TileCatalog>title:Resources/DefaultTileCatalog.xml</TileCatalog>
+	<BlockCatalog>title:Resources/DefaultBlockCatalog.xml</BlockCatalog>
 	<ChunkBuilders>
 		<BuilderDefinition>
 			<Type>Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder</Type>
