@@ -6,7 +6,6 @@ using System.Text;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.IO;
-using Willcraftia.Xna.Framework.Storage;
 
 #endregion
 
@@ -51,7 +50,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             logger.InfoBegin("GetChunk: {0}", position);
 
-            var storageContainer = StorageManager.Instance.StorageContainer;
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePath = ResolveFilePath(position);
 
             bool result;
@@ -82,7 +81,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             logger.InfoBegin("AddChunk: {0}", chunk.Position);
 
-            var storageContainer = StorageManager.Instance.StorageContainer;
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
             if (!storageContainer.DirectoryExists(rootDirectory))
                 storageContainer.CreateDirectory(rootDirectory);
@@ -108,7 +107,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void DeleteChunk(Chunk chunk)
         {
-            var storageContainer = StorageManager.Instance.StorageContainer;
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePath = ResolveFilePath(chunk.Position);
 
             storageContainer.DeleteFile(filePath);
@@ -116,7 +115,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void ClearChunks()
         {
-            var storageContainer = StorageManager.Instance.StorageContainer;
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePaths = storageContainer.GetFileNames(regionDirectory + "/*.bin");
 
             foreach (var filePath in filePaths)
@@ -127,7 +126,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void GetChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize)
         {
-            var storageContainer = StorageManager.Instance.StorageContainer;
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
             var filePaths = GetChunkFilePaths();
             if (filePaths.Length == 0)
@@ -164,7 +163,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         string[] GetChunkFilePaths()
         {
-            var storageContainer = StorageManager.Instance.StorageContainer;
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             return storageContainer.GetFileNames(regionDirectory + "/*.bin");
         }
 

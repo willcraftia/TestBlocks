@@ -5,28 +5,23 @@ using Microsoft.Xna.Framework.Storage;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Storage
+namespace Willcraftia.Xna.Framework
 {
     public sealed class StorageManager
     {
-        public static readonly StorageManager Instance = new StorageManager();
+        public static StorageContainer CurrentStorageContainer { get; set; }
 
-        StorageContainer storageContainer;
-
-        public StorageContainer StorageContainer
+        public static StorageContainer RequiredCurrentStorageContainer
         {
             get
             {
-                if (storageContainer == null)
-                    throw new InvalidOperationException("StorageContainer is not opened.");
-
-                return storageContainer;
+                if (CurrentStorageContainer == null)
+                    throw new InvalidOperationException("Storage container not selected.");
+                return CurrentStorageContainer;
             }
         }
 
-        StorageManager() { }
-
-        public void SelectStorageContainer(string storageName)
+        public static void SelectStorageContainer(string storageName)
         {
             if (string.IsNullOrEmpty(storageName))
                 throw new ArgumentException("storageName must be not null or empty.");
@@ -40,7 +35,7 @@ namespace Willcraftia.Xna.Framework.Storage
             var openContainerResult = storageDevice.BeginOpenContainer(storageName, null, null);
             openContainerResult.AsyncWaitHandle.WaitOne();
 
-            storageContainer = storageDevice.EndOpenContainer(openContainerResult);
+            CurrentStorageContainer = storageDevice.EndOpenContainer(openContainerResult);
             openContainerResult.AsyncWaitHandle.Close();
         }
     }

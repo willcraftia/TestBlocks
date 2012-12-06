@@ -17,7 +17,15 @@ Windows ‚Æ Xbox ‘Î‰ž‚Åì¬‚µ‚Ä‚¢‚é‚ªAXbox ‚ÉŠÖ‚µ‚Ä‚Íƒrƒ‹ƒhŠm”F‚ðs‚È‚Á‚Ä‚¢‚é‚Ì‚
 
 ƒfƒtƒHƒ‹ƒg‚Ì Xbox ƒvƒƒWƒFƒNƒg‚ª\¬‚·‚éƒ‰ƒCƒuƒ‰ƒŠ‚Å‚Í Json.NET ‚ð—˜—p‚Å‚«‚È‚¢B‚±‚Ì‚½‚ßAXbox ƒrƒ‹ƒh‚Å‚Í Json.NET ‚ðŠÜ‚ß‚¸A‚±‚ê‚ÉˆË‘¶‚·‚éƒƒ\ƒbƒh‚Í Mock ŽÀ‘•‚Æ‚µ‚Ä‚¢‚éB
 
-# ƒAƒZƒ“ƒuƒŠŠT—v
+# ƒvƒƒWƒFƒNƒg•ªŠ„•ûj
+
+—lX‚ÈƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Å—p‚¢‚é‚±‚Æ‚ª‚Å‚«‚é‚Æl‚¦‚ç‚ê‚éƒNƒ‰ƒX‚ÍAFramework ƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ß‚éB
+‚½‚¾‚µA‘¼‚ÌƒI[ƒvƒ“ƒ\[ƒX ƒ‰ƒCƒuƒ‰ƒŠA‚ ‚é‚¢‚ÍAWindows ‚Å‚Ì‚Ý—˜—p‚Å‚«‚éƒNƒ‰ƒX‚ð—p‚¢‚é‚æ‚¤‚ÈƒNƒ‰ƒX‚ª‚ ‚éê‡A‚»‚ê‚ç‚ðê—p‚ÌƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ßAFramework ƒAƒZƒ“ƒuƒŠ‚Æ‚Í•ª—£‚³‚¹‚éBB
+
+‚Ü‚½AƒuƒƒbƒN¢ŠE‚Ì•\Œ»‚É—p‚¢‚éƒNƒ‰ƒX‚Í Blocks ƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ß‚éB
+‚½‚¾‚µAFramework ƒvƒƒWƒFƒNƒg‚Æ“¯—l‚Ì•ûj‚É‚æ‚èA•K—v‚É‰ž‚¶‚Äê—p‚ÌƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ß‚éB
+
+# ƒvƒƒWƒFƒNƒgŠT—v
 ‚±‚±‚ÅŠJ”­‚µ‚Ä‚¢‚éŽÀÛ‚ÌƒAƒZƒ“ƒuƒŠ–¼‚¨‚æ‚Ñ–¼‘O‹óŠÔ‚Å‚ÍAÚ“ªŒê‚Æ‚µ‚Ä Willcraftia.Xna ‚ð•t‚¯‚Ä‚¢‚é‚ªA‚±‚±‚Å‚Í‚±‚ê‚ðœ‚¢‚½ŠÈ—ª•\‹L‚Å‹LÚ‚·‚éB
 
 ## All

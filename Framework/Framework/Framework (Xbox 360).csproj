@@ -166,7 +166,7 @@
     <Compile Include="Serialization\ISerializerRegistory.cs" />
     <Compile Include="Serialization\SerializerManager.cs" />
     <Compile Include="ServiceProviderExtension.cs" />
-    <Compile Include="Storage\StorageManager.cs" />
+    <Compile Include="StorageManager.cs" />
     <Compile Include="StringBuilderExtension.cs" />
     <Compile Include="Threading\TaskQueue.cs" />
     <Compile Include="VectorI3.cs" />

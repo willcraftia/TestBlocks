@@ -6,8 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
-using Willcraftia.Xna.Framework.Storage;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
 using Willcraftia.Xna.Framework.Serialization.Xml;
@@ -57,7 +57,7 @@ namespace Willcraftia.Xna.Blocks.Assets.Demo
             //================================================================
             // StorageManager
 
-            StorageManager.Instance.SelectStorageContainer("Blocks.Demo.MainGame");
+            StorageManager.SelectStorageContainer("Blocks.Demo.MainGame");
 
             //================================================================
             // JsonSerializerAdapter
