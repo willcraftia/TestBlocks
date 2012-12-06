@@ -60,7 +60,7 @@ System.Xml.Serialization ‚ÉŠÜ‚Ü‚ê‚éƒNƒ‰ƒX‚Ì‚¤‚¿AƒfƒtƒHƒ‹ƒg‚Ì Xbox ƒvƒƒWƒFƒNƒg‚
 + Xbox ƒfƒtƒHƒ‹ƒgŽQÆ‚É‚È‚¢ System.Xml.Serialization “àƒNƒ‰ƒXB
 
 ## Blocks
-ƒuƒƒbƒN‚ð¢ŠE‚ð•\Œ»‚·‚é‚½‚ß‚ÌŠî‘b‚Æ‚È‚éƒNƒ‰ƒX‚ð‚Ü‚Æ‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠB
+ƒuƒƒbƒN¢ŠE‚ð•\Œ»‚·‚é‚½‚ß‚ÌŠî‘b‚Æ‚È‚éƒNƒ‰ƒX‚ð‚Ü‚Æ‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠB
 
 ### ˆË‘¶
 + Framework
