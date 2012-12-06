@@ -2,6 +2,10 @@ TestBlocks
 ==========
 Windows と Xbox 対応で作成しているが、Xbox に関してはビルド確認を行なっているのみであり、Xbox 360 への配置を伴ったデバッグは行なっていない。
 
+また、.NET Compact Framework for Xbox 360 で対応していないクラスも用いており、そのようなクラスを実装する場合にはプロジェクトを分け、Xbox ビルドでは代替実装あるいは Mock 実装として非サポート機能としている。
+
+なお、XNA Game Studio 4.0 における .NET Compact Framework for Xbox 360 のサポート状況については [.NET Compact Framework for Xbox 360 の名前空間、型、およびメンバー](http://msdn.microsoft.com/ja-jp/library/bb203915\(XNAGameStudio.40\).aspx) を参照のこと。
+
 # 依存ライブラリ
 ここに含めている各プロジェクトは、幾つかのオープンソース ライブラリに依存している。このため、各プロジェクトをビルドして実行するには、それらライブラリを自身でダウンロードし、各プロジェクトの [参照設定] でライブラリを関連付ける必要がある。
 
