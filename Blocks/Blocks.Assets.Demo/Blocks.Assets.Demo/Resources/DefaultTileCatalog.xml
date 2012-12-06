@@ -1,0 +1,9 @@
+﻿<TileCatalogDefinition>
+	<Name>Default Tile Catalog</Name>
+	<Entries>
+		<TileIndexDefinition>
+			<Index>0</Index>
+			<Tile>title:Resources/DefaultTile.json</Tile>
+		</TileIndexDefinition>
+	</Entries>
+</TileCatalogDefinition>

@@ -16,7 +16,11 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 
         static Logger()
         {
+#if XBOX
             Appender = DebugAppender.Instance;
+#else
+            Appender = TraceAppender.Instance;
+#endif
         }
 
         public Logger(string category)

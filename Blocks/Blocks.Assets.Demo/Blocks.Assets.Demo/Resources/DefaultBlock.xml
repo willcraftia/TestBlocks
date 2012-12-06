@@ -1,0 +1,17 @@
+﻿<BlockDefinition>
+	<Name>Default Block</Name>
+	<Mesh>title:Resources/Cube.json</Mesh>
+	<TopTile>title:Resources/DefaultTile.json</TopTile>
+	<BottomTile>title:Resources/DefaultTile.json</BottomTile>
+	<FrontTile>title:Resources/DefaultTile.json</FrontTile>
+	<BackTile>title:Resources/DefaultTile.json</BackTile>
+	<LeftTile>title:Resources/DefaultTile.json</LeftTile>
+	<RightTile>title:Resources/DefaultTile.json</RightTile>
+	<Fluid>false</Fluid>
+	<ShadowCasting>true</ShadowCasting>
+	<Shape>Cube</Shape>
+	<Mass>1</Mass>
+	<StaticFriction>0.5</StaticFriction>
+	<DynamicFriction>0.5</DynamicFriction>
+	<Restitution>0.5</Restitution>
+</BlockDefinition>

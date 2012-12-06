@@ -44,7 +44,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             return region;
         }
 
-        IChunkBuilder CreateChunkGenerator(ref ChunkBuilderDefinition definition)
+        IChunkBuilder CreateChunkGenerator(ref BuilderDefinition definition)
         {
             var type = Type.GetType(definition.Type);
             var result = (IChunkBuilder) type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);

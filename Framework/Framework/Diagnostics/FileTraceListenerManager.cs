@@ -15,7 +15,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         static List<TextWriterTraceListener> fileTraceListeners;
 #endif
 
-        [Conditional("TRACE"), Conditional("DEBUG")]
+        [Conditional("TRACE"), Conditional("DEBUG"), Conditional("WINDOWS")]
         public static void Add(string filePath, bool append)
         {
 #if WINDOWS
@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 #endif
         }
 
-        [Conditional("TRACE"), Conditional("DEBUG")]
+        [Conditional("TRACE"), Conditional("DEBUG"), Conditional("WINDOWS")]
         public static void Clear()
         {
 #if WINDOWS

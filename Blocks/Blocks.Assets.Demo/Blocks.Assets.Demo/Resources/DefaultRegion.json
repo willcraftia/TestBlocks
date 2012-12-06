@@ -1,0 +1,29 @@
+{
+  "Name": "Default Region",
+  "Bounds": {
+    "Min": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "Max": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    }
+  },
+  "TileCatalog": "title:Resources/DefaultTileCatalog.json",
+  "BlockCatalog": "title:Resources/DefaultBlockCatalog.json",
+  "ChunkBundle": null,
+  "ChunkBuilders": [
+    {
+      "Type": "Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder",
+      "Properties": [
+        {
+          "Name": "Property1",
+          "Value": "1"
+        }
+      ]
+    }
+  ]
+}

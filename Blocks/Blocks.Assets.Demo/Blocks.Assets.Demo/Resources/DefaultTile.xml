@@ -1,0 +1,9 @@
+﻿<TileDefinition>
+	<Name>Default Tile</Name>
+	<Texture>title:Resources/DefaultTile.png</Texture>
+	<Translucent>false</Translucent>
+	<DiffuseColor>4294967295</DiffuseColor>
+	<EmissiveColor>4278190080</EmissiveColor>
+	<SpecularColor>4278190080</SpecularColor>
+	<SpecularPower>0</SpecularPower>
+</TileDefinition>

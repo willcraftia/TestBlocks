@@ -12,11 +12,17 @@ namespace Willcraftia.Xna.Framework.Serialization
     {
         public static readonly ExtensionSerializerRegistory Instance = new ExtensionSerializerRegistory();
 
-        public Dictionary<string, ISerializer> SerializerMap { get; private set; }
+        Dictionary<string, ISerializer> serializerMap;
+
+        public ISerializer this[string extension]
+        {
+            get { return serializerMap[extension]; }
+            set { serializerMap[extension] = value; }
+        }
 
         ExtensionSerializerRegistory()
         {
-            SerializerMap = new Dictionary<string, ISerializer>();
+            serializerMap = new Dictionary<string, ISerializer>();
         }
 
         // I/F
@@ -25,10 +31,20 @@ namespace Willcraftia.Xna.Framework.Serialization
             var extension = Path.GetExtension(uri.LocalPath);
 
             ISerializer serializer;
-            if (string.IsNullOrEmpty(extension) || !SerializerMap.TryGetValue(extension, out serializer))
+            if (string.IsNullOrEmpty(extension) || !serializerMap.TryGetValue(extension, out serializer))
                 throw new InvalidOperationException("Serializer not found: " + uri);
 
             return serializer;
+        }
+
+        public void Remove(string extension)
+        {
+            serializerMap.Remove(extension);
+        }
+
+        public void Clear()
+        {
+            serializerMap.Clear();
         }
     }
 }

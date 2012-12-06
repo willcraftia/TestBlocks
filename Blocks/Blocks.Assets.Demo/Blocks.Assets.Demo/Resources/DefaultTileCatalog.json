@@ -1,0 +1,9 @@
+{
+  "Name": "Default Tile Catalog",
+  "Entries": [
+    {
+      "Index": 0,
+      "Tile": "title:Resources/DefaultTile.json"
+    }
+  ]
+}

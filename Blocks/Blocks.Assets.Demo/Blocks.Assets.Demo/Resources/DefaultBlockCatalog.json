@@ -1,0 +1,9 @@
+{
+  "Name": "Default Block",
+  "Entries": [
+    {
+      "Index": 1,
+      "Block": "title:Resources/DefaultBlock.json"
+    }
+  ]
+}

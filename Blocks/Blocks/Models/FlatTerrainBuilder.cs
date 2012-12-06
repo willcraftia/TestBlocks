@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class FlatTerrainChunkBuilder : IChunkBuilder
+    public sealed class FlatTerrainBuilder : IChunkBuilder
     {
         public void PopulateProperty(string name, string value)
         {

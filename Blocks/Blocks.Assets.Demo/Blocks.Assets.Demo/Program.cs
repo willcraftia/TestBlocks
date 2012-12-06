@@ -1,6 +1,6 @@
 using System;
 
-namespace Willcraftia.Xna.Blocks.Demo
+namespace Willcraftia.Xna.Blocks.Assets.Demo
 {
 #if WINDOWS || XBOX
     static class Program

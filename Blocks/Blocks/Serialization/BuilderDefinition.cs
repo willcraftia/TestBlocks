@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public struct ChunkBuilderDefinition
+    public struct BuilderDefinition
     {
         // Full name
         public string Type;

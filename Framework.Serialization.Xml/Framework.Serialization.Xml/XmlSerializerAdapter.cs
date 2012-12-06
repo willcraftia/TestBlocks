@@ -2,10 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
@@ -15,9 +17,13 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
     {
         public static readonly XmlSerializerAdapter Instance = new XmlSerializerAdapter();
 
+        static readonly Logger logger = new Logger(typeof(XmlSerializerAdapter).Name);
+
+#if WINDOWS
         XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
 
         Dictionary<Type, XmlSerializer> cache = new Dictionary<Type, XmlSerializer>();
+#endif
 
         // I/F
         public bool CanDeserializeIntoExistingObject
@@ -31,6 +37,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
 
         XmlSerializerAdapter()
         {
+#if WINDOWS
             namespaces.Add(string.Empty, string.Empty);
 
             WriterSettings = new XmlWriterSettings
@@ -46,6 +53,9 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
                 IgnoreProcessingInstructions = true,
                 IgnoreWhitespace = true
             };
+#else
+            logger.Error("Support windows only.");
+#endif
         }
 
         // I/F
@@ -63,25 +73,34 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
         // I/F
         public object Deserialize(Stream stream, Type type, object existingInstance)
         {
+#if WINDOWS
             var serializer = GetXmlSerializer(type);
 
             using (var reader = CreateXmlReader(stream))
             {
                 return serializer.Deserialize(reader);
             }
+#else
+            throw new NotSupportedException("Support windows only.");
+#endif
         }
 
         // I/F
         public void Serialize(Stream stream, object resource)
         {
+#if WINDOWS
             var serializer = GetXmlSerializer(resource.GetType());
 
             using (var writer = CreateXmlWriter(stream))
             {
                 serializer.Serialize(writer, resource, namespaces);
             }
+#else
+            throw new NotSupportedException("Support windows only.");
+#endif
         }
 
+#if WINDOWS
         public XmlSerializer GetXmlSerializer(Type type)
         {
             lock (cache)
@@ -95,6 +114,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml
                 return result;
             }
         }
+#endif
 
         XmlWriter CreateXmlWriter(Stream stream)
         {

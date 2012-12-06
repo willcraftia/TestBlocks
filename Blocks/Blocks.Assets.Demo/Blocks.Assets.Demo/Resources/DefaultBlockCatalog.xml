@@ -1,0 +1,9 @@
+﻿<BlockCatalogDefinition>
+	<Name>Default Block</Name>
+	<Entries>
+		<BlockIndexDefinition>
+			<Index>1</Index>
+			<Block>title:Resources/DefaultBlock.json</Block>
+		</BlockIndexDefinition>
+	</Entries>
+</BlockCatalogDefinition>

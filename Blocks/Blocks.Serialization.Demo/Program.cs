@@ -28,8 +28,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine();
 
             JsonSerializerAdapter.Instance.JsonSerializer.Formatting = Newtonsoft.Json.Formatting.Indented;
-            ExtensionSerializerRegistory.Instance.SerializerMap[".json"] = JsonSerializerAdapter.Instance;
-            ExtensionSerializerRegistory.Instance.SerializerMap[".xml"] = XmlSerializerAdapter.Instance;
+            ExtensionSerializerRegistory.Instance[".json"] = JsonSerializerAdapter.Instance;
+            ExtensionSerializerRegistory.Instance[".xml"] = XmlSerializerAdapter.Instance;
 
             Console.WriteLine("Press Enter to serialize/deserialize resources.");
             Console.ReadLine();
@@ -144,16 +144,16 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
                 TileCatalog = "title:Resources/DefaultTileCatalog.json",
                 BlockCatalog = "title:Resources/DefaultBlockCatalog.json",
-                ChunkBuilders = new ChunkBuilderDefinition[]
+                ChunkBuilders = new BuilderDefinition[]
                 {
-                    new ChunkBuilderDefinition
+                    new BuilderDefinition
                     {
-                        Type = "Willcraftia.Xna.Blocks.Models.FlatTerrainChunkBuilder",
+                        Type = "Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder",
                         Properties = new PropertyDefinition[]
                         {
                             new PropertyDefinition
                             {
-                                Name = "Demo Parameter",
+                                Name = "Property1",
                                 Value = "1"
                             }
                         }

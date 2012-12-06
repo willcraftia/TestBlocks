@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{CA639C0D-289A-43E2-A6F6-43390D7EFCC7}</ProjectGuid>
+    <ProjectGuid>{DABE66B4-81AE-475A-B4AB-7E41B52E171C}</ProjectGuid>
     <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Willcraftia.Xna.Blocks.Demo</RootNamespace>
-    <AssemblyName>Willcraftia.Xna.Blocks.Demo</AssemblyName>
+    <RootNamespace>Willcraftia.Xna.Blocks.Assets.Demo</RootNamespace>
+    <AssemblyName>Willcraftia.Xna.Blocks.Assets.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <XnaPlatform>Windows</XnaPlatform>
     <XnaProfile>HiDef</XnaProfile>
-    <XnaCrossPlatformGroupID>090c45c1-d781-45eb-9762-17641dea2fc5</XnaCrossPlatformGroupID>
+    <XnaCrossPlatformGroupID>13c8ce79-b6ee-4fe3-9b86-1f1d50efc160</XnaCrossPlatformGroupID>
     <XnaOutputType>Game</XnaOutputType>
     <ApplicationIcon>Game.ico</ApplicationIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
@@ -45,6 +45,9 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip.CF">
+      <HintPath>..\..\..\dll\zip-v1.9-CompactFramework\Release\Ionic.Zip.CF.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
       <Private>False</Private>
     </Reference>
@@ -75,6 +78,9 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\dll\Json45r11\Bin\Net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -99,13 +105,74 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="Resources\Cube.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\DefaultBlock.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\DefaultBlockCatalog.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\DefaultRegion.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="Resources\DefaultTile.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="Resources\DefaultTile.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\DefaultTileCatalog.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DemoContent\DemoContent.contentproj">
-      <Name>DemoContent %28Content%29</Name>
-      <XnaReferenceType>Content</XnaReferenceType>
-      <Project>{813D8FDB-D182-4EEF-9A42-67F264788D52}</Project>
+    <ProjectReference Include="..\..\..\Framework.IO.Compression\Framework.IO.Compression\Framework.IO.Compression %28x86%29.csproj">
+      <Project>{6D1E1A14-5C0D-4939-B61F-5E6A4DAA3C46}</Project>
+      <Name>Framework.IO.Compression %28x86%29</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Framework.Serialization.Json\Framework.Serialization.Json\Framework.Serialization.Json %28x86%29.csproj">
+      <Project>{809E91B9-C8FB-457E-B946-8C169AD5B8CA}</Project>
+      <Name>Framework.Serialization.Json %28x86%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Framework.Serialization.Xml\Framework.Serialization.Xml\Framework.Serialization.Xml %28x86%29.csproj">
+      <Project>{6D4E3633-C0F6-4BDF-874F-DDEBC6E87D0B}</Project>
+      <Name>Framework.Serialization.Xml %28x86%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Framework\Framework\Framework %28x86%29.csproj">
+      <Project>{2E15AFAD-6982-45D4-86B3-F5950139EFD8}</Project>
+      <Name>Framework %28x86%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Blocks\Blocks %28x86%29.csproj">
+      <Project>{2FE63614-021F-46F0-9669-B7745639525E}</Project>
+      <Name>Blocks %28x86%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Blocks.Assets.DemoContent\Blocks.Assets.DemoContent.contentproj">
+      <Name>Blocks.Assets.DemoContent %28Content%29</Name>
+      <XnaReferenceType>Content</XnaReferenceType>
+      <Project>{ABF2DB96-8055-4A99-B756-5CBE375AC1E8}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Cube.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\DefaultBlock.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\DefaultBlockCatalog.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\DefaultRegion.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\DefaultTile.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\DefaultTileCatalog.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
