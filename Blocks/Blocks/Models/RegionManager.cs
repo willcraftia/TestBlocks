@@ -50,6 +50,7 @@ namespace Willcraftia.Xna.Blocks.Models
             logger.InfoBegin("LoadRegion: {0}", uri);
 
             var assetManager = new AssetManager(serviceProvider);
+            assetManager.ContentRootDirectory = "Content";
             assetManager.LoaderMap[typeof(Region)] = new RegionLoader();
             assetManager.LoaderMap[typeof(Tile)] = new TileLoader();
             assetManager.LoaderMap[typeof(TileCatalog)] = new TileCatalogLoader(graphicsDevice);

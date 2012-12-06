@@ -77,8 +77,16 @@ namespace Willcraftia.Xna.Blocks.Assets.Demo
         {
             logger.InfoBegin("LoadContent");
 
+            //================================================================
+            // Region
+
             var regionManager = new RegionManager(Services);
             var region = regionManager.LoadRegion(new Uri("title:Resources/DefaultRegion.json"));
+
+            //================================================================
+            // SpriteFont via the asset manager of the region.
+
+            var spriteFont = region.AssetManager.Load<SpriteFont>("content:Fonts/Demo");
 
             logger.InfoEnd("LoadContent");
         }
