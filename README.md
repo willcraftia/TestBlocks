@@ -20,7 +20,7 @@ Windows ‚Æ Xbox ‘Î‰ž‚Åì¬‚µ‚Ä‚¢‚é‚ªAXbox ‚ÉŠÖ‚µ‚Ä‚Íƒrƒ‹ƒhŠm”F‚ðs‚È‚Á‚Ä‚¢‚é‚Ì‚
 # ƒvƒƒWƒFƒNƒg•ªŠ„•ûj
 
 —lX‚ÈƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚Å—p‚¢‚é‚±‚Æ‚ª‚Å‚«‚é‚Æl‚¦‚ç‚ê‚éƒNƒ‰ƒX‚ÍAFramework ƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ß‚éB
-‚½‚¾‚µA‘¼‚ÌƒI[ƒvƒ“ƒ\[ƒX ƒ‰ƒCƒuƒ‰ƒŠA‚ ‚é‚¢‚ÍAWindows ‚Å‚Ì‚Ý—˜—p‚Å‚«‚éƒNƒ‰ƒX‚ð—p‚¢‚é‚æ‚¤‚ÈƒNƒ‰ƒX‚ª‚ ‚éê‡A‚»‚ê‚ç‚ðê—p‚ÌƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ßAFramework ƒAƒZƒ“ƒuƒŠ‚Æ‚Í•ª—£‚³‚¹‚éBB
+‚½‚¾‚µA‘¼‚ÌƒI[ƒvƒ“ƒ\[ƒX ƒ‰ƒCƒuƒ‰ƒŠA‚ ‚é‚¢‚ÍAWindows ‚Å‚Ì‚Ý—˜—p‚Å‚«‚éƒNƒ‰ƒX‚ð—p‚¢‚é‚æ‚¤‚ÈƒNƒ‰ƒX‚ª‚ ‚éê‡A‚»‚ê‚ç‚ðê—p‚ÌƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ßAFramework ƒAƒZƒ“ƒuƒŠ‚Æ‚Í•ª—£‚³‚¹‚éB
 
 ‚Ü‚½AƒuƒƒbƒN¢ŠE‚Ì•\Œ»‚É—p‚¢‚éƒNƒ‰ƒX‚Í Blocks ƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ß‚éB
 ‚½‚¾‚µAFramework ƒvƒƒWƒFƒNƒg‚Æ“¯—l‚Ì•ûj‚É‚æ‚èA•K—v‚É‰ž‚¶‚Äê—p‚ÌƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ß‚éB
