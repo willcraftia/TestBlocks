@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
@@ -16,6 +17,8 @@ namespace Willcraftia.Xna.Framework.Assets
         static readonly Logger logger = new Logger(typeof(AssetManager).Name);
 
         NoCacheContentManager contentManager;
+
+        LruCache<Uri> baseUriCache = new LruCache<Uri>();
 
         Dictionary<string, Uri> stringUriMap = new Dictionary<string, Uri>();
 
@@ -38,8 +41,36 @@ namespace Willcraftia.Xna.Framework.Assets
             LoaderMap = new Dictionary<Type, IAssetLoader>();
         }
 
+        public Uri CreateBaseUri(Uri uri)
+        {
+            if (uri == null) throw new ArgumentNullException("uri");
+            if (!uri.IsAbsoluteUri) throw new ArgumentException("Uri not absolute: " + uri);
+
+            // if uri.AbsolutePath has no slash, basePathPartLength is just zero.
+            var basePathPartLength = uri.AbsolutePath.LastIndexOf('/') + 1;
+            foreach (var cache in baseUriCache)
+            {
+                if (uri.Scheme != cache.Scheme) continue;
+
+                if (cache.AbsolutePath.Length == basePathPartLength &&
+                    uri.AbsolutePath.StartsWith(cache.AbsolutePath))
+                {
+                    return cache;
+                }
+            }
+
+            var baseUriPartLength = uri.AbsoluteUri.LastIndexOf('/') + 1;
+            var baseUriString = uri.AbsoluteUri.Substring(0, baseUriPartLength);
+
+            var result = new Uri(baseUriString);
+            baseUriCache.Add(result);
+            return result;
+        }
+
         public Uri CreateUri(string uriString)
         {
+            if (uriString == null) throw new ArgumentNullException("uriString");
+
             // Try to use a cached Uri instance.
             Uri uri;
             if (!stringUriMap.TryGetValue(uriString, out uri))

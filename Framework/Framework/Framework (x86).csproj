@@ -100,6 +100,7 @@
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="Collections\ListBase.cs" />
+    <Compile Include="Collections\LruCache.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />
     <Compile Include="Diagnostics\DebugLayout.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="StorageManager.cs" />
     <Compile Include="StringBuilderExtension.cs" />
     <Compile Include="Threading\TaskQueue.cs" />
+    <Compile Include="UriHelper.cs" />
     <Compile Include="VectorI3.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>

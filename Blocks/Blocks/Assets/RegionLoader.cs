@@ -21,12 +21,20 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var resource = ResourceSerializer.Deserialize<RegionDefinition>(uri);
 
+            var baseUri = assetManager.CreateBaseUri(uri);
+
             var region = new Region();
 
             region.Uri = uri;
             region.Name = resource.Name;
             region.Bounds = resource.Bounds;
-            region.TileCatalog = assetManager.Load<TileCatalog>(resource.TileCatalog);
+
+            if (!string.IsNullOrEmpty(resource.TileCatalog))
+            {
+                var tileCatalogUri = UriHelper.ResolveAbsoluteUri(baseUri, resource.TileCatalog);
+                region.TileCatalog = assetManager.Load<TileCatalog>(tileCatalogUri);
+            }
+
             region.BlockCatalog = assetManager.Load<BlockCatalog>(resource.BlockCatalog);
             if (resource.ChunkBundle != null) region.ChunkBundleUri = new Uri(resource.ChunkBundle);
 

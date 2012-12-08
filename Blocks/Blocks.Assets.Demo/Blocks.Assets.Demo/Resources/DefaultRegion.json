@@ -12,7 +12,7 @@
       "Z": 1
     }
   },
-  "TileCatalog": "title:Resources/DefaultTileCatalog.json",
+  "TileCatalog": "DefaultTileCatalog.json",
   "BlockCatalog": "title:Resources/DefaultBlockCatalog.json",
   "ChunkBundle": null,
   "ChunkBuilders": [
