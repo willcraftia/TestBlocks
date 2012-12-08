@@ -18,7 +18,7 @@ namespace Willcraftia.Xna.Framework.Assets
 
         NoCacheContentManager contentManager;
 
-        LruCache<Uri> baseUriCache = new LruCache<Uri>();
+        LruCollection<Uri> baseUriCache = new LruCollection<Uri>();
 
         Dictionary<string, Uri> stringUriMap = new Dictionary<string, Uri>();
 

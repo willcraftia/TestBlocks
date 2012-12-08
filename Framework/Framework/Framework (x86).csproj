@@ -100,7 +100,8 @@
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="Collections\ListBase.cs" />
-    <Compile Include="Collections\LruCache.cs" />
+    <Compile Include="Collections\LruCollection.cs" />
+    <Compile Include="Collections\LruDictionary.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />
     <Compile Include="Diagnostics\DebugLayout.cs" />

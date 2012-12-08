@@ -8,13 +8,15 @@ using System.Collections.Generic;
 
 namespace Willcraftia.Xna.Framework.Collections
 {
-    public sealed class LruCache<T> : ICollection<T>
+    public sealed class LruCollection<T> : ICollection<T>
     {
-        #region LruCacheEnumerator
+        #region Enumerator
 
-        struct LruCacheEnumerator : IEnumerator<T>
+        struct Enumerator : IEnumerator<T>
         {
-            LruCache<T> cache;
+            LruCollection<T> collection;
+
+            LinkedListNode<T> node;
 
             LinkedListNode<T> current;
 
@@ -24,32 +26,37 @@ namespace Willcraftia.Xna.Framework.Collections
                 get { return current.Value; }
             }
 
-            public LruCacheEnumerator(LruCache<T> cache)
-            {
-                this.cache = cache;
-                current = cache.list.First;
-            }
-
-            // I/F
-            public void Dispose() { }
-
             // I/F
             object IEnumerator.Current
             {
                 get { return current.Value; }
             }
 
+            public Enumerator(LruCollection<T> collection)
+            {
+                this.collection = collection;
+                node = collection.list.First;
+                current = null;
+            }
+
+            // I/F
+            public void Dispose() { }
+
             // I/F
             public bool MoveNext()
             {
-                current = current.Next;
-                return current != null;
+                if (node == null) return false;
+
+                current = node;
+                node = node.Next;
+                return true;
             }
 
             // I/F
             public void Reset()
             {
-                current = cache.list.First;
+                node = collection.list.First;
+                current = null;
             }
         }
 
@@ -59,7 +66,7 @@ namespace Willcraftia.Xna.Framework.Collections
 
         LinkedList<T> list = new LinkedList<T>();
 
-        Dictionary<T, LinkedListNode<T>> index;
+        Dictionary<T, LinkedListNode<T>> dictionary;
 
         // I/F
         public int Count
@@ -75,23 +82,25 @@ namespace Willcraftia.Xna.Framework.Collections
 
         public int Capacity { get; private set; }
 
-        public LruCache()
+        public LruCollection()
             : this(defaultCapacity)
         {
         }
 
-        public LruCache(int capacity)
+        public LruCollection(int capacity)
         {
-            if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
+            if (capacity <= 0) throw new ArgumentOutOfRangeException("capacity");
 
             Capacity = capacity;
-            index = new Dictionary<T, LinkedListNode<T>>(capacity);
+            dictionary = new Dictionary<T, LinkedListNode<T>>(capacity);
         }
 
         public bool Touch(T item)
         {
+            if (item == null) throw new ArgumentNullException("item");
+
             LinkedListNode<T> node;
-            if (index.TryGetValue(item, out node))
+            if (dictionary.TryGetValue(item, out node))
             {
                 list.Remove(node);
                 list.AddLast(node);
@@ -104,33 +113,37 @@ namespace Willcraftia.Xna.Framework.Collections
         // I/F
         public void Add(T item)
         {
+            if (item == null) throw new ArgumentNullException("item");
+
             if (Touch(item)) return;
 
-            if (Capacity <= Count && Capacity != 0)
-            {
-                var oldest = list.First.Value;
-                Remove(oldest);
-            }
+            if (Capacity <= Count) Remove(list.First.Value);
 
-            index[item] = list.AddLast(item);
+            dictionary[item] = list.AddLast(item);
         }
 
         // I/F
         public void Clear()
         {
             list.Clear();
-            index.Clear();
+            dictionary.Clear();
         }
 
         // I/F
         public bool Contains(T item)
         {
+            if (item == null) throw new ArgumentNullException("item");
+
             return Touch(item);
         }
 
         // I/F
         public void CopyTo(T[] array, int arrayIndex)
         {
+            if (array == null) throw new ArgumentNullException("array");
+            if (arrayIndex < 0 || array.Length <= arrayIndex || array.Length - arrayIndex < Count)
+                throw new ArgumentOutOfRangeException("arrayIndex");
+
             foreach (var item in this)
                 array[arrayIndex++] = item;
         }
@@ -138,24 +151,26 @@ namespace Willcraftia.Xna.Framework.Collections
         // I/F
         public bool Remove(T item)
         {
+            if (item == null) throw new ArgumentNullException("item");
+
             LinkedListNode<T> node;
-            if (!index.TryGetValue(item, out node)) return false;
+            if (!dictionary.TryGetValue(item, out node)) return false;
 
             list.Remove(node);
-            index.Remove(item);
+            dictionary.Remove(item);
             return true;
         }
 
         // I/F
         public IEnumerator<T> GetEnumerator()
         {
-            return new LruCacheEnumerator(this);
+            return new Enumerator(this);
         }
 
         // I/F
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new LruCacheEnumerator(this);
+            return new Enumerator(this);
         }
     }
 }
