@@ -144,9 +144,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
                 TileCatalog = "title:Resources/DefaultTileCatalog.json",
                 BlockCatalog = "title:Resources/DefaultBlockCatalog.json",
-                ChunkBuilders = new BuilderDefinition[]
+                ChunkProcedures = new ProcedureDefinition[]
                 {
-                    new BuilderDefinition
+                    new ProcedureDefinition
                     {
                         Type = "Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder",
                         Properties = new PropertyDefinition[]

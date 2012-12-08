@@ -38,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Uri ChunkBundleUri { get; set; }
 
-        public List<IChunkBuilder> ChunkGenerators { get; set; }
+        public List<IProcedure<Chunk>> ChunkProcesures { get; set; }
 
         public void Initialize()
         {

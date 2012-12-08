@@ -40,6 +40,7 @@ namespace Willcraftia.Xna.Framework.Noise
             initialized = true;
         }
 
+        // I/F
         public float Sample(float x, float y, float z)
         {
             if (!initialized) Reseed();

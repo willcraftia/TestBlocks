@@ -62,10 +62,12 @@
     <Compile Include="Assets\BlockCatalogLoader.cs" />
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\MeshLoader.cs" />
+    <Compile Include="Assets\Procedures.cs" />
     <Compile Include="Assets\RegionLoader.cs" />
-    <Compile Include="Models\FlatTerrainBuilder.cs" />
-    <Compile Include="Models\IChunkBuilder.cs" />
-    <Compile Include="Serialization\BuilderDefinition.cs" />
+    <Compile Include="Models\BiomeElement.cs" />
+    <Compile Include="Models\Biome.cs" />
+    <Compile Include="Models\IProcedure.cs" />
+    <Compile Include="Serialization\ProcedureDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Serialization\ResourceSerializer.cs" />
     <Compile Include="Assets\Texture2DLoader.cs" />

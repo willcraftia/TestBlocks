@@ -91,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
+    <Compile Include="ArrayHelper.cs" />
     <Compile Include="Assets\AssetHolder.cs" />
     <Compile Include="Assets\AssetHolderCollection.cs" />
     <Compile Include="Assets\AssetManager.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Cameras\PerspectiveFov.cs" />
     <Compile Include="Cameras\ProjectionBase.cs" />
     <Compile Include="Cameras\ViewBase.cs" />
+    <Compile Include="CollectionHelper.cs" />
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
@@ -131,7 +133,7 @@
     <Compile Include="Noise\Billow.cs" />
     <Compile Include="Noise\ClassicPerlin.cs" />
     <Compile Include="Noise\FadeCurves.cs" />
-    <Compile Include="Noise\Gradient.cs" />
+    <Compile Include="Noise\Gradients.cs" />
     <Compile Include="Noise\Heterofractal.cs" />
     <Compile Include="Noise\HybridMultifractal.cs" />
     <Compile Include="Noise\IModule.cs" />
@@ -168,6 +170,7 @@
     <Compile Include="Serialization\ISerializerRegistory.cs" />
     <Compile Include="Serialization\SerializerManager.cs" />
     <Compile Include="ServiceProviderExtension.cs" />
+    <Compile Include="StateOutOfRangeException.cs" />
     <Compile Include="StorageManager.cs" />
     <Compile Include="StringBuilderExtension.cs" />
     <Compile Include="Threading\TaskQueue.cs" />

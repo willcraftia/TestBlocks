@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -14,6 +15,8 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class RegionLoader : IAssetLoader
     {
+        static readonly Logger logger = new Logger(typeof(RegionLoader).Name);
+
         public object Load(AssetManager assetManager, Uri uri)
         {
             var resource = ResourceSerializer.Deserialize<RegionDefinition>(uri);
@@ -27,33 +30,21 @@ namespace Willcraftia.Xna.Blocks.Assets
             region.BlockCatalog = assetManager.Load<BlockCatalog>(resource.BlockCatalog);
             if (resource.ChunkBundle != null) region.ChunkBundleUri = new Uri(resource.ChunkBundle);
 
-            if (resource.ChunkBuilders == null)
+            if (ArrayHelper.IsNullOrEmpty(resource.ChunkProcedures))
             {
-                region.ChunkGenerators = new List<IChunkBuilder>(0);
+                region.ChunkProcesures = new List<IProcedure<Chunk>>(0);
             }
             else
             {
-                region.ChunkGenerators = new List<IChunkBuilder>(resource.ChunkBuilders.Length);
-                for (int i = 0; i < resource.ChunkBuilders.Length; i++)
+                region.ChunkProcesures = new List<IProcedure<Chunk>>(resource.ChunkProcedures.Length);
+                for (int i = 0; i < resource.ChunkProcedures.Length; i++)
                 {
-                    var chunkGenerator = CreateChunkGenerator(ref resource.ChunkBuilders[i]);
-                    region.ChunkGenerators.Add(chunkGenerator);
+                    var procedure = Procedures.ToProcedure<Chunk>(ref resource.ChunkProcedures[i]);
+                    region.ChunkProcesures.Add(procedure);
                 }
             }
 
             return region;
-        }
-
-        IChunkBuilder CreateChunkGenerator(ref BuilderDefinition definition)
-        {
-            var type = Type.GetType(definition.Type);
-            var result = (IChunkBuilder) type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
-
-            if (definition.Properties != null)
-                foreach (var property in definition.Properties)
-                    result.PopulateProperty(property.Name, property.Value);
-
-            return result;
         }
 
         public void Unload(AssetManager assetManager, Uri uri, object asset)
@@ -74,6 +65,16 @@ namespace Willcraftia.Xna.Blocks.Assets
             if (region.BlockCatalog != null && region.BlockCatalog.Uri != null)
                 resource.BlockCatalog = region.BlockCatalog.Uri.OriginalString;
             resource.ChunkBundle = region.ChunkBundleUri.OriginalString;
+
+            if (!CollectionHelper.IsNullOrEmpty(resource.ChunkProcedures))
+            {
+                resource.ChunkProcedures = new ProcedureDefinition[region.ChunkProcesures.Count];
+                for (int i = 0; i < region.ChunkProcesures.Count; i++)
+                {
+                    resource.ChunkProcedures[i] = new ProcedureDefinition();
+                    Procedures.ToDefinition(region.ChunkProcesures[i], out resource.ChunkProcedures[i]);
+                }
+            }
 
             ResourceSerializer.Serialize<RegionDefinition>(uri, resource);
         }

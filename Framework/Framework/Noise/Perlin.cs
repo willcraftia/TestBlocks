@@ -34,6 +34,14 @@ namespace Willcraftia.Xna.Framework.Noise
             set { seed = value; }
         }
 
+        public void Reseed()
+        {
+            random = new Random(seed);
+            InitializePermutationTables();
+
+            initialized = true;
+        }
+
         /// <summary>
         /// Gets/sets a curve function that fades the defference between
         /// the coordinates of the input value and
@@ -50,14 +58,7 @@ namespace Willcraftia.Xna.Framework.Noise
             set { fadeCurve = value; }
         }
 
-        public void Reseed()
-        {
-            random = new Random(seed);
-            InitializePermutationTables();
-
-            initialized = true;
-        }
-
+        // I/F
         public float Sample(float x, float y, float z)
         {
             if (!initialized) Reseed();

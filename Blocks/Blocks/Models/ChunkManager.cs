@@ -117,8 +117,8 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 chunk.Position = position;
 
-                foreach (var generator in region.ChunkGenerators)
-                    generator.Build(chunk);
+                foreach (var procedure in region.ChunkProcesures)
+                    procedure.Generate(chunk);
             }
 
             // Register
