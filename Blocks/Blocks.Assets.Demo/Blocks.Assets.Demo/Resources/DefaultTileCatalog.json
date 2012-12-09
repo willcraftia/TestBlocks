@@ -3,7 +3,7 @@
   "Entries": [
     {
       "Index": 0,
-      "Tile": "title:Resources/DefaultTile.json"
+      "Tile": "DefaultTile.json"
     }
   ]
 }

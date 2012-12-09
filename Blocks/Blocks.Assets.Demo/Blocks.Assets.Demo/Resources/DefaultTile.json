@@ -1,6 +1,6 @@
 {
   "Name": "Default Tile",
-  "Texture": "title:Resources/DefaultTile.png",
+  "Texture": "DefaultTile.png",
   "Translucent": false,
   "DiffuseColor": 4294967295,
   "EmissiveColor": 4278190080,

@@ -26,12 +26,13 @@ namespace Willcraftia.Xna.Framework.Serialization
         }
 
         // I/F
-        public ISerializer ResolveSerializer(Uri uri, Type type)
+        public ISerializer ResolveSerializer(IUri uri, Type type)
         {
-            var extension = Path.GetExtension(uri.LocalPath);
+            if (string.IsNullOrEmpty(uri.Extension))
+                throw new InvalidOperationException("Extension not found: " + uri);
 
             ISerializer serializer;
-            if (string.IsNullOrEmpty(extension) || !serializerMap.TryGetValue(extension, out serializer))
+            if (!serializerMap.TryGetValue(uri.Extension, out serializer))
                 throw new InvalidOperationException("Serializer not found: " + uri);
 
             return serializer;

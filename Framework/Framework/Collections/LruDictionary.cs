@@ -212,6 +212,8 @@ namespace Willcraftia.Xna.Framework.Collections
 
         #endregion
 
+        const int defaultCapacity = 100;
+
         Dictionary<TKey, Node> dictionary;
 
         Node head;
@@ -268,6 +270,11 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         public int Capacity { get; private set; }
+
+        public LruDictionary()
+            : this(defaultCapacity)
+        {
+        }
 
         public LruDictionary(int capacity)
         {

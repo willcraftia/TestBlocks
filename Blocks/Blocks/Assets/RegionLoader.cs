@@ -13,15 +13,18 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class RegionLoader : IAssetLoader
+    public sealed class RegionLoader : AssetLoaderBase
     {
         static readonly Logger logger = new Logger(typeof(RegionLoader).Name);
 
-        public object Load(AssetManager assetManager, Uri uri)
+        public RegionLoader(UriManager uriManager)
+            : base(uriManager)
+        {
+        }
+
+        public override object Load(IUri uri)
         {
             var resource = ResourceSerializer.Deserialize<RegionDefinition>(uri);
-
-            var baseUri = assetManager.CreateBaseUri(uri);
 
             var region = new Region();
 
@@ -31,12 +34,21 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             if (!string.IsNullOrEmpty(resource.TileCatalog))
             {
-                var tileCatalogUri = UriHelper.ResolveAbsoluteUri(baseUri, resource.TileCatalog);
-                region.TileCatalog = assetManager.Load<TileCatalog>(tileCatalogUri);
+                var tileCatalogUri = UriManager.Create(uri.BaseUri, resource.TileCatalog);
+                region.TileCatalog = AssetManager.Load<TileCatalog>(tileCatalogUri);
             }
 
-            region.BlockCatalog = assetManager.Load<BlockCatalog>(resource.BlockCatalog);
-            if (resource.ChunkBundle != null) region.ChunkBundleUri = new Uri(resource.ChunkBundle);
+            if (!string.IsNullOrEmpty(resource.BlockCatalog))
+            {
+                var blockCatalogUri = UriManager.Create(uri.BaseUri, resource.BlockCatalog);
+                region.BlockCatalog = AssetManager.Load<BlockCatalog>(blockCatalogUri);
+            }
+
+            if (!string.IsNullOrEmpty(resource.ChunkBundle))
+            {
+                var chunkBundleUri = UriManager.Create(uri.BaseUri, resource.ChunkBundle);
+                region.ChunkBundleUri = chunkBundleUri;
+            }
 
             if (ArrayHelper.IsNullOrEmpty(resource.ChunkProcedures))
             {
@@ -55,12 +67,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             return region;
         }
 
-        public void Unload(AssetManager assetManager, Uri uri, object asset)
-        {
-            // Region と AssetManager は同じ寿命を持つため、GC に委ねるのみである。
-        }
-
-        public void Save(AssetManager assetManager, Uri uri, object asset)
+        public override void Save(IUri uri, object asset)
         {
             var region = asset as Region;
 
@@ -68,11 +75,15 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             resource.Name = region.Name;
             resource.Bounds = region.Bounds;
+            
             if (region.TileCatalog != null && region.TileCatalog.Uri != null)
-                resource.TileCatalog = region.TileCatalog.Uri.OriginalString;
+                resource.TileCatalog = UriManager.CreateRelativeUri(uri.BaseUri, region.TileCatalog.Uri);
+            
             if (region.BlockCatalog != null && region.BlockCatalog.Uri != null)
-                resource.BlockCatalog = region.BlockCatalog.Uri.OriginalString;
-            resource.ChunkBundle = region.ChunkBundleUri.OriginalString;
+                resource.BlockCatalog = UriManager.CreateRelativeUri(uri.BaseUri, region.BlockCatalog.Uri);
+
+            if (region.ChunkBundleUri != null)
+                resource.ChunkBundle = UriManager.CreateRelativeUri(uri.BaseUri, region.ChunkBundleUri);
 
             if (!CollectionHelper.IsNullOrEmpty(resource.ChunkProcedures))
             {

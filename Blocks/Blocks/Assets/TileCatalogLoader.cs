@@ -2,7 +2,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -10,18 +10,19 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class TileCatalogLoader : IAssetLoader
+    public sealed class TileCatalogLoader : AssetLoaderBase
     {
         GraphicsDevice graphicsDevice;
 
-        public TileCatalogLoader(GraphicsDevice graphicsDevice)
+        public TileCatalogLoader(UriManager uriManager, GraphicsDevice graphicsDevice)
+            : base(uriManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
             this.graphicsDevice = graphicsDevice;
         }
 
-        public object Load(AssetManager assetManager, Uri uri)
+        public override object Load(IUri uri)
         {
             var resource = ResourceSerializer.Deserialize<TileCatalogDefinition>(uri);
 
@@ -32,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             foreach (var entry in resource.Entries)
             {
-                var tile = assetManager.Load<Tile>(entry.Tile);
+                var tile = LoadTile(uri.BaseUri, entry.Tile);
                 tile.Index = entry.Index;
                 tileCatalog.Tiles.Add(tile);
             }
@@ -40,20 +41,13 @@ namespace Willcraftia.Xna.Blocks.Assets
             return tileCatalog;
         }
 
-        public void Unload(AssetManager assetManager, Uri uri, object asset)
+        Tile LoadTile(string baseUri, string tileUri)
         {
-            var tileCatalog = asset as TileCatalog;
-
-            tileCatalog.Uri = null;
-            tileCatalog.Name = null;
-            tileCatalog.Tiles.Clear();
-            tileCatalog.TileMap.Dispose();
-            tileCatalog.DiffuseColorMap.Dispose();
-            tileCatalog.EmissiveColorMap.Dispose();
-            tileCatalog.SpecularColorMap.Dispose();
+            var uri = UriManager.Create(baseUri, tileUri);
+            return AssetManager.Load<Tile>(uri);
         }
 
-        public void Save(AssetManager assetManager, Uri uri, object asset)
+        public override void Save(IUri uri, object asset)
         {
             var tileCatalog = asset as TileCatalog;
 
@@ -67,7 +61,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 resource.Entries[i] = new TileIndexDefinition
                 {
                     Index = tile.Index,
-                    Tile = tile.Uri.OriginalString
+                    Tile = UriManager.CreateRelativeUri(uri.BaseUri, tile.Uri)
                 };
             }
 

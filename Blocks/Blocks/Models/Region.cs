@@ -24,11 +24,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager chunkManager;
 
+        public UriManager UriManager { get; set; }
+
         public AssetManager AssetManager { get; set; }
 
         public IChunkStore ChunkStore { get; set; }
 
-        public Uri Uri { get; set; }
+        public IUri Uri { get; set; }
 
         public string Name { get; set; }
 
@@ -36,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public BlockCatalog BlockCatalog { get; set; }
 
-        public Uri ChunkBundleUri { get; set; }
+        public IUri ChunkBundleUri { get; set; }
 
         public List<IProcedure<Chunk>> ChunkProcesures { get; set; }
 

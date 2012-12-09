@@ -1,12 +1,12 @@
 ﻿<BlockDefinition>
 	<Name>Default Block</Name>
-	<Mesh>title:Resources/Cube.xml</Mesh>
-	<TopTile>title:Resources/DefaultTile.xml</TopTile>
-	<BottomTile>title:Resources/DefaultTile.xml</BottomTile>
-	<FrontTile>title:Resources/DefaultTile.xml</FrontTile>
-	<BackTile>title:Resources/DefaultTile.xml</BackTile>
-	<LeftTile>title:Resources/DefaultTile.xml</LeftTile>
-	<RightTile>title:Resources/DefaultTile.xml</RightTile>
+	<Mesh>title:Resources/Cube.json</Mesh>
+	<TopTile>title:Resources/DefaultTile.json</TopTile>
+	<BottomTile>title:Resources/DefaultTile.json</BottomTile>
+	<FrontTile>title:Resources/DefaultTile.json</FrontTile>
+	<BackTile>title:Resources/DefaultTile.json</BackTile>
+	<LeftTile>title:Resources/DefaultTile.json</LeftTile>
+	<RightTile>title:Resources/DefaultTile.json</RightTile>
 	<Fluid>false</Fluid>
 	<ShadowCasting>true</ShadowCasting>
 	<Shape>Cube</Shape>

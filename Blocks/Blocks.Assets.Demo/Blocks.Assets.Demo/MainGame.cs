@@ -81,12 +81,14 @@ namespace Willcraftia.Xna.Blocks.Assets.Demo
             // Region
 
             var regionManager = new RegionManager(Services);
-            var region = regionManager.LoadRegion(new Uri("title:Resources/DefaultRegion.json"));
+            var region = regionManager.LoadRegion("title:Resources/DefaultRegion.json");
 
             //================================================================
             // SpriteFont via the asset manager of the region.
 
-            var spriteFont = region.AssetManager.Load<SpriteFont>("content:Fonts/Demo");
+            var spriteFontUriString = "content:Fonts/Demo";
+            var spriteFontUri = UriParserRegistory.Instance.GetUriParser(spriteFontUriString).Parse(spriteFontUriString);
+            var spriteFont = region.AssetManager.Load<SpriteFont>(spriteFontUri);
 
             logger.InfoEnd("LoadContent");
         }

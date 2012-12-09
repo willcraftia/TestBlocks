@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
@@ -8,7 +9,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class BlockCatalog
     {
-        public Uri Uri { get; set; }
+        public IUri Uri { get; set; }
 
         public string Name { get; set; }
 

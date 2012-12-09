@@ -7,14 +7,14 @@ using Willcraftia.Xna.Framework.Collections;
 
 namespace Willcraftia.Xna.Framework.Assets
 {
-    public sealed class AssetHolderCollection : KeyedList<Uri, AssetHolder>
+    public sealed class AssetHolderCollection : KeyedList<IUri, AssetHolder>
     {
-        public bool TryGetItem(Uri key, out AssetHolder item)
+        public bool TryGetItem(IUri key, out AssetHolder item)
         {
             return Dictionary.TryGetValue(key, out item);
         }
 
-        protected override Uri GetKeyForItem(AssetHolder item)
+        protected override IUri GetKeyForItem(AssetHolder item)
         {
             return item.Uri;
         }

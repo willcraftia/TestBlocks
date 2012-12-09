@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
@@ -18,7 +19,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Color[] colorBuffer;
 
-        public Uri Uri { get; set; }
+        public IUri Uri { get; set; }
 
         public string Name { get; set; }
 

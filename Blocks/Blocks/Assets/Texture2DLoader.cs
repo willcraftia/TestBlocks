@@ -2,52 +2,52 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework.Assets;
-using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class Texture2DLoader : IAssetLoader
+    public sealed class Texture2DLoader : AssetLoaderBase
     {
         GraphicsDevice graphicsDevice;
 
-        public Texture2DLoader(GraphicsDevice graphicsDevice)
+        public Texture2DLoader(UriManager uriManager, GraphicsDevice graphicsDevice)
+            : base(uriManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
             this.graphicsDevice = graphicsDevice;
         }
 
-        public object Load(AssetManager assetManager, Uri uri)
+        public override object Load(IUri uri)
         {
-            using (var stream = ResourceContainerManager.Instance.Open(uri))
+            using (var stream = uri.Open())
             {
                 var result = Texture2D.FromStream(graphicsDevice, stream);
-                result.Name = uri.OriginalString;
+                result.Name = uri.AbsoluteUri;
                 return result;
             }
         }
 
-        public void Unload(AssetManager assetManager, Uri uri, object asset)
+        public override void Unload(IUri uri, object asset)
         {
             var texture = asset as Texture2D;
             if (texture == null)
-                throw new ArgumentException(string.Format("The unexpected asset is specified: {0}", asset.GetType()));
+                throw new ArgumentException("Invalid asset type: " + asset.GetType());
 
             texture.Dispose();
         }
 
-        public void Save(AssetManager assetManager, Uri uri, object asset)
+        public override void Save(IUri uri, object asset)
         {
             var texture = asset as Texture2D;
             if (texture == null)
-                throw new ArgumentException(string.Format("The unexpected asset is specified: {0}", asset.GetType()));
+                throw new ArgumentException("Invalid asset type: " + asset.GetType());
 
-            using (var stream = ResourceContainerManager.Instance.Create(uri))
+            using (var stream = uri.Create())
             {
-                // PNG format only.
+                // PNG only.
                 texture.SaveAsPng(stream, texture.Width, texture.Height);
             }
         }

@@ -41,7 +41,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             var tile = new TileDefinition
             {
                 Name = "Default Tile",
-                Texture = "title:Resources/DefaultTile.png",
+                Texture = "DefaultTile.png",
                 Translucent = false,
                 DiffuseColor = Color.White.PackedValue,
                 EmissiveColor = Color.Black.PackedValue,
@@ -68,7 +68,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     new TileIndexDefinition
                     {
                         Index = 0,
-                        Tile = "title:Resources/DefaultTile.json"
+                        Tile = "DefaultTile.json"
                     }
                 }
             };
@@ -87,13 +87,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             var block = new BlockDefinition
             {
                 Name = "Default Block",
-                Mesh = "title:Resources/Cube.json",
-                TopTile = "title:Resources/DefaultTile.json",
-                BottomTile = "title:Resources/DefaultTile.json",
-                FrontTile = "title:Resources/DefaultTile.json",
-                BackTile = "title:Resources/DefaultTile.json",
-                LeftTile = "title:Resources/DefaultTile.json",
-                RightTile = "title:Resources/DefaultTile.json",
+                Mesh = "Cube.json",
+                TopTile = "DefaultTile.json",
+                BottomTile = "DefaultTile.json",
+                FrontTile = "DefaultTile.json",
+                BackTile = "DefaultTile.json",
+                LeftTile = "DefaultTile.json",
+                RightTile = "DefaultTile.json",
                 Fluid = false,
                 ShadowCasting = true,
                 Shape = BlockShape.Cube,
@@ -122,7 +122,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     new BlockIndexDefinition
                     {
                         Index = 1,
-                        Block = "title:Resources/DefaultBlock.json"
+                        Block = "DefaultBlock.json"
                     }
                 }
             };
@@ -142,23 +142,23 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 Name = "Default Region",
                 Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
-                TileCatalog = "title:Resources/DefaultTileCatalog.json",
-                BlockCatalog = "title:Resources/DefaultBlockCatalog.json",
-                ChunkProcedures = new ProcedureDefinition[]
-                {
-                    new ProcedureDefinition
-                    {
-                        Type = "Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder",
-                        Properties = new PropertyDefinition[]
-                        {
-                            new PropertyDefinition
-                            {
-                                Name = "Property1",
-                                Value = "1"
-                            }
-                        }
-                    }
-                }
+                TileCatalog = "DefaultTileCatalog.json",
+                BlockCatalog = "DefaultBlockCatalog.json",
+                //ChunkProcedures = new ProcedureDefinition[]
+                //{
+                //    new ProcedureDefinition
+                //    {
+                //        Type = "Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder",
+                //        Properties = new PropertyDefinition[]
+                //        {
+                //            new PropertyDefinition
+                //            {
+                //                Name = "Property1",
+                //                Value = "1"
+                //            }
+                //        }
+                //    }
+                //}
             };
             {
                 var jsonUri = SerializeToJson<RegionDefinition>("DefaultRegion", region);
@@ -188,26 +188,30 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.ReadLine();
         }
 
-        static Uri SerializeToJson<T>(string baseFileName, T resource)
+        static IUri SerializeToJson<T>(string baseFileName, T resource)
         {
-            var uri = new Uri(directoryPath + "/" + baseFileName + ".json");
+            var uriString = "file:///" + directoryPath + "/" + baseFileName + ".json";
+            var parser = UriParserRegistory.Instance.GetUriParser(uriString);
+            var uri = parser.Parse(uriString);
             ResourceSerializer.Serialize<T>(uri, resource);
-            Console.WriteLine("Serialized: " + Path.GetFileName(uri.LocalPath));
+            Console.WriteLine("Serialized: " + Path.GetFileName(uri.AbsoluteUri));
             return uri;
         }
 
-        static Uri SerializeToXml<T>(string baseFileName, T resource)
+        static IUri SerializeToXml<T>(string baseFileName, T resource)
         {
-            var uri = new Uri(directoryPath + "/" + baseFileName + ".xml");
+            var uriString = "file:///" + directoryPath + "/" + baseFileName + ".json";
+            var parser = UriParserRegistory.Instance.GetUriParser(uriString);
+            var uri = parser.Parse(uriString);
             ResourceSerializer.Serialize<T>(uri, resource);
-            Console.WriteLine("Serialized: " + Path.GetFileName(uri.LocalPath));
+            Console.WriteLine("Serialized: " + Path.GetFileName(uri.AbsoluteUri));
             return uri;
         }
 
-        static T Deserialize<T>(Uri uri)
+        static T Deserialize<T>(IUri uri)
         {
             var result = ResourceSerializer.Deserialize<T>(uri);
-            Console.WriteLine("Deserialized: " + Path.GetFileName(uri.LocalPath));
+            Console.WriteLine("Deserialized: " + Path.GetFileName(uri.AbsoluteUri));
             return result;
         }
 

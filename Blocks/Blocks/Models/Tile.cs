@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
@@ -18,13 +19,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte Index { get; set; }
 
-        public Uri Uri { get; set; }
+        public IUri Uri { get; set; }
 
         public string Name { get; set; }
 
         public Texture2D Texture { get; set; }
 
-        public Uri TextureUri { get; set; }
+        public string TextureUri { get; set; }
 
         public bool Translucent { get; set; }
 

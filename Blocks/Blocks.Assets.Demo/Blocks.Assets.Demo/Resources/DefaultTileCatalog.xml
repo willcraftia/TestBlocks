@@ -3,7 +3,7 @@
 	<Entries>
 		<TileIndexDefinition>
 			<Index>0</Index>
-			<Tile>title:Resources/DefaultTile.xml</Tile>
+			<Tile>title:Resources/DefaultTile.json</Tile>
 		</TileIndexDefinition>
 	</Entries>
 </TileCatalogDefinition>

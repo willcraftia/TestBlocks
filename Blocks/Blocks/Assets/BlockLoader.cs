@@ -1,7 +1,7 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -9,9 +9,14 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class BlockLoader : IAssetLoader
+    public sealed class BlockLoader : AssetLoaderBase
     {
-        public object Load(AssetManager assetManager, Uri uri)
+        public BlockLoader(UriManager uriManager)
+            : base(uriManager)
+        {
+        }
+
+        public override object Load(IUri uri)
         {
             var resource = ResourceSerializer.Deserialize<BlockDefinition>(uri);
 
@@ -24,13 +29,18 @@ namespace Willcraftia.Xna.Blocks.Assets
             // AssetManager のキャッシュを前提に、同一 URI ならば同一の Tile を得られるため、
             // TileCatalog を用いないならば、単に Index 未使用として Tile をバインドし、
             // TileCatalog を用いるならば、そこへの Tile の登録で Index が確定することを利用する。
-            if (resource.Mesh != null) block.Mesh = assetManager.Load<Mesh>(resource.Mesh);
-            if (resource.TopTile != null) block.TopTile = assetManager.Load<Tile>(resource.TopTile);
-            if (resource.BottomTile != null) block.BottomTile = assetManager.Load<Tile>(resource.BottomTile);
-            if (resource.FrontTile != null) block.FrontTile = assetManager.Load<Tile>(resource.FrontTile);
-            if (resource.BackTile != null) block.BackTile = assetManager.Load<Tile>(resource.BackTile);
-            if (resource.LeftTile != null) block.LeftTile = assetManager.Load<Tile>(resource.LeftTile);
-            if (resource.RightTile != null) block.RightTile = assetManager.Load<Tile>(resource.RightTile);
+            if (resource.Mesh != null)
+            {
+                var meshUri = UriManager.Create(uri.BaseUri, resource.Mesh);
+                block.Mesh = AssetManager.Load<Mesh>(meshUri);
+            }
+
+            block.TopTile = LoadTile(uri.BaseUri, resource.TopTile);
+            block.BottomTile = LoadTile(uri.BaseUri, resource.BottomTile);
+            block.FrontTile = LoadTile(uri.BaseUri, resource.FrontTile);
+            block.BackTile = LoadTile(uri.BaseUri, resource.BackTile);
+            block.LeftTile = LoadTile(uri.BaseUri, resource.LeftTile);
+            block.RightTile = LoadTile(uri.BaseUri, resource.RightTile);
 
             block.Fluid = resource.Fluid;
             block.ShadowCasting = resource.ShadowCasting;
@@ -44,29 +54,15 @@ namespace Willcraftia.Xna.Blocks.Assets
             return block;
         }
 
-        public void Unload(AssetManager assetManager, Uri uri, object asset)
+        Tile LoadTile(string baseUri, string tileUri)
         {
-            var block = asset as Block;
+            if (tileUri == null) return null;
 
-            block.Uri = null;
-            block.Name = null;
-            block.Mesh = null;
-            block.TopTile = null;
-            block.BottomTile = null;
-            block.FrontTile = null;
-            block.BackTile = null;
-            block.LeftTile = null;
-            block.RightTile = null;
-            block.Fluid = false;
-            block.ShadowCasting = false;
-            block.Shape = BlockShape.Cube;
-            block.Mass = 0;
-            block.StaticFriction = 0;
-            block.DynamicFriction = 0;
-            block.Restitution = 0;
+            var uri = UriManager.Create(baseUri, tileUri);
+            return AssetManager.Load<Tile>(uri);
         }
 
-        public void Save(AssetManager assetManager, Uri uri, object asset)
+        public override void Save(IUri uri, object asset)
         {
             var block = asset as Block;
 
@@ -74,13 +70,15 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             resource.Name = block.Name;
 
-            if (block.Mesh != null) resource.Mesh = block.Mesh.Uri.OriginalString;
-            if (block.TopTile != null) resource.TopTile = block.TopTile.Uri.OriginalString;
-            if (block.BottomTile != null) resource.BottomTile = block.BottomTile.Uri.OriginalString;
-            if (block.FrontTile != null) resource.FrontTile = block.FrontTile.Uri.OriginalString;
-            if (block.BackTile != null) resource.BackTile = block.BackTile.Uri.OriginalString;
-            if (block.LeftTile != null) resource.LeftTile = block.LeftTile.Uri.OriginalString;
-            if (block.RightTile != null) resource.RightTile = block.RightTile.Uri.OriginalString;
+            if (block.Mesh != null && block.Mesh.Uri != null)
+                resource.Mesh = UriManager.CreateRelativeUri(uri.BaseUri, block.Mesh.Uri);
+
+            resource.TopTile = CreateTileUri(uri.BaseUri, block.TopTile.Uri);
+            resource.BottomTile = CreateTileUri(uri.BaseUri, block.BottomTile.Uri);
+            resource.FrontTile = CreateTileUri(uri.BaseUri, block.FrontTile.Uri);
+            resource.BackTile = CreateTileUri(uri.BaseUri, block.BackTile.Uri);
+            resource.LeftTile = CreateTileUri(uri.BaseUri, block.LeftTile.Uri);
+            resource.RightTile = CreateTileUri(uri.BaseUri, block.RightTile.Uri);
 
             resource.Fluid = block.Fluid;
             resource.ShadowCasting = block.ShadowCasting;
@@ -94,6 +92,13 @@ namespace Willcraftia.Xna.Blocks.Assets
             ResourceSerializer.Serialize<BlockDefinition>(uri, resource);
 
             block.Uri = uri;
+        }
+
+        string CreateTileUri(string baseUri, IUri tileUri)
+        {
+            if (tileUri == null) return null;
+
+            return UriManager.CreateRelativeUri(baseUri, tileUri);
         }
     }
 }

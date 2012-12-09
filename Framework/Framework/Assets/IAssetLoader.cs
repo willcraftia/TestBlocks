@@ -8,7 +8,9 @@ namespace Willcraftia.Xna.Framework.Assets
 {
     public interface IAssetLoader
     {
-        object Load(AssetManager assetManager, Uri uri);
+        AssetManager AssetManager { set; }
+
+        object Load(IUri uri);
 
         //
         // Unload は、Dispose すべきプロパティを持つならば、その Dispose を行う。
@@ -24,8 +26,8 @@ namespace Willcraftia.Xna.Framework.Assets
         // ただし、エディタなどで不要となったアセットを即座に解放したい場合など、
         // 特殊な状況下では、個々のアセットについて Unload を呼び出す可能性がある。
         //
-        void Unload(AssetManager assetManager, Uri uri, object asset);
+        void Unload(IUri uri, object asset);
 
-        void Save(AssetManager assetManager, Uri uri, object asset);
+        void Save(IUri uri, object asset);
     }
 }

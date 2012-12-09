@@ -17,12 +17,12 @@ namespace Willcraftia.Xna.Framework.Serialization
             Registory = ExtensionSerializerRegistory.Instance;
         }
 
-        public ISerializer GetSerializer<T>(Uri uri)
+        public ISerializer GetSerializer<T>(IUri uri)
         {
             return GetSerializer(uri, typeof(T));
         }
 
-        public ISerializer GetSerializer(Uri uri, Type type)
+        public ISerializer GetSerializer(IUri uri, Type type)
         {
             return Registory.ResolveSerializer(uri, type);
         }

@@ -3,7 +3,7 @@
 	<Entries>
 		<BlockIndexDefinition>
 			<Index>1</Index>
-			<Block>title:Resources/DefaultBlock.xml</Block>
+			<Block>title:Resources/DefaultBlock.json</Block>
 		</BlockIndexDefinition>
 	</Entries>
 </BlockCatalogDefinition>

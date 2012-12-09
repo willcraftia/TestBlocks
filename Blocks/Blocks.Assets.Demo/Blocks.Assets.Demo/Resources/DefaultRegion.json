@@ -13,17 +13,7 @@
     }
   },
   "TileCatalog": "DefaultTileCatalog.json",
-  "BlockCatalog": "title:Resources/DefaultBlockCatalog.json",
+  "BlockCatalog": "DefaultBlockCatalog.json",
   "ChunkBundle": null,
-  "ChunkBuilders": [
-    {
-      "Type": "Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder",
-      "Properties": [
-        {
-          "Name": "Property1",
-          "Value": "1"
-        }
-      ]
-    }
-  ]
+  "ChunkProcedures": null
 }

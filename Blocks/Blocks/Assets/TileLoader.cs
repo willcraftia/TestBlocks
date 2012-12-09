@@ -3,7 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -11,9 +11,14 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class TileLoader : IAssetLoader
+    public sealed class TileLoader : AssetLoaderBase
     {
-        public object Load(AssetManager assetManager, Uri uri)
+        public TileLoader(UriManager uriManager)
+            : base(uriManager)
+        {
+        }
+
+        public override object Load(IUri uri)
         {
             var resource = ResourceSerializer.Deserialize<TileDefinition>(uri);
 
@@ -21,8 +26,13 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             tile.Uri = uri;
             tile.Name = resource.Name;
-            tile.TextureUri = assetManager.CreateUri(resource.Texture);
-            tile.Texture = assetManager.Load<Texture2D>(tile.TextureUri);
+            
+            //
+            // TODO: absolute URI
+            //
+            
+            tile.TextureUri = resource.Texture;
+            tile.Texture = LoadTexture(uri.BaseUri, tile.TextureUri);
             tile.Translucent = resource.Translucent;
 
             Color color;
@@ -41,29 +51,20 @@ namespace Willcraftia.Xna.Blocks.Assets
             return tile;
         }
 
-        public void Unload(AssetManager assetManager, Uri uri, object asset)
+        Texture2D LoadTexture(string baseUri, string textureUri)
         {
-            var tile = asset as Tile;
-
-            tile.Uri = null;
-            tile.Name = null;
-            tile.TextureUri = null;
-            tile.Texture = null;
-            tile.Translucent = false;
-            tile.DiffuseColor = default(Color);
-            tile.EmissiveColor = default(Color);
-            tile.SpecularColor = default(Color);
-            tile.SpecularPower = 0;
+            var uri = UriManager.Create(baseUri, textureUri);
+            return AssetManager.Load<Texture2D>(uri);
         }
 
-        public void Save(AssetManager assetManager, Uri uri, object asset)
+        public override void Save(IUri uri, object asset)
         {
             var tile = asset as Tile;
 
             var resource = new TileDefinition();
 
             resource.Name = tile.Name;
-            resource.Texture = tile.TextureUri.OriginalString;
+            resource.Texture = tile.TextureUri;
             resource.Translucent = tile.Translucent;
             resource.DiffuseColor = tile.DiffuseColor.PackedValue;
             resource.EmissiveColor = tile.EmissiveColor.PackedValue;

@@ -86,12 +86,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArchiveUri.cs" />
+    <Compile Include="ArchiveUriParser.cs" />
     <Compile Include="CompressionLevel.cs" />
     <Compile Include="CompressionMode.cs" />
     <Compile Include="GZipStream.cs" />
     <Compile Include="IonicUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZipEntryContainer.cs" />
     <Compile Include="ZipEntryStream.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
@@ -9,9 +10,14 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class MeshLoader : IAssetLoader
+    public sealed class MeshLoader : AssetLoaderBase
     {
-        public object Load(AssetManager assetManager, Uri uri)
+        public MeshLoader(UriManager uriManager)
+            : base(uriManager)
+        {
+        }
+
+        public override object Load(IUri uri)
         {
             var resource = ResourceSerializer.Deserialize<MeshDefinition>(uri);
 
@@ -36,13 +42,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             return mesh;
         }
 
-        public void Unload(AssetManager assetManager, Uri uri, object asset)
-        {
-            // 他のアセットへの参照なし。
-            // Dispose が必要なプロパティもなし。
-        }
-
-        public void Save(AssetManager assetManager, Uri uri, object asset)
+        public override void Save(IUri uri, object asset)
         {
             var mesh = asset as Mesh;
 

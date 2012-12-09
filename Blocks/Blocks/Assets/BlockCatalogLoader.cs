@@ -1,7 +1,7 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -9,9 +9,14 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class BlockCatalogLoader : IAssetLoader
+    public sealed class BlockCatalogLoader : AssetLoaderBase
     {
-        public object Load(AssetManager assetManager, Uri uri)
+        public BlockCatalogLoader(UriManager uriManager)
+            : base(uriManager)
+        {
+        }
+
+        public override object Load(IUri uri)
         {
             var resource = ResourceSerializer.Deserialize<BlockCatalogDefinition>(uri);
 
@@ -22,7 +27,8 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             foreach (var entry in resource.Entries)
             {
-                var block = assetManager.Load<Block>(entry.Block);
+                var blockUri = UriManager.Create(uri.BaseUri, entry.Block);
+                var block = AssetManager.Load<Block>(blockUri);
                 block.Index = entry.Index;
                 blockCatalog.Blocks.Add(block);
             }
@@ -30,16 +36,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             return blockCatalog;
         }
 
-        public void Unload(AssetManager assetManager, Uri uri, object asset)
-        {
-            var blockCatalog = asset as BlockCatalog;
-
-            blockCatalog.Uri = null;
-            blockCatalog.Name = null;
-            blockCatalog.Blocks.Clear();
-        }
-
-        public void Save(AssetManager assetManager, Uri uri, object asset)
+        public override void Save(IUri uri, object asset)
         {
             var blockCatalog = asset as BlockCatalog;
 
@@ -51,10 +48,11 @@ namespace Willcraftia.Xna.Blocks.Assets
             for (int i = 0; i < blockCatalog.Blocks.Count; i++)
             {
                 var block = blockCatalog.Blocks[i];
+                var blockUri = UriManager.CreateRelativeUri(uri.BaseUri, block.Uri);
                 resource.Entries[i] = new BlockIndexDefinition
                 {
                     Index = block.Index,
-                    Block = block.Uri.OriginalString
+                    Block = blockUri
                 };
             }
 

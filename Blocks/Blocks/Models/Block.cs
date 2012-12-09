@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
@@ -24,7 +25,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // これが保存要求の URI と異なる場合、AssetManager 内での URI との関連付けを破棄する。
         // その後、保存要求の URI で保存を行い、アセットにその URI を設定する。
 
-        public Uri Uri { get; set; }
+        public IUri Uri { get; set; }
 
         public byte Index { get; set; }
 

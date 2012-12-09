@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
-using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
@@ -12,19 +11,13 @@ namespace Willcraftia.Xna.Framework.Assets
 {
     public sealed class AssetManager : IDisposable
     {
-        public const string ContentScheme = "content";
-
         static readonly Logger logger = new Logger(typeof(AssetManager).Name);
 
         NoCacheContentManager contentManager;
 
-        LruSet<Uri> baseUriCache = new LruSet<Uri>();
-
-        Dictionary<string, Uri> stringUriMap = new Dictionary<string, Uri>();
-
         AssetHolderCollection holders = new AssetHolderCollection();
 
-        public Dictionary<Type, IAssetLoader> LoaderMap { get; private set; }
+        Dictionary<Type, IAssetLoader> loaderMap;
 
         public string ContentRootDirectory
         {
@@ -38,98 +31,67 @@ namespace Willcraftia.Xna.Framework.Assets
 
             contentManager = new NoCacheContentManager(serviceProvider);
             contentManager.RootDirectory = "Content";
-            LoaderMap = new Dictionary<Type, IAssetLoader>();
+            loaderMap = new Dictionary<Type, IAssetLoader>();
         }
 
-        public Uri CreateBaseUri(Uri uri)
+        public void RegisterLoader(Type type, IAssetLoader loader)
         {
-            if (uri == null) throw new ArgumentNullException("uri");
-            if (!uri.IsAbsoluteUri) throw new ArgumentException("Uri not absolute: " + uri);
+            loaderMap[type] = loader;
+            loader.AssetManager = this;
+        }
 
-            // if uri.AbsolutePath has no slash, basePathPartLength is just zero.
-            var basePathPartLength = uri.AbsolutePath.LastIndexOf('/') + 1;
-            foreach (var cache in baseUriCache)
+        public bool Unregister(Type type)
+        {
+            IAssetLoader loader;
+            if (loaderMap.TryGetValue(type, out loader))
             {
-                if (uri.Scheme != cache.Scheme) continue;
-
-                if (cache.AbsolutePath.Length == basePathPartLength &&
-                    uri.AbsolutePath.StartsWith(cache.AbsolutePath))
-                {
-                    return cache;
-                }
+                loader.AssetManager = null;
+                loaderMap.Remove(type);
+                return true;
             }
 
-            var baseUriPartLength = uri.AbsoluteUri.LastIndexOf('/') + 1;
-            var baseUriString = uri.AbsoluteUri.Substring(0, baseUriPartLength);
-
-            var result = new Uri(baseUriString);
-            baseUriCache.Add(result);
-            return result;
+            return false;
         }
 
-        public Uri CreateUri(string uriString)
-        {
-            if (uriString == null) throw new ArgumentNullException("uriString");
-
-            // Try to use a cached Uri instance.
-            Uri uri;
-            if (!stringUriMap.TryGetValue(uriString, out uri))
-                uri = new Uri(uriString);
-
-            return uri;
-        }
-
-        public T Load<T>(string uriString)
-        {
-            return Load<T>(CreateUri(uriString));
-        }
-
-        public T Load<T>(Uri uri)
+        public T Load<T>(IUri uri)
         {
             if (uri == null) throw new ArgumentNullException("uri");
 
-            // Use the cached asset or create a new one.
             AssetHolder holder;
             if (!holders.TryGetItem(uri, out holder)) holder = LoadNew<T>(uri);
 
             return (T) holder.Asset;
         }
 
-        AssetHolder LoadNew<T>(Uri uri)
+        AssetHolder LoadNew<T>(IUri uri)
         {
             logger.InfoBegin("LoadNew: {0}", uri);
 
             object asset;
             IAssetLoader loader;
-            if (ContentScheme == uri.Scheme)
+            if (uri is ContentUri)
             {
                 // XNA content framework
+                asset = contentManager.Load<T>(uri.AbsolutePath);
                 loader = null;
-                asset = contentManager.Load<T>(uri.LocalPath);
             }
             else
             {
                 // My asset framework
                 loader = GetLoader(typeof(T));
-                asset = loader.Load(this, uri);
+                asset = loader.Load(uri);
             }
 
             // Cache
             var holder = new AssetHolder { Uri = uri, Asset = asset, Loader = loader };
             holders.Add(holder);
-            stringUriMap[uri.OriginalString] = uri;
 
             logger.InfoEnd("LoadNew: {0}", uri);
 
             return holder;
         }
 
-        public void Unload(string uriString)
-        {
-            Unload(CreateUri(uriString));
-        }
-
-        public void Unload(Uri uri)
+        public void Unload(IUri uri)
         {
             logger.InfoBegin("Unload: {0}", uri);
 
@@ -142,12 +104,10 @@ namespace Willcraftia.Xna.Framework.Assets
                 }
                 else
                 {
-                    holder.Loader.Unload(this, holder.Uri, holder.Asset);
+                    holder.Loader.Unload(holder.Uri, holder.Asset);
                 }
 
                 holders.Remove(uri);
-                stringUriMap.Remove(uri.OriginalString);
-
                 holder.Uri = null;
                 holder.Asset = null;
                 holder.Loader = null;
@@ -185,17 +145,11 @@ namespace Willcraftia.Xna.Framework.Assets
         // この削除処理では、単に AssetManager でアセットを削除するだけでなく、
         // 削除したいアセットを参照しているクラスから、その参照を取り除く必要がある。
 
-        public void Save<T>(string uriString, T asset)
-        {
-            Save<T>(CreateUri(uriString), asset);
-        }
-
-        public void Save<T>(Uri uri, T asset)
+        public void Save<T>(IUri uri, T asset)
         {
             if (uri == null) throw new ArgumentNullException("uri");
             if (asset == null) throw new ArgumentNullException("asset");
-            if (ContentScheme == uri.Scheme)
-                throw new ArgumentException(string.Format("The scheme '{0}' locates a read-only asset.", uri.Scheme));
+            if (uri.ReadOnly) throw new InvalidOperationException("Read-only uri: " + uri);
 
             logger.InfoBegin("Save: {0}", uri);
 
@@ -225,7 +179,7 @@ namespace Willcraftia.Xna.Framework.Assets
 
             // Save.
             var loader = GetLoader(typeof(T));
-            loader.Save(this, uri, asset);
+            loader.Save(uri, asset);
 
             // Prepare the asset holder.
             var newHolder = oldHolder ?? new AssetHolder();
@@ -235,7 +189,6 @@ namespace Willcraftia.Xna.Framework.Assets
 
             // Cache.
             holders.Add(newHolder);
-            stringUriMap[uri.OriginalString] = uri;
 
             logger.InfoEnd("Save: {0}", uri);
         }
@@ -251,7 +204,7 @@ namespace Willcraftia.Xna.Framework.Assets
 
         bool TryGetLoader(Type type, out IAssetLoader result)
         {
-            if (LoaderMap.TryGetValue(type, out result))
+            if (loaderMap.TryGetValue(type, out result))
                 return true;
 
             // By the interface.
