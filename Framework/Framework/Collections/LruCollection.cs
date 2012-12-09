@@ -115,8 +115,6 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             if (item == null) throw new ArgumentNullException("item");
 
-            if (Touch(item)) return;
-
             if (Capacity <= Count) Remove(list.First.Value);
 
             dictionary[item] = list.AddLast(item);
@@ -144,7 +142,7 @@ namespace Willcraftia.Xna.Framework.Collections
             if (arrayIndex < 0 || array.Length <= arrayIndex || array.Length - arrayIndex < Count)
                 throw new ArgumentOutOfRangeException("arrayIndex");
 
-            foreach (var item in this)
+            foreach (var item in list)
                 array[arrayIndex++] = item;
         }
 
