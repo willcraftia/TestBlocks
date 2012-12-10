@@ -2,25 +2,26 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class Texture2DLoader : AssetLoaderBase
+    public sealed class Texture2DLoader : IAssetLoader
     {
         GraphicsDevice graphicsDevice;
 
-        public Texture2DLoader(ResourceManager resourceManager, GraphicsDevice graphicsDevice)
-            : base(resourceManager)
+        public Texture2DLoader(GraphicsDevice graphicsDevice)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
             this.graphicsDevice = graphicsDevice;
         }
 
-        public override object Load(IResource resource)
+        // I/F
+        public object Load(IResource resource)
         {
             using (var stream = resource.Open())
             {
@@ -30,7 +31,8 @@ namespace Willcraftia.Xna.Blocks.Assets
             }
         }
 
-        public override void Unload(IResource resource, object asset)
+        // I/F
+        public void Unload(IResource resource, object asset)
         {
             var texture = asset as Texture2D;
             if (texture == null)
@@ -39,7 +41,8 @@ namespace Willcraftia.Xna.Blocks.Assets
             texture.Dispose();
         }
 
-        public override void Save(IResource resource, object asset)
+        // I/F
+        public void Save(IResource resource, object asset)
         {
             var texture = asset as Texture2D;
             if (texture == null)

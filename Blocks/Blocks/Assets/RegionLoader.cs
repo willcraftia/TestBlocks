@@ -13,18 +13,20 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class RegionLoader : AssetLoaderBase
+    public sealed class RegionLoader : IAssetLoader, IAssetManagerAware, IResourceManagerAware
     {
         static readonly Logger logger = new Logger(typeof(RegionLoader).Name);
 
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
 
-        public RegionLoader(ResourceManager resourceManager)
-            : base(resourceManager)
-        {
-        }
+        // I/F
+        public AssetManager AssetManager { private get; set; }
 
-        public override object Load(IResource resource)
+        // I/F
+        public ResourceManager ResourceManager { private get; set; }
+
+        // I/F
+        public object Load(IResource resource)
         {
             var definition = (RegionDefinition) serializer.Deserialize(resource);
 
@@ -69,7 +71,11 @@ namespace Willcraftia.Xna.Blocks.Assets
             return region;
         }
 
-        public override void Save(IResource resource, object asset)
+        // I/F
+        public void Unload(IResource resource, object asset) { }
+
+        // I/F
+        public void Save(IResource resource, object asset)
         {
             var region = asset as Region;
 

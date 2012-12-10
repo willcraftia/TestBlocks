@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
@@ -11,16 +12,18 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class TileLoader : AssetLoaderBase
+    public sealed class TileLoader : IAssetLoader, IAssetManagerAware, IResourceManagerAware
     {
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(TileDefinition));
 
-        public TileLoader(ResourceManager resourceManager)
-            : base(resourceManager)
-        {
-        }
+        // I/F
+        public AssetManager AssetManager { private get; set; }
 
-        public override object Load(IResource resource)
+        // I/F
+        public ResourceManager ResourceManager { private get; set; }
+
+        // I/F
+        public object Load(IResource resource)
         {
             var definition = (TileDefinition) serializer.Deserialize(resource);
 
@@ -59,7 +62,11 @@ namespace Willcraftia.Xna.Blocks.Assets
             return AssetManager.Load<Texture2D>(resource);
         }
 
-        public override void Save(IResource resource, object asset)
+        // I/F
+        public void Unload(IResource resource, object asset) { }
+
+        // I/F
+        public void Save(IResource resource, object asset)
         {
             var tile = asset as Tile;
 

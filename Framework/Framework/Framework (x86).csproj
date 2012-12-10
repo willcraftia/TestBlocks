@@ -92,6 +92,8 @@
     <Compile Include="Assets\AssetHolderCollection.cs" />
     <Compile Include="Assets\AssetManager.cs" />
     <Compile Include="Assets\IAssetLoader.cs" />
+    <Compile Include="Assets\IAssetManagerAware.cs" />
+    <Compile Include="Assets\IResourceManagerAware.cs" />
     <Compile Include="Assets\NoCacheContentManager.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="Cameras\PerspectiveFov.cs" />

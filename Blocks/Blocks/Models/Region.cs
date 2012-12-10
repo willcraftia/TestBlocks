@@ -25,8 +25,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager chunkManager;
 
-        public ResourceManager ResourceManager { get; set; }
-
         public AssetManager AssetManager { get; set; }
 
         public IChunkStore ChunkStore { get; set; }

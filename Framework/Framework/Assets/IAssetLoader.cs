@@ -9,8 +9,6 @@ namespace Willcraftia.Xna.Framework.Assets
 {
     public interface IAssetLoader
     {
-        AssetManager AssetManager { set; }
-
         object Load(IResource resource);
 
         //

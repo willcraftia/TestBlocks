@@ -10,16 +10,12 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class MeshLoader : AssetLoaderBase
+    public sealed class MeshLoader : IAssetLoader
     {
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(MeshDefinition));
 
-        public MeshLoader(ResourceManager resourceManager)
-            : base(resourceManager)
-        {
-        }
-
-        public override object Load(IResource resource)
+        // I/F
+        public object Load(IResource resource)
         {
             var definition = (MeshDefinition) serializer.Deserialize(resource);
 
@@ -44,7 +40,11 @@ namespace Willcraftia.Xna.Blocks.Assets
             return mesh;
         }
 
-        public override void Save(IResource resource, object asset)
+        // I/F
+        public void Unload(IResource resource, object asset) { }
+
+        // I/F
+        public void Save(IResource resource, object asset)
         {
             var mesh = asset as Mesh;
 

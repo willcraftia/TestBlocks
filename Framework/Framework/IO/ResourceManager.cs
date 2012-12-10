@@ -115,6 +115,7 @@ namespace Willcraftia.Xna.Framework.IO
         public void ClearCache()
         {
             cache.Clear();
+            relativeUriCache.Clear();
         }
     }
 }

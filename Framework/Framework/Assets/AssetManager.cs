@@ -14,6 +14,8 @@ namespace Willcraftia.Xna.Framework.Assets
     {
         static readonly Logger logger = new Logger(typeof(AssetManager).Name);
 
+        ResourceManager resourceManager;
+
         NoCacheContentManager contentManager;
 
         AssetHolderCollection holders = new AssetHolderCollection();
@@ -26,9 +28,12 @@ namespace Willcraftia.Xna.Framework.Assets
             set { contentManager.RootDirectory = value; }
         }
 
-        public AssetManager(IServiceProvider serviceProvider)
+        public AssetManager(IServiceProvider serviceProvider, ResourceManager resourceManager)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
+            if (resourceManager == null) throw new ArgumentNullException("resourceManager");
+
+            this.resourceManager = resourceManager;
 
             contentManager = new NoCacheContentManager(serviceProvider);
             contentManager.RootDirectory = "Content";
@@ -38,7 +43,12 @@ namespace Willcraftia.Xna.Framework.Assets
         public void RegisterLoader(Type type, IAssetLoader loader)
         {
             loaderMap[type] = loader;
-            loader.AssetManager = this;
+
+            var assetManagerAware = loader as IAssetManagerAware;
+            if (assetManagerAware != null) assetManagerAware.AssetManager = this;
+
+            var resourceManagerAware = loader as IResourceManagerAware;
+            if (resourceManagerAware != null) resourceManagerAware.ResourceManager = resourceManager;
         }
 
         public bool Unregister(Type type)
@@ -46,7 +56,12 @@ namespace Willcraftia.Xna.Framework.Assets
             IAssetLoader loader;
             if (loaderMap.TryGetValue(type, out loader))
             {
-                loader.AssetManager = null;
+                var assetManagerAware = loader as IAssetManagerAware;
+                if (assetManagerAware != null) assetManagerAware.AssetManager = null;
+
+                var resourceManagerAware = loader as IResourceManagerAware;
+                if (resourceManagerAware != null) resourceManagerAware.ResourceManager = null;
+                
                 loaderMap.Remove(type);
                 return true;
             }

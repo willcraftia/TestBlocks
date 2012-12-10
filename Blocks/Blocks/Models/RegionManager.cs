@@ -45,6 +45,23 @@ namespace Willcraftia.Xna.Blocks.Models
             graphicsDevice = graphicsDeviceService.GraphicsDevice;
         }
 
+        //
+        // AssetManager の扱い
+        //
+        // エディタ:
+        //      エディタで一つの AssetManager。
+        //      各モデルは、必ずしも Region に関連付けられるとは限らない。
+        //
+        // ゲーム環境:
+        //      Region で一つの AssetManager。
+        //      各モデルは、必ず一つの Region に関連付けられる。
+        //
+        // ※
+        // 寿命としては ResourceManager も同様。
+        // ただし、ResourceManager は AssetManager から Region をロードするに先駆け、
+        // Region の Resource を解決するために用いられる点に注意する。
+        //
+
         // 非同期呼び出しを想定。
         // Region 丸ごと別スレッドでロードするつもり。
         public Region LoadRegion(string uri)
@@ -55,18 +72,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var resource = resourceManager.Load(uri);
 
-            var assetManager = new AssetManager(serviceProvider);
-            assetManager.RegisterLoader(typeof(Region), new RegionLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(Tile), new TileLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(resourceManager, graphicsDevice));
-            assetManager.RegisterLoader(typeof(Block), new BlockLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(Mesh), new MeshLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(Texture2D), new Texture2DLoader(resourceManager, graphicsDevice));
+            var assetManager = new AssetManager(serviceProvider, resourceManager);
+            assetManager.RegisterLoader(typeof(Region), new RegionLoader());
+            assetManager.RegisterLoader(typeof(Tile), new TileLoader());
+            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(graphicsDevice));
+            assetManager.RegisterLoader(typeof(Block), new BlockLoader());
+            assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader());
+            assetManager.RegisterLoader(typeof(Mesh), new MeshLoader());
+            assetManager.RegisterLoader(typeof(Texture2D), new Texture2DLoader(graphicsDevice));
 
             var region = assetManager.Load<Region>(resource);
             region.ChunkSize = ChunkSize;
-            region.ResourceManager = resourceManager;
             region.AssetManager = assetManager;
             region.ChunkStore = new StorageChunkStore(resource);
             region.Initialize();

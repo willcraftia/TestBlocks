@@ -59,7 +59,6 @@
     <XnaCompressContent>false</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\AssetLoaderBase.cs" />
     <Compile Include="Assets\BlockCatalogLoader.cs" />
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\MeshLoader.cs" />
