@@ -29,46 +29,16 @@ namespace Willcraftia.Xna.Blocks.Assets
         public object Load(IResource resource)
         {
             var definition = (RegionDefinition) serializer.Deserialize(resource);
-
-            var region = new Region();
-
-            region.Resource = resource;
-            region.Name = definition.Name;
-            region.Bounds = definition.Bounds;
-
-            if (!string.IsNullOrEmpty(definition.TileCatalog))
+            return new Region
             {
-                var tileCatalogResource = ResourceManager.Load(resource, definition.TileCatalog);
-                region.TileCatalog = AssetManager.Load<TileCatalog>(tileCatalogResource);
-            }
-
-            if (!string.IsNullOrEmpty(definition.BlockCatalog))
-            {
-                var blockCatalogResource = ResourceManager.Load(resource, definition.BlockCatalog);
-                region.BlockCatalog = AssetManager.Load<BlockCatalog>(blockCatalogResource);
-            }
-
-            if (!string.IsNullOrEmpty(definition.ChunkBundle))
-            {
-                var chunkBundleResource = ResourceManager.Load(resource, definition.ChunkBundle);
-                region.ChunkBundleResource = chunkBundleResource;
-            }
-
-            if (ArrayHelper.IsNullOrEmpty(definition.ChunkProcedures))
-            {
-                region.ChunkProcesures = new List<IProcedure<Chunk>>(0);
-            }
-            else
-            {
-                region.ChunkProcesures = new List<IProcedure<Chunk>>(definition.ChunkProcedures.Length);
-                for (int i = 0; i < definition.ChunkProcedures.Length; i++)
-                {
-                    var procedure = Procedures.ToProcedure<Chunk>(ref definition.ChunkProcedures[i]);
-                    region.ChunkProcesures.Add(procedure);
-                }
-            }
-
-            return region;
+                Resource = resource,
+                Name = definition.Name,
+                Bounds = definition.Bounds,
+                TileCatalog = Load<TileCatalog>(resource, definition.TileCatalog),
+                BlockCatalog = Load<BlockCatalog>(resource, definition.BlockCatalog),
+                ChunkBundleResource = Load(resource, definition.ChunkBundle),
+                ChunkProcesures = ToChunkProcedures(definition.ChunkProcedures)
+            };
         }
 
         // I/F
@@ -76,31 +46,76 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var region = asset as Region;
 
-            var definition = new RegionDefinition();
-
-            definition.Name = region.Name;
-            definition.Bounds = region.Bounds;
-            
-            if (region.TileCatalog != null && region.TileCatalog.Resource != null)
-                definition.TileCatalog = ResourceManager.CreateRelativeUri(resource, region.TileCatalog.Resource);
-            
-            if (region.BlockCatalog != null && region.BlockCatalog.Resource != null)
-                definition.BlockCatalog = ResourceManager.CreateRelativeUri(resource, region.BlockCatalog.Resource);
-
-            if (region.ChunkBundleResource != null)
-                definition.ChunkBundle = ResourceManager.CreateRelativeUri(resource, region.ChunkBundleResource);
-
-            if (!CollectionHelper.IsNullOrEmpty(definition.ChunkProcedures))
+            var definition = new RegionDefinition
             {
-                definition.ChunkProcedures = new ProcedureDefinition[region.ChunkProcesures.Count];
-                for (int i = 0; i < region.ChunkProcesures.Count; i++)
-                {
-                    definition.ChunkProcedures[i] = new ProcedureDefinition();
-                    Procedures.ToDefinition(region.ChunkProcesures[i], out definition.ChunkProcedures[i]);
-                }
-            }
+                Name = region.Name,
+                Bounds = region.Bounds,
+                TileCatalog = ToUri(resource, region.TileCatalog),
+                BlockCatalog = ToUri(resource, region.BlockCatalog),
+                ChunkBundle = ToUri(resource, region.ChunkBundleResource),
+                ChunkProcedures = ToProcedureDefinitions(region.ChunkProcesures)
+            };
 
             serializer.Serialize(resource, definition);
+
+            region.Resource = resource;
+        }
+
+        IResource Load(IResource baseResource, string uri)
+        {
+            if (string.IsNullOrEmpty(uri)) return null;
+
+            return ResourceManager.Load(baseResource, uri);
+        }
+
+        T Load<T>(IResource baseResource, string uri) where T : class
+        {
+            if (string.IsNullOrEmpty(uri)) return null;
+
+            var resource = ResourceManager.Load(baseResource, uri);
+            return AssetManager.Load<T>(resource);
+        }
+
+        List<IProcedure<Chunk>> ToChunkProcedures(ProcedureDefinition[] definitions)
+        {
+            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<IProcedure<Chunk>>(0);
+
+            var list = new List<IProcedure<Chunk>>(definitions.Length);
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                var procedure = Procedures.ToProcedure<Chunk>(ref definitions[i]);
+                list.Add(procedure);
+            }
+
+            return list;
+        }
+
+        string ToUri(IResource baseResource, IResource resource)
+        {
+            if (resource == null) return null;
+
+            return ResourceManager.CreateRelativeUri(baseResource, resource);
+        }
+
+        string ToUri(IResource baseResource, IAsset asset)
+        {
+            if (asset == null || asset.Resource == null) return null;
+
+            return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
+        }
+
+        ProcedureDefinition[] ToProcedureDefinitions(List<IProcedure<Chunk>> procedures)
+        {
+            if (CollectionHelper.IsNullOrEmpty(procedures)) return null;
+
+            var definitions = new ProcedureDefinition[procedures.Count];
+            for (int i = 0; i < procedures.Count; i++)
+            {
+                definitions[i] = new ProcedureDefinition();
+                Procedures.ToDefinition(procedures[i], out definitions[i]);
+            }
+
+            return definitions;
         }
     }
 }

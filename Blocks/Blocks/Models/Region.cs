@@ -11,7 +11,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class Region
+    public sealed class Region : IAsset
     {
         //====================================================================
         // Efficiency
@@ -25,11 +25,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager chunkManager;
 
+        // I/F
+        public IResource Resource { get; set; }
+
         public AssetManager AssetManager { get; set; }
 
         public IChunkStore ChunkStore { get; set; }
-
-        public IResource Resource { get; set; }
 
         public string Name { get; set; }
 

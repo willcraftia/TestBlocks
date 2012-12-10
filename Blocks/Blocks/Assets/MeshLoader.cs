@@ -18,26 +18,17 @@ namespace Willcraftia.Xna.Blocks.Assets
         public object Load(IResource resource)
         {
             var definition = (MeshDefinition) serializer.Deserialize(resource);
-
-            var mesh = new Mesh();
-
-            mesh.Resource = resource;
-            mesh.Name = definition.Name;
-
-            if (definition.Top.Vertices != null || definition.Top.Vertices.Length != 0)
-                mesh.Top = CreateMeshPart(definition.Top);
-            if (definition.Bottom.Vertices != null || definition.Bottom.Vertices.Length != 0)
-                mesh.Bottom = CreateMeshPart(definition.Bottom);
-            if (definition.Front.Vertices != null || definition.Front.Vertices.Length != 0)
-                mesh.Front = CreateMeshPart(definition.Front);
-            if (definition.Back.Vertices != null || definition.Back.Vertices.Length != 0)
-                mesh.Back = CreateMeshPart(definition.Back);
-            if (definition.Left.Vertices != null || definition.Left.Vertices.Length != 0)
-                mesh.Left = CreateMeshPart(definition.Left);
-            if (definition.Right.Vertices != null || definition.Right.Vertices.Length != 0)
-                mesh.Right = CreateMeshPart(definition.Right);
-
-            return mesh;
+            return new Mesh
+            {
+                Resource = resource,
+                Name = definition.Name,
+                Top = ToMeshPart(definition.Top),
+                Bottom = ToMeshPart(definition.Bottom),
+                Front = ToMeshPart(definition.Front),
+                Back = ToMeshPart(definition.Back),
+                Left = ToMeshPart(definition.Left),
+                Right = ToMeshPart(definition.Right)
+            };
         }
 
         // I/F
@@ -45,29 +36,35 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var mesh = asset as Mesh;
 
-            var definition = new MeshDefinition();
-
-            definition.Name = mesh.Name;
-
-            if (mesh.Top != null) definition.Top = CreateMeshPartDefinition(mesh.Top);
-            if (mesh.Bottom != null) definition.Bottom = CreateMeshPartDefinition(mesh.Bottom);
-            if (mesh.Front != null) definition.Front = CreateMeshPartDefinition(mesh.Front);
-            if (mesh.Back != null) definition.Back = CreateMeshPartDefinition(mesh.Back);
-            if (mesh.Left != null) definition.Left = CreateMeshPartDefinition(mesh.Left);
-            if (mesh.Right != null) definition.Right = CreateMeshPartDefinition(mesh.Right);
+            var definition = new MeshDefinition
+            {
+                Name = mesh.Name,
+                Top = ToMeshPartDefinition(mesh.Top),
+                Bottom = ToMeshPartDefinition(mesh.Bottom),
+                Front = ToMeshPartDefinition(mesh.Front),
+                Back = ToMeshPartDefinition(mesh.Back),
+                Left = ToMeshPartDefinition(mesh.Left),
+                Right = ToMeshPartDefinition(mesh.Right)
+            };
 
             serializer.Serialize(resource, definition);
 
             mesh.Resource = resource;
         }
 
-        MeshPart CreateMeshPart(MeshPartDefinition meshPartDefinition)
+        MeshPart ToMeshPart(MeshPartDefinition meshPartDefinition)
         {
+            if (meshPartDefinition.Vertices == null || meshPartDefinition.Vertices.Length == 0 ||
+                meshPartDefinition.Indices == null || meshPartDefinition.Indices.Length == 0)
+                return null;
+
             return new MeshPart(meshPartDefinition.Vertices, meshPartDefinition.Indices);
         }
 
-        MeshPartDefinition CreateMeshPartDefinition(MeshPart meshPart)
+        MeshPartDefinition ToMeshPartDefinition(MeshPart meshPart)
         {
+            if (meshPart == null) return new MeshPartDefinition();
+
             return new MeshPartDefinition
             {
                 Vertices = meshPart.Vertices,

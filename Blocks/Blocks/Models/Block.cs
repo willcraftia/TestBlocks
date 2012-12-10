@@ -7,7 +7,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class Block
+    public sealed class Block : IAsset
     {
         public const byte EmptyIndex = 0;
 
@@ -25,6 +25,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // これが保存要求の URI と異なる場合、AssetManager 内での URI との関連付けを破棄する。
         // その後、保存要求の URI で保存を行い、アセットにその URI を設定する。
 
+        // I/F
         public IResource Resource { get; set; }
 
         public byte Index { get; set; }

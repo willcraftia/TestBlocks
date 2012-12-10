@@ -9,7 +9,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class Tile
+    public sealed class Tile : IAsset
     {
         Vector3 diffuseColor;
 
@@ -17,9 +17,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 specularColor;
 
-        public byte Index { get; set; }
-
+        // I/F
         public IResource Resource { get; set; }
+
+        public byte Index { get; set; }
 
         public string Name { get; set; }
 

@@ -9,7 +9,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class TileCatalog
+    public sealed class TileCatalog : IAsset
     {
         public const int TextureSize = 256;
 
@@ -19,6 +19,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Color[] colorBuffer;
 
+        // I/F
         public IResource Resource { get; set; }
 
         public string Name { get; set; }

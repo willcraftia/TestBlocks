@@ -42,6 +42,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             {
                 // PNG only.
                 texture.SaveAsPng(stream, texture.Width, texture.Height);
+                texture.Name = resource.AbsoluteUri;
             }
         }
     }

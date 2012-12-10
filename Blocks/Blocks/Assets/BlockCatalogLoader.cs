@@ -25,17 +25,20 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var definition = (BlockCatalogDefinition) serializer.Deserialize(resource);
 
-            var blockCatalog = new BlockCatalog(definition.Entries.Length);
-
-            blockCatalog.Resource = resource;
-            blockCatalog.Name = definition.Name;
+            var blockCatalog = new BlockCatalog(definition.Entries.Length)
+            {
+                Resource = resource,
+                Name = definition.Name
+            };
 
             foreach (var entry in definition.Entries)
             {
-                var blockResource = ResourceManager.Load(resource, entry.Block);
-                var block = AssetManager.Load<Block>(blockResource);
-                block.Index = entry.Index;
-                blockCatalog.Blocks.Add(block);
+                var block = Load<Block>(resource, entry.Block);
+                if (block != null)
+                {
+                    block.Index = entry.Index;
+                    blockCatalog.Blocks.Add(block);
+                }
             }
 
             return blockCatalog;
@@ -46,25 +49,40 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var blockCatalog = asset as BlockCatalog;
 
-            var definition = new BlockCatalogDefinition();
+            var definition = new BlockCatalogDefinition
+            {
+                Name = blockCatalog.Name,
+                Entries = new BlockIndexDefinition[blockCatalog.Blocks.Count]
+            };
 
-            definition.Name = blockCatalog.Name;
-
-            definition.Entries = new BlockIndexDefinition[blockCatalog.Blocks.Count];
             for (int i = 0; i < blockCatalog.Blocks.Count; i++)
             {
                 var block = blockCatalog.Blocks[i];
-                var blockUri = ResourceManager.CreateRelativeUri(resource, block.Resource);
                 definition.Entries[i] = new BlockIndexDefinition
                 {
                     Index = block.Index,
-                    Block = blockUri
+                    Block = ToUri(resource, block)
                 };
             }
 
             serializer.Serialize(resource, definition);
 
             blockCatalog.Resource = resource;
+        }
+
+        T Load<T>(IResource baseResource, string uri) where T : class
+        {
+            if (string.IsNullOrEmpty(uri)) return null;
+
+            var resource = ResourceManager.Load(baseResource, uri);
+            return AssetManager.Load<T>(resource);
+        }
+
+        string ToUri(IResource baseResource, IAsset asset)
+        {
+            if (asset == null || asset.Resource == null) return null;
+
+            return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
     }
 }

@@ -35,25 +35,23 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var definition = (TileCatalogDefinition) serializer.Deserialize(resource);
 
-            var tileCatalog = new TileCatalog(graphicsDevice, definition.Entries.Length);
-
-            tileCatalog.Resource = resource;
-            tileCatalog.Name = definition.Name;
+            var tileCatalog = new TileCatalog(graphicsDevice, definition.Entries.Length)
+            {
+                Resource = resource,
+                Name = definition.Name
+            };
 
             foreach (var entry in definition.Entries)
             {
-                var tile = LoadTile(resource, entry.Tile);
-                tile.Index = entry.Index;
-                tileCatalog.Tiles.Add(tile);
+                var tile = Load<Tile>(resource, entry.Tile);
+                if (tile != null)
+                {
+                    tile.Index = entry.Index;
+                    tileCatalog.Tiles.Add(tile);
+                }
             }
 
             return tileCatalog;
-        }
-
-        Tile LoadTile(IResource baseResource, string tileUri)
-        {
-            var resource = ResourceManager.Load(baseResource, tileUri);
-            return AssetManager.Load<Tile>(resource);
         }
 
         // I/F
@@ -61,23 +59,40 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var tileCatalog = asset as TileCatalog;
 
-            var definition = new TileCatalogDefinition();
+            var definition = new TileCatalogDefinition
+            {
+                Name = tileCatalog.Name,
+                Entries = new TileIndexDefinition[tileCatalog.Tiles.Count]
+            };
 
-            definition.Name = tileCatalog.Name;
-            definition.Entries = new TileIndexDefinition[tileCatalog.Tiles.Count];
             for (int i = 0; i < tileCatalog.Tiles.Count; i++)
             {
                 var tile = tileCatalog.Tiles[i];
                 definition.Entries[i] = new TileIndexDefinition
                 {
                     Index = tile.Index,
-                    Tile = ResourceManager.CreateRelativeUri(resource, tile.Resource)
+                    Tile = ToUri(resource, tile)
                 };
             }
 
             serializer.Serialize(resource, definition);
 
             tileCatalog.Resource = resource;
+        }
+
+        T Load<T>(IResource baseResource, string uri) where T : class
+        {
+            if (string.IsNullOrEmpty(uri)) return null;
+
+            var resource = ResourceManager.Load(baseResource, uri);
+            return AssetManager.Load<T>(resource);
+        }
+
+        string ToUri(IResource baseResource, IAsset asset)
+        {
+            if (asset == null || asset.Resource == null) return null;
+
+            return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
     }
 }

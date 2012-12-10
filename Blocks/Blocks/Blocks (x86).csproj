@@ -66,6 +66,7 @@
     <Compile Include="Assets\RegionLoader.cs" />
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\Biome.cs" />
+    <Compile Include="Models\IAsset.cs" />
     <Compile Include="Models\IProcedure.cs" />
     <Compile Include="Serialization\ProcedureDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />

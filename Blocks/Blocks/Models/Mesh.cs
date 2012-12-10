@@ -7,8 +7,9 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class Mesh
+    public sealed class Mesh : IAsset
     {
+        // I/F
         public IResource Resource { get; set; }
 
         public string Name { get; set; }
