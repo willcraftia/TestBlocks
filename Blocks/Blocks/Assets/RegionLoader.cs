@@ -53,7 +53,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 TileCatalog = ToUri(resource, region.TileCatalog),
                 BlockCatalog = ToUri(resource, region.BlockCatalog),
                 ChunkBundle = ToUri(resource, region.ChunkBundleResource),
-                ChunkProcedures = ToProcedureDefinitions(region.ChunkProcesures)
+                ChunkProcedures = ToComponentDefinitions(region.ChunkProcesures)
             };
 
             serializer.Serialize(resource, definition);
@@ -76,14 +76,17 @@ namespace Willcraftia.Xna.Blocks.Assets
             return AssetManager.Load<T>(resource);
         }
 
-        List<IProcedure<Chunk>> ToChunkProcedures(ProcedureDefinition[] definitions)
+        List<IProcedure<Chunk>> ToChunkProcedures(ComponentDefinition[] definitions)
         {
             if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<IProcedure<Chunk>>(0);
 
             var list = new List<IProcedure<Chunk>>(definitions.Length);
             for (int i = 0; i < definitions.Length; i++)
             {
-                var procedure = Procedures.ToProcedure<Chunk>(ref definitions[i]);
+                var component = ComponentHelper.ToComponent(ref definitions[i]);
+                var procedure = component as IProcedure<Chunk>;
+                if (procedure == null)
+                    throw new InvalidOperationException("Unexpected component: " + component.GetType().FullName);
                 list.Add(procedure);
             }
 
@@ -104,15 +107,15 @@ namespace Willcraftia.Xna.Blocks.Assets
             return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
 
-        ProcedureDefinition[] ToProcedureDefinitions(List<IProcedure<Chunk>> procedures)
+        ComponentDefinition[] ToComponentDefinitions(List<IProcedure<Chunk>> procedures)
         {
             if (CollectionHelper.IsNullOrEmpty(procedures)) return null;
 
-            var definitions = new ProcedureDefinition[procedures.Count];
+            var definitions = new ComponentDefinition[procedures.Count];
             for (int i = 0; i < procedures.Count; i++)
             {
-                definitions[i] = new ProcedureDefinition();
-                Procedures.ToDefinition(procedures[i], out definitions[i]);
+                definitions[i] = new ComponentDefinition();
+                ComponentHelper.ToDefinition(procedures[i], out definitions[i]);
             }
 
             return definitions;

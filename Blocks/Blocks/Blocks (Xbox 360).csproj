@@ -94,9 +94,9 @@
   <ItemGroup>
     <Compile Include="Assets\BlockCatalogLoader.cs" />
     <Compile Include="Assets\BlockLoader.cs" />
+    <Compile Include="Assets\ComponentHelper.cs" />
     <Compile Include="Assets\Image2DLoader.cs" />
     <Compile Include="Assets\MeshLoader.cs" />
-    <Compile Include="Assets\Procedures.cs" />
     <Compile Include="Assets\RegionLoader.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />
@@ -131,10 +131,10 @@
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
     <Compile Include="Serialization\BlockIndexDefinition.cs" />
+    <Compile Include="Serialization\ComponentDefinition.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
-    <Compile Include="Serialization\ProcedureDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />

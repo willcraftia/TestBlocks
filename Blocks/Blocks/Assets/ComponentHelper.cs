@@ -10,36 +10,36 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class Procedures
+    public sealed class ComponentHelper
     {
-        public static IProcedure<T> ToProcedure<T>(ref ProcedureDefinition definition)
+        public static object ToComponent(ref ComponentDefinition definition)
         {
             var type = Type.GetType(definition.Type);
             if (type == null)
                 throw new InvalidOperationException("Type not found: " + definition.Type);
 
-            var instance = (IProcedure<T>) type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
+            var instance = type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
 
             if (definition.Properties != null)
             {
-                foreach (var propertyDef in definition.Properties)
+                foreach (var propertyDefinition in definition.Properties)
                 {
-                    var propertyInfo = type.GetProperty(propertyDef.Name);
+                    var propertyInfo = type.GetProperty(propertyDefinition.Name);
                     if (propertyInfo == null)
-                        throw new InvalidOperationException("Invalid property name: " + propertyDef.Name);
+                        throw new InvalidOperationException("Invalid property name: " + propertyDefinition.Name);
 
-                    propertyInfo.SetValue(instance, propertyDef.Value, null);
+                    propertyInfo.SetValue(instance, propertyDefinition.Value, null);
                 }
             }
 
             return instance;
         }
 
-        public static void ToDefinition<T>(IProcedure<T> procedure, out ProcedureDefinition result)
+        public static void ToDefinition(object component, out ComponentDefinition result)
         {
-            var type = procedure.GetType();
+            var type = component.GetType();
 
-            result = new ProcedureDefinition
+            result = new ComponentDefinition
             {
                 Type = type.FullName
             };
@@ -53,7 +53,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                     result.Properties[i] = new PropertyDefinition
                     {
                         Name = properties[i].Name,
-                        Value = Convert.ToString(properties[i].GetValue(procedure, null))
+                        Value = Convert.ToString(properties[i].GetValue(component, null))
                     };
                 }
             }

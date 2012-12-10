@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public struct ProcedureDefinition
+    public struct ComponentDefinition
     {
         // Full name
         public string Type;
