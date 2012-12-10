@@ -4,16 +4,17 @@ using System;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class Texture2DLoader : IAssetLoader
+    public sealed class Image2DLoader : IAssetLoader
     {
         GraphicsDevice graphicsDevice;
 
-        public Texture2DLoader(GraphicsDevice graphicsDevice)
+        public Image2DLoader(GraphicsDevice graphicsDevice)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
@@ -23,6 +24,25 @@ namespace Willcraftia.Xna.Blocks.Assets
         // I/F
         public object Load(IResource resource)
         {
+            return new Image2D
+            {
+                Resource = resource,
+                Texture = LoadTexture(resource)
+            };
+        }
+
+        // I/F
+        public void Save(IResource resource, object asset)
+        {
+            var image = asset as Image2D;
+
+            SaveTexture(resource, image.Texture);
+
+            image.Resource = resource;
+        }
+
+        Texture2D LoadTexture(IResource resource)
+        {
             using (var stream = resource.Open())
             {
                 var result = Texture2D.FromStream(graphicsDevice, stream);
@@ -31,12 +51,9 @@ namespace Willcraftia.Xna.Blocks.Assets
             }
         }
 
-        // I/F
-        public void Save(IResource resource, object asset)
+        void SaveTexture(IResource resource, Texture2D texture)
         {
-            var texture = asset as Texture2D;
-            if (texture == null)
-                throw new ArgumentException("Invalid asset type: " + asset.GetType());
+            if (texture == null) return;
 
             using (var stream = resource.Create())
             {

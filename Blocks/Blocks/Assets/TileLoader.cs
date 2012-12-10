@@ -30,8 +30,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             {
                 Resource = resource,
                 Name = definition.Name,
-                TextureUri = definition.Texture,
-                Texture = Load<Texture2D>(resource, definition.Texture),
+                Texture = Load<Image2D>(resource, definition.Texture),
                 Translucent = definition.Translucent,
                 DiffuseColor = ToColor(definition.DiffuseColor),
                 EmissiveColor = ToColor(definition.EmissiveColor),
@@ -48,7 +47,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             var definition = new TileDefinition
             {
                 Name = tile.Name,
-                Texture = tile.TextureUri,
+                Texture = ToUri(resource, tile.Texture),
                 Translucent = tile.Translucent,
                 DiffuseColor = tile.DiffuseColor.PackedValue,
                 EmissiveColor = tile.EmissiveColor.PackedValue,
@@ -78,6 +77,13 @@ namespace Willcraftia.Xna.Blocks.Assets
                 G = (byte) (packedValue >> 8),
                 B = (byte) (packedValue)
             };
+        }
+
+        string ToUri(IResource baseResource, IAsset asset)
+        {
+            if (asset == null || asset.Resource == null) return null;
+
+            return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
     }
 }

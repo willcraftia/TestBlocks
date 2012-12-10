@@ -2,7 +2,6 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 
 #endregion
@@ -24,9 +23,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public Texture2D Texture { get; set; }
-
-        public string TextureUri { get; set; }
+        public Image2D Texture { get; set; }
 
         public bool Translucent { get; set; }
 

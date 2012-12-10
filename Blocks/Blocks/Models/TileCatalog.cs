@@ -39,10 +39,10 @@ namespace Willcraftia.Xna.Blocks.Models
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
             Tiles = new TileCollection(capacity);
-            TileMap = new Texture2D(graphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color);
-            DiffuseColorMap = new Texture2D(graphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color);
-            EmissiveColorMap = new Texture2D(graphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color);
-            SpecularColorMap = new Texture2D(graphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color);
+            TileMap = CreateMap(graphicsDevice);
+            DiffuseColorMap = CreateMap(graphicsDevice);
+            EmissiveColorMap = CreateMap(graphicsDevice);
+            SpecularColorMap = CreateMap(graphicsDevice);
         }
 
         //
@@ -61,50 +61,35 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             var tile = Tiles[index];
 
-            //------------------------
-            // Tile Texture
+            Rectangle bounds;
+            CalculateTileBounds(index, out bounds);
 
-            if (colorBuffer == null)
-                colorBuffer = new Color[TileSize * TileSize];
-            tile.Texture.GetData<Color>(colorBuffer);
+            EnsureColorBuffer();
 
             //------------------------
             // TileMap
 
-            var bounds = new Rectangle
-            {
-                X = index % TileLineWidth,
-                Y = index / TileLineWidth,
-                Width = TileSize,
-                Height = TileSize
-            };
-
-            TileMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+            GetColorBuffer(tile.Texture);
+            SetColorBuffer(TileMap, ref bounds);
 
             //------------------------
             // DiffuseColorMap
 
             var diffuseColor = tile.DiffuseColor;
-            for (int i = 0; i < colorBuffer.Length; i++)
-                colorBuffer[i] = diffuseColor;
-            DiffuseColorMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+            SetColorBuffer(DiffuseColorMap, ref bounds, ref diffuseColor);
 
             //------------------------
             // EmissiveColorMap
 
             var emissiveColor = tile.EmissiveColor;
-            for (int i = 0; i < colorBuffer.Length; i++)
-                colorBuffer[i] = emissiveColor;
-            EmissiveColorMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+            SetColorBuffer(EmissiveColorMap, ref bounds, ref emissiveColor);
 
             //------------------------
             // SpecularColorMap
 
             var specularColor = tile.SpecularColor;
             specularColor.A = (byte) (tile.SpecularPower * 255);
-            for (int i = 0; i < colorBuffer.Length; i++)
-                colorBuffer[i] = specularColor;
-            SpecularColorMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+            SetColorBuffer(SpecularColorMap, ref bounds, ref specularColor);
         }
 
         public void ClearMaps()
@@ -115,39 +100,60 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void ClearMaps(byte index)
         {
-            if (colorBuffer == null)
-                colorBuffer = new Color[TileSize * TileSize];
+            EnsureColorBuffer();
+            ClearColorBuffer();
 
-            for (int i = 0; i < colorBuffer.Length; i++)
-                colorBuffer[i] = Color.Black;
+            Rectangle bounds;
+            CalculateTileBounds(index, out bounds);
 
-            //------------------------
-            // TileMap
+            SetColorBuffer(TileMap, ref bounds);
+            SetColorBuffer(DiffuseColorMap, ref bounds);
+            SetColorBuffer(EmissiveColorMap, ref bounds);
+            SetColorBuffer(SpecularColorMap, ref bounds);
+        }
 
-            var bounds = new Rectangle
+        Texture2D CreateMap(GraphicsDevice graphicsDevice)
+        {
+            return new Texture2D(graphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color);
+        }
+
+        void CalculateTileBounds(byte index, out Rectangle bounds)
+        {
+            bounds = new Rectangle
             {
                 X = index % TileLineWidth,
                 Y = index / TileLineWidth,
                 Width = TileSize,
                 Height = TileSize
             };
+        }
 
-            TileMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+        void GetColorBuffer(Image2D image)
+        {
+            if (image == null || image.Texture == null) return;
 
-            //------------------------
-            // DiffuseColorMap
+            image.Texture.GetData(colorBuffer);
+        }
 
-            DiffuseColorMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+        void SetColorBuffer(Texture2D texture, ref Rectangle bounds)
+        {
+            texture.SetData(0, bounds, colorBuffer, 0, colorBuffer.Length);
+        }
 
-            //------------------------
-            // EmissiveColorMap
+        void SetColorBuffer(Texture2D texture, ref Rectangle bounds, ref Color color)
+        {
+            for (int i = 0; i < colorBuffer.Length; i++) colorBuffer[i] = color;
+            SetColorBuffer(texture, ref bounds);
+        }
 
-            EmissiveColorMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+        void EnsureColorBuffer()
+        {
+            if (colorBuffer == null) colorBuffer = new Color[TileSize * TileSize];
+        }
 
-            //------------------------
-            // SpecularColorMap
-
-            SpecularColorMap.SetData<Color>(0, bounds, colorBuffer, 0, colorBuffer.Length);
+        void ClearColorBuffer()
+        {
+            for (int i = 0; i < colorBuffer.Length; i++) colorBuffer[i] = Color.Black;
         }
     }
 }

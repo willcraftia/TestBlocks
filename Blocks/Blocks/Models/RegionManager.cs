@@ -74,12 +74,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var assetManager = new AssetManager(serviceProvider, resourceManager);
             assetManager.RegisterLoader(typeof(Region), new RegionLoader());
+            assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(graphicsDevice));
+            assetManager.RegisterLoader(typeof(Mesh), new MeshLoader());
             assetManager.RegisterLoader(typeof(Tile), new TileLoader());
             assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(graphicsDevice));
             assetManager.RegisterLoader(typeof(Block), new BlockLoader());
             assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader());
-            assetManager.RegisterLoader(typeof(Mesh), new MeshLoader());
-            assetManager.RegisterLoader(typeof(Texture2D), new Texture2DLoader(graphicsDevice));
 
             var region = assetManager.Load<Region>(resource);
             region.ChunkSize = ChunkSize;
