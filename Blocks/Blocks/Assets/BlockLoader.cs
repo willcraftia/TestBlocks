@@ -68,9 +68,6 @@ namespace Willcraftia.Xna.Blocks.Assets
         }
 
         // I/F
-        public void Unload(IResource resource, object asset) { }
-
-        // I/F
         public void Save(IResource resource, object asset)
         {
             var block = asset as Block;

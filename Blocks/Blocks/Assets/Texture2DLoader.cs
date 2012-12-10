@@ -32,16 +32,6 @@ namespace Willcraftia.Xna.Blocks.Assets
         }
 
         // I/F
-        public void Unload(IResource resource, object asset)
-        {
-            var texture = asset as Texture2D;
-            if (texture == null)
-                throw new ArgumentException("Invalid asset type: " + asset.GetType());
-
-            texture.Dispose();
-        }
-
-        // I/F
         public void Save(IResource resource, object asset)
         {
             var texture = asset as Texture2D;

@@ -62,13 +62,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public float Restitution { get; set; }
 
-        // 厳密に読み取り専用かどうかは、compact framework for xna では保存時まで分からない。
-        // Uri スキームから、ある程度は判断できるが、これは Save() の呼び出し側で Uri から事前に判断させる。
-        // また、Save() での対象が読み取り専用ファイルである場合は IOException が発生すると思われるが、
-        // これも呼び出し側で判断させる。
-
-        //public bool ReadOnly { get; private set; }
-
         public Tile GetTile(Side side)
         {
             switch (side)

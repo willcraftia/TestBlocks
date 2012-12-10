@@ -99,7 +99,7 @@ namespace Willcraftia.Xna.Framework.Assets
             }
 
             // Cache
-            var holder = new AssetHolder { Resource = resource, Asset = asset, Loader = loader };
+            var holder = new AssetHolder { Resource = resource, Asset = asset };
             holders.Add(holder);
 
             logger.InfoEnd("LoadNew: {0}", resource);
@@ -114,19 +114,10 @@ namespace Willcraftia.Xna.Framework.Assets
             AssetHolder holder;
             if (holders.TryGetItem(resource, out holder))
             {
-                if (holder.Loader == null)
-                {
-                    DisposeIfNeeded(holder);
-                }
-                else
-                {
-                    holder.Loader.Unload(holder.Resource, holder.Asset);
-                }
-
+                DisposeIfNeeded(holder);
                 holders.Remove(resource);
                 holder.Resource = null;
                 holder.Asset = null;
-                holder.Loader = null;
             }
 
             logger.InfoEnd("Unload: {0}", resource);
@@ -200,7 +191,6 @@ namespace Willcraftia.Xna.Framework.Assets
             var newHolder = oldHolder ?? new AssetHolder();
             newHolder.Resource = resource;
             newHolder.Asset = asset;
-            newHolder.Loader = loader;
 
             // Cache.
             holders.Add(newHolder);

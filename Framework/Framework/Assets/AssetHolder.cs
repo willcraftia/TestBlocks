@@ -12,7 +12,5 @@ namespace Willcraftia.Xna.Framework.Assets
         public IResource Resource { get; set; }
 
         public object Asset { get; set; }
-
-        public IAssetLoader Loader { get; set; }
     }
 }
