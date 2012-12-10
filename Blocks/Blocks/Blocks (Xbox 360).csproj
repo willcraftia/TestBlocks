@@ -98,7 +98,6 @@
     <Compile Include="Assets\MeshLoader.cs" />
     <Compile Include="Assets\Procedures.cs" />
     <Compile Include="Assets\RegionLoader.cs" />
-    <Compile Include="Assets\Texture2DLoader.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />
     <Compile Include="BlockShape.cs" />
@@ -111,8 +110,6 @@
     <Compile Include="Models\BlockCatalog.cs" />
     <Compile Include="Models\BlockCollection.cs" />
     <Compile Include="Models\Chunk.cs" />
-    <Compile Include="Models\ChunkBundleReader.cs" />
-    <Compile Include="Models\ChunkBundleWriter.cs" />
     <Compile Include="Models\ChunkCollection.cs" />
     <Compile Include="Models\ChunkManager.cs" />
     <Compile Include="Models\ChunkMesh.cs" />

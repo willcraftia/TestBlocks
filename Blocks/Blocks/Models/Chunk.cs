@@ -11,10 +11,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Chunk
     {
-        VectorI3 size;
-
-        byte[] blockIndices;
-
         //====================================================================
         // Efficiency
 
@@ -22,6 +18,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         //
         //====================================================================
+
+        VectorI3 size;
+
+        byte[] blockIndices;
 
         public byte this[int x, int y, int z]
         {
