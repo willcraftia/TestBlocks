@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0DC1063B-147E-47E0-9130-373AB99B3FD0}</ProjectGuid>
+    <ProjectGuid>{B1D5B66E-FA3D-4256-906D-C8ABA37DAE8E}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Willcraftia.Xna.Framework.Serialization.Xml.Demo</RootNamespace>
-    <AssemblyName>Willcraftia.Xna.Framework.Serialization.Xml.Demo</AssemblyName>
+    <RootNamespace>Willcraftia.Xna.Framework.Serialization.Demo</RootNamespace>
+    <AssemblyName>Willcraftia.Xna.Framework.Serialization.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -47,13 +47,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Framework\Framework\Framework %28x86%29.csproj">
+    <ProjectReference Include="..\Framework\Framework %28x86%29.csproj">
       <Project>{2E15AFAD-6982-45D4-86B3-F5950139EFD8}</Project>
       <Name>Framework %28x86%29</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Framework.Serialization.Xml\Framework.Serialization.Xml %28x86%29.csproj">
-      <Project>{6D4E3633-C0F6-4BDF-874F-DDEBC6E87D0B}</Project>
-      <Name>Framework.Serialization.Xml %28x86%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -11,7 +11,7 @@ using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Serialization.Xml
+namespace Willcraftia.Xna.Framework.Serialization
 {
     public sealed class XmlSerializerAdapter : ISerializer
     {

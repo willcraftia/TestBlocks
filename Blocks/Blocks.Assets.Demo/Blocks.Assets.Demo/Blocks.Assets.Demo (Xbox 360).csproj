@@ -65,10 +65,6 @@
       <Project>{7A27832E-0774-4F52-B8D7-ACDEF19110C4}</Project>
       <Name>Framework.Serialization.Json (Xbox 360)</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Framework.Serialization.Xml\Framework.Serialization.Xml\Framework.Serialization.Xml (Xbox 360).csproj">
-      <Project>{3071a17f-8163-4c76-b47f-98248767357b}</Project>
-      <Name>Framework.Serialization.Xml (Xbox 360)</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Framework\Framework\Framework (Xbox 360).csproj">
       <Project>{69D1A7DE-A718-49EA-8314-C47DC521227E}</Project>
       <Name>Framework (Xbox 360)</Name>
@@ -99,6 +95,7 @@
     <Reference Include="System.Net" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Serialization, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

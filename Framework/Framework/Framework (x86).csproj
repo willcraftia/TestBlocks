@@ -124,6 +124,7 @@
     <Compile Include="Graphics\WritableVertexBuffer.cs" />
     <Compile Include="IUri.cs" />
     <Compile Include="IUriParser.cs" />
+    <Compile Include="Serialization\XmlSerializerAdapter.cs" />
     <Compile Include="StateOutOfRangeException.cs" />
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionCollection.cs" />

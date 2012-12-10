@@ -61,10 +61,6 @@
       <Project>{809E91B9-C8FB-457E-B946-8C169AD5B8CA}</Project>
       <Name>Framework.Serialization.Json %28x86%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Framework.Serialization.Xml\Framework.Serialization.Xml\Framework.Serialization.Xml %28x86%29.csproj">
-      <Project>{6D4E3633-C0F6-4BDF-874F-DDEBC6E87D0B}</Project>
-      <Name>Framework.Serialization.Xml %28x86%29</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Framework\Framework\Framework %28x86%29.csproj">
       <Project>{2E15AFAD-6982-45D4-86B3-F5950139EFD8}</Project>
       <Name>Framework %28x86%29</Name>

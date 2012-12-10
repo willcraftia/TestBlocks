@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("Framework.Serialization.Xml.Demo")]
+[assembly: AssemblyTitle("Framework.Serialization.Demo")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Framework.Serialization.Xml.Demo")]
+[assembly: AssemblyProduct("Framework.Serialization.Demo")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 次の GUID は、このプロジェクトが COM に公開される場合の、typelib の ID です
-[assembly: Guid("a7de5d4c-34ec-47d2-acb4-488d2d006661")]
+[assembly: Guid("76fba1ed-3e2e-4e89-bb70-a52eeba2d334")]
 
 // アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
 //

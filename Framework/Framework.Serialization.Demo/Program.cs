@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Serialization.Xml.Demo
+namespace Willcraftia.Xna.Framework.Serialization.Demo
 {
     public class Program
     {
@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Xml.Demo
         public class AnimalManager : IXmlSerializable
         {
             public IAnimal[] Animals;
-            
+
             XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
 
             public AnimalManager()

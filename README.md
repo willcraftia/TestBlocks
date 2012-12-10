@@ -49,15 +49,6 @@ Xbox ƒrƒ‹ƒh‚Å‚Í Mock À‘•B
 + Framework
 + Json.NET
 
-## Framework.Serialization.Xml
-Framework ‚ÉŠÜ‚Ü‚ê‚é ISerializer ƒCƒ“ƒ^ƒtƒF[ƒX‚Ì XML À‘•‚ğŠÜ‚Şƒ‰ƒCƒuƒ‰ƒŠBXbox ƒrƒ‹ƒh‚Å‚Íƒƒ\ƒbƒh‚ğ Mock À‘•B
-
-System.Xml.Serialization ‚ÉŠÜ‚Ü‚ê‚éƒNƒ‰ƒX‚Ì‚¤‚¿AƒfƒtƒHƒ‹ƒg‚Ì Xbox ƒvƒƒWƒFƒNƒg‚ª\¬‚·‚éƒ‰ƒCƒuƒ‰ƒŠ‚Å‚Í—˜—p‚Å‚«‚È‚¢ƒNƒ‰ƒX (XmlSerializer ‚È‚Ç) ‚ÉˆË‘¶‚µ‚Ä‚¢‚éB
-
-### ˆË‘¶
-+ Framework
-+ Xbox ƒfƒtƒHƒ‹ƒgQÆ‚É‚È‚¢ System.Xml.Serialization “àƒNƒ‰ƒXB
-
 ## Blocks
 ƒuƒƒbƒN¢ŠE‚ğ•\Œ»‚·‚é‚½‚ß‚ÌŠî‘b‚Æ‚È‚éƒNƒ‰ƒX‚ğ‚Ü‚Æ‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠB
 
@@ -65,6 +56,5 @@ System.Xml.Serialization ‚ÉŠÜ‚Ü‚ê‚éƒNƒ‰ƒX‚Ì‚¤‚¿AƒfƒtƒHƒ‹ƒg‚Ì Xbox ƒvƒƒWƒFƒNƒg‚
 + Framework
 + Framework.IO.Compression
 + Framework.Serialization.Json
-+ Framework.Serialization.Xml
 + DotNetZip
 + Json.NET

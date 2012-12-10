@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
-using Willcraftia.Xna.Framework.Serialization.Xml;
 
 #endregion
 

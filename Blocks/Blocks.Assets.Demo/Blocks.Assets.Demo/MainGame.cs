@@ -10,7 +10,6 @@ using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
-using Willcraftia.Xna.Framework.Serialization.Xml;
 using Willcraftia.Xna.Blocks.Models;
 
 #endregion

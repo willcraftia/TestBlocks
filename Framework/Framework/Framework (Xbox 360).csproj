@@ -88,6 +88,7 @@
     <Reference Include="System.Net">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Xml.Serialization, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Serialization\ISerializer.cs" />
     <Compile Include="Serialization\ISerializerRegistory.cs" />
     <Compile Include="Serialization\SerializerManager.cs" />
+    <Compile Include="Serialization\XmlSerializerAdapter.cs" />
     <Compile Include="ServiceProviderExtension.cs" />
     <Compile Include="StateOutOfRangeException.cs" />
     <Compile Include="StorageManager.cs" />
