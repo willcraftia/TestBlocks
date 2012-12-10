@@ -19,11 +19,9 @@ namespace Willcraftia.Xna.Framework.Serialization
 
         static readonly Logger logger = new Logger(typeof(XmlSerializerAdapter).Name);
 
-#if WINDOWS
         XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
 
         Dictionary<Type, XmlSerializer> cache = new Dictionary<Type, XmlSerializer>();
-#endif
 
         // I/F
         public bool CanDeserializeIntoExistingObject
@@ -37,7 +35,6 @@ namespace Willcraftia.Xna.Framework.Serialization
 
         XmlSerializerAdapter()
         {
-#if WINDOWS
             namespaces.Add(string.Empty, string.Empty);
 
             WriterSettings = new XmlWriterSettings
@@ -53,9 +50,6 @@ namespace Willcraftia.Xna.Framework.Serialization
                 IgnoreProcessingInstructions = true,
                 IgnoreWhitespace = true
             };
-#else
-            logger.Error("Support windows only.");
-#endif
         }
 
         // I/F
@@ -73,34 +67,25 @@ namespace Willcraftia.Xna.Framework.Serialization
         // I/F
         public object Deserialize(Stream stream, Type type, object existingInstance)
         {
-#if WINDOWS
             var serializer = GetXmlSerializer(type);
 
             using (var reader = CreateXmlReader(stream))
             {
                 return serializer.Deserialize(reader);
             }
-#else
-            throw new NotSupportedException("Support windows only.");
-#endif
         }
 
         // I/F
         public void Serialize(Stream stream, object resource)
         {
-#if WINDOWS
             var serializer = GetXmlSerializer(resource.GetType());
 
             using (var writer = CreateXmlWriter(stream))
             {
                 serializer.Serialize(writer, resource, namespaces);
             }
-#else
-            throw new NotSupportedException("Support windows only.");
-#endif
         }
 
-#if WINDOWS
         public XmlSerializer GetXmlSerializer(Type type)
         {
             lock (cache)
@@ -114,7 +99,6 @@ namespace Willcraftia.Xna.Framework.Serialization
                 return result;
             }
         }
-#endif
 
         XmlWriter CreateXmlWriter(Stream stream)
         {
