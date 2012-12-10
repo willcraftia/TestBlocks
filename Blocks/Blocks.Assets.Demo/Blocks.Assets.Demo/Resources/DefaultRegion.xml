@@ -1,4 +1,5 @@
-﻿<RegionDefinition>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RegionDefinition>
 	<Name>Default Region</Name>
 	<Bounds>
 		<Min>
@@ -12,17 +13,6 @@
 			<Z>1</Z>
 		</Max>
 	</Bounds>
-	<TileCatalog>title:Resources/DefaultTileCatalog.json</TileCatalog>
-	<BlockCatalog>title:Resources/DefaultBlockCatalog.json</BlockCatalog>
-	<ChunkBuilders>
-		<BuilderDefinition>
-			<Type>Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder</Type>
-			<Properties>
-				<PropertyDefinition>
-					<Name>Property1</Name>
-					<Value>1</Value>
-				</PropertyDefinition>
-			</Properties>
-		</BuilderDefinition>
-	</ChunkBuilders>
+	<TileCatalog>DefaultTileCatalog.json</TileCatalog>
+	<BlockCatalog>DefaultBlockCatalog.json</BlockCatalog>
 </RegionDefinition>

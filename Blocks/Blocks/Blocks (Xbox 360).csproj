@@ -132,12 +132,12 @@
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
     <Compile Include="Serialization\BlockIndexDefinition.cs" />
+    <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\ProcedureDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
-    <Compile Include="Serialization\ResourceSerializer.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
     <Compile Include="Serialization\TileIndexDefinition.cs" />
@@ -147,6 +147,10 @@
     <ProjectReference Include="..\..\Framework.IO.Compression\Framework.IO.Compression\Framework.IO.Compression %28Xbox 360%29.csproj">
       <Project>{CFA0F7C2-10D6-4453-8770-2ECC0F1098F0}</Project>
       <Name>Framework.IO.Compression %28Xbox 360%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Framework.Serialization.Json\Framework.Serialization.Json\Framework.Serialization.Json %28Xbox 360%29.csproj">
+      <Project>{7A27832E-0774-4F52-B8D7-ACDEF19110C4}</Project>
+      <Name>Framework.Serialization.Json %28Xbox 360%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Framework\Framework\Framework %28Xbox 360%29.csproj">
       <Project>{69D1A7DE-A718-49EA-8314-C47DC521227E}</Project>

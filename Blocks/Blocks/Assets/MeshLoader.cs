@@ -12,6 +12,8 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class MeshLoader : AssetLoaderBase
     {
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(MeshDefinition));
+
         public MeshLoader(UriManager uriManager)
             : base(uriManager)
         {
@@ -19,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         public override object Load(IUri uri)
         {
-            var resource = ResourceSerializer.Deserialize<MeshDefinition>(uri);
+            var resource = (MeshDefinition) serializer.Deserialize(uri);
 
             var mesh = new Mesh();
 
@@ -57,7 +59,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             if (mesh.Left != null) resource.Left = CreateMeshPartDefinition(mesh.Left);
             if (mesh.Right != null) resource.Right = CreateMeshPartDefinition(mesh.Right);
 
-            ResourceSerializer.Serialize<MeshDefinition>(uri, resource);
+            serializer.Serialize(uri, resource);
 
             mesh.Uri = uri;
         }

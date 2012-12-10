@@ -12,6 +12,8 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class TileCatalogLoader : AssetLoaderBase
     {
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(TileCatalogDefinition));
+
         GraphicsDevice graphicsDevice;
 
         public TileCatalogLoader(UriManager uriManager, GraphicsDevice graphicsDevice)
@@ -24,7 +26,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         public override object Load(IUri uri)
         {
-            var resource = ResourceSerializer.Deserialize<TileCatalogDefinition>(uri);
+            var resource = (TileCatalogDefinition) serializer.Deserialize(uri);
 
             var tileCatalog = new TileCatalog(graphicsDevice, resource.Entries.Length);
 
@@ -65,7 +67,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 };
             }
 
-            ResourceSerializer.Serialize<TileCatalogDefinition>(uri, resource);
+            serializer.Serialize(uri, resource);
 
             tileCatalog.Uri = uri;
         }

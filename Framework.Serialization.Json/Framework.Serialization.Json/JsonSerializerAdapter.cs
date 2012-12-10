@@ -15,9 +15,9 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
 {
     public sealed class JsonSerializerAdapter : ISerializer
     {
-        public static readonly JsonSerializerAdapter Instance = new JsonSerializerAdapter();
-
         static readonly Logger logger = new Logger(typeof(JsonSerializerAdapter).Name);
+
+        Type type;
 
         // I/F
         public bool CanDeserializeIntoExistingObject
@@ -29,8 +29,12 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
         public JsonSerializer JsonSerializer { get; private set; }
 #endif
 
-        JsonSerializerAdapter()
+        public JsonSerializerAdapter(Type type)
         {
+            if (type == null) throw new ArgumentNullException("type");
+
+            this.type = type;
+
 #if WINDOWS
             JsonSerializer = new JsonSerializer();
             JsonSerializer.TypeNameHandling = TypeNameHandling.Auto;
@@ -40,27 +44,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
         }
 
         // I/F
-        public T Deserialize<T>(Stream stream)
-        {
-#if WINDOWS
-            return (T) Deserialize(stream, typeof(T), null);
-#else
-            throw new NotSupportedException("Support only windows.");
-#endif
-        }
-
-        // I/F
-        public T Deserialize<T>(Stream stream, T existingInstance) where T : class
-        {
-#if WINDOWS
-            return Deserialize(stream, typeof(T), existingInstance) as T;
-#else
-            throw new NotSupportedException("Support only windows.");
-#endif
-        }
-
-        // I/F
-        public object Deserialize(Stream stream, Type type, object existingInstance)
+        public object Deserialize(Stream stream, object existingInstance)
         {
 #if WINDOWS
             using (var reader = new StreamReader(stream))

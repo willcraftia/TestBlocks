@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,10 +27,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine("Output: " + directoryPath);
             Console.WriteLine();
 
-            JsonSerializerAdapter.Instance.JsonSerializer.Formatting = Newtonsoft.Json.Formatting.Indented;
-            ExtensionSerializerRegistory.Instance[".json"] = JsonSerializerAdapter.Instance;
-            ExtensionSerializerRegistory.Instance[".xml"] = XmlSerializerAdapter.Instance;
-
             Console.WriteLine("Press Enter to serialize/deserialize resources.");
             Console.ReadLine();
 
@@ -50,8 +47,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var jsonUri = SerializeToJson<TileDefinition>("DefaultTile", tile);
                 var xmlUri = SerializeToXml<TileDefinition>("DefaultTile", tile);
-                var fromJson = Deserialize<TileDefinition>(jsonUri);
-                var fromXml = Deserialize<TileDefinition>(xmlUri);
+                var fromJson = DeserializeFromJson<TileDefinition>(jsonUri);
+                var fromXml = DeserializeFromXml<TileDefinition>(xmlUri);
             }
             Console.WriteLine();
 
@@ -74,8 +71,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var jsonUri = SerializeToJson<TileCatalogDefinition>("DefaultTileCatalog", tileCatalog);
                 var xmlUri = SerializeToXml<TileCatalogDefinition>("DefaultTileCatalog", tileCatalog);
-                var fromJson = Deserialize<TileCatalogDefinition>(jsonUri);
-                var fromXml = Deserialize<TileCatalogDefinition>(xmlUri);
+                var fromJson = DeserializeFromJson<TileCatalogDefinition>(jsonUri);
+                var fromXml = DeserializeFromXml<TileCatalogDefinition>(xmlUri);
             }
             Console.WriteLine();
 
@@ -104,8 +101,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var jsonUri = SerializeToJson<BlockDefinition>("DefaultBlock", block);
                 var xmlUri = SerializeToXml<BlockDefinition>("DefaultBlock", block);
-                var fromJson = Deserialize<BlockDefinition>(jsonUri);
-                var fromXml = Deserialize<BlockDefinition>(xmlUri);
+                var fromJson = DeserializeFromJson<BlockDefinition>(jsonUri);
+                var fromXml = DeserializeFromXml<BlockDefinition>(xmlUri);
             }
             Console.WriteLine();
 
@@ -128,8 +125,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var jsonUri = SerializeToJson<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
                 var xmlUri = SerializeToXml<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
-                var fromJson = Deserialize<BlockCatalogDefinition>(jsonUri);
-                var fromXml = Deserialize<BlockCatalogDefinition>(xmlUri);
+                var fromJson = DeserializeFromJson<BlockCatalogDefinition>(jsonUri);
+                var fromXml = DeserializeFromXml<BlockCatalogDefinition>(xmlUri);
             }
             Console.WriteLine();
 
@@ -162,8 +159,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var jsonUri = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlUri = SerializeToXml<RegionDefinition>("DefaultRegion", region);
-                var fromJson = Deserialize<RegionDefinition>(jsonUri);
-                var fromXml = Deserialize<RegionDefinition>(xmlUri);
+                var fromJson = DeserializeFromJson<RegionDefinition>(jsonUri);
+                var fromXml = DeserializeFromXml<RegionDefinition>(xmlUri);
             }
             Console.WriteLine();
 
@@ -175,8 +172,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var jsonUri = SerializeToJson<MeshDefinition>("Cube", cubeMesh);
                 var xmlUri = SerializeToXml<MeshDefinition>("Cube", cubeMesh);
-                var fromJson = Deserialize<MeshDefinition>(jsonUri);
-                var fromXml = Deserialize<MeshDefinition>(xmlUri);
+                var fromJson = DeserializeFromJson<MeshDefinition>(jsonUri);
+                var fromXml = DeserializeFromXml<MeshDefinition>(xmlUri);
             }
             Console.WriteLine();
 
@@ -189,27 +186,58 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
         static IUri SerializeToJson<T>(string baseFileName, T resource)
         {
+            var serializer = new JsonSerializerAdapter(typeof(T));
+            serializer.JsonSerializer.Formatting = Newtonsoft.Json.Formatting.Indented;
+
             var uriString = "file:///" + directoryPath + "/" + baseFileName + ".json";
-            var parser = UriParserRegistory.Instance.GetUriParser(uriString);
-            var uri = parser.Parse(uriString);
-            ResourceSerializer.Serialize<T>(uri, resource);
+            var uri = FileUriParser.Instance.Parse(uriString);
+            using (var stream = uri.Create())
+            {
+                serializer.Serialize(stream, resource);
+            }
             Console.WriteLine("Serialized: " + Path.GetFileName(uri.AbsoluteUri));
             return uri;
         }
 
         static IUri SerializeToXml<T>(string baseFileName, T resource)
         {
-            var uriString = "file:///" + directoryPath + "/" + baseFileName + ".json";
-            var parser = UriParserRegistory.Instance.GetUriParser(uriString);
-            var uri = parser.Parse(uriString);
-            ResourceSerializer.Serialize<T>(uri, resource);
+            var serializer = new XmlSerializerAdapter(typeof(T));
+            serializer.WriterSettings.Indent = true;
+            serializer.WriterSettings.IndentChars = "\t";
+
+            var uriString = "file:///" + directoryPath + "/" + baseFileName + ".xml";
+            var uri = FileUriParser.Instance.Parse(uriString);
+            using (var stream = uri.Create())
+            {
+                serializer.Serialize(stream, resource);
+            }
             Console.WriteLine("Serialized: " + Path.GetFileName(uri.AbsoluteUri));
             return uri;
         }
 
-        static T Deserialize<T>(IUri uri)
+        static T DeserializeFromJson<T>(IUri uri)
         {
-            var result = ResourceSerializer.Deserialize<T>(uri);
+            var serializer = new JsonSerializerAdapter(typeof(T));
+            serializer.JsonSerializer.Formatting = Newtonsoft.Json.Formatting.Indented;
+
+            T result;
+            using (var stream = uri.Open())
+            {
+                result = (T) serializer.Deserialize(stream, null);
+            }
+            Console.WriteLine("Deserialized: " + Path.GetFileName(uri.AbsoluteUri));
+            return result;
+        }
+
+        static T DeserializeFromXml<T>(IUri uri)
+        {
+            var serializer = new XmlSerializerAdapter(typeof(T));
+
+            T result;
+            using (var stream = uri.Open())
+            {
+                result = (T) serializer.Deserialize(stream, null);
+            }
             Console.WriteLine("Deserialized: " + Path.GetFileName(uri.AbsoluteUri));
             return result;
         }

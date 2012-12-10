@@ -13,6 +13,8 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class TileLoader : AssetLoaderBase
     {
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(TileDefinition));
+
         public TileLoader(UriManager uriManager)
             : base(uriManager)
         {
@@ -20,7 +22,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         public override object Load(IUri uri)
         {
-            var resource = ResourceSerializer.Deserialize<TileDefinition>(uri);
+            var resource = (TileDefinition) serializer.Deserialize(uri);
 
             var tile = new Tile();
 
@@ -71,7 +73,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             resource.SpecularColor = tile.SpecularColor.PackedValue;
             resource.SpecularPower = tile.SpecularPower;
 
-            ResourceSerializer.Serialize<TileDefinition>(uri, resource);
+            serializer.Serialize(uri, resource);
 
             tile.Uri = uri;
         }

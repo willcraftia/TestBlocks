@@ -49,9 +49,23 @@ namespace Willcraftia.Xna.Framework.Serialization.Demo
 
             XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
 
+            XmlSerializer dogSerializer = new XmlSerializer(typeof(Dog));
+
+            XmlSerializer catSerializer = new XmlSerializer(typeof(Cat));
+
             public AnimalManager()
             {
                 namespaces.Add(string.Empty, string.Empty);
+            }
+
+            XmlSerializer SelectXmlSerializer(Type type)
+            {
+                if (typeof(Dog) == type)
+                    return dogSerializer;
+                if (typeof(Cat) == type)
+                    return catSerializer;
+
+                throw new InvalidOperationException();
             }
 
             // I/F
@@ -75,7 +89,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Demo
 
                     var animalType = Type.GetType(typeString);
 
-                    var animalSerializer = XmlSerializerAdapter.Instance.GetXmlSerializer(animalType);
+                    var animalSerializer = SelectXmlSerializer(animalType);
                     var animal = animalSerializer.Deserialize(reader) as IAnimal;
 
                     list.Add(animal);
@@ -102,7 +116,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Demo
                     var animalType = animal.GetType();
                     writer.WriteAttributeString("Type", animalType.FullName);
 
-                    var animalSerializer = XmlSerializerAdapter.Instance.GetXmlSerializer(animalType);
+                    var animalSerializer = SelectXmlSerializer(animalType);
                     animalSerializer.Serialize(writer, animal, namespaces);
 
                     writer.WriteEndElement();
@@ -146,10 +160,13 @@ namespace Willcraftia.Xna.Framework.Serialization.Demo
             // Output file path.
             var path = Path.Combine(Directory.GetCurrentDirectory(), "AnimalManager.xml");
 
+            var serializer = new XmlSerializerAdapter(typeof(AnimalManager));
+            serializer.WriterSettings.Indent = true;
+
             // Serialize.
             using (var stream = File.Create(path))
             {
-                XmlSerializerAdapter.Instance.Serialize(stream, animalManager);
+                serializer.Serialize(stream, animalManager);
             }
             Console.WriteLine("Serialize:");
             Console.WriteLine(path);
@@ -166,7 +183,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Demo
             AnimalManager loadedObject;
             using (var stream = File.Open(path, FileMode.Open))
             {
-                loadedObject = XmlSerializerAdapter.Instance.Deserialize<AnimalManager>(stream);
+                loadedObject = serializer.Deserialize(stream, null) as AnimalManager;
             }
             Console.WriteLine("Deserialize:");
             Console.WriteLine(loadedObject);

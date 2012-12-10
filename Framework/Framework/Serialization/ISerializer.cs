@@ -11,11 +11,7 @@ namespace Willcraftia.Xna.Framework.Serialization
     {
         bool CanDeserializeIntoExistingObject { get; }
 
-        T Deserialize<T>(Stream stream);
-
-        T Deserialize<T>(Stream stream, T existingInstance) where T : class;
-
-        object Deserialize(Stream stream, Type type, object existingInstance);
+        object Deserialize(Stream stream, object existingInstance);
 
         void Serialize(Stream stream, object resource);
     }

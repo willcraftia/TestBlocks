@@ -70,7 +70,6 @@
     <Compile Include="Models\IProcedure.cs" />
     <Compile Include="Serialization\ProcedureDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />
-    <Compile Include="Serialization\ResourceSerializer.cs" />
     <Compile Include="Assets\Texture2DLoader.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />
@@ -105,6 +104,7 @@
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
+    <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
     <Compile Include="Serialization\TileIndexDefinition.cs" />
@@ -162,6 +162,10 @@
     <ProjectReference Include="..\..\Framework.IO.Compression\Framework.IO.Compression\Framework.IO.Compression %28x86%29.csproj">
       <Project>{6D1E1A14-5C0D-4939-B61F-5E6A4DAA3C46}</Project>
       <Name>Framework.IO.Compression %28x86%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Framework.Serialization.Json\Framework.Serialization.Json\Framework.Serialization.Json %28x86%29.csproj">
+      <Project>{809E91B9-C8FB-457E-B946-8C169AD5B8CA}</Project>
+      <Name>Framework.Serialization.Json %28x86%29</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Framework\Framework\Framework %28x86%29.csproj">
       <Project>{2E15AFAD-6982-45D4-86B3-F5950139EFD8}</Project>

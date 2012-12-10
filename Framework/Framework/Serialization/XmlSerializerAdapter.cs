@@ -1,8 +1,6 @@
 ﻿#region Using
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -15,13 +13,11 @@ namespace Willcraftia.Xna.Framework.Serialization
 {
     public sealed class XmlSerializerAdapter : ISerializer
     {
-        public static readonly XmlSerializerAdapter Instance = new XmlSerializerAdapter();
-
         static readonly Logger logger = new Logger(typeof(XmlSerializerAdapter).Name);
 
-        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+        XmlSerializer xmlSerializer;
 
-        Dictionary<Type, XmlSerializer> cache = new Dictionary<Type, XmlSerializer>();
+        XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
 
         // I/F
         public bool CanDeserializeIntoExistingObject
@@ -33,16 +29,17 @@ namespace Willcraftia.Xna.Framework.Serialization
 
         public XmlReaderSettings ReaderSettings { get; private set; }
 
-        XmlSerializerAdapter()
+        public XmlSerializerAdapter(Type type)
         {
+            if (type == null) throw new ArgumentNullException("type");
+
+            xmlSerializer = new XmlSerializer(type);
+
             namespaces.Add(string.Empty, string.Empty);
 
             WriterSettings = new XmlWriterSettings
             {
-                Indent = true,
-                IndentChars = "\t",
-                Encoding = Encoding.UTF8,
-                OmitXmlDeclaration = true
+                Encoding = Encoding.UTF8
             };
             ReaderSettings = new XmlReaderSettings
             {
@@ -53,61 +50,21 @@ namespace Willcraftia.Xna.Framework.Serialization
         }
 
         // I/F
-        public T Deserialize<T>(Stream stream)
+        public object Deserialize(Stream stream, object existingInstance)
         {
-            return (T) Deserialize(stream, typeof(T), null);
-        }
-
-        // I/F
-        public T Deserialize<T>(Stream stream, T existingInstance) where T : class
-        {
-            return Deserialize(stream, typeof(T), existingInstance) as T;
-        }
-
-        // I/F
-        public object Deserialize(Stream stream, Type type, object existingInstance)
-        {
-            var serializer = GetXmlSerializer(type);
-
-            using (var reader = CreateXmlReader(stream))
+            using (var reader = XmlReader.Create(stream, ReaderSettings))
             {
-                return serializer.Deserialize(reader);
+                return xmlSerializer.Deserialize(reader);
             }
         }
 
         // I/F
         public void Serialize(Stream stream, object resource)
         {
-            var serializer = GetXmlSerializer(resource.GetType());
-
-            using (var writer = CreateXmlWriter(stream))
+            using (var writer = XmlWriter.Create(stream, WriterSettings))
             {
-                serializer.Serialize(writer, resource, namespaces);
+                xmlSerializer.Serialize(writer, resource, namespaces);
             }
-        }
-
-        public XmlSerializer GetXmlSerializer(Type type)
-        {
-            lock (cache)
-            {
-                XmlSerializer result;
-                if (!cache.TryGetValue(type, out result))
-                {
-                    result = new XmlSerializer(type);
-                    cache[type] = result;
-                }
-                return result;
-            }
-        }
-
-        XmlWriter CreateXmlWriter(Stream stream)
-        {
-            return XmlWriter.Create(stream, WriterSettings);
-        }
-
-        XmlReader CreateXmlReader(Stream stream)
-        {
-            return XmlReader.Create(stream, ReaderSettings);
         }
     }
 }

@@ -59,12 +59,6 @@ namespace Willcraftia.Xna.Blocks.Assets.Demo
             StorageManager.SelectStorageContainer("Blocks.Demo.MainGame");
 
             //================================================================
-            // JsonSerializerAdapter
-
-            ExtensionSerializerRegistory.Instance[".json"] = JsonSerializerAdapter.Instance;
-            ExtensionSerializerRegistory.Instance[".xml"] = XmlSerializerAdapter.Instance;
-
-            //================================================================
             // Others
 
             base.Initialize();

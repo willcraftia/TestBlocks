@@ -1,6 +1,7 @@
-﻿<TileDefinition>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TileDefinition>
 	<Name>Default Tile</Name>
-	<Texture>title:Resources/DefaultTile.png</Texture>
+	<Texture>DefaultTile.png</Texture>
 	<Translucent>false</Translucent>
 	<DiffuseColor>4294967295</DiffuseColor>
 	<EmissiveColor>4278190080</EmissiveColor>

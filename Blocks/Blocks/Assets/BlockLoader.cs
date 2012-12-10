@@ -11,6 +11,8 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class BlockLoader : AssetLoaderBase
     {
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(BlockDefinition));
+
         public BlockLoader(UriManager uriManager)
             : base(uriManager)
         {
@@ -18,7 +20,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         public override object Load(IUri uri)
         {
-            var resource = ResourceSerializer.Deserialize<BlockDefinition>(uri);
+            var resource = (BlockDefinition) serializer.Deserialize(uri);
 
             var block = new Block();
 
@@ -89,7 +91,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             resource.DynamicFriction = block.DynamicFriction;
             resource.Restitution = block.Restitution;
 
-            ResourceSerializer.Serialize<BlockDefinition>(uri, resource);
+            serializer.Serialize(uri, resource);
 
             block.Uri = uri;
         }

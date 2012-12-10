@@ -16,7 +16,7 @@ namespace Willcraftia.Xna.Framework
             Add(ContentUriParser.Instance);
             Add(TitleUriParser.Instance);
             Add(StorageUriParser.Instance);
-#if !XBOX
+#if WINDOWS
             Add(FileUriParser.Instance);
 #endif
         }

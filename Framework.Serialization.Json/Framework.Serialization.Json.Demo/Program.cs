@@ -77,8 +77,9 @@ namespace Willcraftia.Xna.Framework.Serialization.Json.Demo
                 new Cat { Name = "Tama", CatProperty = "Nya nya" }
             };
 
-            // Test settings.
-            JsonSerializerAdapter.Instance.JsonSerializer.Formatting = Formatting.Indented;
+            // Serializer.
+            var serializer = new JsonSerializerAdapter(typeof(AnimalManager));
+            serializer.JsonSerializer.Formatting = Formatting.Indented;
             
             // Output file path.
             var path = Path.Combine(Directory.GetCurrentDirectory(), "AnimalManager.json");
@@ -86,7 +87,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Json.Demo
             // Serialize.
             using (var stream = File.Create(path))
             {
-                JsonSerializerAdapter.Instance.Serialize(stream, animalManager);
+                serializer.Serialize(stream, animalManager);
             }
             Console.WriteLine("Serialize:");
             Console.WriteLine(path);
@@ -103,7 +104,7 @@ namespace Willcraftia.Xna.Framework.Serialization.Json.Demo
             AnimalManager loadedObject;
             using (var stream = File.Open(path, FileMode.Open))
             {
-                loadedObject = JsonSerializerAdapter.Instance.Deserialize<AnimalManager>(stream);
+                loadedObject = serializer.Deserialize(stream, null) as AnimalManager;
             }
             Console.WriteLine("Deserialize:");
             Console.WriteLine(loadedObject);

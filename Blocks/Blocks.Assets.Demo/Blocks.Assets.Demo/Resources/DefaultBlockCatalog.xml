@@ -1,9 +1,10 @@
-﻿<BlockCatalogDefinition>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BlockCatalogDefinition>
 	<Name>Default Block</Name>
 	<Entries>
 		<BlockIndexDefinition>
 			<Index>1</Index>
-			<Block>title:Resources/DefaultBlock.json</Block>
+			<Block>DefaultBlock.json</Block>
 		</BlockIndexDefinition>
 	</Entries>
 </BlockCatalogDefinition>

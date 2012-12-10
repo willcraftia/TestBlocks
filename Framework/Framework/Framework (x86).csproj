@@ -163,13 +163,10 @@
     <Compile Include="Plugins\PluginHostRegistory.cs" />
     <Compile Include="Plugins\PluginManager.cs" />
     <Compile Include="RectangleF.cs" />
-    <Compile Include="Serialization\ExtensionSerializerRegistory.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
-    <Compile Include="Serialization\ISerializerRegistory.cs" />
     <Compile Include="Pool.cs" />
     <Compile Include="Projection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\SerializerManager.cs" />
     <Compile Include="ServiceProviderExtension.cs" />
     <Compile Include="StorageManager.cs" />
     <Compile Include="StorageUri.cs" />

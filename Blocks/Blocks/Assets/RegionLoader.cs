@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Framework.Diagnostics;
@@ -17,6 +16,8 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         static readonly Logger logger = new Logger(typeof(RegionLoader).Name);
 
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
+
         public RegionLoader(UriManager uriManager)
             : base(uriManager)
         {
@@ -24,7 +25,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         public override object Load(IUri uri)
         {
-            var resource = ResourceSerializer.Deserialize<RegionDefinition>(uri);
+            var resource = (RegionDefinition) serializer.Deserialize(uri);
 
             var region = new Region();
 
@@ -95,7 +96,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 }
             }
 
-            ResourceSerializer.Serialize<RegionDefinition>(uri, resource);
+            serializer.Serialize(uri, resource);
         }
     }
 }
