@@ -1,8 +1,8 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
@@ -13,23 +13,23 @@ namespace Willcraftia.Xna.Blocks.Assets
         // I/F
         public AssetManager AssetManager { get; set; }
 
-        protected UriManager UriManager { get; private set; }
+        protected ResourceManager ResourceManager { get; private set; }
 
-        protected AssetLoaderBase(UriManager uriManager)
+        protected AssetLoaderBase(ResourceManager resourceManager)
         {
-            if (uriManager == null) throw new ArgumentNullException("uriManager");
+            if (resourceManager == null) throw new ArgumentNullException("resourceManager");
 
-            UriManager = uriManager;
+            ResourceManager = resourceManager;
         }
 
         // I/F
-        public abstract object Load(IUri uri);
+        public abstract object Load(IResource resource);
 
         // I/F
-        public virtual void Unload(IUri uri, object asset) { }
+        public virtual void Unload(IResource resource, object asset) { }
 
         // I/F
-        public virtual void Save(IUri uri, object asset)
+        public virtual void Save(IResource resource, object asset)
         {
             throw new NotSupportedException();
         }

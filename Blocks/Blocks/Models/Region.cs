@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
@@ -24,13 +25,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager chunkManager;
 
-        public UriManager UriManager { get; set; }
+        public ResourceManager ResourceManager { get; set; }
 
         public AssetManager AssetManager { get; set; }
 
         public IChunkStore ChunkStore { get; set; }
 
-        public IUri Uri { get; set; }
+        public IResource Resource { get; set; }
 
         public string Name { get; set; }
 
@@ -38,7 +39,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public BlockCatalog BlockCatalog { get; set; }
 
-        public IUri ChunkBundleUri { get; set; }
+        public IResource ChunkBundleResource { get; set; }
 
         public List<IProcedure<Chunk>> ChunkProcesures { get; set; }
 

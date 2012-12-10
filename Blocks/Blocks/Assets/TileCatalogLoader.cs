@@ -2,7 +2,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -16,26 +16,26 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         GraphicsDevice graphicsDevice;
 
-        public TileCatalogLoader(UriManager uriManager, GraphicsDevice graphicsDevice)
-            : base(uriManager)
+        public TileCatalogLoader(ResourceManager resourceManager, GraphicsDevice graphicsDevice)
+            : base(resourceManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
             this.graphicsDevice = graphicsDevice;
         }
 
-        public override object Load(IUri uri)
+        public override object Load(IResource resource)
         {
-            var resource = (TileCatalogDefinition) serializer.Deserialize(uri);
+            var definition = (TileCatalogDefinition) serializer.Deserialize(resource);
 
-            var tileCatalog = new TileCatalog(graphicsDevice, resource.Entries.Length);
+            var tileCatalog = new TileCatalog(graphicsDevice, definition.Entries.Length);
 
-            tileCatalog.Uri = uri;
-            tileCatalog.Name = resource.Name;
+            tileCatalog.Resource = resource;
+            tileCatalog.Name = definition.Name;
 
-            foreach (var entry in resource.Entries)
+            foreach (var entry in definition.Entries)
             {
-                var tile = LoadTile(uri.BaseUri, entry.Tile);
+                var tile = LoadTile(resource, entry.Tile);
                 tile.Index = entry.Index;
                 tileCatalog.Tiles.Add(tile);
             }
@@ -43,33 +43,33 @@ namespace Willcraftia.Xna.Blocks.Assets
             return tileCatalog;
         }
 
-        Tile LoadTile(string baseUri, string tileUri)
+        Tile LoadTile(IResource baseResource, string tileUri)
         {
-            var uri = UriManager.Create(baseUri, tileUri);
-            return AssetManager.Load<Tile>(uri);
+            var resource = ResourceManager.Load(baseResource, tileUri);
+            return AssetManager.Load<Tile>(resource);
         }
 
-        public override void Save(IUri uri, object asset)
+        public override void Save(IResource resource, object asset)
         {
             var tileCatalog = asset as TileCatalog;
 
-            var resource = new TileCatalogDefinition();
+            var definition = new TileCatalogDefinition();
 
-            resource.Name = tileCatalog.Name;
-            resource.Entries = new TileIndexDefinition[tileCatalog.Tiles.Count];
+            definition.Name = tileCatalog.Name;
+            definition.Entries = new TileIndexDefinition[tileCatalog.Tiles.Count];
             for (int i = 0; i < tileCatalog.Tiles.Count; i++)
             {
                 var tile = tileCatalog.Tiles[i];
-                resource.Entries[i] = new TileIndexDefinition
+                definition.Entries[i] = new TileIndexDefinition
                 {
                     Index = tile.Index,
-                    Tile = UriManager.CreateRelativeUri(uri.BaseUri, tile.Uri)
+                    Tile = ResourceManager.CreateRelativeUri(resource, tile.Resource)
                 };
             }
 
-            serializer.Serialize(uri, resource);
+            serializer.Serialize(resource, definition);
 
-            tileCatalog.Uri = uri;
+            tileCatalog.Resource = resource;
         }
     }
 }

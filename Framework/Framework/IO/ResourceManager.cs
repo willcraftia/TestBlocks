@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.IO
 {
-    public sealed class UriManager
+    public sealed class ResourceManager
     {
         #region RelativeUriKey
 
@@ -61,55 +61,55 @@ namespace Willcraftia.Xna.Framework
 
         #endregion
 
-        Dictionary<string, IUri> cache = new Dictionary<string, IUri>();
+        Dictionary<string, IResource> cache = new Dictionary<string, IResource>();
 
-        Dictionary<RelativeUriKey, IUri> relativeUriCache = new Dictionary<RelativeUriKey, IUri>();
+        Dictionary<RelativeUriKey, IResource> relativeUriCache = new Dictionary<RelativeUriKey, IResource>();
 
-        public IUri Create(string uriString)
+        public IResource Load(string uri)
         {
-            if (uriString == null) throw new ArgumentNullException("uriString");
+            if (uri == null) throw new ArgumentNullException("uri");
 
-            var parser = UriParserRegistory.Instance.GetUriParser(uriString);
-            var uri = parser.Parse(uriString);
-            cache[uri.AbsoluteUri] = uri;
-            return uri;
+            IResource resource;
+            if (cache.TryGetValue(uri, out resource))
+                return resource;
+
+            resource = ResourceLoader.Load(uri);
+            cache[resource.AbsoluteUri] = resource;
+            return resource;
         }
 
-        public IUri Create(string baseUri, string relativeUri)
+        public IResource Load(IResource baseResource, string relativeUri)
         {
-            if (baseUri == null) throw new ArgumentNullException("baseUri");
+            if (baseResource == null) throw new ArgumentNullException("baseResource");
             if (relativeUri == null) throw new ArgumentNullException("relativeUri");
 
-            IUri uri;
-            if (cache.TryGetValue(relativeUri, out uri))
-                return uri;
-
             if (0 < relativeUri.IndexOf(':'))
-                return Create(relativeUri);
+                return Load(relativeUri);
 
             var relativeUriKey = new RelativeUriKey
             {
-                BaseUri = baseUri,
+                BaseUri = baseResource.BaseUri,
                 RelativeUri = relativeUri
             };
 
-            if (relativeUriCache.TryGetValue(relativeUriKey, out uri))
-                return uri;
+            IResource resource;
+            if (relativeUriCache.TryGetValue(relativeUriKey, out resource))
+                return resource;
 
-            uri = Create(baseUri + relativeUri);
-            relativeUriCache[relativeUriKey] = uri;
-            return uri;
+            resource = Load(baseResource.BaseUri + relativeUri);
+            relativeUriCache[relativeUriKey] = resource;
+            return resource;
         }
 
-        public string CreateRelativeUri(string baseUri, IUri uri)
+        public string CreateRelativeUri(IResource baseResource, IResource resource)
         {
-            if (baseUri == null) throw new ArgumentNullException("baseUri");
-            if (uri == null) throw new ArgumentNullException("uri");
+            if (baseResource == null) throw new ArgumentNullException("baseResource");
+            if (resource == null) throw new ArgumentNullException("resource");
 
-            if (uri.AbsoluteUri.StartsWith(baseUri))
-                return uri.AbsoluteUri.Substring(baseUri.Length);
+            if (resource.AbsoluteUri.StartsWith(baseResource.BaseUri))
+                return resource.AbsoluteUri.Substring(baseResource.BaseUri.Length);
 
-            return uri.AbsoluteUri;
+            return resource.AbsoluteUri;
         }
 
         public void ClearCache()

@@ -5,9 +5,9 @@ using System.IO;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.IO
 {
-    public interface IUri
+    public interface IResource
     {
         string AbsoluteUri { get; }
 

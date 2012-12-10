@@ -5,11 +5,15 @@ using System.IO;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.IO
 {
-    public sealed class ContentUri : IUri, IEquatable<ContentUri>
+    public sealed class FileResource : IResource, IEquatable<FileResource>
     {
-        public const string ContentScheme = "content";
+        public const string FileScheme = "file";
+     
+        string extension;
+
+        object extensionLock = new object();
 
         string baseUri;
 
@@ -21,7 +25,7 @@ namespace Willcraftia.Xna.Framework
         // I/F
         public string Scheme
         {
-            get { return ContentScheme; }
+            get { return FileScheme; }
         }
 
         // I/F
@@ -30,13 +34,15 @@ namespace Willcraftia.Xna.Framework
         // I/F
         public string Extension
         {
-            get { return string.Empty; }
-        }
-
-        // I/F
-        public bool ReadOnly
-        {
-            get { return true; }
+            get
+            {
+                lock (extensionLock)
+                {
+                    if (extension == null)
+                        extension = Path.GetExtension(AbsolutePath);
+                    return extension;
+                }
+            }
         }
 
         // I/F
@@ -51,38 +57,61 @@ namespace Willcraftia.Xna.Framework
                         var lastSlash = AbsolutePath.LastIndexOf('/');
                         if (lastSlash < 0) lastSlash = 0;
                         var basePath = AbsolutePath.Substring(0, lastSlash + 1);
-                        baseUri = ContentScheme + ":" + basePath;
+                        baseUri = FileScheme + ":///" + basePath;
                     }
                     return baseUri;
                 }
             }
         }
 
-        internal ContentUri() { }
+        // I/F
+        public bool ReadOnly
+        {
+            get
+            {
+#if XBOX
+                return true;
+#else
+                var attributes = File.GetAttributes(AbsolutePath);
+                return (attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
+#endif
+            }
+        }
+
+        internal FileResource() { }
 
         // I/F
-        public Stream Open() { throw new NotSupportedException(); }
+        public Stream Open()
+        {
+            return File.Open(AbsolutePath, FileMode.Open);
+        }
 
         // I/F
-        public Stream Create() { throw new NotSupportedException(); }
+        public Stream Create()
+        {
+            return File.Create(AbsolutePath);
+        }
 
         // I/F
-        public void Delete() { throw new NotSupportedException(); }
+        public void Delete()
+        {
+            File.Delete(AbsolutePath);
+        }
 
         #region Equatable
 
-        public static bool operator ==(ContentUri p1, ContentUri p2)
+        public static bool operator ==(FileResource p1, FileResource p2)
         {
             return p1.Equals(p2);
         }
 
-        public static bool operator !=(ContentUri p1, ContentUri p2)
+        public static bool operator !=(FileResource p1, FileResource p2)
         {
             return !p1.Equals(p2);
         }
 
         // I/F
-        public bool Equals(ContentUri other)
+        public bool Equals(FileResource other)
         {
             return AbsoluteUri == other.AbsoluteUri;
         }
@@ -91,7 +120,7 @@ namespace Willcraftia.Xna.Framework
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((ContentUri) obj);
+            return Equals((FileResource) obj);
         }
 
         public override int GetHashCode()

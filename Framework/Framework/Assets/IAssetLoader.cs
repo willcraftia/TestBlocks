@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
@@ -10,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Assets
     {
         AssetManager AssetManager { set; }
 
-        object Load(IUri uri);
+        object Load(IResource resource);
 
         //
         // Unload は、Dispose すべきプロパティを持つならば、その Dispose を行う。
@@ -26,8 +27,8 @@ namespace Willcraftia.Xna.Framework.Assets
         // ただし、エディタなどで不要となったアセットを即座に解放したい場合など、
         // 特殊な状況下では、個々のアセットについて Unload を呼び出す可能性がある。
         //
-        void Unload(IUri uri, object asset);
+        void Unload(IResource resource, object asset);
 
-        void Save(IUri uri, object asset);
+        void Save(IResource resource, object asset);
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -18,49 +19,49 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
 
-        public RegionLoader(UriManager uriManager)
-            : base(uriManager)
+        public RegionLoader(ResourceManager resourceManager)
+            : base(resourceManager)
         {
         }
 
-        public override object Load(IUri uri)
+        public override object Load(IResource resource)
         {
-            var resource = (RegionDefinition) serializer.Deserialize(uri);
+            var definition = (RegionDefinition) serializer.Deserialize(resource);
 
             var region = new Region();
 
-            region.Uri = uri;
-            region.Name = resource.Name;
-            region.Bounds = resource.Bounds;
+            region.Resource = resource;
+            region.Name = definition.Name;
+            region.Bounds = definition.Bounds;
 
-            if (!string.IsNullOrEmpty(resource.TileCatalog))
+            if (!string.IsNullOrEmpty(definition.TileCatalog))
             {
-                var tileCatalogUri = UriManager.Create(uri.BaseUri, resource.TileCatalog);
-                region.TileCatalog = AssetManager.Load<TileCatalog>(tileCatalogUri);
+                var tileCatalogResource = ResourceManager.Load(resource, definition.TileCatalog);
+                region.TileCatalog = AssetManager.Load<TileCatalog>(tileCatalogResource);
             }
 
-            if (!string.IsNullOrEmpty(resource.BlockCatalog))
+            if (!string.IsNullOrEmpty(definition.BlockCatalog))
             {
-                var blockCatalogUri = UriManager.Create(uri.BaseUri, resource.BlockCatalog);
-                region.BlockCatalog = AssetManager.Load<BlockCatalog>(blockCatalogUri);
+                var blockCatalogResource = ResourceManager.Load(resource, definition.BlockCatalog);
+                region.BlockCatalog = AssetManager.Load<BlockCatalog>(blockCatalogResource);
             }
 
-            if (!string.IsNullOrEmpty(resource.ChunkBundle))
+            if (!string.IsNullOrEmpty(definition.ChunkBundle))
             {
-                var chunkBundleUri = UriManager.Create(uri.BaseUri, resource.ChunkBundle);
-                region.ChunkBundleUri = chunkBundleUri;
+                var chunkBundleResource = ResourceManager.Load(resource, definition.ChunkBundle);
+                region.ChunkBundleResource = chunkBundleResource;
             }
 
-            if (ArrayHelper.IsNullOrEmpty(resource.ChunkProcedures))
+            if (ArrayHelper.IsNullOrEmpty(definition.ChunkProcedures))
             {
                 region.ChunkProcesures = new List<IProcedure<Chunk>>(0);
             }
             else
             {
-                region.ChunkProcesures = new List<IProcedure<Chunk>>(resource.ChunkProcedures.Length);
-                for (int i = 0; i < resource.ChunkProcedures.Length; i++)
+                region.ChunkProcesures = new List<IProcedure<Chunk>>(definition.ChunkProcedures.Length);
+                for (int i = 0; i < definition.ChunkProcedures.Length; i++)
                 {
-                    var procedure = Procedures.ToProcedure<Chunk>(ref resource.ChunkProcedures[i]);
+                    var procedure = Procedures.ToProcedure<Chunk>(ref definition.ChunkProcedures[i]);
                     region.ChunkProcesures.Add(procedure);
                 }
             }
@@ -68,35 +69,35 @@ namespace Willcraftia.Xna.Blocks.Assets
             return region;
         }
 
-        public override void Save(IUri uri, object asset)
+        public override void Save(IResource resource, object asset)
         {
             var region = asset as Region;
 
-            var resource = new RegionDefinition();
+            var definition = new RegionDefinition();
 
-            resource.Name = region.Name;
-            resource.Bounds = region.Bounds;
+            definition.Name = region.Name;
+            definition.Bounds = region.Bounds;
             
-            if (region.TileCatalog != null && region.TileCatalog.Uri != null)
-                resource.TileCatalog = UriManager.CreateRelativeUri(uri.BaseUri, region.TileCatalog.Uri);
+            if (region.TileCatalog != null && region.TileCatalog.Resource != null)
+                definition.TileCatalog = ResourceManager.CreateRelativeUri(resource, region.TileCatalog.Resource);
             
-            if (region.BlockCatalog != null && region.BlockCatalog.Uri != null)
-                resource.BlockCatalog = UriManager.CreateRelativeUri(uri.BaseUri, region.BlockCatalog.Uri);
+            if (region.BlockCatalog != null && region.BlockCatalog.Resource != null)
+                definition.BlockCatalog = ResourceManager.CreateRelativeUri(resource, region.BlockCatalog.Resource);
 
-            if (region.ChunkBundleUri != null)
-                resource.ChunkBundle = UriManager.CreateRelativeUri(uri.BaseUri, region.ChunkBundleUri);
+            if (region.ChunkBundleResource != null)
+                definition.ChunkBundle = ResourceManager.CreateRelativeUri(resource, region.ChunkBundleResource);
 
-            if (!CollectionHelper.IsNullOrEmpty(resource.ChunkProcedures))
+            if (!CollectionHelper.IsNullOrEmpty(definition.ChunkProcedures))
             {
-                resource.ChunkProcedures = new ProcedureDefinition[region.ChunkProcesures.Count];
+                definition.ChunkProcedures = new ProcedureDefinition[region.ChunkProcesures.Count];
                 for (int i = 0; i < region.ChunkProcesures.Count; i++)
                 {
-                    resource.ChunkProcedures[i] = new ProcedureDefinition();
-                    Procedures.ToDefinition(region.ChunkProcesures[i], out resource.ChunkProcedures[i]);
+                    definition.ChunkProcedures[i] = new ProcedureDefinition();
+                    Procedures.ToDefinition(region.ChunkProcesures[i], out definition.ChunkProcedures[i]);
                 }
             }
 
-            serializer.Serialize(uri, resource);
+            serializer.Serialize(resource, definition);
         }
     }
 }

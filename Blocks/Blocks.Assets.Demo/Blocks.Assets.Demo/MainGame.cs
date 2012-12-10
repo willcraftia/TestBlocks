@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
 using Willcraftia.Xna.Blocks.Models;
@@ -59,6 +60,14 @@ namespace Willcraftia.Xna.Blocks.Assets.Demo
             StorageManager.SelectStorageContainer("Blocks.Demo.MainGame");
 
             //================================================================
+            // ResourceLoader
+
+            ResourceLoader.Register(ContentResourceLoader.Instance);
+            ResourceLoader.Register(TitleResourceLoader.Instance);
+            ResourceLoader.Register(StorageResourceLoader.Instance);
+            ResourceLoader.Register(FileResourceLoader.Instance);
+
+            //================================================================
             // Others
 
             base.Initialize();
@@ -80,7 +89,7 @@ namespace Willcraftia.Xna.Blocks.Assets.Demo
             // SpriteFont via the asset manager of the region.
 
             var spriteFontUriString = "content:Fonts/Demo";
-            var spriteFontUri = UriParserRegistory.Instance.GetUriParser(spriteFontUriString).Parse(spriteFontUriString);
+            var spriteFontUri = ContentResourceLoader.Instance.LoadResource(spriteFontUriString);
             var spriteFont = region.AssetManager.Load<SpriteFont>(spriteFontUri);
 
             logger.InfoEnd("LoadContent");

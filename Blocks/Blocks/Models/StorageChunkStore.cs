@@ -15,21 +15,21 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         static readonly Logger logger = new Logger(typeof(StorageChunkStore).Name);
 
-        IUri regionUri;
+        IResource regionUri;
 
         string rootDirectory = "Chunks";
 
         string regionDirectory;
 
-        public StorageChunkStore(IUri regionUri)
+        public StorageChunkStore(IResource regionResource)
         {
-            if (regionUri == null) throw new ArgumentNullException("regionUri");
+            if (regionResource == null) throw new ArgumentNullException("regionResource");
 
-            this.regionUri = regionUri;
+            this.regionUri = regionResource;
 
             var b = new StringBuilder(rootDirectory);
             b.Append('/');
-            foreach (var c in regionUri.AbsoluteUri)
+            foreach (var c in regionResource.AbsoluteUri)
             {
                 switch (c)
                 {

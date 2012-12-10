@@ -13,6 +13,6 @@ namespace Willcraftia.Xna.Framework.Serialization
 
         object Deserialize(Stream stream, object existingInstance);
 
-        void Serialize(Stream stream, object resource);
+        void Serialize(Stream stream, object instance);
     }
 }

@@ -1,7 +1,7 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -13,24 +13,24 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(BlockCatalogDefinition));
 
-        public BlockCatalogLoader(UriManager uriManager)
-            : base(uriManager)
+        public BlockCatalogLoader(ResourceManager resourceManager)
+            : base(resourceManager)
         {
         }
 
-        public override object Load(IUri uri)
+        public override object Load(IResource resource)
         {
-            var resource = (BlockCatalogDefinition) serializer.Deserialize(uri);
+            var definition = (BlockCatalogDefinition) serializer.Deserialize(resource);
 
-            var blockCatalog = new BlockCatalog(resource.Entries.Length);
+            var blockCatalog = new BlockCatalog(definition.Entries.Length);
 
-            blockCatalog.Uri = uri;
-            blockCatalog.Name = resource.Name;
+            blockCatalog.Resource = resource;
+            blockCatalog.Name = definition.Name;
 
-            foreach (var entry in resource.Entries)
+            foreach (var entry in definition.Entries)
             {
-                var blockUri = UriManager.Create(uri.BaseUri, entry.Block);
-                var block = AssetManager.Load<Block>(blockUri);
+                var blockResource = ResourceManager.Load(resource, entry.Block);
+                var block = AssetManager.Load<Block>(blockResource);
                 block.Index = entry.Index;
                 blockCatalog.Blocks.Add(block);
             }
@@ -38,29 +38,29 @@ namespace Willcraftia.Xna.Blocks.Assets
             return blockCatalog;
         }
 
-        public override void Save(IUri uri, object asset)
+        public override void Save(IResource resource, object asset)
         {
             var blockCatalog = asset as BlockCatalog;
 
-            var resource = new BlockCatalogDefinition();
+            var definition = new BlockCatalogDefinition();
 
-            resource.Name = blockCatalog.Name;
+            definition.Name = blockCatalog.Name;
 
-            resource.Entries = new BlockIndexDefinition[blockCatalog.Blocks.Count];
+            definition.Entries = new BlockIndexDefinition[blockCatalog.Blocks.Count];
             for (int i = 0; i < blockCatalog.Blocks.Count; i++)
             {
                 var block = blockCatalog.Blocks[i];
-                var blockUri = UriManager.CreateRelativeUri(uri.BaseUri, block.Uri);
-                resource.Entries[i] = new BlockIndexDefinition
+                var blockUri = ResourceManager.CreateRelativeUri(resource, block.Resource);
+                definition.Entries[i] = new BlockIndexDefinition
                 {
                     Index = block.Index,
                     Block = blockUri
                 };
             }
 
-            serializer.Serialize(uri, resource);
+            serializer.Serialize(resource, definition);
 
-            blockCatalog.Uri = uri;
+            blockCatalog.Resource = resource;
         }
     }
 }

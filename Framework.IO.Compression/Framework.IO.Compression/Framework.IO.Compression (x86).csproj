@@ -86,8 +86,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArchiveUri.cs" />
-    <Compile Include="ArchiveUriParser.cs" />
+    <Compile Include="ArchiveResource.cs" />
+    <Compile Include="ArchiveResourceLoader.cs" />
     <Compile Include="CompressionLevel.cs" />
     <Compile Include="CompressionMode.cs" />
     <Compile Include="GZipStream.cs" />

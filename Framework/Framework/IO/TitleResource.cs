@@ -2,14 +2,15 @@
 
 using System;
 using System.IO;
+using Microsoft.Xna.Framework;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.IO
 {
-    public sealed class StorageUri : IUri, IEquatable<StorageUri>
+    public sealed class TitleResource : IResource, IEquatable<TitleResource>
     {
-        public const string StorageScheme = "storage";
+        public const string TitleScheme = "title";
 
         string extension;
 
@@ -25,7 +26,7 @@ namespace Willcraftia.Xna.Framework
         // I/F
         public string Scheme
         {
-            get { return StorageScheme; }
+            get { return TitleScheme; }
         }
 
         // I/F
@@ -48,7 +49,7 @@ namespace Willcraftia.Xna.Framework
         // I/F
         public bool ReadOnly
         {
-            get { return false; }
+            get { return true; }
         }
 
         // I/F
@@ -63,55 +64,41 @@ namespace Willcraftia.Xna.Framework
                         var lastSlash = AbsolutePath.LastIndexOf('/');
                         if (lastSlash < 0) lastSlash = 0;
                         var basePath = AbsolutePath.Substring(0, lastSlash + 1);
-                        baseUri = StorageScheme + ":" + basePath;
+                        baseUri = TitleScheme + ":" + basePath;
                     }
                     return baseUri;
                 }
             }
         }
 
-        internal StorageUri() { }
+        internal TitleResource() { }
 
         // I/F
         public Stream Open()
         {
-            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-            return storageContainer.OpenFile(AbsolutePath, FileMode.Open);
+            return TitleContainer.OpenStream(AbsolutePath);
         }
 
         // I/F
-        public Stream Create()
-        {
-            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-
-            var directoryPath = Path.GetDirectoryName(AbsolutePath);
-            if (!storageContainer.DirectoryExists(directoryPath))
-                storageContainer.CreateDirectory(directoryPath);
-
-            return storageContainer.CreateFile(AbsolutePath);
-        }
+        public Stream Create() { throw new NotSupportedException(); }
 
         // I/F
-        public void Delete()
-        {
-            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-            storageContainer.DeleteFile(AbsolutePath);
-        }
+        public void Delete() { throw new NotSupportedException(); }
 
         #region Equatable
 
-        public static bool operator ==(StorageUri p1, StorageUri p2)
+        public static bool operator ==(TitleResource p1, TitleResource p2)
         {
             return p1.Equals(p2);
         }
 
-        public static bool operator !=(StorageUri p1, StorageUri p2)
+        public static bool operator !=(TitleResource p1, TitleResource p2)
         {
             return !p1.Equals(p2);
         }
 
         // I/F
-        public bool Equals(StorageUri other)
+        public bool Equals(TitleResource other)
         {
             return AbsoluteUri == other.AbsoluteUri;
         }
@@ -120,7 +107,7 @@ namespace Willcraftia.Xna.Framework
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((StorageUri) obj);
+            return Equals((TitleResource) obj);
         }
 
         public override int GetHashCode()

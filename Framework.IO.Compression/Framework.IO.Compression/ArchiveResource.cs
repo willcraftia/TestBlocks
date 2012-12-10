@@ -2,15 +2,14 @@
 
 using System;
 using System.IO;
-using Microsoft.Xna.Framework;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.IO.Compression
 {
-    public sealed class TitleUri : IUri, IEquatable<TitleUri>
+    public sealed class ArchiveResource : IResource, IEquatable<ArchiveResource>
     {
-        public const string TitleScheme = "title";
+        public const string ArchiveScheme = "archive";
 
         string extension;
 
@@ -26,7 +25,7 @@ namespace Willcraftia.Xna.Framework
         // I/F
         public string Scheme
         {
-            get { return TitleScheme; }
+            get { return ArchiveScheme; }
         }
 
         // I/F
@@ -40,7 +39,7 @@ namespace Willcraftia.Xna.Framework
                 lock (extensionLock)
                 {
                     if (extension == null)
-                        extension = Path.GetExtension(AbsolutePath);
+                        extension = Path.GetExtension(EntryPath);
                     return extension;
                 }
             }
@@ -64,19 +63,23 @@ namespace Willcraftia.Xna.Framework
                         var lastSlash = AbsolutePath.LastIndexOf('/');
                         if (lastSlash < 0) lastSlash = 0;
                         var basePath = AbsolutePath.Substring(0, lastSlash + 1);
-                        baseUri = TitleScheme + ":" + basePath;
+                        baseUri = ArchiveScheme + ":" + ZipResource + "!" + basePath;
                     }
                     return baseUri;
                 }
             }
         }
 
-        internal TitleUri() { }
+        public IResource ZipResource { get; internal set; }
+
+        public string EntryPath { get; internal set; }
+
+        internal ArchiveResource() { }
 
         // I/F
         public Stream Open()
         {
-            return TitleContainer.OpenStream(AbsolutePath);
+            return new ZipEntryStream(ZipResource.Open(), EntryPath);
         }
 
         // I/F
@@ -87,18 +90,18 @@ namespace Willcraftia.Xna.Framework
 
         #region Equatable
 
-        public static bool operator ==(TitleUri p1, TitleUri p2)
+        public static bool operator ==(ArchiveResource p1, ArchiveResource p2)
         {
             return p1.Equals(p2);
         }
 
-        public static bool operator !=(TitleUri p1, TitleUri p2)
+        public static bool operator !=(ArchiveResource p1, ArchiveResource p2)
         {
             return !p1.Equals(p2);
         }
 
         // I/F
-        public bool Equals(TitleUri other)
+        public bool Equals(ArchiveResource other)
         {
             return AbsoluteUri == other.AbsoluteUri;
         }
@@ -107,7 +110,7 @@ namespace Willcraftia.Xna.Framework
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((TitleUri) obj);
+            return Equals((ArchiveResource) obj);
         }
 
         public override int GetHashCode()

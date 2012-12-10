@@ -5,15 +5,11 @@ using System.IO;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.IO.Compression
+namespace Willcraftia.Xna.Framework.IO
 {
-    public sealed class ArchiveUri : IUri, IEquatable<ArchiveUri>
+    public sealed class ContentResource : IResource, IEquatable<ContentResource>
     {
-        public const string ArchiveScheme = "archive";
-
-        string extension;
-
-        object extensionLock = new object();
+        public const string ContentScheme = "content";
 
         string baseUri;
 
@@ -25,7 +21,7 @@ namespace Willcraftia.Xna.Framework.IO.Compression
         // I/F
         public string Scheme
         {
-            get { return ArchiveScheme; }
+            get { return ContentScheme; }
         }
 
         // I/F
@@ -34,15 +30,7 @@ namespace Willcraftia.Xna.Framework.IO.Compression
         // I/F
         public string Extension
         {
-            get
-            {
-                lock (extensionLock)
-                {
-                    if (extension == null)
-                        extension = Path.GetExtension(EntryPath);
-                    return extension;
-                }
-            }
+            get { return string.Empty; }
         }
 
         // I/F
@@ -63,25 +51,17 @@ namespace Willcraftia.Xna.Framework.IO.Compression
                         var lastSlash = AbsolutePath.LastIndexOf('/');
                         if (lastSlash < 0) lastSlash = 0;
                         var basePath = AbsolutePath.Substring(0, lastSlash + 1);
-                        baseUri = ArchiveScheme + ":" + ZipUri + "!" + basePath;
+                        baseUri = ContentScheme + ":" + basePath;
                     }
                     return baseUri;
                 }
             }
         }
 
-        public IUri ZipUri { get; internal set; }
-
-        public string EntryPath { get; internal set; }
-
-        internal ArchiveUri() { }
+        internal ContentResource() { }
 
         // I/F
-        public Stream Open()
-        {
-            var archiveStream = ZipUri.Open();
-            return new ZipEntryStream(archiveStream, EntryPath);
-        }
+        public Stream Open() { throw new NotSupportedException(); }
 
         // I/F
         public Stream Create() { throw new NotSupportedException(); }
@@ -91,18 +71,18 @@ namespace Willcraftia.Xna.Framework.IO.Compression
 
         #region Equatable
 
-        public static bool operator ==(ArchiveUri p1, ArchiveUri p2)
+        public static bool operator ==(ContentResource p1, ContentResource p2)
         {
             return p1.Equals(p2);
         }
 
-        public static bool operator !=(ArchiveUri p1, ArchiveUri p2)
+        public static bool operator !=(ContentResource p1, ContentResource p2)
         {
             return !p1.Equals(p2);
         }
 
         // I/F
-        public bool Equals(ArchiveUri other)
+        public bool Equals(ContentResource other)
         {
             return AbsoluteUri == other.AbsoluteUri;
         }
@@ -111,7 +91,7 @@ namespace Willcraftia.Xna.Framework.IO.Compression
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((ArchiveUri) obj);
+            return Equals((ContentResource) obj);
         }
 
         public override int GetHashCode()

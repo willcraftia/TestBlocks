@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
 
@@ -26,21 +26,21 @@ namespace Willcraftia.Xna.Blocks.Serialization
             serializerMap[".xml"] = xmlSerializer;
         }
 
-        public object Deserialize(IUri uri)
+        public object Deserialize(IResource resource)
         {
-            var serializer = GetSerializer(uri.Extension);
-            using (var stream = uri.Open())
+            var serializer = GetSerializer(resource.Extension);
+            using (var stream = resource.Open())
             {
                 return serializer.Deserialize(stream, null);
             }
         }
 
-        public void Serialize(IUri uri, object resource)
+        public void Serialize(IResource resource, object instance)
         {
-            var serializer = GetSerializer(uri.Extension);
-            using (var stream = uri.Create())
+            var serializer = GetSerializer(resource.Extension);
+            using (var stream = resource.Create())
             {
-                serializer.Serialize(stream, resource);
+                serializer.Serialize(stream, instance);
             }
         }
 

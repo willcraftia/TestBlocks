@@ -1,7 +1,7 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -13,94 +13,94 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(BlockDefinition));
 
-        public BlockLoader(UriManager uriManager)
-            : base(uriManager)
+        public BlockLoader(ResourceManager resourceManager)
+            : base(resourceManager)
         {
         }
 
-        public override object Load(IUri uri)
+        public override object Load(IResource resource)
         {
-            var resource = (BlockDefinition) serializer.Deserialize(uri);
+            var definition = (BlockDefinition) serializer.Deserialize(resource);
 
             var block = new Block();
 
-            block.Uri = uri;
-            block.Name = resource.Name;
+            block.Resource = resource;
+            block.Name = definition.Name;
             
             // ※注意
             // AssetManager のキャッシュを前提に、同一 URI ならば同一の Tile を得られるため、
             // TileCatalog を用いないならば、単に Index 未使用として Tile をバインドし、
             // TileCatalog を用いるならば、そこへの Tile の登録で Index が確定することを利用する。
-            if (resource.Mesh != null)
+            if (definition.Mesh != null)
             {
-                var meshUri = UriManager.Create(uri.BaseUri, resource.Mesh);
-                block.Mesh = AssetManager.Load<Mesh>(meshUri);
+                var meshResource = ResourceManager.Load(resource, definition.Mesh);
+                block.Mesh = AssetManager.Load<Mesh>(meshResource);
             }
 
-            block.TopTile = LoadTile(uri.BaseUri, resource.TopTile);
-            block.BottomTile = LoadTile(uri.BaseUri, resource.BottomTile);
-            block.FrontTile = LoadTile(uri.BaseUri, resource.FrontTile);
-            block.BackTile = LoadTile(uri.BaseUri, resource.BackTile);
-            block.LeftTile = LoadTile(uri.BaseUri, resource.LeftTile);
-            block.RightTile = LoadTile(uri.BaseUri, resource.RightTile);
+            block.TopTile = LoadTile(resource, definition.TopTile);
+            block.BottomTile = LoadTile(resource, definition.BottomTile);
+            block.FrontTile = LoadTile(resource, definition.FrontTile);
+            block.BackTile = LoadTile(resource, definition.BackTile);
+            block.LeftTile = LoadTile(resource, definition.LeftTile);
+            block.RightTile = LoadTile(resource, definition.RightTile);
 
-            block.Fluid = resource.Fluid;
-            block.ShadowCasting = resource.ShadowCasting;
-            block.Shape = resource.Shape;
-            block.Mass = resource.Mass;
+            block.Fluid = definition.Fluid;
+            block.ShadowCasting = definition.ShadowCasting;
+            block.Shape = definition.Shape;
+            block.Mass = definition.Mass;
             //block.Immovable = resource.Immovable;
-            block.StaticFriction = resource.StaticFriction;
-            block.DynamicFriction = resource.DynamicFriction;
-            block.Restitution = resource.Restitution;
+            block.StaticFriction = definition.StaticFriction;
+            block.DynamicFriction = definition.DynamicFriction;
+            block.Restitution = definition.Restitution;
 
             return block;
         }
 
-        Tile LoadTile(string baseUri, string tileUri)
+        Tile LoadTile(IResource baseResource, string tileUri)
         {
             if (tileUri == null) return null;
 
-            var uri = UriManager.Create(baseUri, tileUri);
-            return AssetManager.Load<Tile>(uri);
+            var resource = ResourceManager.Load(baseResource, tileUri);
+            return AssetManager.Load<Tile>(resource);
         }
 
-        public override void Save(IUri uri, object asset)
+        public override void Save(IResource resource, object asset)
         {
             var block = asset as Block;
 
-            var resource = new BlockDefinition();
+            var definition = new BlockDefinition();
 
-            resource.Name = block.Name;
+            definition.Name = block.Name;
 
-            if (block.Mesh != null && block.Mesh.Uri != null)
-                resource.Mesh = UriManager.CreateRelativeUri(uri.BaseUri, block.Mesh.Uri);
+            if (block.Mesh != null && block.Mesh.Resource != null)
+                definition.Mesh = ResourceManager.CreateRelativeUri(resource, block.Mesh.Resource);
 
-            resource.TopTile = CreateTileUri(uri.BaseUri, block.TopTile.Uri);
-            resource.BottomTile = CreateTileUri(uri.BaseUri, block.BottomTile.Uri);
-            resource.FrontTile = CreateTileUri(uri.BaseUri, block.FrontTile.Uri);
-            resource.BackTile = CreateTileUri(uri.BaseUri, block.BackTile.Uri);
-            resource.LeftTile = CreateTileUri(uri.BaseUri, block.LeftTile.Uri);
-            resource.RightTile = CreateTileUri(uri.BaseUri, block.RightTile.Uri);
+            definition.TopTile = CreateTileUri(resource, block.TopTile.Resource);
+            definition.BottomTile = CreateTileUri(resource, block.BottomTile.Resource);
+            definition.FrontTile = CreateTileUri(resource, block.FrontTile.Resource);
+            definition.BackTile = CreateTileUri(resource, block.BackTile.Resource);
+            definition.LeftTile = CreateTileUri(resource, block.LeftTile.Resource);
+            definition.RightTile = CreateTileUri(resource, block.RightTile.Resource);
 
-            resource.Fluid = block.Fluid;
-            resource.ShadowCasting = block.ShadowCasting;
-            resource.Shape = block.Shape;
-            resource.Mass = block.Mass;
+            definition.Fluid = block.Fluid;
+            definition.ShadowCasting = block.ShadowCasting;
+            definition.Shape = block.Shape;
+            definition.Mass = block.Mass;
             //resource.Immovable = block.Immovable;
-            resource.StaticFriction = block.StaticFriction;
-            resource.DynamicFriction = block.DynamicFriction;
-            resource.Restitution = block.Restitution;
+            definition.StaticFriction = block.StaticFriction;
+            definition.DynamicFriction = block.DynamicFriction;
+            definition.Restitution = block.Restitution;
 
-            serializer.Serialize(uri, resource);
+            serializer.Serialize(resource, definition);
 
-            block.Uri = uri;
+            block.Resource = resource;
         }
 
-        string CreateTileUri(string baseUri, IUri tileUri)
+        string CreateTileUri(IResource baseResource, IResource tileUri)
         {
             if (tileUri == null) return null;
 
-            return UriManager.CreateRelativeUri(baseUri, tileUri);
+            return ResourceManager.CreateRelativeUri(baseResource, tileUri);
         }
     }
 }

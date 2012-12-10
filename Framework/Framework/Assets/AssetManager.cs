@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
@@ -53,50 +54,50 @@ namespace Willcraftia.Xna.Framework.Assets
             return false;
         }
 
-        public T Load<T>(IUri uri)
+        public T Load<T>(IResource resource)
         {
-            if (uri == null) throw new ArgumentNullException("uri");
+            if (resource == null) throw new ArgumentNullException("resource");
 
             AssetHolder holder;
-            if (!holders.TryGetItem(uri, out holder)) holder = LoadNew<T>(uri);
+            if (!holders.TryGetItem(resource, out holder)) holder = LoadNew<T>(resource);
 
             return (T) holder.Asset;
         }
 
-        AssetHolder LoadNew<T>(IUri uri)
+        AssetHolder LoadNew<T>(IResource resource)
         {
-            logger.InfoBegin("LoadNew: {0}", uri);
+            logger.InfoBegin("LoadNew: {0}", resource);
 
             object asset;
             IAssetLoader loader;
-            if (uri is ContentUri)
+            if (resource is ContentResource)
             {
                 // XNA content framework
-                asset = contentManager.Load<T>(uri.AbsolutePath);
+                asset = contentManager.Load<T>(resource.AbsolutePath);
                 loader = null;
             }
             else
             {
                 // My asset framework
                 loader = GetLoader(typeof(T));
-                asset = loader.Load(uri);
+                asset = loader.Load(resource);
             }
 
             // Cache
-            var holder = new AssetHolder { Uri = uri, Asset = asset, Loader = loader };
+            var holder = new AssetHolder { Resource = resource, Asset = asset, Loader = loader };
             holders.Add(holder);
 
-            logger.InfoEnd("LoadNew: {0}", uri);
+            logger.InfoEnd("LoadNew: {0}", resource);
 
             return holder;
         }
 
-        public void Unload(IUri uri)
+        public void Unload(IResource resource)
         {
-            logger.InfoBegin("Unload: {0}", uri);
+            logger.InfoBegin("Unload: {0}", resource);
 
             AssetHolder holder;
-            if (holders.TryGetItem(uri, out holder))
+            if (holders.TryGetItem(resource, out holder))
             {
                 if (holder.Loader == null)
                 {
@@ -104,16 +105,16 @@ namespace Willcraftia.Xna.Framework.Assets
                 }
                 else
                 {
-                    holder.Loader.Unload(holder.Uri, holder.Asset);
+                    holder.Loader.Unload(holder.Resource, holder.Asset);
                 }
 
-                holders.Remove(uri);
-                holder.Uri = null;
+                holders.Remove(resource);
+                holder.Resource = null;
                 holder.Asset = null;
                 holder.Loader = null;
             }
 
-            logger.InfoEnd("Unload: {0}", uri);
+            logger.InfoEnd("Unload: {0}", resource);
         }
 
         public void Unload()
@@ -121,7 +122,7 @@ namespace Willcraftia.Xna.Framework.Assets
             if (holders.Count == 0) return;
 
             while (0 < holders.Count)
-                Unload(holders[holders.Count - 1].Uri);
+                Unload(holders[holders.Count - 1].Resource);
         }
 
         // ※保存に関する注意
@@ -145,25 +146,24 @@ namespace Willcraftia.Xna.Framework.Assets
         // この削除処理では、単に AssetManager でアセットを削除するだけでなく、
         // 削除したいアセットを参照しているクラスから、その参照を取り除く必要がある。
 
-        public void Save<T>(IUri uri, T asset)
+        public void Save<T>(IResource resource, T asset)
         {
-            if (uri == null) throw new ArgumentNullException("uri");
+            if (resource == null) throw new ArgumentNullException("resource");
             if (asset == null) throw new ArgumentNullException("asset");
-            if (uri.ReadOnly) throw new InvalidOperationException("Read-only uri: " + uri);
+            if (resource.ReadOnly) throw new InvalidOperationException("Read-only resource: " + resource);
 
-            logger.InfoBegin("Save: {0}", uri);
+            logger.InfoBegin("Save: {0}", resource);
 
             // Protect.
             AssetHolder testHolder;
-            if (holders.TryGetItem(uri, out testHolder) && !asset.Equals(testHolder.Asset))
-                throw new InvalidOperationException(
-                    string.Format("The specified uri '{0}' is bound to the other asset '{0}'.", uri));
+            if (holders.TryGetItem(resource, out testHolder) && !asset.Equals(testHolder.Asset))
+                throw new InvalidOperationException("Resource '{0}' is bound to the other asset: " + resource);
 
             // Unbind if needed.
             AssetHolder oldHolder = null;
             foreach (var assetHolder in holders)
             {
-                if (assetHolder.Asset.Equals(asset) && assetHolder.Uri != uri)
+                if (assetHolder.Asset.Equals(asset) && assetHolder.Resource != resource)
                 {
                     oldHolder = assetHolder;
                     break;
@@ -174,23 +174,23 @@ namespace Willcraftia.Xna.Framework.Assets
             {
                 holders.Remove(oldHolder);
 
-                logger.Info("Old asset holder removed: {0}", oldHolder.Uri);
+                logger.Info("Old asset holder removed: {0}", oldHolder.Resource);
             }
 
             // Save.
             var loader = GetLoader(typeof(T));
-            loader.Save(uri, asset);
+            loader.Save(resource, asset);
 
             // Prepare the asset holder.
             var newHolder = oldHolder ?? new AssetHolder();
-            newHolder.Uri = uri;
+            newHolder.Resource = resource;
             newHolder.Asset = asset;
             newHolder.Loader = loader;
 
             // Cache.
             holders.Add(newHolder);
 
-            logger.InfoEnd("Save: {0}", uri);
+            logger.InfoEnd("Save: {0}", resource);
         }
 
         IAssetLoader GetLoader(Type type)
@@ -199,7 +199,7 @@ namespace Willcraftia.Xna.Framework.Assets
             if (TryGetLoader(type, out result))
                 return result;
 
-            throw new InvalidOperationException(string.Format("The asset loader for '{0}' can not be found.", type));
+            throw new InvalidOperationException("Asset loader not found: " + type);
         }
 
         bool TryGetLoader(Type type, out IAssetLoader result)

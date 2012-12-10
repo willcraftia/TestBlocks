@@ -47,28 +47,28 @@ namespace Willcraftia.Xna.Blocks.Models
 
         // 非同期呼び出しを想定。
         // Region 丸ごと別スレッドでロードするつもり。
-        public Region LoadRegion(string uriString)
+        public Region LoadRegion(string uri)
         {
-            logger.InfoBegin("LoadRegion: {0}", uriString);
+            logger.InfoBegin("LoadRegion: {0}", uri);
 
-            var uriManager = new UriManager();
+            var resourceManager = new ResourceManager();
 
-            var uri = uriManager.Create(uriString);
+            var resource = resourceManager.Load(uri);
 
             var assetManager = new AssetManager(serviceProvider);
-            assetManager.RegisterLoader(typeof(Region), new RegionLoader(uriManager));
-            assetManager.RegisterLoader(typeof(Tile), new TileLoader(uriManager));
-            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(uriManager, graphicsDevice));
-            assetManager.RegisterLoader(typeof(Block), new BlockLoader(uriManager));
-            assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader(uriManager));
-            assetManager.RegisterLoader(typeof(Mesh), new MeshLoader(uriManager));
-            assetManager.RegisterLoader(typeof(Texture2D), new Texture2DLoader(uriManager, graphicsDevice));
+            assetManager.RegisterLoader(typeof(Region), new RegionLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(Tile), new TileLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(resourceManager, graphicsDevice));
+            assetManager.RegisterLoader(typeof(Block), new BlockLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(Mesh), new MeshLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(Texture2D), new Texture2DLoader(resourceManager, graphicsDevice));
 
-            var region = assetManager.Load<Region>(uri);
+            var region = assetManager.Load<Region>(resource);
             region.ChunkSize = ChunkSize;
-            region.UriManager = uriManager;
+            region.ResourceManager = resourceManager;
             region.AssetManager = assetManager;
-            region.ChunkStore = new StorageChunkStore(uri);
+            region.ChunkStore = new StorageChunkStore(resource);
             region.Initialize();
 
             lock (regions)
@@ -76,7 +76,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 regions.Add(region);
             }
 
-            logger.InfoEnd("LoadRegion: {0}", uriString);
+            logger.InfoEnd("LoadRegion: {0}", uri);
 
             return region;
         }

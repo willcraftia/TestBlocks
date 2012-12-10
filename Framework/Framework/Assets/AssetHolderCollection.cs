@@ -2,21 +2,22 @@
 
 using System;
 using Willcraftia.Xna.Framework.Collections;
+using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Assets
 {
-    public sealed class AssetHolderCollection : KeyedList<IUri, AssetHolder>
+    public sealed class AssetHolderCollection : KeyedList<IResource, AssetHolder>
     {
-        public bool TryGetItem(IUri key, out AssetHolder item)
+        public bool TryGetItem(IResource key, out AssetHolder item)
         {
             return Dictionary.TryGetValue(key, out item);
         }
 
-        protected override IUri GetKeyForItem(AssetHolder item)
+        protected override IResource GetKeyForItem(AssetHolder item)
         {
-            return item.Uri;
+            return item.Resource;
         }
     }
 }

@@ -5,12 +5,12 @@ using System.IO;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.IO
 {
-    public sealed class FileUri : IUri, IEquatable<FileUri>
+    public sealed class StorageResource : IResource, IEquatable<StorageResource>
     {
-        public const string FileScheme = "file";
-     
+        public const string StorageScheme = "storage";
+
         string extension;
 
         object extensionLock = new object();
@@ -25,7 +25,7 @@ namespace Willcraftia.Xna.Framework
         // I/F
         public string Scheme
         {
-            get { return FileScheme; }
+            get { return StorageScheme; }
         }
 
         // I/F
@@ -46,6 +46,12 @@ namespace Willcraftia.Xna.Framework
         }
 
         // I/F
+        public bool ReadOnly
+        {
+            get { return false; }
+        }
+
+        // I/F
         public string BaseUri
         {
             get
@@ -57,61 +63,55 @@ namespace Willcraftia.Xna.Framework
                         var lastSlash = AbsolutePath.LastIndexOf('/');
                         if (lastSlash < 0) lastSlash = 0;
                         var basePath = AbsolutePath.Substring(0, lastSlash + 1);
-                        baseUri = FileScheme + ":///" + basePath;
+                        baseUri = StorageScheme + ":" + basePath;
                     }
                     return baseUri;
                 }
             }
         }
 
-        // I/F
-        public bool ReadOnly
-        {
-            get
-            {
-#if XBOX
-                return true;
-#else
-                var attributes = File.GetAttributes(AbsolutePath);
-                return (attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
-#endif
-            }
-        }
-
-        internal FileUri() { }
+        internal StorageResource() { }
 
         // I/F
         public Stream Open()
         {
-            return File.Open(AbsolutePath, FileMode.Open);
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
+            return storageContainer.OpenFile(AbsolutePath, FileMode.Open);
         }
 
         // I/F
         public Stream Create()
         {
-            return File.Create(AbsolutePath);
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
+
+            var directoryPath = Path.GetDirectoryName(AbsolutePath);
+            if (!storageContainer.DirectoryExists(directoryPath))
+                storageContainer.CreateDirectory(directoryPath);
+
+            return storageContainer.CreateFile(AbsolutePath);
         }
 
         // I/F
         public void Delete()
         {
-            File.Delete(AbsolutePath);
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
+            storageContainer.DeleteFile(AbsolutePath);
         }
 
         #region Equatable
 
-        public static bool operator ==(FileUri p1, FileUri p2)
+        public static bool operator ==(StorageResource p1, StorageResource p2)
         {
             return p1.Equals(p2);
         }
 
-        public static bool operator !=(FileUri p1, FileUri p2)
+        public static bool operator !=(StorageResource p1, StorageResource p2)
         {
             return !p1.Equals(p2);
         }
 
         // I/F
-        public bool Equals(FileUri other)
+        public bool Equals(StorageResource other)
         {
             return AbsoluteUri == other.AbsoluteUri;
         }
@@ -120,7 +120,7 @@ namespace Willcraftia.Xna.Framework
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((FileUri) obj);
+            return Equals((StorageResource) obj);
         }
 
         public override int GetHashCode()

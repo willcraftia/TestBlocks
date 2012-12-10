@@ -72,18 +72,18 @@ namespace Willcraftia.Xna.Framework.Serialization.Json
         }
 
         // I/F
-        public void Serialize(Stream stream, object resource)
+        public void Serialize(Stream stream, object instance)
         {
 #if WINDOWS
             using (var writer = new StreamWriter(stream))
             {
                 try
                 {
-                    JsonSerializer.Serialize(writer, resource);
+                    JsonSerializer.Serialize(writer, instance);
                 }
                 catch (JsonException e)
                 {
-                    throw new SerializationException("Error json serializing: " + resource.GetType(), e);
+                    throw new SerializationException("Error json serializing: " + instance.GetType(), e);
                 }
             }
 #else

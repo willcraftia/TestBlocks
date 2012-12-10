@@ -3,7 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
@@ -19,7 +19,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte Index { get; set; }
 
-        public IUri Uri { get; set; }
+        public IResource Resource { get; set; }
 
         public string Name { get; set; }
 

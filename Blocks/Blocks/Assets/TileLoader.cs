@@ -3,7 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -15,67 +15,67 @@ namespace Willcraftia.Xna.Blocks.Assets
     {
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(TileDefinition));
 
-        public TileLoader(UriManager uriManager)
-            : base(uriManager)
+        public TileLoader(ResourceManager resourceManager)
+            : base(resourceManager)
         {
         }
 
-        public override object Load(IUri uri)
+        public override object Load(IResource resource)
         {
-            var resource = (TileDefinition) serializer.Deserialize(uri);
+            var definition = (TileDefinition) serializer.Deserialize(resource);
 
             var tile = new Tile();
 
-            tile.Uri = uri;
-            tile.Name = resource.Name;
+            tile.Resource = resource;
+            tile.Name = definition.Name;
             
             //
             // TODO: absolute URI
             //
             
-            tile.TextureUri = resource.Texture;
-            tile.Texture = LoadTexture(uri.BaseUri, tile.TextureUri);
-            tile.Translucent = resource.Translucent;
+            tile.TextureUri = definition.Texture;
+            tile.Texture = LoadTexture(resource, tile.TextureUri);
+            tile.Translucent = definition.Translucent;
 
             Color color;
 
-            UnpackColor(resource.DiffuseColor, out color);
+            UnpackColor(definition.DiffuseColor, out color);
             tile.DiffuseColor = color;
 
-            UnpackColor(resource.EmissiveColor, out color);
+            UnpackColor(definition.EmissiveColor, out color);
             tile.EmissiveColor = color;
 
-            UnpackColor(resource.SpecularColor, out color);
+            UnpackColor(definition.SpecularColor, out color);
             tile.SpecularColor = color;
 
-            tile.SpecularPower = resource.SpecularPower;
+            tile.SpecularPower = definition.SpecularPower;
 
             return tile;
         }
 
-        Texture2D LoadTexture(string baseUri, string textureUri)
+        Texture2D LoadTexture(IResource baseResource, string textureUri)
         {
-            var uri = UriManager.Create(baseUri, textureUri);
-            return AssetManager.Load<Texture2D>(uri);
+            var resource = ResourceManager.Load(baseResource, textureUri);
+            return AssetManager.Load<Texture2D>(resource);
         }
 
-        public override void Save(IUri uri, object asset)
+        public override void Save(IResource resource, object asset)
         {
             var tile = asset as Tile;
 
-            var resource = new TileDefinition();
+            var definition = new TileDefinition();
 
-            resource.Name = tile.Name;
-            resource.Texture = tile.TextureUri;
-            resource.Translucent = tile.Translucent;
-            resource.DiffuseColor = tile.DiffuseColor.PackedValue;
-            resource.EmissiveColor = tile.EmissiveColor.PackedValue;
-            resource.SpecularColor = tile.SpecularColor.PackedValue;
-            resource.SpecularPower = tile.SpecularPower;
+            definition.Name = tile.Name;
+            definition.Texture = tile.TextureUri;
+            definition.Translucent = tile.Translucent;
+            definition.DiffuseColor = tile.DiffuseColor.PackedValue;
+            definition.EmissiveColor = tile.EmissiveColor.PackedValue;
+            definition.SpecularColor = tile.SpecularColor.PackedValue;
+            definition.SpecularPower = tile.SpecularPower;
 
-            serializer.Serialize(uri, resource);
+            serializer.Serialize(resource, definition);
 
-            tile.Uri = uri;
+            tile.Resource = resource;
         }
 
         void UnpackColor(uint packedValue, out Color color)

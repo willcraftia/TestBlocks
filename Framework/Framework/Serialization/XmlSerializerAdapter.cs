@@ -59,11 +59,11 @@ namespace Willcraftia.Xna.Framework.Serialization
         }
 
         // I/F
-        public void Serialize(Stream stream, object resource)
+        public void Serialize(Stream stream, object instance)
         {
             using (var writer = XmlWriter.Create(stream, WriterSettings))
             {
-                xmlSerializer.Serialize(writer, resource, namespaces);
+                xmlSerializer.Serialize(writer, instance, namespaces);
             }
         }
     }
