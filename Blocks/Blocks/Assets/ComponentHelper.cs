@@ -12,11 +12,14 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class ComponentHelper
     {
-        public static object ToComponent(ref ComponentDefinition definition)
+        public static T ToComponent<T>(ref ComponentDefinition definition)
         {
             var type = Type.GetType(definition.Type);
             if (type == null)
                 throw new InvalidOperationException("Type not found: " + definition.Type);
+
+            if (!typeof(T).IsAssignableFrom(type))
+                throw new InvalidOperationException("Unexpected type: " + type.FullName);
 
             var instance = type.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
 
@@ -32,7 +35,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 }
             }
 
-            return instance;
+            return (T) instance;
         }
 
         public static void ToDefinition(object component, out ComponentDefinition result)

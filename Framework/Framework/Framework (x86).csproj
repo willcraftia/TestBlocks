@@ -126,6 +126,17 @@
     <Compile Include="Graphics\WritableVertexBuffer.cs" />
     <Compile Include="IO\IResource.cs" />
     <Compile Include="IO\ResourceLoader.cs" />
+    <Compile Include="Noise\Definitions\NoisePropertyInfoCollection.cs" />
+    <Compile Include="Noise\Definitions\NoiseSourceInfo.cs" />
+    <Compile Include="Noise\Definitions\NoiseSourceInfoCollection.cs" />
+    <Compile Include="Noise\Definitions\NoiseSourceTypeAlias.cs" />
+    <Compile Include="Noise\NoiseParameterAttribute.cs" />
+    <Compile Include="Noise\NoiseReferenceAttribute.cs" />
+    <Compile Include="Noise\Definitions\NoiseReferenceDefinition.cs" />
+    <Compile Include="Noise\Definitions\NoiseSourceDefinition.cs" />
+    <Compile Include="Noise\Definitions\NoiseProject.cs" />
+    <Compile Include="Noise\Definitions\NoiseProjectDefinition.cs" />
+    <Compile Include="Noise\Definitions\NoiseParameterDefinition.cs" />
     <Compile Include="Serialization\XmlSerializerAdapter.cs" />
     <Compile Include="StateOutOfRangeException.cs" />
     <Compile Include="Landscape\Partition.cs" />
@@ -139,7 +150,7 @@
     <Compile Include="Noise\Heterofractal.cs" />
     <Compile Include="Noise\HybridMultifractal.cs" />
     <Compile Include="Noise\INoiseArray2.cs" />
-    <Compile Include="Noise\IModule.cs" />
+    <Compile Include="Noise\INoiseSource.cs" />
     <Compile Include="Noise\Metrics.cs" />
     <Compile Include="Noise\MetricsDelegate.cs" />
     <Compile Include="Noise\Multifractal.cs" />
@@ -151,7 +162,6 @@
     <Compile Include="Noise\Perlin.cs" />
     <Compile Include="Noise\PerlinFractal.cs" />
     <Compile Include="Noise\RidgedMultifractal.cs" />
-    <Compile Include="Noise\SampleSourceDelegate.cs" />
     <Compile Include="Noise\ScaleBias.cs" />
     <Compile Include="Noise\Select.cs" />
     <Compile Include="Noise\Simplex.cs" />

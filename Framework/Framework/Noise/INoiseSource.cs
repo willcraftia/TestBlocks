@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public interface IModule
+    public interface INoiseSource
     {
         float Sample(float x, float y, float z);
     }

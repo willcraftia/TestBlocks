@@ -19,12 +19,14 @@ namespace Willcraftia.Xna.Framework.Noise
 
         float gain = MusgraveGain;
 
+        [NoiseParameter]
         public float Offset
         {
             get { return offset; }
             set { offset = value; }
         }
 
+        [NoiseParameter]
         public float Gain
         {
             get { return gain; }
@@ -47,7 +49,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
             for (int i = 0; i < octaveCount; i++)
             {
-                var signal = Source(x, y, z);
+                var signal = Source.Sample(x, y, z);
 
                 signal = Math.Abs(signal);
                 signal = offset - signal;

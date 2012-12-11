@@ -6,27 +6,30 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public sealed class Add : IModule
+    public sealed class Add : INoiseSource
     {
-        SampleSourceDelegate source0;
+        INoiseSource source0;
 
-        SampleSourceDelegate source1;
+        INoiseSource source1;
 
-        public SampleSourceDelegate Source0
+        [NoiseReference]
+        public INoiseSource Source0
         {
             get { return source0; }
             set { source0 = value; }
         }
 
-        public SampleSourceDelegate Source1
+        [NoiseReference]
+        public INoiseSource Source1
         {
             get { return source1; }
             set { source1 = value; }
         }
 
+        // I/F
         public float Sample(float x, float y, float z)
         {
-            return source0(x, y, z) + source1(x, y, z);
+            return source0.Sample(x, y, z) + source1.Sample(x, y, z);
         }
     }
 }

@@ -6,39 +6,43 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public sealed class ScaleBias : IModule
+    public sealed class ScaleBias : INoiseSource
     {
         public const float DefaultBias = 0;
 
         public const float DefaultScale = 1;
 
-        SampleSourceDelegate source;
+        INoiseSource source;
 
         float bias = DefaultBias;
 
         float scale = DefaultScale;
 
-        public SampleSourceDelegate Source
+        [NoiseReference]
+        public INoiseSource Source
         {
             get { return source; }
             set { source = value; }
         }
 
+        [NoiseParameter]
         public float Bias
         {
             get { return bias; }
             set { bias = value; }
         }
 
+        [NoiseParameter]
         public float Scale
         {
             get { return scale; }
             set { scale = value; }
         }
 
+        // I/F
         public float Sample(float x, float y, float z)
         {
-            return source(x, y, z) * scale + bias;
+            return source.Sample(x, y, z) * scale + bias;
         }
     }
 }

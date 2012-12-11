@@ -10,6 +10,7 @@ namespace Willcraftia.Xna.Framework.Noise
     {
         float offset = 0.7f;
 
+        [NoiseParameter]
         public float Offset
         {
             get { return offset; }
@@ -22,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Noise
             y *= frequency;
             z *= frequency;
 
-            float signal = Source(x, y, z) + offset;
+            float signal = Source.Sample(x, y, z) + offset;
             float value = signal;
 
             x *= lacunarity;
@@ -31,7 +32,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
             for (int i = 1; i < octaveCount; i++)
             {
-                signal = Source(x, y, z) + offset;
+                signal = Source.Sample(x, y, z) + offset;
                 signal *= spectralWeights[i];
                 signal *= value;
                 value += signal;

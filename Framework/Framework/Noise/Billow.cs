@@ -6,8 +6,10 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public sealed class Billow : IModule
+    public sealed class Billow : INoiseSource
     {
+        INoiseSource source;
+
         float frequency = 1;
 
         float lacunarity = 2;
@@ -16,32 +18,42 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int octaveCount = 6;
 
-        public SampleSourceDelegate Source { get; set; }
+        [NoiseReference]
+        public INoiseSource Source
+        {
+            get { return source; }
+            set { source = value; }
+        }
 
+        [NoiseParameter]
         public float Frequency
         {
             get { return frequency; }
             set { frequency = value; }
         }
 
+        [NoiseParameter]
         public float Lacunarity
         {
             get { return lacunarity; }
             set { lacunarity = value; }
         }
 
+        [NoiseParameter]
         public float Persistence
         {
             get { return persistence; }
             set { persistence = value; }
         }
 
+        [NoiseParameter]
         public int OctaveCount
         {
             get { return octaveCount; }
             set { octaveCount = value; }
         }
 
+        // I/F
         public float Sample(float x, float y, float z)
         {
             float value = 0;
@@ -53,7 +65,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
             for (int i = 0; i < octaveCount; i++)
             {
-                var signal = Source(x, y, z);
+                var signal = source.Sample(x, y, z);
                 signal = 2 * Math.Abs(signal) - 1;
                 value += signal * amplitude;
 

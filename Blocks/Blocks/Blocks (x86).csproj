@@ -67,10 +67,14 @@
     <Compile Include="Assets\RegionLoader.cs" />
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\Biome.cs" />
+    <Compile Include="Models\FlatTerrainProcedure.cs" />
     <Compile Include="Models\IAsset.cs" />
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\IProcedure.cs" />
+    <Compile Include="Models\NoiseBiome.cs" />
     <Compile Include="Serialization\ComponentDefinition.cs" />
+    <Compile Include="Serialization\NoiseDefinition.cs" />
+    <Compile Include="Serialization\NoiseSourceDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />

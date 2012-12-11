@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public sealed class Turbulence : IModule
+    public sealed class Turbulence : INoiseSource
     {
         public const float DefaultFrequency = 1;
 
@@ -22,7 +22,7 @@ namespace Willcraftia.Xna.Framework.Noise
         PerlinFractal distortY = new PerlinFractal();
         PerlinFractal distortZ = new PerlinFractal();
 
-        SampleSourceDelegate source;
+        INoiseSource source;
 
         float frequency = DefaultFrequency;
 
@@ -30,12 +30,14 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int roughness = DefaultRoughness;
 
-        public SampleSourceDelegate Source
+        [NoiseReference]
+        public INoiseSource Source
         {
             get { return source; }
             set { source = value; }
         }
 
+        [NoiseParameter]
         public float Frequency
         {
             get { return frequency; }
@@ -49,12 +51,14 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
+        [NoiseParameter]
         public float Power
         {
             get { return power; }
             set { power = value; }
         }
 
+        [NoiseParameter]
         public int Roughness
         {
             get { return roughness; }
@@ -68,6 +72,7 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
+        [NoiseParameter]
         public int Seed
         {
             get { return noiseX.Seed; }
@@ -81,9 +86,9 @@ namespace Willcraftia.Xna.Framework.Noise
 
         public Turbulence()
         {
-            distortX.Source = noiseX.Sample;
-            distortY.Source = noiseY.Sample;
-            distortZ.Source = noiseZ.Sample;
+            distortX.Source = noiseX;
+            distortY.Source = noiseY;
+            distortZ.Source = noiseZ;
 
             distortX.Frequency = frequency;
             distortY.Frequency = frequency;
@@ -97,6 +102,7 @@ namespace Willcraftia.Xna.Framework.Noise
             noiseZ.Seed = noiseX.Seed + 2;
         }
 
+        // I/F
         public float Sample(float x, float y, float z)
         {
             // from libnoise's Turbulence class.
@@ -119,7 +125,7 @@ namespace Willcraftia.Xna.Framework.Noise
             float dy = y + distortY.Sample(x, y, z) * power;
             float dz = z + distortZ.Sample(x, y, z) * power;
 
-            return source(dx, dy, dz);
+            return source.Sample(dx, dy, dz);
         }
     }
 }

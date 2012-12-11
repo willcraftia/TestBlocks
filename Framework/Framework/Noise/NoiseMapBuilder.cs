@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Framework.Noise
 {
     public sealed class NoiseMapBuilder
     {
-        SampleSourceDelegate source;
+        INoiseSource source;
 
         INoiseArray2<float> destination;
 
@@ -17,7 +17,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool seamlessEnabled;
 
-        public SampleSourceDelegate Source
+        public INoiseSource Source
         {
             get { return source; }
             set { source = value; }
@@ -69,14 +69,14 @@ namespace Willcraftia.Xna.Framework.Noise
 
                     if (!seamlessEnabled)
                     {
-                        value = source(x, 0, y);
+                        value = source.Sample(x, 0, y);
                     }
                     else
                     {
-                        float sw = source(x, 0, y);
-                        float se = source(x + bounds.Width, 0, y);
-                        float nw = source(x, 0, y + bounds.Height);
-                        float ne = source(x + bounds.Width, 0, y + bounds.Height);
+                        float sw = source.Sample(x, 0, y);
+                        float se = source.Sample(x + bounds.Width, 0, y);
+                        float nw = source.Sample(x, 0, y + bounds.Height);
+                        float ne = source.Sample(x + bounds.Width, 0, y + bounds.Height);
                         float xa = 1 - ((x - bounds.X) / bounds.Width);
                         float ya = 1 - ((y - bounds.Y) / bounds.Height);
                         float y0 = MathHelper.Lerp(sw, se, xa);

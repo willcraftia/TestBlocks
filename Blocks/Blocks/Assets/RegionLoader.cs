@@ -83,10 +83,7 @@ namespace Willcraftia.Xna.Blocks.Assets
             var list = new List<IProcedure<Chunk>>(definitions.Length);
             for (int i = 0; i < definitions.Length; i++)
             {
-                var component = ComponentHelper.ToComponent(ref definitions[i]);
-                var procedure = component as IProcedure<Chunk>;
-                if (procedure == null)
-                    throw new InvalidOperationException("Unexpected component: " + component.GetType().FullName);
+                var procedure = ComponentHelper.ToComponent<IProcedure<Chunk>>(ref definitions[i]);
                 list.Add(procedure);
             }
 
