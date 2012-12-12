@@ -7,8 +7,7 @@ using System;
 namespace Willcraftia.Xna.Framework.Component
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public sealed class ComponentPropertyAttribute : Attribute
+    public sealed class ComponentPropertyIgnoredAttribute : Attribute
     {
-        public bool Ignored { get; set; }
     }
 }

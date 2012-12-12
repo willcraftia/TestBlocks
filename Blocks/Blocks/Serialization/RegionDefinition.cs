@@ -2,6 +2,7 @@
 
 using System;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
@@ -34,6 +35,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
         // URI
         public string ChunkBundle;
 
-        public ComponentDefinition[] ChunkProcedures;
+        public ProcedureDefinition[] ChunkProcedures;
     }
 }

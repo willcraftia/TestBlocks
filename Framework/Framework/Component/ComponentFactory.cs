@@ -8,13 +8,13 @@ using System.Collections.ObjectModel;
 
 namespace Willcraftia.Xna.Framework.Component
 {
-    public sealed class ComponentContainer
+    public sealed class ComponentFactory
     {
         #region Holder
 
         class Holder
         {
-            public ComponentDefinition Definition;
+            public NamedComponentDefinition Definition;
 
             public ComponentInfo ComponentInfo;
 
@@ -35,72 +35,33 @@ namespace Willcraftia.Xna.Framework.Component
 
         #endregion
 
+        ComponentTypeRegistory typeRegistory;
+
         ComponentInfoCollection componentInfoCollection = new ComponentInfoCollection();
 
         HolderCollection holders = new HolderCollection();
 
-        Dictionary<string, Type> typeDictionary;
-
-        Dictionary<Type, string> reverseTypeDictionary;
-
-        public object this[string name]
+        public object this[string componentName]
         {
             get
             {
-                if (name == null) throw new ArgumentNullException("name");
-                return holders[name].Component;
+                if (componentName == null) throw new ArgumentNullException("componentName");
+                return holders[componentName].Component;
             }
         }
 
-        public Type ResolveType(string typeName)
+        public ComponentFactory() { }
+
+        public ComponentFactory(ComponentTypeRegistory typeRegistory)
         {
-            if (typeName == null) throw new ArgumentNullException("typeName");
-
-            Type type;
-            if (typeDictionary != null && typeDictionary.TryGetValue(typeName, out type))
-                return type;
-
-            type = Type.GetType(typeName);
-            if (type == null) throw new ArgumentException("Unknown type: " + typeName);
-
-            return type;
+            this.typeRegistory = typeRegistory;
         }
 
-        public string ResolveAlias(Type type)
+        public ComponentInfo GetComponentInfo(string typeAlias)
         {
-            if (type == null) throw new ArgumentNullException("type");
+            if (typeAlias == null) throw new ArgumentNullException("typeAlias");
 
-            string alias;
-            if (reverseTypeDictionary != null && reverseTypeDictionary.TryGetValue(type, out alias))
-                return alias;
-
-            throw new ArgumentException("Unknown type: " + type);
-        }
-
-        public void RegisterAlias(Type type)
-        {
-            RegisterAlias(type.Name, type);
-        }
-
-        public void RegisterAlias(string alias, Type type)
-        {
-            if (alias == null) throw new ArgumentNullException("alias");
-            if (type == null) throw new ArgumentNullException("type");
-
-            if (typeDictionary == null)
-            {
-                typeDictionary = new Dictionary<string, Type>();
-                reverseTypeDictionary = new Dictionary<Type, string>();
-            }
-            typeDictionary[alias] = type;
-            reverseTypeDictionary[type] = alias;
-        }
-
-        public ComponentInfo GetComponentInfo(string alias)
-        {
-            if (alias == null) throw new ArgumentNullException("alias");
-
-            var type = ResolveType(alias);
+            var type = ResolveType(typeAlias);
             return GetComponentInfo(type);
         }
 
@@ -113,6 +74,20 @@ namespace Willcraftia.Xna.Framework.Component
             var componentInfo = new ComponentInfo(type);
             componentInfoCollection.Add(componentInfo);
             return componentInfo;
+        }
+
+        public Type ResolveType(string typeName)
+        {
+            Type type;
+            if (typeRegistory != null)
+            {
+                type = typeRegistory.ResolveType(typeName);
+            }
+            else
+            {
+                type = Type.GetType(typeName, true);
+            }
+            return type;
         }
 
         public bool ContainsComponentName(string componentName)
@@ -157,58 +132,82 @@ namespace Willcraftia.Xna.Framework.Component
         // For editors.
         //
 
+        public void AddComponent(string componentName, Type type)
+        {
+            AddComponent(componentName, GetComponentInfo(type));
+        }
+
+        public void AddComponent(string componentName, string typeName)
+        {
+            AddComponent(componentName, GetComponentInfo(typeName));
+        }
+
         public void AddComponent(string componentName, ComponentInfo componentInfo)
         {
             if (componentName == null) throw new ArgumentNullException("componentName");
             if (componentInfo == null) throw new ArgumentNullException("componentInfo");
 
+            if (!componentInfoCollection.Contains(componentInfo))
+                componentInfoCollection.Add(componentInfo);
+
             var component = componentInfo.CreateInstance();
+
+            var componentFactoryAware = component as IComponentFactoryAware;
+            if (componentFactoryAware != null) componentFactoryAware.ComponentFactory = this;
+
+            var componentInfoAware = component as IComponentInfoAware;
+            if (componentInfoAware != null) componentInfoAware.ComponentInfo = componentInfo;
+
+            var componentNameAware = component as IComponentNameAware;
+            if (componentNameAware != null) componentNameAware.ComponentName = componentName;
 
             var holder = new Holder
             {
-                Component = component,
-                ComponentInfo = componentInfo
+                ComponentInfo = componentInfo,
+                Component = component
             };
 
             // Create the initial definition.
-            CreateDefinition(componentName, componentInfo, component, out holder.Definition);
+            CreateNamedComponentDefinition(componentName, componentInfo, component, out holder.Definition);
 
             holders.Add(holder);
         }
 
-        void CreateDefinition(string componentName, ComponentInfo componentInfo, object component, out ComponentDefinition definition)
+        string ResolveTypeAlias(Type type)
         {
-            definition = new ComponentDefinition
+            if (typeRegistory == null) return type.FullName;
+
+            return typeRegistory.ResolveAlias(type);
+        }
+
+        void CreateNamedComponentDefinition(string componentName, ComponentInfo componentInfo, object component,
+            out NamedComponentDefinition definition)
+        {
+            definition = new NamedComponentDefinition
             {
                 Name = componentName,
-                Type = ResolveAlias(componentInfo.Type)
+                Component = new ComponentDefinition
+                {
+                    Type = ResolveTypeAlias(componentInfo.Type)
+                }
             };
 
             var properties = componentInfo.Properties;
             if (!CollectionHelper.IsNullOrEmpty(properties))
             {
-                definition.Properties = new ComponentPropertyDefinition[properties.Count];
+                definition.Component.Properties = new ComponentPropertyDefinition[properties.Count];
                 for (int i = 0; i < properties.Count; i++)
                 {
                     var name = properties[i].Name;
-                    var value = componentInfo.GetPropertyValue(component, name);
-                    definition.Properties[i] = new ComponentPropertyDefinition
+
+                    string value = null;
+                    if (!componentInfo.IsComponentReference(name))
+                        value = Convert.ToString(componentInfo.GetPropertyValue(component, name));
+
+                    definition.Component.Properties[i] = new ComponentPropertyDefinition
                     {
                         Name = name,
-                        Value = Convert.ToString(value)
-                    };
-                }
-            }
-
-            var references = componentInfo.References;
-            if (!CollectionHelper.IsNullOrEmpty(references))
-            {
-                definition.References = new ComponentPropertyDefinition[references.Count];
-                for (int i = 0; i < references.Count; i++)
-                {
-                    definition.References[i] = new ComponentPropertyDefinition
-                    {
-                        Name = references[i].Name
+                        Value = value
                     };
                 }
             }
@@ -224,47 +223,46 @@ namespace Willcraftia.Xna.Framework.Component
             var componentInfo = holder.ComponentInfo;
             var component = holder.Component;
 
+            string referencedName = null;
+            if (componentInfo.IsComponentReference(propertyName))
+            {
+                referencedName = propertyValue as string;
+                if (referencedName == null)
+                    throw new ArgumentException("Invalid value type: " + propertyValue.GetType());
+                AssertContainsComponentName(referencedName);
+
+                propertyValue = holders[referencedName].Component;
+            }
+
             componentInfo.SetPropertyValue(holder.Component, propertyName, propertyValue);
 
             // Refresh the definition.
-            var properties = holder.Definition.Properties;
+            var properties = holder.Definition.Component.Properties;
             if (!ArrayHelper.IsNullOrEmpty(properties))
             {
                 for (int i = 0; i < properties.Length; i++)
                 {
                     if (properties[i].Name == propertyName)
-                        properties[i].Value = Convert.ToString(propertyValue);
+                    {
+                        if (referencedName == null)
+                        {
+                            properties[i].Value = Convert.ToString(propertyValue);
+                        }
+                        else
+                        {
+                            properties[i].Value = referencedName;
+                        }
+                    }
                 }
             }
         }
 
-        public void SetReferencedComponent(string componentName, string propertyName, string referencedName)
+        public void SetComponentReference(string componentName, string propertyName, string referenceName)
         {
-            if (componentName == null) throw new ArgumentNullException("componentName");
-            if (propertyName == null) throw new ArgumentNullException("propertyName");
-            AssertContainsComponentName(componentName);
-            AssertContainsComponentName(referencedName);
-
-            var holder = holders[componentName];
-            var componentInfo = holder.ComponentInfo;
-            var component = holder.Component;
-            var referencedComponent = holders[referencedName].Component;
-
-            componentInfo.SetReferencedComponent(component, propertyName, referencedComponent);
-
-            // Refresh the definition.
-            var references = holder.Definition.References;
-            if (!ArrayHelper.IsNullOrEmpty(references))
-            {
-                for (int i = 0; i < references.Length; i++)
-                {
-                    if (references[i].Name == propertyName)
-                        references[i].Value = referencedName;
-                }
-            }
+            SetPropertyValue(componentName, propertyName, referenceName);
         }
 
-        public void UnbindReferencedComponent(string componentName, string propertyName)
+        public void UnbindComponentReference(string componentName, string propertyName)
         {
             if (componentName == null) throw new ArgumentNullException("componentName");
             if (propertyName == null) throw new ArgumentNullException("propertyName");
@@ -274,16 +272,18 @@ namespace Willcraftia.Xna.Framework.Component
             var componentInfo = holder.ComponentInfo;
             var component = holder.Component;
 
-            componentInfo.SetReferencedComponent(component, propertyName, null);
+            if (!componentInfo.IsComponentReference(propertyName)) return;
+
+            componentInfo.SetPropertyValue(component, propertyName, null);
 
             // Refresh the definition.
-            var references = holder.Definition.References;
-            if (!ArrayHelper.IsNullOrEmpty(references))
+            var properties = holder.Definition.Component.Properties;
+            if (!ArrayHelper.IsNullOrEmpty(properties))
             {
-                for (int i = 0; i < references.Length; i++)
+                for (int i = 0; i < properties.Length; i++)
                 {
-                    if (references[i].Name == propertyName)
-                        references[i].Value = null;
+                    if (properties[i].Name == propertyName)
+                        properties[i].Value = null;
                 }
             }
         }
@@ -307,7 +307,7 @@ namespace Willcraftia.Xna.Framework.Component
 
                 var name = cursorComponentInfo.GetReferenceName(cursorComponent, component);
                 if (name != null)
-                    UnbindReferencedComponent(cursorHolder.Definition.Name, name);
+                    UnbindComponentReference(cursorHolder.Definition.Name, name);
             }
 
             holders.Remove(holder);
@@ -326,20 +326,36 @@ namespace Willcraftia.Xna.Framework.Component
         // For deserialization.
         //
 
-        public void Initialize(ComponentDefinition[] definitions)
+        public void Initialize(ref ComponentBundleDefinition definition)
         {
-            for (int i = 0; i < definitions.Length; i++)
-                AddDefinition(ref definitions[i]);
+            if (ArrayHelper.IsNullOrEmpty(definition.Components)) return;
+
+            for (int i = 0; i < definition.Components.Length; i++)
+                AddComponentDefinition(ref definition.Components[i]);
 
             BindAll();
         }
 
-        void AddDefinition(ref ComponentDefinition definition)
+        void AddComponentDefinition(ref NamedComponentDefinition definition)
         {
-            if (ContainsComponentName(definition.Name)) throw new ArgumentException("Component name duplicated: " + definition.Name);
+            if (ContainsComponentName(definition.Name))
+                throw new ArgumentException("Component name duplicated: " + definition.Name);
 
-            var componentInfo = GetComponentInfo(definition.Type);
+            var componentInfo = GetComponentInfo(definition.Component.Type);
             var component = componentInfo.CreateInstance();
+
+            var properties = definition.Component.Properties;
+            if (!ArrayHelper.IsNullOrEmpty(properties))
+            {
+                for (int i = 0; i < properties.Length; i++)
+                {
+                    var name = properties[i].Name;
+                    var value = properties[i].Value;
+
+                    if (!componentInfo.IsComponentReference(name))
+                        componentInfo.SetPropertyValue(component, name, value);
+                }
+            }
 
             var holder = new Holder
             {
@@ -358,13 +374,16 @@ namespace Willcraftia.Xna.Framework.Component
                 var componentInfo = holder.ComponentInfo;
                 var component = holder.Component;
 
-                var references = holder.Definition.References;
-                if (!ArrayHelper.IsNullOrEmpty(references))
+                var properties = holder.Definition.Component.Properties;
+                if (!ArrayHelper.IsNullOrEmpty(properties))
                 {
-                    for (int i = 0; i < references.Length; i++)
+                    for (int i = 0; i < properties.Length; i++)
                     {
-                        var referencedComponent = holders[references[i].Value].Component;
-                        componentInfo.SetReferencedComponent(component, references[i].Name, referencedComponent);
+                        if (componentInfo.IsComponentReference(properties[i].Name))
+                        {
+                            var referencedComponent = holders[properties[i].Value].Component;
+                            componentInfo.SetPropertyValue(component, properties[i].Name, referencedComponent);
+                        }
                     }
                 }
             }
@@ -378,12 +397,17 @@ namespace Willcraftia.Xna.Framework.Component
         // For serialization
         //
 
-        public void GetDefinitions(out ComponentDefinition[] definitions)
+        public void GetDefinition(out ComponentBundleDefinition definition)
         {
-            definitions = new ComponentDefinition[holders.Count];
+            definition = new ComponentBundleDefinition();
 
-            for (int i = 0; i < holders.Count; i++)
-                definitions[i] = holders[i].Definition;
+            if (!CollectionHelper.IsNullOrEmpty(holders))
+            {
+                definition.Components = new NamedComponentDefinition[holders.Count];
+
+                for (int i = 0; i < holders.Count; i++)
+                    definition.Components[i] = holders[i].Definition;
+            }
         }
 
         //

@@ -7,10 +7,10 @@ using Willcraftia.Xna.Framework.Component;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public struct NoiseDefinition
+    public struct ProcedureDefinition
     {
-        public string RootName;
+        public string Target;
 
-        public NamedComponentDefinition[] Components;
+        public ComponentBundleDefinition ComponentBundle;
     }
 }

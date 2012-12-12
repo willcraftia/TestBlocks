@@ -56,7 +56,7 @@ namespace Willcraftia.Xna.Framework.Noise
         /// Standard quality: set Noise.SCurve3()
         /// High quality: set Noise.SCurve5()
         /// </summary>
-        [ComponentProperty(Ignored = true)]
+        [ComponentPropertyIgnored]
         public Func<float, float> FadeCurve
         {
             get { return fadeCurve; }

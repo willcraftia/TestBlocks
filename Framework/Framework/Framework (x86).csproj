@@ -95,7 +95,6 @@
     <Compile Include="Assets\IAssetManagerAware.cs" />
     <Compile Include="Assets\IResourceManagerAware.cs" />
     <Compile Include="Assets\NoCacheContentManager.cs" />
-    <Compile Include="AttributeHelper.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="Cameras\PerspectiveFov.cs" />
     <Compile Include="Cameras\ProjectionBase.cs" />
@@ -106,8 +105,14 @@
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
     <Compile Include="Component\ComponentAttribute.cs" />
-    <Compile Include="Component\ComponentContainer.cs" />
+    <Compile Include="Component\ComponentFactory.cs" />
+    <Compile Include="Component\ComponentBundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />
+    <Compile Include="Component\ComponentTypeRegistory.cs" />
+    <Compile Include="Component\IComponentInfoAware.cs" />
+    <Compile Include="Component\IComponentFactoryAware.cs" />
+    <Compile Include="Component\IComponentNameAware.cs" />
+    <Compile Include="Component\NamedComponentDefinition.cs" />
     <Compile Include="Component\ComponentInfo.cs" />
     <Compile Include="Component\ComponentInfoCollection.cs" />
     <Compile Include="Component\ComponentPropertyAttribute.cs" />

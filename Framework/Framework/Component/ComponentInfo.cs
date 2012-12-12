@@ -16,8 +16,6 @@ namespace Willcraftia.Xna.Framework.Component
 
         ComponentPropertyCollection properties;
 
-        ComponentPropertyCollection references;
-
         public Type Type { get; private set; }
 
         public ReadOnlyCollection<PropertyInfo> Properties
@@ -25,33 +23,20 @@ namespace Willcraftia.Xna.Framework.Component
             get { return properties == null ? readOnlyEmpty : properties.AsReadOnly(); }
         }
 
-        public ReadOnlyCollection<PropertyInfo> References
-        {
-            get { return references == null ? readOnlyEmpty : references.AsReadOnly(); }
-        }
-
-        internal ComponentInfo(Type type)
+        public ComponentInfo(Type type)
         {
             if (type == null) throw new ArgumentNullException("type");
-            if (!IsComponent(type)) throw new ArgumentException("Type not component: " + type);
+            if (!IsComponentType(type)) throw new ArgumentException("Type not component: " + type);
 
             Type = type;
 
             foreach (var property in type.GetProperties())
             {
-                if (IsPropertyIngnored(property) || !property.CanRead || !property.CanWrite)
+                if (IsIgnoredProperty(property) || !property.CanRead || !property.CanWrite)
                     continue;
 
-                if (IsComponent(property.PropertyType))
-                {
-                    if (references == null) references = new ComponentPropertyCollection();
-                    references.Add(property);
-                }
-                else
-                {
-                    if (properties == null) properties = new ComponentPropertyCollection();
-                    properties.Add(property);
-                }
+                if (properties == null) properties = new ComponentPropertyCollection();
+                properties.Add(property);
             }
         }
 
@@ -67,30 +52,17 @@ namespace Willcraftia.Xna.Framework.Component
             return properties != null && properties.Contains(name);
         }
 
-        public bool ReferenceExists(string name)
-        {
-            if (name == null) throw new ArgumentNullException("name");
-
-            return references != null && references.Contains(name);
-        }
-
-        public void SetPropertyValue(object instance, string name, object value)
+        public void SetPropertyValue(object instance, string propertyName, object propertyValue)
         {
             if (instance == null) throw new ArgumentNullException("instance");
-            if (name == null) throw new ArgumentNullException("name");
+            if (propertyName == null) throw new ArgumentNullException("propertyName");
 
-            var property = GetProperty(name);
-            var realValue = Convert.ChangeType(value, property.PropertyType, null);
-            property.SetValue(instance, realValue, null);
-        }
+            var property = GetProperty(propertyName);
 
-        public void SetReferencedComponent(object instance, string name, object referencedComponent)
-        {
-            if (instance == null) throw new ArgumentNullException("instance");
-            if (name == null) throw new ArgumentNullException("name");
-
-            var property = GetReference(name);
-            property.SetValue(instance, referencedComponent, null);
+            if (!property.PropertyType.IsAssignableFrom(propertyValue.GetType()))
+                propertyValue = Convert.ChangeType(propertyValue, property.PropertyType, null);
+            
+            property.SetValue(instance, propertyValue, null);
         }
 
         public string GetReferenceName(object instance, object referencedComponent)
@@ -102,6 +74,8 @@ namespace Willcraftia.Xna.Framework.Component
 
             foreach (var property in properties)
             {
+                if (!IsComponentReferenceProperty(property)) continue;
+
                 if (property.GetValue(instance, null) == referencedComponent)
                     return property.Name;
             }
@@ -109,63 +83,58 @@ namespace Willcraftia.Xna.Framework.Component
             return null;
         }
 
-        public object GetPropertyValue(object instance, string name)
+        public object GetPropertyValue(object instance, string propertyName)
         {
             if (instance == null) throw new ArgumentNullException("instance");
-            if (name == null) throw new ArgumentNullException("name");
+            if (propertyName == null) throw new ArgumentNullException("propertyName");
 
-            var property = GetProperty(name);
+            var property = GetProperty(propertyName);
             return property.GetValue(instance, null);
         }
 
-        public object GetReferencedComponent(object instance, string name)
-        {
-            if (instance == null) throw new ArgumentNullException("instance");
-            if (name == null) throw new ArgumentNullException("name");
-
-            var property = GetReference(name);
-            return property.GetValue(instance, null);
-        }
-
-        public void UnbindReferencedComponent(object instance, object target)
+        public void UnbindComponentReference(object instance, object target)
         {
             if (instance == null) throw new ArgumentNullException("instance");
             if (target == null) throw new ArgumentNullException("target");
 
-            if (references == null) return;
+            if (properties == null) return;
 
-            foreach (var property in references)
+            foreach (var property in properties)
             {
+                if (!IsComponentReferenceProperty(property)) continue;
+
                 var reference = property.GetValue(instance, null);
                 if (reference == target) property.SetValue(instance, null, null);
             }
         }
 
-        bool IsPropertyIngnored(PropertyInfo property)
+        public bool IsComponentReference(string propertyName)
         {
-            var attribute = AttributeHelper.GetAttribute<ComponentPropertyAttribute>(property);
-            if (attribute == null) return false;
-
-            return attribute.Ignored;
+            var property = GetProperty(propertyName);
+            return IsComponentReferenceProperty(property);
         }
 
-        bool IsComponent(Type type)
+        bool IsIgnoredProperty(PropertyInfo property)
         {
-            return AttributeHelper.HasAttribute<ComponentAttribute>(type);
+            return Attribute.IsDefined(property, typeof(ComponentPropertyIgnoredAttribute));
         }
 
-        PropertyInfo GetProperty(string name)
+        bool IsComponentReferenceProperty(PropertyInfo property)
         {
-            if (!PropertyExists(name)) throw new InvalidOperationException("Property not found: " + name);
-
-            return properties[name];
+            return IsComponentType(property.PropertyType);
         }
 
-        PropertyInfo GetReference(string name)
+        bool IsComponentType(Type type)
         {
-            if (!ReferenceExists(name)) throw new InvalidOperationException("Referece not found: " + name);
+            return Attribute.IsDefined(type, typeof(ComponentAttribute));
+        }
 
-            return references[name];
+        PropertyInfo GetProperty(string propertyName)
+        {
+            if (!PropertyExists(propertyName))
+                throw new InvalidOperationException("Property not found: " + propertyName);
+
+            return properties[propertyName];
         }
     }
 }

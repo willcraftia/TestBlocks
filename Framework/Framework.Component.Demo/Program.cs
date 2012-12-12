@@ -11,73 +11,83 @@ using Willcraftia.Xna.Framework.Serialization;
 
 namespace Willcraftia.Xna.Framework.Component.Demo
 {
-    public struct OwnerDefinition
-    {
-        public ComponentDefinition[] Definitions;
-    }
-
     class Program
     {
-        static void InitialzieAliases(ComponentContainer container)
-        {
-            container.RegisterAlias(typeof(Perlin));
-            container.RegisterAlias(typeof(SumFractal));
-            container.RegisterAlias(typeof(ScaleBias));
-        }
-
         static void Main(string[] args)
         {
-            var container = new ComponentContainer();
-            InitialzieAliases(container);
+            //================================================================
+            //
+            // Shared ComponentTypeRegistory
+            //
 
-            var perlinInfo = container.GetComponentInfo("Perlin");
-            container.AddComponent("perlin", perlinInfo);
+            var typeRegistory = new ComponentTypeRegistory();
+            typeRegistory.SetAlias(typeof(Perlin));
+            typeRegistory.SetAlias(typeof(SumFractal));
+            typeRegistory.SetAlias(typeof(ScaleBias));
+
+            //================================================================
+            //
+            // ComponentContainer
+            //
+
+            var container = new ComponentFactory(typeRegistory);
+
+            container.AddComponent("perlin", "Perlin");
             container.SetPropertyValue("perlin", "Seed", 300);
 
-            var sumFractalInfo = container.GetComponentInfo("SumFractal");
-            container.AddComponent("sumFractal", sumFractalInfo);
-            container.SetReferencedComponent("sumFractal", "Source", "perlin");
+            container.AddComponent("sumFractal", "SumFractal");
+            container.SetComponentReference("sumFractal", "Source", "perlin");
 
-            var scaleBias = container.GetComponentInfo("ScaleBias");
-            container.AddComponent("scaleBias", scaleBias);
+            container.AddComponent("scaleBias", "ScaleBias");
             container.SetPropertyValue("scaleBias", "Scale", 0.5f);
             container.SetPropertyValue("scaleBias", "Bias", 0.5f);
-            container.SetReferencedComponent("scaleBias", "Source", "sumFractal");
+            container.SetComponentReference("scaleBias", "Source", "sumFractal");
 
-            ComponentDefinition[] definitions;
-            container.GetDefinitions(out definitions);
+            //================================================================
+            //
+            // Serialization
+            //
 
-            var newContainer = new ComponentContainer();
-            InitialzieAliases(newContainer);
-            newContainer.Initialize(definitions);
+            ComponentBundleDefinition definition;
+            container.GetDefinition(out definition);
 
-            var ownerDefinition = new OwnerDefinition
-            {
-                Definitions = definitions
-            };
-
-            var xmlSerializer = new XmlSerializerAdapter(typeof(OwnerDefinition));
+            var xmlSerializer = new XmlSerializerAdapter(typeof(ComponentBundleDefinition));
             xmlSerializer.WriterSettings.Indent = true;
             xmlSerializer.WriterSettings.OmitXmlDeclaration = true;
 
             var resource = FileResourceLoader.Instance.LoadResource("file:///" + Directory.GetCurrentDirectory() + "/Noise.xml");
             using (var stream = resource.Create())
             {
-                xmlSerializer.Serialize(stream, ownerDefinition);
+                xmlSerializer.Serialize(stream, definition);
             }
 
-            OwnerDefinition deserializedOwnerDefinition;
+            //================================================================
+            //
+            // Deserialization
+            //
+
+            ComponentBundleDefinition deserializedDefinition;
             using (var stream = resource.Open())
             {
-                deserializedOwnerDefinition = (OwnerDefinition) xmlSerializer.Deserialize(stream, null);
+                deserializedDefinition = (ComponentBundleDefinition) xmlSerializer.Deserialize(stream, null);
             }
 
-            var deserializedContainer = new ComponentContainer();
-            InitialzieAliases(deserializedContainer);
-            deserializedContainer.Initialize(deserializedOwnerDefinition.Definitions);
+            //================================================================
+            //
+            // Other ComponentContainer
+            //
 
-            var noiseSource = container["scaleBias"] as INoiseSource;
-            var signal = noiseSource.Sample(0.5f, 0.5f, 0.5f);
+            var otherContainer = new ComponentFactory(typeRegistory);
+            otherContainer.Initialize(ref deserializedDefinition);
+
+            // just debug
+            var noise = otherContainer["scaleBias"] as INoiseSource;
+            var signal = noise.Sample(0.5f, 0.5f, 0.5f);
+
+            //================================================================
+            //
+            // Exit
+            //
 
             Console.WriteLine("Press Enter to exit.");
             Console.ReadLine();

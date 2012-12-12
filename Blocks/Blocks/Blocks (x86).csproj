@@ -63,7 +63,6 @@
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\Image2DLoader.cs" />
     <Compile Include="Assets\MeshLoader.cs" />
-    <Compile Include="Assets\ComponentHelper.cs" />
     <Compile Include="Assets\RegionLoader.cs" />
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\Biome.cs" />
@@ -72,9 +71,8 @@
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\IProcedure.cs" />
     <Compile Include="Models\NoiseBiome.cs" />
-    <Compile Include="Serialization\ComponentDefinition.cs" />
+    <Compile Include="Serialization\ProcedureDefinition.cs" />
     <Compile Include="Serialization\NoiseDefinition.cs" />
-    <Compile Include="Serialization\NoiseSourceDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />
