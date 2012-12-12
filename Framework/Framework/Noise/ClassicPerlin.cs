@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
@@ -10,6 +11,7 @@ namespace Willcraftia.Xna.Framework.Noise
     /// <summary>
     /// The class generates Perlin noise.
     /// </summary>
+    [Component]
     public sealed class ClassicPerlin : INoiseSource
     {
         const int wrapIndex = 256;
@@ -30,7 +32,6 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool initialized;
 
-        [NoiseParameter]
         public int Seed
         {
             get { return seed; }
@@ -55,7 +56,7 @@ namespace Willcraftia.Xna.Framework.Noise
         /// Standard quality: set Noise.SCurve3()
         /// High quality: set Noise.SCurve5()
         /// </summary>
-        [NoiseParameter]
+        [ComponentProperty(Ignored = true)]
         public Func<float, float> FadeCurve
         {
             get { return fadeCurve; }

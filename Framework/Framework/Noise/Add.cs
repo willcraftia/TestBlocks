@@ -1,25 +1,25 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
+    [Component]
     public sealed class Add : INoiseSource
     {
         INoiseSource source0;
 
         INoiseSource source1;
 
-        [NoiseReference]
         public INoiseSource Source0
         {
             get { return source0; }
             set { source0 = value; }
         }
 
-        [NoiseReference]
         public INoiseSource Source1
         {
             get { return source1; }

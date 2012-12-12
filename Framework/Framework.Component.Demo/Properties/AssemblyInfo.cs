@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("Framework.Noise.Definitions.Demo")]
+[assembly: AssemblyTitle("Framework.Component.Demo")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Framework.Noise.Definitions.Demo")]
+[assembly: AssemblyProduct("Framework.Component.Demo")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 次の GUID は、このプロジェクトが COM に公開される場合の、typelib の ID です
-[assembly: Guid("8705f80c-d021-4ddd-b798-1ede43b2b7fa")]
+[assembly: Guid("b989370d-b606-49b5-9fbe-99bbec2e7508")]
 
 // アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
 //

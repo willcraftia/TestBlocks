@@ -6,9 +6,9 @@ using System.Reflection;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Noise.Definitions
+namespace Willcraftia.Xna.Framework.Component
 {
-    public sealed class NoisePropertyInfoCollection : KeyedCollection<string, PropertyInfo>
+    public sealed class ComponentPropertyCollection : KeyedCollection<string, PropertyInfo>
     {
         ReadOnlyCollection<PropertyInfo> readOnly;
 

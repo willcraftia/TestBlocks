@@ -1,11 +1,13 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
+    [Component]
     public sealed class Turbulence : INoiseSource
     {
         public const float DefaultFrequency = 1;
@@ -30,14 +32,12 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int roughness = DefaultRoughness;
 
-        [NoiseReference]
         public INoiseSource Source
         {
             get { return source; }
             set { source = value; }
         }
 
-        [NoiseParameter]
         public float Frequency
         {
             get { return frequency; }
@@ -51,14 +51,12 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
-        [NoiseParameter]
         public float Power
         {
             get { return power; }
             set { power = value; }
         }
 
-        [NoiseParameter]
         public int Roughness
         {
             get { return roughness; }
@@ -72,7 +70,6 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
-        [NoiseParameter]
         public int Seed
         {
             get { return noiseX.Seed; }

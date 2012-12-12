@@ -10,7 +10,6 @@ namespace Willcraftia.Xna.Framework.Noise
     {
         float offset = 1f;
 
-        [NoiseParameter]
         public float Offset
         {
             get { return offset; }

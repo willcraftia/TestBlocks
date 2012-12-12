@@ -1,11 +1,13 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
+    [Component]
     public abstract class Musgrave : INoiseSource
     {
         public const int MaxOctaveCount = 30;
@@ -30,13 +32,11 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool initialized;
 
-        [NoiseReference]
         public INoiseSource Source { get; set; }
 
         /// <summary>
         /// H (Hurst).
         /// </summary>
-        [NoiseParameter]
         public float Hurst
         {
             get { return hurst; }
@@ -49,7 +49,6 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
-        [NoiseParameter]
         public float Frequency
         {
             get { return frequency; }
@@ -62,7 +61,6 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
-        [NoiseParameter]
         public float Lacunarity
         {
             get { return lacunarity; }
@@ -75,7 +73,6 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
-        [NoiseParameter]
         public int OctaveCount
         {
             get { return octaveCount; }

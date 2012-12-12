@@ -1,11 +1,13 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
+    [Component]
     public sealed class ScaleBias : INoiseSource
     {
         public const float DefaultBias = 0;
@@ -18,21 +20,18 @@ namespace Willcraftia.Xna.Framework.Noise
 
         float scale = DefaultScale;
 
-        [NoiseReference]
         public INoiseSource Source
         {
             get { return source; }
             set { source = value; }
         }
 
-        [NoiseParameter]
         public float Bias
         {
             get { return bias; }
             set { bias = value; }
         }
 
-        [NoiseParameter]
         public float Scale
         {
             get { return scale; }

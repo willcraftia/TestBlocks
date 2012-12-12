@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D9E94B37-650E-481C-B16C-FE97B9A8A0CC}</ProjectGuid>
+    <ProjectGuid>{D1345342-8D77-4948-8EB6-31A4A95063A1}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Willcraftia.Xna.Framework.Noise.Definitions.Demo</RootNamespace>
-    <AssemblyName>Willcraftia.Xna.Framework.Noise.Definitions.Demo</AssemblyName>
+    <RootNamespace>Willcraftia.Xna.Framework.Component.Demo</RootNamespace>
+    <AssemblyName>Willcraftia.Xna.Framework.Component.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

@@ -2,11 +2,13 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
+    [Component]
     public sealed class Voronoi : INoiseSource
     {
         public const float DefaultDisplacement = 1;
@@ -25,42 +27,36 @@ namespace Willcraftia.Xna.Framework.Noise
 
         MetricsDelegate metrics = Willcraftia.Xna.Framework.Noise.Metrics.Squared;
 
-        [NoiseParameter]
         public int Seed
         {
             get { return seed; }
             set { seed = value; }
         }
 
-        [NoiseParameter]
         public float Displacement
         {
             get { return displacement; }
             set { displacement = value; }
         }
 
-        [NoiseParameter]
         public float Frequency
         {
             get { return frequency; }
             set { frequency = value; }
         }
 
-        [NoiseParameter]
         public bool DistanceEnabled
         {
             get { return distanceEnabled; }
             set { distanceEnabled = value; }
         }
 
-        [NoiseParameter]
         public VoronoiType VoronoiType
         {
             get { return voronoiType; }
             set { voronoiType = value; }
         }
 
-        [NoiseParameter]
         public MetricsDelegate Metrics
         {
             get { return metrics; }

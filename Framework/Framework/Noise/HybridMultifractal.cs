@@ -14,7 +14,6 @@ namespace Willcraftia.Xna.Framework.Noise
 
         float offset = MusgraveOffset;
 
-        [NoiseParameter]
         public float Offset
         {
             get { return offset; }

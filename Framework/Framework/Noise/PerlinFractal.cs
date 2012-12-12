@@ -1,11 +1,13 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
+    [Component]
     public sealed class PerlinFractal : INoiseSource
     {
         public const float DefaultFrequency = 1;
@@ -26,35 +28,30 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int octaveCount = DefaultOctave;
 
-        [NoiseReference]
         public INoiseSource Source
         {
             get { return source; }
             set { source = value; }
         }
 
-        [NoiseParameter]
         public float Frequency
         {
             get { return frequency; }
             set { frequency = value; }
         }
 
-        [NoiseParameter]
         public float Lacunarity
         {
             get { return lacunarity; }
             set { lacunarity = value; }
         }
 
-        [NoiseParameter]
         public float Persistence
         {
             get { return persistence; }
             set { persistence = value; }
         }
 
-        [NoiseParameter]
         public int OctaveCount
         {
             get { return octaveCount; }

@@ -100,6 +100,7 @@
     <Compile Include="Assets\IAssetManagerAware.cs" />
     <Compile Include="Assets\IResourceManagerAware.cs" />
     <Compile Include="Assets\NoCacheContentManager.cs" />
+    <Compile Include="AttributeHelper.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="Cameras\PerspectiveFov.cs" />
     <Compile Include="Cameras\ProjectionBase.cs" />
@@ -109,6 +110,14 @@
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
+    <Compile Include="Component\ComponentAttribute.cs" />
+    <Compile Include="Component\ComponentContainer.cs" />
+    <Compile Include="Component\ComponentDefinition.cs" />
+    <Compile Include="Component\ComponentInfo.cs" />
+    <Compile Include="Component\ComponentInfoCollection.cs" />
+    <Compile Include="Component\ComponentPropertyAttribute.cs" />
+    <Compile Include="Component\ComponentPropertyCollection.cs" />
+    <Compile Include="Component\ComponentPropertyDefinition.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />
     <Compile Include="Diagnostics\DebugLayout.cs" />
@@ -143,15 +152,6 @@
     <Compile Include="Noise\Add.cs" />
     <Compile Include="Noise\Billow.cs" />
     <Compile Include="Noise\ClassicPerlin.cs" />
-    <Compile Include="Noise\Definitions\NoiseParameterDefinition.cs" />
-    <Compile Include="Noise\Definitions\NoiseProject.cs" />
-    <Compile Include="Noise\Definitions\NoiseProjectDefinition.cs" />
-    <Compile Include="Noise\Definitions\NoisePropertyInfoCollection.cs" />
-    <Compile Include="Noise\Definitions\NoiseReferenceDefinition.cs" />
-    <Compile Include="Noise\Definitions\NoiseSourceDefinition.cs" />
-    <Compile Include="Noise\Definitions\NoiseSourceInfo.cs" />
-    <Compile Include="Noise\Definitions\NoiseSourceInfoCollection.cs" />
-    <Compile Include="Noise\Definitions\NoiseSourceTypeAlias.cs" />
     <Compile Include="Noise\FadeCurves.cs" />
     <Compile Include="Noise\Gradients.cs" />
     <Compile Include="Noise\Heterofractal.cs" />
@@ -165,8 +165,6 @@
     <Compile Include="Noise\NoiseArray2.cs" />
     <Compile Include="Noise\NoiseArrayF2Extension.cs" />
     <Compile Include="Noise\NoiseMapBuilder.cs" />
-    <Compile Include="Noise\NoiseParameterAttribute.cs" />
-    <Compile Include="Noise\NoiseReferenceAttribute.cs" />
     <Compile Include="Noise\Perlin.cs" />
     <Compile Include="Noise\PerlinFractal.cs" />
     <Compile Include="Noise\RidgedMultifractal.cs" />

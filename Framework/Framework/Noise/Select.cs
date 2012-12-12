@@ -2,11 +2,13 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
+    [Component]
     public sealed class Select : INoiseSource
     {
         public const float DefaultEdgeFalloff = 0;
@@ -27,42 +29,36 @@ namespace Willcraftia.Xna.Framework.Noise
 
         float upperBound = DefaultUpperBound;
 
-        [NoiseReference]
         public INoiseSource Controller
         {
             get { return controller; }
             set { controller = value; }
         }
 
-        [NoiseReference]
         public INoiseSource Source0
         {
             get { return source0; }
             set { source0 = value; }
         }
 
-        [NoiseReference]
         public INoiseSource Source1
         {
             get { return source1; }
             set { source1 = value; }
         }
 
-        [NoiseParameter]
         public float EdgeFalloff
         {
             get { return edgeFalloff; }
             set { edgeFalloff = value; }
         }
 
-        [NoiseParameter]
         public float LowerBound
         {
             get { return lowerBound; }
             set { lowerBound = value; }
         }
 
-        [NoiseParameter]
         public float UpperBound
         {
             get { return upperBound; }

@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
@@ -12,6 +13,7 @@ namespace Willcraftia.Xna.Framework.Noise
     /// http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
     /// http://staffwww.itn.liu.se/~stegu/aqsis/aqsis-newnoise/
     /// </summary>
+    [Component]
     public sealed class Simplex : INoiseSource
     {
         const int wrapIndex = 256;
@@ -26,7 +28,6 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool initialized;
 
-        [NoiseParameter]
         public int Seed
         {
             get { return seed; }
