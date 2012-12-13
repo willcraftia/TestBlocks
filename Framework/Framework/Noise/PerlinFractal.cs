@@ -1,13 +1,11 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    [Component]
     public sealed class PerlinFractal : INoiseSource
     {
         public const float DefaultFrequency = 1;

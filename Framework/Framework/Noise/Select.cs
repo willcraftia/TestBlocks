@@ -2,13 +2,11 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    [Component]
     public sealed class Select : INoiseSource
     {
         public const float DefaultEdgeFalloff = 0;

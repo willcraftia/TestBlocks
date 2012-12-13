@@ -7,12 +7,13 @@ using System.Collections.Generic;
 
 namespace Willcraftia.Xna.Framework.Component
 {
-    public sealed class ComponentTypeRegistory
+    public sealed class AliasComponentTypeRegistory : IComponentTypeRegistory
     {
         Dictionary<string, Type> typeDictionary;
 
         Dictionary<Type, string> reverseTypeDictionary;
 
+        // I/F
         public Type ResolveType(string typeName)
         {
             if (typeName == null) throw new ArgumentNullException("typeName");
@@ -24,7 +25,8 @@ namespace Willcraftia.Xna.Framework.Component
             return Type.GetType(typeName, true);
         }
 
-        public string ResolveAlias(Type type)
+        // I/F
+        public string ResolveTypeName(Type type)
         {
             if (type == null) throw new ArgumentNullException("type");
 
@@ -32,15 +34,15 @@ namespace Willcraftia.Xna.Framework.Component
             if (reverseTypeDictionary != null && reverseTypeDictionary.TryGetValue(type, out alias))
                 return alias;
 
-            throw new ArgumentException("Unknown type: " + type);
+            return type.FullName;
         }
 
-        public void SetAlias(Type type)
+        public void SetTypeAlias(Type type)
         {
-            SetAlias(type, type.Name);
+            SetTypeAlias(type, type.Name);
         }
 
-        public void SetAlias(Type type, string alias)
+        public void SetTypeAlias(Type type, string alias)
         {
             if (type == null) throw new ArgumentNullException("type");
             if (alias == null) throw new ArgumentNullException("alias");

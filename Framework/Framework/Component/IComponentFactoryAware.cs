@@ -8,6 +8,6 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public interface IComponentFactoryAware
     {
-        ComponentFactory ComponentFactory { set; }
+        ComponentFactory ComponentFactory { get; set; }
     }
 }

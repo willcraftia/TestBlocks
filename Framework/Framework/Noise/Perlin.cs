@@ -13,7 +13,6 @@ namespace Willcraftia.Xna.Framework.Noise
     ///
     /// http://mrl.nyu.edu/~perlin/noise/
     /// </summary>
-    [Component]
     public sealed class Perlin : INoiseSource
     {
         const int wrapIndex = 256;

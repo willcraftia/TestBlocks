@@ -8,6 +8,6 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public struct ComponentBundleDefinition
     {
-        public NamedComponentDefinition[] Components;
+        public NamedComponentDefinition[] NamedComponents;
     }
 }

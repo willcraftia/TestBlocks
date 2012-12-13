@@ -2,13 +2,11 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    [Component]
     public sealed class Voronoi : INoiseSource
     {
         public const float DefaultDisplacement = 1;

@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Component
     {
         protected override Type GetKeyForItem(ComponentInfo item)
         {
-            return item.Type;
+            return item.ComponentType;
         }
     }
 }

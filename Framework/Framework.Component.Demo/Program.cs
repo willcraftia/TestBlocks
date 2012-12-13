@@ -20,28 +20,29 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Shared ComponentTypeRegistory
             //
 
-            var typeRegistory = new ComponentTypeRegistory();
-            typeRegistory.SetAlias(typeof(Perlin));
-            typeRegistory.SetAlias(typeof(SumFractal));
-            typeRegistory.SetAlias(typeof(ScaleBias));
+            var typeRegistory = new AliasComponentTypeRegistory();
+            typeRegistory.SetTypeAlias(typeof(Perlin));
+            typeRegistory.SetTypeAlias(typeof(SumFractal));
+            typeRegistory.SetTypeAlias(typeof(ScaleBias));
 
             //================================================================
             //
-            // ComponentContainer
+            // NamedComponentFactory
             //
 
-            var container = new ComponentFactory(typeRegistory);
+            var factory = new NamedComponentFactory(typeRegistory);
 
-            container.AddComponent("perlin", "Perlin");
-            container.SetPropertyValue("perlin", "Seed", 300);
+            factory.AddComponent("perlin", "Perlin");
+            factory.SetPropertyValue("perlin", "Seed", 300);
 
-            container.AddComponent("sumFractal", "SumFractal");
-            container.SetComponentReference("sumFractal", "Source", "perlin");
+            factory.AddComponent("sumFractal", "SumFractal");
+            factory.SetPropertyValue("sumFractal", "Source", "perlin");
 
-            container.AddComponent("scaleBias", "ScaleBias");
-            container.SetPropertyValue("scaleBias", "Scale", 0.5f);
-            container.SetPropertyValue("scaleBias", "Bias", 0.5f);
-            container.SetComponentReference("scaleBias", "Source", "sumFractal");
+            factory.AddComponent("scaleBias", "ScaleBias");
+            factory.SetPropertyValue("scaleBias", "Scale", 0.5f);
+            factory.SetPropertyValue("scaleBias", "Bias", 0.5f);
+            factory.SetPropertyValue("scaleBias", "Source", "sumFractal");
+            factory.Build();
 
             //================================================================
             //
@@ -49,7 +50,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             //
 
             ComponentBundleDefinition definition;
-            container.GetDefinition(out definition);
+            factory.GetDefinition(out definition);
 
             var xmlSerializer = new XmlSerializerAdapter(typeof(ComponentBundleDefinition));
             xmlSerializer.WriterSettings.Indent = true;
@@ -74,14 +75,15 @@ namespace Willcraftia.Xna.Framework.Component.Demo
 
             //================================================================
             //
-            // Other ComponentContainer
+            // Other NamedComponentFactory
             //
 
-            var otherContainer = new ComponentFactory(typeRegistory);
-            otherContainer.Initialize(ref deserializedDefinition);
+            var otherFactory = new NamedComponentFactory(typeRegistory);
+            otherFactory.Initialize(ref deserializedDefinition);
+            otherFactory.Build();
 
             // just debug
-            var noise = otherContainer["scaleBias"] as INoiseSource;
+            var noise = otherFactory["scaleBias"] as INoiseSource;
             var signal = noise.Sample(0.5f, 0.5f, 0.5f);
 
             //================================================================

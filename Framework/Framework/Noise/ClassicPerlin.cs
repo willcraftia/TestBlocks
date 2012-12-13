@@ -11,7 +11,6 @@ namespace Willcraftia.Xna.Framework.Noise
     /// <summary>
     /// The class generates Perlin noise.
     /// </summary>
-    [Component]
     public sealed class ClassicPerlin : INoiseSource
     {
         const int wrapIndex = 256;

@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Assets
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
 
         // for procedures and noise sources.
-        ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
+        AliasComponentTypeRegistory componentTypeRegistory = new AliasComponentTypeRegistory();
 
         // I/F
         public AssetManager AssetManager { private get; set; }
@@ -102,7 +102,7 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         IProcedure<Chunk> ToChunkProcedure(ref ProcedureDefinition definition)
         {
-            var factory = new ComponentFactory(componentTypeRegistory);
+            var factory = new NamedComponentFactory(componentTypeRegistory);
             factory.Initialize(ref definition.ComponentBundle);
 
             return factory[definition.Target] as IProcedure<Chunk>;
@@ -137,11 +137,11 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             definition = new ProcedureDefinition { Target = procedure.ComponentName };
 
-            var factory = procedure.ComponentFactory;
+            var factory = procedure.NamedComponentFactory;
             if (factory == null)
             {
-                factory = new ComponentFactory(componentTypeRegistory);
-                procedure.ComponentFactory = factory;
+                factory = new NamedComponentFactory(componentTypeRegistory);
+                procedure.NamedComponentFactory = factory;
             }
 
             factory.GetDefinition(out definition.ComponentBundle);
