@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Shared ComponentTypeRegistory
             //
 
-            var typeRegistory = new AliasComponentTypeRegistory();
+            var typeRegistory = new AliasTypeRegistory();
             typeRegistory.SetTypeAlias(typeof(Perlin));
             typeRegistory.SetTypeAlias(typeof(SumFractal));
             typeRegistory.SetTypeAlias(typeof(ScaleBias));
@@ -30,7 +30,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // NamedComponentFactory
             //
 
-            var factory = new NamedComponentFactory(typeRegistory);
+            var factory = new ComponentBundleFactory(typeRegistory);
 
             factory.AddComponent("perlin", "Perlin");
             factory.SetPropertyValue("perlin", "Seed", 300);
@@ -49,10 +49,10 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Serialization
             //
 
-            ComponentBundleDefinition definition;
+            BundleDefinition definition;
             factory.GetDefinition(out definition);
 
-            var xmlSerializer = new XmlSerializerAdapter(typeof(ComponentBundleDefinition));
+            var xmlSerializer = new XmlSerializerAdapter(typeof(BundleDefinition));
             xmlSerializer.WriterSettings.Indent = true;
             xmlSerializer.WriterSettings.OmitXmlDeclaration = true;
 
@@ -67,10 +67,10 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Deserialization
             //
 
-            ComponentBundleDefinition deserializedDefinition;
+            BundleDefinition deserializedDefinition;
             using (var stream = resource.Open())
             {
-                deserializedDefinition = (ComponentBundleDefinition) xmlSerializer.Deserialize(stream, null);
+                deserializedDefinition = (BundleDefinition) xmlSerializer.Deserialize(stream, null);
             }
 
             //================================================================
@@ -78,7 +78,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Other NamedComponentFactory
             //
 
-            var otherFactory = new NamedComponentFactory(typeRegistory);
+            var otherFactory = new ComponentBundleFactory(typeRegistory);
             otherFactory.Initialize(ref deserializedDefinition);
             otherFactory.Build();
 

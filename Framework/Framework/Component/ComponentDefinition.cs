@@ -1,15 +1,19 @@
 ﻿#region Using
 
 using System;
+using System.Xml.Serialization;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Component
 {
+    [XmlRoot("Component")]
     public struct ComponentDefinition
     {
+        [XmlAttribute]
         public string Type;
 
-        public ComponentPropertyDefinition[] Properties;
+        [XmlArrayItem("Property")]
+        public PropertyDefinition[] Properties;
     }
 }

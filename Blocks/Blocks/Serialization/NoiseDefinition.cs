@@ -11,6 +11,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
     {
         public string RootName;
 
-        public NamedComponentDefinition[] Components;
+        public BundleEntryDefinition[] Components;
     }
 }

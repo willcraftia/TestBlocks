@@ -11,6 +11,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
     {
         public string Target;
 
-        public ComponentBundleDefinition ComponentBundle;
+        public BundleDefinition ComponentBundle;
     }
 }

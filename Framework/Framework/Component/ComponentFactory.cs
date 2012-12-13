@@ -8,13 +8,13 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public sealed class ComponentFactory
     {
-        IComponentTypeRegistory typeRegistory = DefaultComponentTypeRegistory.Instance;
+        ITypeRegistory typeRegistory = DefaultTypeRegistory.Instance;
 
         ComponentInfoCollection componentInfoCollection = new ComponentInfoCollection();
 
         public ComponentFactory() { }
 
-        public ComponentFactory(IComponentTypeRegistory typeRegistory)
+        public ComponentFactory(ITypeRegistory typeRegistory)
         {
             if (typeRegistory == null) throw new ArgumentNullException("typeRegistory");
 
@@ -99,16 +99,16 @@ namespace Willcraftia.Xna.Framework.Component
                 Type = typeRegistory.ResolveTypeName(componentInfo.ComponentType)
             };
 
-            var properties = componentInfo.Properties;
-            if (!CollectionHelper.IsNullOrEmpty(properties))
+            var propertyNames = componentInfo.PropertyNames;
+            if (!CollectionHelper.IsNullOrEmpty(propertyNames))
             {
-                definition.Properties = new ComponentPropertyDefinition[properties.Count];
-                for (int i = 0; i < properties.Count; i++)
+                definition.Properties = new PropertyDefinition[propertyNames.Count];
+                for (int i = 0; i < propertyNames.Count; i++)
                 {
-                    var name = properties[i].Name;
+                    var name = propertyNames[i];
                     var value = Convert.ToString(componentInfo.GetPropertyValue(component, name));
 
-                    definition.Properties[i] = new ComponentPropertyDefinition
+                    definition.Properties[i] = new PropertyDefinition
                     {
                         Name = name,
                         Value = value
