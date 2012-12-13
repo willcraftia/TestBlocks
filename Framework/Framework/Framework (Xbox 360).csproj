@@ -112,14 +112,14 @@
     <Compile Include="Component\AliasTypeRegistory.cs" />
     <Compile Include="Component\BundleDefinition.cs" />
     <Compile Include="Component\BundleEntryDefinition.cs" />
-    <Compile Include="Component\ComponentBundleFactory.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\ComponentInfo.cs" />
     <Compile Include="Component\ComponentInfoCollection.cs" />
     <Compile Include="Component\DefaultTypeRegistory.cs" />
-    <Compile Include="Component\IComponentBundleFactoryAware.cs" />
-    <Compile Include="Component\IComponentFactoryAware.cs" />
+    <Compile Include="Component\IComponentFactoryAware.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Component\IComponentInfoAware.cs" />
     <Compile Include="Component\IComponentNameAware.cs" />
     <Compile Include="Component\ITypeRegistory.cs" />

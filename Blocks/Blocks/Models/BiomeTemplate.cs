@@ -9,34 +9,41 @@ using Willcraftia.Xna.Framework.Noise;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class BiomeTemplate : IAsset, IComponentBundleFactoryAware, IComponentNameAware
+    public sealed class BiomeTemplate : IAsset
     {
-        ComponentBundleFactory factory;
+        public const string ComponentName = "BiomeTemplate";
 
-        string componentName;
+        static readonly AliasTypeRegistory typeRegistory = new AliasTypeRegistory();
 
-        // Inject
-        public INoiseSource NoiseSource { get; set; }
+        BiomeTemplateComponent component;
 
         // I/F
-        [PropertyIgnored]
         public IResource Resource { get; set; }
 
-        [PropertyIgnored]
         public int Index { get; set; }
 
-        public string Name { get; set; }
+        public ComponentFactory ComponentFactory { get; private set; }
 
-        // I/F
-        public void SetComponentBundleFactory(ComponentBundleFactory factory)
+        public BiomeTemplateComponent Component
         {
-            this.factory = factory;
+            get
+            {
+                if (component == null)
+                    component = ComponentFactory[ComponentName] as BiomeTemplateComponent;
+                return component;
+            }
         }
 
-        // I/F
-        public void SetComponentName(string componentName)
+        static BiomeTemplate()
         {
-            this.componentName = componentName;
+            typeRegistory.SetTypeAlias(typeof(Perlin));
+            typeRegistory.SetTypeAlias(typeof(SumFractal));
+            typeRegistory.SetTypeAlias(typeof(BiomeTemplateComponent), "BiomeTemplate");
+        }
+
+        public BiomeTemplate()
+        {
+            ComponentFactory = new ComponentFactory(typeRegistory);
         }
     }
 }

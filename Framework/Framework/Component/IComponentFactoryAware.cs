@@ -13,6 +13,6 @@ namespace Willcraftia.Xna.Framework.Component
         // これを綺麗に回避する方法がないためメソッドとしている。
         //
 
-        void SetComponentFactory(ComponentFactory factory);
+        void SetComponentBundleFactory(ComponentFactory factory);
     }
 }

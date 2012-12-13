@@ -133,9 +133,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine();
 
             //================================================================
-            // BundleDefinition (BiomeTemplate)
+            // BundleDefinition (BiomeTemplateComponent)
 
-            Console.WriteLine("BundleDefinition (BiomeTemplate)");
+            Console.WriteLine("BundleDefinition (BiomeTemplateComponent)");
             var biomeTemplate = new BundleDefinition
             {
                 Entries = new BundleEntryDefinition[]

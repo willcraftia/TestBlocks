@@ -14,36 +14,33 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class BiomeTemplateLoader : IAssetLoader
     {
-        public const string BiomeTemplateComponentName = "BiomeTemplate";
-
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(BundleDefinition));
-
-        AliasTypeRegistory typeRegistory = new AliasTypeRegistory();
-
-        public BiomeTemplateLoader()
-        {
-            typeRegistory.SetTypeAlias(typeof(Perlin));
-            typeRegistory.SetTypeAlias(typeof(SumFractal));
-            typeRegistory.SetTypeAlias(typeof(BiomeTemplate));
-        }
 
         public object Load(IResource resource)
         {
             var definition = (BundleDefinition) serializer.Deserialize(resource);
 
-            var factory = new ComponentBundleFactory(typeRegistory);
-            factory.Initialize(ref definition);
-            factory.Build();
+            var biomeTemplate = new BiomeTemplate
+            {
+                Resource = resource
+            };
 
-            var biomeTemplate = factory[BiomeTemplateComponentName] as BiomeTemplate;
-            biomeTemplate.Resource = resource;
+            biomeTemplate.ComponentFactory.AddBundleDefinition(ref definition);
+            biomeTemplate.ComponentFactory.Build();
+            
             return biomeTemplate;
         }
 
         public void Save(IResource resource, object asset)
         {
-            // TODO
-            throw new NotImplementedException();
+            var biomeTemplate = asset as BiomeTemplate;
+
+            BundleDefinition definition;
+            biomeTemplate.ComponentFactory.GetDefinition(out definition);
+
+            serializer.Serialize(resource, definition);
+
+            biomeTemplate.Resource = resource;
         }
     }
 }

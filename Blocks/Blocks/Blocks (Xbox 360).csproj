@@ -107,6 +107,7 @@
     <Compile Include="Models\Biome.cs" />
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\BiomeTemplate.cs" />
+    <Compile Include="Models\BiomeTemplateComponent.cs" />
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\BlockCatalog.cs" />
     <Compile Include="Models\BlockCollection.cs" />
@@ -116,11 +117,12 @@
     <Compile Include="Models\ChunkMesh.cs" />
     <Compile Include="Models\ChunkMeshPart.cs" />
     <Compile Include="Models\ChunkMeshUpdateManager.cs" />
-    <Compile Include="Models\FlatTerrainProcedure.cs" />
+    <Compile Include="Models\ChunkProcedure.cs" />
+    <Compile Include="Models\ChunkProcedureComponent.cs" />
+    <Compile Include="Models\FlatTerrainProcedureComponent.cs" />
     <Compile Include="Models\IAsset.cs" />
     <Compile Include="Models\IChunkStore.cs" />
     <Compile Include="Models\Image2D.cs" />
-    <Compile Include="Models\IProcedure.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />
     <Compile Include="Models\NoiseBiome.cs" />
@@ -134,7 +136,6 @@
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
     <Compile Include="Serialization\BlockIndexDefinition.cs" />
-    <Compile Include="Serialization\ChunkProcedureDefinition.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />

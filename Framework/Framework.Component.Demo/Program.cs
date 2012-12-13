@@ -11,7 +11,7 @@ using Willcraftia.Xna.Framework.Serialization;
 
 namespace Willcraftia.Xna.Framework.Component.Demo
 {
-    public sealed class DemoComponent : IComponentBundleFactoryAware, IComponentNameAware
+    public sealed class DemoComponent : IComponentFactoryAware, IComponentNameAware
     {
         public DemoComponent Child { get; set; }
 
@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
         [PropertyIgnored]
         public string IgnoredProperty { get; set; }
 
-        public void SetComponentBundleFactory(ComponentBundleFactory factory)
+        public void SetComponentBundleFactory(ComponentFactory factory)
         {
         }
 
@@ -48,7 +48,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // NamedComponentFactory
             //
 
-            var factory = new ComponentBundleFactory(typeRegistory);
+            var factory = new ComponentFactory(typeRegistory);
 
             factory.AddComponent("perlin", "Perlin");
             factory.SetPropertyValue("perlin", "Seed", 300);
@@ -96,8 +96,8 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Other NamedComponentFactory
             //
 
-            var otherFactory = new ComponentBundleFactory(typeRegistory);
-            otherFactory.Initialize(ref deserializedDefinition);
+            var otherFactory = new ComponentFactory(typeRegistory);
+            otherFactory.AddBundleDefinition(ref deserializedDefinition);
             otherFactory.Build();
 
             // just debug
@@ -109,7 +109,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // DemoComponent
             //
 
-            var demoFactory = new ComponentBundleFactory();
+            var demoFactory = new ComponentFactory();
             demoFactory.AddComponent("rootComponent", typeof(DemoComponent).AssemblyQualifiedName);
             demoFactory.SetPropertyValue("rootComponent", "StringProperty", "rootValue");
             demoFactory.SetComponentReference("rootComponent", "Child", "childComponent");

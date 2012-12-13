@@ -20,19 +20,11 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
 
-        // for procedures and noise sources.
-        AliasTypeRegistory typeRegistory = new AliasTypeRegistory();
-
         // I/F
         public AssetManager AssetManager { private get; set; }
 
         // I/F
         public ResourceManager ResourceManager { private get; set; }
-
-        public RegionLoader()
-        {
-            // todo: ComponentTypeRegistory
-        }
 
         // I/F
         public object Load(IResource resource)
@@ -100,49 +92,33 @@ namespace Willcraftia.Xna.Blocks.Assets
             return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
 
-        List<IProcedure<Chunk>> ToChunkProcedures(ChunkProcedureDefinition[] definitions)
+        List<ChunkProcedure> ToChunkProcedures(BundleDefinition[] definitions)
         {
-            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<IProcedure<Chunk>>(0);
+            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<ChunkProcedure>(0);
 
-            var list = new List<IProcedure<Chunk>>(definitions.Length);
+            var list = new List<ChunkProcedure>(definitions.Length);
             for (int i = 0; i < definitions.Length; i++)
             {
-                var procedure = ToChunkProcedure(ref definitions[i]);
-                list.Add(procedure);
+                var chunkProcedure = new ChunkProcedure();
+
+                chunkProcedure.ComponentFactory.AddBundleDefinition(ref definitions[i]);
+                chunkProcedure.ComponentFactory.Build();
+
+                list.Add(chunkProcedure);
             }
 
             return list;
         }
 
-        IProcedure<Chunk> ToChunkProcedure(ref ChunkProcedureDefinition definition)
-        {
-            var factory = new ComponentBundleFactory(typeRegistory);
-            factory.Initialize(ref definition.Bundle);
-            return factory[definition.Target] as IProcedure<Chunk>;
-        }
-
-        ChunkProcedureDefinition[] ToChunkProcedureDefinition(List<IProcedure<Chunk>> procedures)
+        BundleDefinition[] ToChunkProcedureDefinition(List<ChunkProcedure> procedures)
         {
             if (CollectionHelper.IsNullOrEmpty(procedures)) return null;
 
-            var definitions = new ChunkProcedureDefinition[procedures.Count];
+            var definitions = new BundleDefinition[procedures.Count];
             for (int i = 0; i < procedures.Count; i++)
-                ToChunkProcedureDefinition(procedures[i], out definitions[i]);
+                procedures[i].ComponentFactory.GetDefinition(out definitions[i]);
 
             return definitions;
-        }
-
-        void ToChunkProcedureDefinition(IProcedure<Chunk> procedure, out ChunkProcedureDefinition definition)
-        {
-            var factory = procedure.GetComponentBundleFactory();
-            if (factory == null)
-                throw new InvalidOperationException("ComponentBundleFactory is null.");
-
-            if (string.IsNullOrEmpty(procedure.GetComponentName()))
-                throw new InvalidOperationException("ComponentName is null.");
-
-            factory.GetDefinition(out definition.Bundle);
-            definition.Target = procedure.GetComponentName();
         }
     }
 }
