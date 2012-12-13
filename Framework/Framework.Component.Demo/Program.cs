@@ -11,6 +11,24 @@ using Willcraftia.Xna.Framework.Serialization;
 
 namespace Willcraftia.Xna.Framework.Component.Demo
 {
+    public sealed class DemoComponent : IComponentBundleFactoryAware, IComponentNameAware
+    {
+        public DemoComponent Child { get; set; }
+
+        public string StringProperty { get; set; }
+
+        [PropertyIgnored]
+        public string IgnoredProperty { get; set; }
+
+        public void SetComponentBundleFactory(ComponentBundleFactory factory)
+        {
+        }
+
+        public void SetComponentName(string componentName)
+        {
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -85,6 +103,19 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // just debug
             var noise = otherFactory["scaleBias"] as INoiseSource;
             var signal = noise.Sample(0.5f, 0.5f, 0.5f);
+
+            //================================================================
+            //
+            // DemoComponent
+            //
+
+            var demoFactory = new ComponentBundleFactory();
+            demoFactory.AddComponent("rootComponent", typeof(DemoComponent).AssemblyQualifiedName);
+            demoFactory.SetPropertyValue("rootComponent", "StringProperty", "rootValue");
+            demoFactory.SetComponentReference("rootComponent", "Child", "childComponent");
+            demoFactory.AddComponent("childComponent", typeof(DemoComponent).AssemblyQualifiedName);
+            demoFactory.SetPropertyValue("childComponent", "StringProperty", "childValue");
+            demoFactory.Build();
 
             //================================================================
             //

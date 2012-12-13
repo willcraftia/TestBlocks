@@ -92,6 +92,7 @@
     <Reference Include="System.Xml.Serialization, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\BiomeTemplateLoader.cs" />
     <Compile Include="Assets\BlockCatalogLoader.cs" />
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\Image2DLoader.cs" />
@@ -105,6 +106,7 @@
     <Compile Include="Landscape\ChunkRenderer.cs" />
     <Compile Include="Models\Biome.cs" />
     <Compile Include="Models\BiomeElement.cs" />
+    <Compile Include="Models\BiomeTemplate.cs" />
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\BlockCatalog.cs" />
     <Compile Include="Models\BlockCollection.cs" />
@@ -132,11 +134,11 @@
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
     <Compile Include="Serialization\BlockIndexDefinition.cs" />
+    <Compile Include="Serialization\ChunkProcedureDefinition.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\NoiseDefinition.cs" />
-    <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />

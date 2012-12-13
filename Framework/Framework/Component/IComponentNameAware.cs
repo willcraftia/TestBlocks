@@ -8,6 +8,11 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public interface IComponentNameAware
     {
-        string ComponentName { set; }
+        //
+        // プロパティ形式にすると ComponentInfo で検知されてしまうので注意。
+        // これを綺麗に回避する方法がないためメソッドとしている。
+        //
+
+        void SetComponentName(string componentName);
     }
 }

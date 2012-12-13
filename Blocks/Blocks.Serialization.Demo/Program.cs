@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
@@ -128,6 +129,40 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var xmlResource = SerializeToXml<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
                 var fromJson = DeserializeFromJson<BlockCatalogDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<BlockCatalogDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            //================================================================
+            // BundleDefinition (BiomeTemplate)
+
+            Console.WriteLine("BundleDefinition (BiomeTemplate)");
+            var biomeTemplate = new BundleDefinition
+            {
+                Entries = new BundleEntryDefinition[]
+                {
+                    new BundleEntryDefinition
+                    {
+                        Name = "BiomeTemplate",
+                        Component = new ComponentDefinition
+                        {
+                            Type = "BiomeTemplate",
+                            Properties = new PropertyDefinition[]
+                            {
+                                new PropertyDefinition
+                                {
+                                    Name = "Name",
+                                    Value = "Default Biome Template"
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            {
+                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiomeTemplate", biomeTemplate);
+                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiomeTemplate", biomeTemplate);
+                var fromJson = DeserializeFromJson<BundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<BundleDefinition>(xmlResource);
             }
             Console.WriteLine();
 

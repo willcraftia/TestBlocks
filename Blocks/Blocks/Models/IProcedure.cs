@@ -7,11 +7,13 @@ using Willcraftia.Xna.Framework.Component;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public interface IProcedure<T> : IComponentFactoryAware, IComponentNameAware
+    public interface IProcedure<T> : IComponentBundleFactoryAware, IComponentNameAware
     {
-        new ComponentFactory ComponentFactory { get; set; }
+        ComponentBundleFactory GetComponentBundleFactory();
 
-        new string ComponentName { get; set; }
+        string GetComponentName();
+
+        void SetRegion(Region region);
 
         void Generate(T instance);
     }

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Bundle>
+	<Entries>
+		<Entry Name="BiomeTemplate">
+			<Component Type="BiomeTemplate">
+				<Properties>
+					<Property Name="Name" Value="Default Biome Template" />
+				</Properties>
+			</Component>
+		</Entry>
+	</Entries>
+</Bundle>

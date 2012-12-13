@@ -8,6 +8,11 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public interface IComponentBundleFactoryAware
     {
-        ComponentBundleFactory ComponentBundleFactory { set; }
+        //
+        // プロパティ形式にすると ComponentInfo で検知されてしまうので注意。
+        // これを綺麗に回避する方法がないためメソッドとしている。
+        //
+
+        void SetComponentBundleFactory(ComponentBundleFactory factory);
     }
 }

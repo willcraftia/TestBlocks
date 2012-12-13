@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Component
         {
             if (type == null) throw new ArgumentNullException("type");
 
-            return type.FullName;
+            return type.AssemblyQualifiedName;
         }
     }
 }

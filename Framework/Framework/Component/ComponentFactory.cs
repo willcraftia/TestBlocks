@@ -45,7 +45,7 @@ namespace Willcraftia.Xna.Framework.Component
             var component = componentInfo.CreateInstance();
 
             var componentFactoryAware = component as IComponentFactoryAware;
-            if (componentFactoryAware != null) componentFactoryAware.ComponentFactory = this;
+            if (componentFactoryAware != null) componentFactoryAware.SetComponentFactory(this);
 
             return component;
         }

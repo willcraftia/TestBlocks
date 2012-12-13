@@ -1,0 +1,16 @@
+{
+  "Entries": [
+    {
+      "Name": "BiomeTemplate",
+      "Component": {
+        "Type": "BiomeTemplate",
+        "Properties": [
+          {
+            "Name": "Name",
+            "Value": "Default Biome Template"
+          }
+        ]
+      }
+    }
+  ]
+}

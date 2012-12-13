@@ -61,7 +61,7 @@ namespace Willcraftia.Xna.Framework.Component
             for (int i = 0; i < definedProperties.Length; i++)
             {
                 var property = definedProperties[i];
-                if (IsIgnoredProperty(property) || !property.CanRead || !property.CanWrite)
+                if (!property.CanRead || !property.CanWrite || IsIgnoredProperty(property))
                 {
                     // 後の処理を省くために、無効なプロパティのインデックスに null を設定する。
                     // null ならば無効なプロパティであったということ。
@@ -126,7 +126,7 @@ namespace Willcraftia.Xna.Framework.Component
             var instance = ComponentType.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
 
             var componentInfoAware = instance as IComponentInfoAware;
-            if (componentInfoAware != null) componentInfoAware.ComponentInfo = this;
+            if (componentInfoAware != null) componentInfoAware.SetComponentInfo(this);
 
             return instance;
         }

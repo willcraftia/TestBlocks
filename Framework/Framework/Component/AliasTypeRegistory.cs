@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Framework.Component
             if (reverseTypeDictionary != null && reverseTypeDictionary.TryGetValue(type, out alias))
                 return alias;
 
-            return type.FullName;
+            return type.AssemblyQualifiedName;
         }
 
         public void SetTypeAlias(Type type)

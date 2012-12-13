@@ -120,7 +120,7 @@ namespace Willcraftia.Xna.Framework.Component
             var component = componentInfo.CreateInstance();
 
             var factoryAware = component as IComponentBundleFactoryAware;
-            if (factoryAware != null) factoryAware.ComponentBundleFactory = this;
+            if (factoryAware != null) factoryAware.SetComponentBundleFactory(this);
 
             return component;
         }
@@ -130,7 +130,7 @@ namespace Willcraftia.Xna.Framework.Component
             var component = CreateComponent(componentInfo);
 
             var nameAware = component as IComponentNameAware;
-            if (nameAware != null) nameAware.ComponentName = componentName;
+            if (nameAware != null) nameAware.SetComponentName(componentName);
 
             return component;
         }
