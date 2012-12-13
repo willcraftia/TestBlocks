@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Assets
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
 
         // for procedures and noise sources.
-        AliasTypeRegistory componentTypeRegistory = new AliasTypeRegistory();
+        AliasTypeRegistory typeRegistory = new AliasTypeRegistory();
 
         // I/F
         public AssetManager AssetManager { private get; set; }
@@ -63,7 +63,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 TileCatalog = ToUri(resource, region.TileCatalog),
                 BlockCatalog = ToUri(resource, region.BlockCatalog),
                 ChunkBundle = ToUri(resource, region.ChunkBundleResource),
-                ChunkProcedures = ToProcedureDefinitions(region.ChunkProcesures)
+                ChunkProcedures = ToComponentDefinitions(region.ChunkProcesures)
             };
 
             serializer.Serialize(resource, definition);
@@ -86,28 +86,6 @@ namespace Willcraftia.Xna.Blocks.Assets
             return AssetManager.Load<T>(resource);
         }
 
-        List<IProcedure<Chunk>> ToChunkProcedures(ProcedureDefinition[] definitions)
-        {
-            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<IProcedure<Chunk>>(0);
-
-            var list = new List<IProcedure<Chunk>>(definitions.Length);
-            for (int i = 0; i < definitions.Length; i++)
-            {
-                var procedure = ToChunkProcedure(ref definitions[i]);
-                list.Add(procedure);
-            }
-
-            return list;
-        }
-
-        IProcedure<Chunk> ToChunkProcedure(ref ProcedureDefinition definition)
-        {
-            var factory = new ComponentBundleFactory(componentTypeRegistory);
-            factory.Initialize(ref definition.ComponentBundle);
-
-            return factory[definition.Target] as IProcedure<Chunk>;
-        }
-
         string ToUri(IResource baseResource, IResource resource)
         {
             if (resource == null) return null;
@@ -122,29 +100,47 @@ namespace Willcraftia.Xna.Blocks.Assets
             return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
 
-        ProcedureDefinition[] ToProcedureDefinitions(List<IProcedure<Chunk>> procedures)
+        List<IProcedure<Chunk>> ToChunkProcedures(ComponentDefinition[] definitions)
+        {
+            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<IProcedure<Chunk>>(0);
+
+            var list = new List<IProcedure<Chunk>>(definitions.Length);
+            for (int i = 0; i < definitions.Length; i++)
+            {
+                var procedure = ToChunkProcedure(ref definitions[i]);
+                list.Add(procedure);
+            }
+
+            return list;
+        }
+
+        IProcedure<Chunk> ToChunkProcedure(ref ComponentDefinition definition)
+        {
+            var factory = new ComponentFactory(typeRegistory);
+            var component = factory.CreateComponent(ref definition);
+            return component as IProcedure<Chunk>;
+        }
+
+        ComponentDefinition[] ToComponentDefinitions(List<IProcedure<Chunk>> procedures)
         {
             if (CollectionHelper.IsNullOrEmpty(procedures)) return null;
 
-            var definitions = new ProcedureDefinition[procedures.Count];
+            var definitions = new ComponentDefinition[procedures.Count];
             for (int i = 0; i < procedures.Count; i++)
-                ToProcedureDefinition(procedures[i], out definitions[i]);
+                ToComponentDefinition(procedures[i], out definitions[i]);
 
             return definitions;
         }
 
-        void ToProcedureDefinition(IProcedure<Chunk> procedure, out ProcedureDefinition definition)
+        void ToComponentDefinition(IProcedure<Chunk> procedure, out ComponentDefinition definition)
         {
-            definition = new ProcedureDefinition { Target = procedure.ComponentName };
-
-            var factory = procedure.ComponentBundleFactory;
+            var factory = procedure.ComponentFactory;
             if (factory == null)
             {
-                factory = new ComponentBundleFactory(componentTypeRegistory);
-                procedure.ComponentBundleFactory = factory;
+                factory = new ComponentFactory(typeRegistory);
+                procedure.ComponentFactory = factory;
             }
-
-            factory.GetDefinition(out definition.ComponentBundle);
+            factory.CreateDefinition(procedure, out definition);
         }
     }
 }

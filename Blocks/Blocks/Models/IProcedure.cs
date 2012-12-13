@@ -7,9 +7,9 @@ using Willcraftia.Xna.Framework.Component;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public interface IProcedure<T> : IComponentBundleFactoryAware, IComponentNameAware
+    public interface IProcedure<T> : IComponentFactoryAware, IComponentNameAware
     {
-        new ComponentBundleFactory ComponentBundleFactory { get; set; }
+        new ComponentFactory ComponentFactory { get; set; }
 
         new string ComponentName { get; set; }
 

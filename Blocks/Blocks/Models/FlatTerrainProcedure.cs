@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class FlatTerrainProcedure : IProcedure<Chunk>
     {
-        public ComponentBundleFactory ComponentBundleFactory { get; set; }
+        public ComponentFactory ComponentFactory { get; set; }
 
         public string ComponentName { get; set; }
 

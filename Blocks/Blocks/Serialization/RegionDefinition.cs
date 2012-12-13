@@ -35,6 +35,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
         // URI
         public string ChunkBundle;
 
-        public ProcedureDefinition[] ChunkProcedures;
+        public ComponentDefinition[] ChunkProcedures;
     }
 }

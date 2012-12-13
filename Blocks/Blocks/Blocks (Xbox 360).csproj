@@ -136,7 +136,6 @@
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\NoiseDefinition.cs" />
-    <Compile Include="Serialization\ProcedureDefinition.cs" />
     <Compile Include="Serialization\PropertyDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
