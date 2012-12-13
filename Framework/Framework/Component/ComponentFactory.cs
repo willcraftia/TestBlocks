@@ -115,26 +115,6 @@ namespace Willcraftia.Xna.Framework.Component
                 throw new InvalidOperationException("Component not found: " + componentName);
         }
 
-        object CreateComponent(ComponentInfo componentInfo)
-        {
-            var component = componentInfo.CreateInstance();
-
-            var factoryAware = component as IComponentFactoryAware;
-            if (factoryAware != null) factoryAware.SetComponentBundleFactory(this);
-
-            return component;
-        }
-
-        object CreateComponent(ComponentInfo componentInfo, string componentName)
-        {
-            var component = CreateComponent(componentInfo);
-
-            var nameAware = component as IComponentNameAware;
-            if (nameAware != null) nameAware.SetComponentName(componentName);
-
-            return component;
-        }
-
         //====================================================================
         //
         // For editors.
@@ -217,7 +197,7 @@ namespace Willcraftia.Xna.Framework.Component
             foreach (var holder in holders)
             {
                 if (holder.Component == null)
-                    holder.Component = CreateComponent(holder.ComponentInfo, holder.BundleEntryDefinition.Name);
+                    holder.Component = holder.ComponentInfo.CreateInstance();
             }
 
             foreach (var holder in holders)

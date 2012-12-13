@@ -11,7 +11,7 @@ using Willcraftia.Xna.Framework.Serialization;
 
 namespace Willcraftia.Xna.Framework.Component.Demo
 {
-    public sealed class DemoComponent : IComponentFactoryAware, IComponentNameAware
+    public sealed class DemoComponent
     {
         public DemoComponent Child { get; set; }
 

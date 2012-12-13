@@ -117,11 +117,6 @@
     <Compile Include="Component\ComponentInfo.cs" />
     <Compile Include="Component\ComponentInfoCollection.cs" />
     <Compile Include="Component\DefaultTypeRegistory.cs" />
-    <Compile Include="Component\IComponentFactoryAware.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Component\IComponentInfoAware.cs" />
-    <Compile Include="Component\IComponentNameAware.cs" />
     <Compile Include="Component\ITypeRegistory.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />
     <Compile Include="Component\PropertyIgnoredAttribute.cs" />

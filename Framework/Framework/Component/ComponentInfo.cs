@@ -123,12 +123,7 @@ namespace Willcraftia.Xna.Framework.Component
 
         public object CreateInstance()
         {
-            var instance = ComponentType.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
-
-            var componentInfoAware = instance as IComponentInfoAware;
-            if (componentInfoAware != null) componentInfoAware.SetComponentInfo(this);
-
-            return instance;
+            return ComponentType.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
         }
 
         public bool PropertyExists(string propertyName)
