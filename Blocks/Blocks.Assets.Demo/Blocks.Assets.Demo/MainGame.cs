@@ -99,12 +99,6 @@ namespace Willcraftia.Xna.Blocks.Assets.Demo
             var region = regionManager.LoadRegion("title:Resources/DefaultRegion.json");
 
             //================================================================
-            // BiomeTemplate (just test)
-
-            var biomeTemplateUri = TitleResourceLoader.Instance.LoadResource("title:Resources/DefaultBiomeTemplate.json");
-            var biomeTemplate = region.AssetManager.Load<Biome>(biomeTemplateUri);
-
-            //================================================================
             // SpriteFont via the asset manager of the region.
 
             var spriteFontUri = ContentResourceLoader.Instance.LoadResource("content:Fonts/Demo");

@@ -4,7 +4,7 @@
 		<Entry Name="Component">
 			<Component Type="BiomeComponent">
 				<Properties>
-					<Property Name="Name" Value="Default Biome Template" />
+					<Property Name="Name" Value="Default Biome Component" />
 					<Property Name="HumidityNoise" Value="HumidityNoise" />
 					<Property Name="TemperatureNoise" Value="TemperatureNoise" />
 				</Properties>

@@ -29,6 +29,9 @@ namespace Willcraftia.Xna.Blocks.Serialization
         // URI
         public string BlockCatalog;
 
+        // URI
+        public string BiomeCatalog;
+
         //----------------------------
         // Chunk
 

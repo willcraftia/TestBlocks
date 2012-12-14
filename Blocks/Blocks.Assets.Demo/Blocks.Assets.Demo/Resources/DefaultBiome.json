@@ -7,7 +7,7 @@
         "Properties": [
           {
             "Name": "Name",
-            "Value": "Default Biome Template"
+            "Value": "Default Biome Component"
           },
           {
             "Name": "HumidityNoise",

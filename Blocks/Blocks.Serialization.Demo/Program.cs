@@ -115,7 +115,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var blockCatalog = new BlockCatalogDefinition
                 {
-                    Name = "Default Block",
+                    Name = "Default Block Catalog",
                     Entries = new IndexedUriDefinition[]
                     {
                         new IndexedUriDefinition
@@ -138,7 +138,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var biome = new Biome();
                 biome.ComponentFactory.AddComponent("Component", "BiomeComponent");
-                biome.ComponentFactory.SetPropertyValue("Component", "Name", "Default Biome Template");
+                biome.ComponentFactory.SetPropertyValue("Component", "Name", "Default Biome Component");
                 biome.ComponentFactory.SetPropertyValue("Component", "HumidityNoise", "HumidityNoise");
                 biome.ComponentFactory.SetPropertyValue("Component", "TemperatureNoise", "TemperatureNoise");
 
@@ -155,10 +155,33 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 BundleDefinition biomeBundle;
                 biome.ComponentFactory.GetDefinition(out biomeBundle);
 
-                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiomeTemplate", biomeBundle);
-                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiomeTemplate", biomeBundle);
+                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiome", biomeBundle);
+                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiome", biomeBundle);
                 var fromJson = DeserializeFromJson<BundleDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<BundleDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            //================================================================
+            // BiomeCatalogDefinition
+
+            Console.WriteLine("BiomeCatalogDefinition");
+            {
+                var biomeCatalog = new BiomeCatalogDefinition
+                {
+                    Name = "Default Biome Catalog",
+                    Entries = new IndexedUriDefinition[]
+                    {
+                        new IndexedUriDefinition
+                        {
+                            Index = 1, Uri = "DefaultBiome.json"
+                        }
+                    }
+                };
+                var jsonResource = SerializeToJson<BiomeCatalogDefinition>("DefaultBiomeCatalog", biomeCatalog);
+                var xmlResource = SerializeToXml<BiomeCatalogDefinition>("DefaultBiomeCatalog", biomeCatalog);
+                var fromJson = DeserializeFromJson<BiomeCatalogDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<BiomeCatalogDefinition>(xmlResource);
             }
             Console.WriteLine();
 
@@ -173,6 +196,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
                     TileCatalog = "DefaultTileCatalog.json",
                     BlockCatalog = "DefaultBlockCatalog.json",
+                    BiomeCatalog = "DefaultBiomeCatalog.json"
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlResource = SerializeToXml<RegionDefinition>("DefaultRegion", region);

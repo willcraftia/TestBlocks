@@ -15,4 +15,5 @@
 	</Bounds>
 	<TileCatalog>DefaultTileCatalog.json</TileCatalog>
 	<BlockCatalog>DefaultBlockCatalog.json</BlockCatalog>
+	<BiomeCatalog>DefaultBiomeCatalog.json</BiomeCatalog>
 </RegionDefinition>

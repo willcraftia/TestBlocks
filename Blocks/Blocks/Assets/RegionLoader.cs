@@ -38,6 +38,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 Bounds = definition.Bounds,
                 TileCatalog = Load<TileCatalog>(resource, definition.TileCatalog),
                 BlockCatalog = Load<BlockCatalog>(resource, definition.BlockCatalog),
+                BiomeCatalog = Load<BiomeCatalog>(resource, definition.BiomeCatalog),
                 ChunkBundleResource = Load(resource, definition.ChunkBundle),
                 ChunkProcesures = ToChunkProcedures(definition.ChunkProcedures)
             };
@@ -54,6 +55,7 @@ namespace Willcraftia.Xna.Blocks.Assets
                 Bounds = region.Bounds,
                 TileCatalog = ToUri(resource, region.TileCatalog),
                 BlockCatalog = ToUri(resource, region.BlockCatalog),
+                BiomeCatalog = ToUri(resource, region.BiomeCatalog),
                 ChunkBundle = ToUri(resource, region.ChunkBundleResource),
                 ChunkProcedures = ToChunkProcedureDefinition(region.ChunkProcesures)
             };

@@ -38,6 +38,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public BlockCatalog BlockCatalog { get; set; }
 
+        public BiomeCatalog BiomeCatalog { get; set; }
+
         public IResource ChunkBundleResource { get; set; }
 
         public List<ChunkProcedure> ChunkProcesures { get; set; }
