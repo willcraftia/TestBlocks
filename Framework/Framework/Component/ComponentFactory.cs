@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Component
 
         #endregion
 
-        ITypeRegistory typeRegistory = DefaultTypeRegistory.Instance;
+        ComponentTypeRegistory typeRegistory;
 
         ComponentInfoCollection componentInfoCache = new ComponentInfoCollection();
 
@@ -62,9 +62,7 @@ namespace Willcraftia.Xna.Framework.Component
             }
         }
 
-        public ComponentFactory() { }
-
-        public ComponentFactory(ITypeRegistory typeRegistory)
+        public ComponentFactory(ComponentTypeRegistory typeRegistory)
         {
             if (typeRegistory == null) throw new ArgumentNullException("typeRegistory");
 
@@ -75,7 +73,7 @@ namespace Willcraftia.Xna.Framework.Component
         {
             if (typeName == null) throw new ArgumentNullException("typeName");
 
-            var type = typeRegistory.ResolveType(typeName);
+            var type = typeRegistory.GetType(typeName);
             return GetComponentInfo(type);
         }
 
@@ -154,7 +152,7 @@ namespace Willcraftia.Xna.Framework.Component
             if (0 < componentInfo.PropertyCount)
                 propertyDefinitions = new PropertyDefinition[componentInfo.PropertyCount];
 
-            var typeName = typeRegistory.ResolveTypeName(componentInfo.ComponentType);
+            var typeDefinitionName = typeRegistory.GetTypeDefinitionName(componentInfo.ComponentType);
 
             var holder = new Holder
             {
@@ -163,7 +161,7 @@ namespace Willcraftia.Xna.Framework.Component
                     Name = componentName,
                     Component = new ComponentDefinition
                     {
-                        Type = typeName,
+                        Type = typeDefinitionName,
                         Properties = propertyDefinitions
                     }
                 },

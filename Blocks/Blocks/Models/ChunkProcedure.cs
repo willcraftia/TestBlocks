@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public const string ComponentName = "ChunkProcedure";
 
-        static readonly AliasTypeRegistory typeRegistory = new AliasTypeRegistory();
+        static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
 
         ChunkProcedureComponent component;
 
@@ -31,12 +31,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static ChunkProcedure()
         {
-            typeRegistory.SetTypeAlias(typeof(FlatTerrainProcedureComponent), "FlatTerrain");
+            componentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureComponent), "FlatTerrain");
         }
 
         public ChunkProcedure()
         {
-            ComponentFactory = new ComponentFactory(typeRegistory);
+            ComponentFactory = new ComponentFactory(componentTypeRegistory);
         }
 
         public void Generate(Chunk chunk)

@@ -22,7 +22,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // block unit
         public const int SizeZ = 256;
 
-        static readonly AliasTypeRegistory typeRegistory = new AliasTypeRegistory();
+        static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
 
         BiomeComponent component;
 
@@ -45,13 +45,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static Biome()
         {
-            NoiseHelper.SetTypeAliases(typeRegistory);
-            typeRegistory.SetTypeAlias(typeof(BiomeComponent));
+            NoiseHelper.SetTypeAliases(componentTypeRegistory);
+            componentTypeRegistory.SetTypeDefinitionName(typeof(BiomeComponent));
         }
 
         public Biome()
         {
-            ComponentFactory = new ComponentFactory(typeRegistory);
+            ComponentFactory = new ComponentFactory(componentTypeRegistory);
         }
 
         public float GetHumidity(int x, int z)

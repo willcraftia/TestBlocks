@@ -10,30 +10,30 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public static class NoiseHelper
     {
-        public static void SetTypeAliases(AliasTypeRegistory typeRegistory)
+        public static void SetTypeAliases(ComponentTypeRegistory typeRegistory)
         {
             if (typeRegistory == null) throw new ArgumentNullException("typeRegistory");
 
             // Gradient noises.
-            typeRegistory.SetTypeAlias(typeof(Perlin));
-            typeRegistory.SetTypeAlias(typeof(ClassicPerlin));
-            typeRegistory.SetTypeAlias(typeof(Simplex));
+            typeRegistory.SetTypeDefinitionName(typeof(Perlin));
+            typeRegistory.SetTypeDefinitionName(typeof(ClassicPerlin));
+            typeRegistory.SetTypeDefinitionName(typeof(Simplex));
 
             // Perlin fractal function.
-            typeRegistory.SetTypeAlias(typeof(PerlinFractal));
+            typeRegistory.SetTypeDefinitionName(typeof(PerlinFractal));
 
             // Musgrave fractal functions.
-            typeRegistory.SetTypeAlias(typeof(Heterofractal));
-            typeRegistory.SetTypeAlias(typeof(HybridMultifractal));
-            typeRegistory.SetTypeAlias(typeof(Multifractal));
-            typeRegistory.SetTypeAlias(typeof(RidgedMultifractal));
-            typeRegistory.SetTypeAlias(typeof(SinFractal));
-            typeRegistory.SetTypeAlias(typeof(SumFractal));
+            typeRegistory.SetTypeDefinitionName(typeof(Heterofractal));
+            typeRegistory.SetTypeDefinitionName(typeof(HybridMultifractal));
+            typeRegistory.SetTypeDefinitionName(typeof(Multifractal));
+            typeRegistory.SetTypeDefinitionName(typeof(RidgedMultifractal));
+            typeRegistory.SetTypeDefinitionName(typeof(SinFractal));
+            typeRegistory.SetTypeDefinitionName(typeof(SumFractal));
 
             // Controllers.
-            typeRegistory.SetTypeAlias(typeof(Add));
-            typeRegistory.SetTypeAlias(typeof(ScaleBias));
-            typeRegistory.SetTypeAlias(typeof(Select));
+            typeRegistory.SetTypeDefinitionName(typeof(Add));
+            typeRegistory.SetTypeDefinitionName(typeof(ScaleBias));
+            typeRegistory.SetTypeDefinitionName(typeof(Select));
         }
     }
 }

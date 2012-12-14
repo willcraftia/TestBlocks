@@ -11,24 +11,6 @@ using Willcraftia.Xna.Framework.Serialization;
 
 namespace Willcraftia.Xna.Framework.Component.Demo
 {
-    public sealed class DemoComponent
-    {
-        public DemoComponent Child { get; set; }
-
-        public string StringProperty { get; set; }
-
-        [PropertyIgnored]
-        public string IgnoredProperty { get; set; }
-
-        public void SetComponentBundleFactory(ComponentFactory factory)
-        {
-        }
-
-        public void SetComponentName(string componentName)
-        {
-        }
-    }
-
     class Program
     {
         static void Main(string[] args)
@@ -38,11 +20,11 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Shared ComponentTypeRegistory
             //
 
-            var typeRegistory = new AliasTypeRegistory();
-            typeRegistory.SetTypeAlias(typeof(SCurve5));
-            typeRegistory.SetTypeAlias(typeof(Perlin));
-            typeRegistory.SetTypeAlias(typeof(SumFractal));
-            typeRegistory.SetTypeAlias(typeof(ScaleBias));
+            var typeRegistory = new ComponentTypeRegistory();
+            typeRegistory.SetTypeDefinitionName(typeof(SCurve5));
+            typeRegistory.SetTypeDefinitionName(typeof(Perlin));
+            typeRegistory.SetTypeDefinitionName(typeof(SumFractal));
+            typeRegistory.SetTypeDefinitionName(typeof(ScaleBias));
 
             //================================================================
             //
@@ -106,19 +88,6 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // just debug
             var noise = otherFactory["scaleBias"] as INoiseSource;
             var signal = noise.Sample(0.5f, 0.5f, 0.5f);
-
-            //================================================================
-            //
-            // DemoComponent
-            //
-
-            var demoFactory = new ComponentFactory();
-            demoFactory.AddComponent("rootComponent", typeof(DemoComponent).AssemblyQualifiedName);
-            demoFactory.SetPropertyValue("rootComponent", "StringProperty", "rootValue");
-            demoFactory.SetComponentReference("rootComponent", "Child", "childComponent");
-            demoFactory.AddComponent("childComponent", typeof(DemoComponent).AssemblyQualifiedName);
-            demoFactory.SetPropertyValue("childComponent", "StringProperty", "childValue");
-            demoFactory.Build();
 
             //================================================================
             //
