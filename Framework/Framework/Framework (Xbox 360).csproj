@@ -189,7 +189,6 @@
     <Compile Include="Noise\SumFractal.cs" />
     <Compile Include="Noise\Turbulence.cs" />
     <Compile Include="Noise\Voronoi.cs" />
-    <Compile Include="Noise\VoronoiTypes.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\IPluginHostRegistory.cs" />
     <Compile Include="Plugins\PluginHostRegistory.cs" />
