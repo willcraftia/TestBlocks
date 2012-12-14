@@ -19,9 +19,11 @@ namespace Willcraftia.Xna.Framework.Noise
 
         const int largePower2 = 4096;
 
+        static readonly IFadeCurve defaultFadeCurve = new SCurve3();
+
         int seed = Environment.TickCount;
 
-        Func<float, float> fadeCurve = FadeCurves.SCurve3;
+        IFadeCurve fadeCurve = defaultFadeCurve;
 
         Random random;
 
@@ -51,15 +53,14 @@ namespace Willcraftia.Xna.Framework.Noise
         /// the coordinates of the cube's outer-lower-left vertex.
         /// 
         /// e.g.
-        /// Low quality: set Noise.PassThrough()
-        /// Standard quality: set Noise.SCurve3()
-        /// High quality: set Noise.SCurve5()
+        /// Standard quality (default): set SCurve3
+        /// High quality: set SCurve5
+        /// Low quality: set NoFadeCurve
         /// </summary>
-        [PropertyIgnored]
-        public Func<float, float> FadeCurve
+        public IFadeCurve FadeCurve
         {
             get { return fadeCurve; }
-            set { fadeCurve = value; }
+            set { fadeCurve = value ?? defaultFadeCurve; }
         }
 
         // I/F
@@ -95,9 +96,9 @@ namespace Willcraftia.Xna.Framework.Noise
             var indexLU = permutation[indexL + gridPointU];
             var indexRU = permutation[indexR + gridPointU];
 
-            var sx = fadeCurve(distanceFromL);
-            var sy = fadeCurve(distanceFromD);
-            var sz = fadeCurve(distanceFromB);
+            var sx = fadeCurve.Calculate(distanceFromL);
+            var sy = fadeCurve.Calculate(distanceFromD);
+            var sz = fadeCurve.Calculate(distanceFromB);
 
             Vector3 q;
             float u;

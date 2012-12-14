@@ -79,7 +79,7 @@ namespace Willcraftia.Xna.Framework.Noise
                 {
                     var lowerCurve = lowerBound - edgeFalloff;
                     var upperCurve = lowerBound + edgeFalloff;
-                    var amount = FadeCurves.SCurve3((control - lowerCurve) / (upperCurve - lowerCurve));
+                    var amount = SCurve3.Function((control - lowerCurve) / (upperCurve - lowerCurve));
                     return MathHelper.Lerp(source0.Sample(x, y, z), source1.Sample(x, y, z), amount);
                 }
 
@@ -90,7 +90,7 @@ namespace Willcraftia.Xna.Framework.Noise
                 {
                     var lowerCurve = upperBound - edgeFalloff;
                     var upperCurve = upperBound + edgeFalloff;
-                    var amount = FadeCurves.SCurve3((control - lowerCurve) / (upperCurve - lowerCurve));
+                    var amount = SCurve3.Function((control - lowerCurve) / (upperCurve - lowerCurve));
                     return MathHelper.Lerp(source1.Sample(x, y, z), source0.Sample(x, y, z), amount);
                 }
 

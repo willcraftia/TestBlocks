@@ -9,6 +9,8 @@ namespace Willcraftia.Xna.Framework.Noise
 {
     public sealed class Voronoi : INoiseSource
     {
+        static readonly IMetric defaultMetric = new SquaredMetric();
+
         public const float DefaultDisplacement = 1;
 
         public const float DefaultFrequency = 1;
@@ -21,9 +23,9 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool distanceEnabled;
 
-        VoronoiType voronoiType = VoronoiType.First;
+        VoronoiTypes voronoiType = VoronoiTypes.First;
 
-        MetricsDelegate metrics = Willcraftia.Xna.Framework.Noise.Metrics.Squared;
+        IMetric metric = defaultMetric;
 
         public int Seed
         {
@@ -49,16 +51,16 @@ namespace Willcraftia.Xna.Framework.Noise
             set { distanceEnabled = value; }
         }
 
-        public VoronoiType VoronoiType
+        public VoronoiTypes VoronoiType
         {
             get { return voronoiType; }
             set { voronoiType = value; }
         }
 
-        public MetricsDelegate Metrics
+        public IMetric Metric
         {
-            get { return metrics; }
-            set { metrics = value; }
+            get { return metric; }
+            set { metric = value ?? defaultMetric; }
         }
 
         // I/F
@@ -71,7 +73,7 @@ namespace Willcraftia.Xna.Framework.Noise
             return Calculate(x, y, z, voronoiType);
         }
 
-        float Calculate(float x, float y, float z, VoronoiType type)
+        float Calculate(float x, float y, float z, VoronoiTypes type)
         {
             Result distanceResult;
 
@@ -83,7 +85,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
             switch (type)
             {
-                case VoronoiType.First:
+                case VoronoiTypes.First:
                     {
                         Calculate(x, y, z, out distanceResult);
 
@@ -96,7 +98,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
                         return value + displacement * GetPosition(xci, yci, zci, 0);
                     }
-                case VoronoiType.Second:
+                case VoronoiTypes.Second:
                     {
                         Calculate(x, y, z, out distanceResult);
 
@@ -109,7 +111,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
                         return value + displacement * GetPosition(xci, yci, zci, 0);
                     }
-                case VoronoiType.Third:
+                case VoronoiTypes.Third:
                     {
                         Calculate(x, y, z, out distanceResult);
 
@@ -122,7 +124,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
                         return value + displacement * GetPosition(xci, yci, zci, 0);
                     }
-                case VoronoiType.Fourth:
+                case VoronoiTypes.Fourth:
                     {
                         Calculate(x, y, z, out distanceResult);
 
@@ -135,7 +137,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
                         return value + displacement * GetPosition(xci, yci, zci, 0);
                     }
-                case VoronoiType.Difference21:
+                case VoronoiTypes.Difference21:
                     {
                         Calculate(x, y, z, out distanceResult);
 
@@ -151,7 +153,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
                         return value + displacement * GetPosition(xci, yci, zci, 0);
                     }
-                case VoronoiType.Difference32:
+                case VoronoiTypes.Difference32:
                     {
                         Calculate(x, y, z, out distanceResult);
 
@@ -167,9 +169,9 @@ namespace Willcraftia.Xna.Framework.Noise
 
                         return value + displacement * GetPosition(xci, yci, zci, 0);
                     }
-                case VoronoiType.Crackle:
+                case VoronoiTypes.Crackle:
                     {
-                        var d = 10 * Calculate(x, y, z, VoronoiType.Difference21);
+                        var d = 10 * Calculate(x, y, z, VoronoiTypes.Difference21);
                         return (1 < d) ? 1 : d;
                     }
             }
@@ -238,7 +240,7 @@ namespace Willcraftia.Xna.Framework.Noise
                         float zd = zp - z;
 
                         // Calculate the distance with the specified metric.
-                        float d = metrics(xd, yd, zd);
+                        float d = metric.Calculate(xd, yd, zd);
 
                         if (d < result.Distance0)
                         {

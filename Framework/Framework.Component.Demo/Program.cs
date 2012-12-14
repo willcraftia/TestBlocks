@@ -39,6 +39,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             //
 
             var typeRegistory = new AliasTypeRegistory();
+            typeRegistory.SetTypeAlias(typeof(SCurve5));
             typeRegistory.SetTypeAlias(typeof(Perlin));
             typeRegistory.SetTypeAlias(typeof(SumFractal));
             typeRegistory.SetTypeAlias(typeof(ScaleBias));
@@ -50,8 +51,10 @@ namespace Willcraftia.Xna.Framework.Component.Demo
 
             var factory = new ComponentFactory(typeRegistory);
 
+            factory.AddComponent("scurve5", "SCurve5");
             factory.AddComponent("perlin", "Perlin");
             factory.SetPropertyValue("perlin", "Seed", 300);
+            factory.SetPropertyValue("perlin", "FadeCurve", "scurve5");
 
             factory.AddComponent("sumFractal", "SumFractal");
             factory.SetPropertyValue("sumFractal", "Source", "perlin");

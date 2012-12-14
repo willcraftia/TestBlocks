@@ -6,5 +6,8 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public delegate float MetricsDelegate(float x, float y, float z);
+    public interface IFadeCurve
+    {
+        float Calculate(float x);
+    }
 }

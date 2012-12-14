@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public enum VoronoiType
+    public enum VoronoiTypes
     {
         First,
         Second,
