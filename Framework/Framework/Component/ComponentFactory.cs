@@ -212,19 +212,20 @@ namespace Willcraftia.Xna.Framework.Component
                     var propertyName = propertyDefinitions[i].Name;
                     if (string.IsNullOrEmpty(propertyName)) continue;
 
-                    var propertyType = componentInfo.GetPropertyType(propertyName);
+                    var property = componentInfo.GetProperty(propertyName);
+                    var propertyType = property.PropertyType;
                     var propertyValueString = propertyDefinitions[i].Value;
 
                     bool propertyHandled = false;
                     if (propertyType == typeof(string))
                     {
-                        componentInfo.SetPropertyValue(holder.Component, propertyName, propertyValueString);
+                        property.SetValue(holder.Component, propertyValueString, null);
                         propertyHandled = true;
                     }
                     else if (typeof(IConvertible).IsAssignableFrom(propertyType))
                     {
                         var convertedValue = Convert.ChangeType(propertyValueString, propertyType, null);
-                        componentInfo.SetPropertyValue(holder.Component, propertyName, convertedValue);
+                        property.SetValue(holder.Component, convertedValue, null);
                         propertyHandled = true;
                     }
                     else if (ContainsComponentName(propertyValueString))
@@ -232,7 +233,7 @@ namespace Willcraftia.Xna.Framework.Component
                         var referencedComponent = this[propertyValueString];
                         if (propertyType.IsAssignableFrom(referencedComponent.GetType()))
                         {
-                            componentInfo.SetPropertyValue(holder.Component, propertyName, referencedComponent);
+                            property.SetValue(holder.Component, referencedComponent, null);
                             propertyHandled = true;
                         }
                     }

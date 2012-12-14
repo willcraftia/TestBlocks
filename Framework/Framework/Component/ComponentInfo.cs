@@ -140,32 +140,7 @@ namespace Willcraftia.Xna.Framework.Component
             return Array.IndexOf(propertyNames, propertyName);
         }
 
-        public Type GetPropertyType(string propertyName)
-        {
-            if (propertyName == null) throw new ArgumentNullException("propertyName");
-
-            return GetProperty(propertyName).PropertyType;
-        }
-
-        public void SetPropertyValue(object instance, string propertyName, object propertyValue)
-        {
-            if (instance == null) throw new ArgumentNullException("instance");
-            if (propertyName == null) throw new ArgumentNullException("propertyName");
-
-            var property = GetProperty(propertyName);
-            property.SetValue(instance, propertyValue, null);
-        }
-
-        public object GetPropertyValue(object instance, string propertyName)
-        {
-            if (instance == null) throw new ArgumentNullException("instance");
-            if (propertyName == null) throw new ArgumentNullException("propertyName");
-
-            var property = GetProperty(propertyName);
-            return property.GetValue(instance, null);
-        }
-
-        PropertyInfo GetProperty(string propertyName)
+        public PropertyInfo GetProperty(string propertyName)
         {
             var index = GetPropertyIndex(propertyName);
             if (index < 0)
