@@ -234,6 +234,12 @@ namespace Willcraftia.Xna.Framework.Component
                         property.SetValue(holder.Component, propertyValueString, null);
                         propertyHandled = true;
                     }
+                    else if (propertyType.IsEnum)
+                    {
+                        var convertedValue = Enum.Parse(propertyType, propertyValueString, true);
+                        property.SetValue(holder.Component, convertedValue, null);
+                        propertyHandled = true;
+                    }
                     else if (typeof(IConvertible).IsAssignableFrom(propertyType))
                     {
                         var convertedValue = Convert.ChangeType(propertyValueString, propertyType, null);
