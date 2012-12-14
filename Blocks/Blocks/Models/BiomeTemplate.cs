@@ -13,6 +13,15 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public const string ComponentName = "BiomeTemplate";
 
+        // block unit
+        public const int SizeX = 256;
+
+        // block unit
+        public const int SizeY = 256;
+
+        // block unit
+        public const int SizeZ = 256;
+
         static readonly AliasTypeRegistory typeRegistory = new AliasTypeRegistory();
 
         BiomeTemplateComponent component;
@@ -44,6 +53,21 @@ namespace Willcraftia.Xna.Blocks.Models
         public BiomeTemplate()
         {
             ComponentFactory = new ComponentFactory(typeRegistory);
+        }
+
+        public float GetHumidity(int x, int z)
+        {
+            return component.GetHumidity(x, z);
+        }
+
+        public float GetTemperature(int x, int z)
+        {
+            return component.GetTemperature(x, z);
+        }
+
+        public BiomeElement GetBiomeElement(int x, int z)
+        {
+            return component.GetBiomeElement(x, z);
         }
     }
 }

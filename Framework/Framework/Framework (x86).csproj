@@ -105,6 +105,7 @@
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
     <Compile Include="Component\DefaultTypeRegistory.cs" />
+    <Compile Include="Component\IComponentInitializable.cs" />
     <Compile Include="Component\ITypeRegistory.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\BundleDefinition.cs" />

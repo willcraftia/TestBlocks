@@ -215,51 +215,58 @@ namespace Willcraftia.Xna.Framework.Component
             foreach (var holder in holders)
             {
                 var componentInfo = holder.ComponentInfo;
+                var component = holder.Component;
 
                 var propertyDefinitions = holder.BundleEntryDefinition.Component.Properties;
                 if (ArrayHelper.IsNullOrEmpty(propertyDefinitions)) continue;
 
                 for (int i = 0; i < propertyDefinitions.Length; i++)
+                    PopulateProperty(componentInfo, component, ref propertyDefinitions[i]);
+
+                var initializable = component as IComponentInitializable;
+                if (initializable != null) initializable.Initialize();
+            }
+        }
+
+        void PopulateProperty(ComponentInfo componentInfo, object component, ref PropertyDefinition propertyDefinition)
+        {
+            var propertyName = propertyDefinition.Name;
+            if (string.IsNullOrEmpty(propertyName)) return;
+
+            var property = componentInfo.GetProperty(propertyName);
+            var propertyType = property.PropertyType;
+            var propertyValue = propertyDefinition.Value;
+
+            bool propertyHandled = false;
+            if (propertyType == typeof(string))
+            {
+                property.SetValue(component, propertyValue, null);
+                propertyHandled = true;
+            }
+            else if (propertyType.IsEnum)
+            {
+                var convertedValue = Enum.Parse(propertyType, propertyValue, true);
+                property.SetValue(component, convertedValue, null);
+                propertyHandled = true;
+            }
+            else if (typeof(IConvertible).IsAssignableFrom(propertyType))
+            {
+                var convertedValue = Convert.ChangeType(propertyValue, propertyType, null);
+                property.SetValue(component, convertedValue, null);
+                propertyHandled = true;
+            }
+            else if (ContainsComponentName(propertyValue))
+            {
+                var referencedComponent = this[propertyValue];
+                if (propertyType.IsAssignableFrom(referencedComponent.GetType()))
                 {
-                    var propertyName = propertyDefinitions[i].Name;
-                    if (string.IsNullOrEmpty(propertyName)) continue;
-
-                    var property = componentInfo.GetProperty(propertyName);
-                    var propertyType = property.PropertyType;
-                    var propertyValueString = propertyDefinitions[i].Value;
-
-                    bool propertyHandled = false;
-                    if (propertyType == typeof(string))
-                    {
-                        property.SetValue(holder.Component, propertyValueString, null);
-                        propertyHandled = true;
-                    }
-                    else if (propertyType.IsEnum)
-                    {
-                        var convertedValue = Enum.Parse(propertyType, propertyValueString, true);
-                        property.SetValue(holder.Component, convertedValue, null);
-                        propertyHandled = true;
-                    }
-                    else if (typeof(IConvertible).IsAssignableFrom(propertyType))
-                    {
-                        var convertedValue = Convert.ChangeType(propertyValueString, propertyType, null);
-                        property.SetValue(holder.Component, convertedValue, null);
-                        propertyHandled = true;
-                    }
-                    else if (ContainsComponentName(propertyValueString))
-                    {
-                        var referencedComponent = this[propertyValueString];
-                        if (propertyType.IsAssignableFrom(referencedComponent.GetType()))
-                        {
-                            property.SetValue(holder.Component, referencedComponent, null);
-                            propertyHandled = true;
-                        }
-                    }
-
-                    if (!propertyHandled)
-                        throw new InvalidOperationException("Property not handled: " + propertyName);
+                    property.SetValue(component, referencedComponent, null);
+                    propertyHandled = true;
                 }
             }
+
+            if (!propertyHandled)
+                throw new InvalidOperationException("Property not handled: " + propertyName);
         }
 
         //
