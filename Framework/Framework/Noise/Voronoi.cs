@@ -7,8 +7,49 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public sealed class Voronoi : INoiseSource
+    public abstract class Voronoi : INoiseSource
     {
+        #region Result
+
+        protected struct VoronoiDistance
+        {
+            public float Distance0;
+            public float Distance1;
+            public float Distance2;
+            public float Distance3;
+
+            public Vector3 Position0;
+            public Vector3 Position1;
+            public Vector3 Position2;
+            public Vector3 Position3;
+
+            public float GetDistance(int index)
+            {
+                switch (index)
+                {
+                    case 0: return Distance0;
+                    case 1: return Distance1;
+                    case 2: return Distance2;
+                    case 3: return Distance3;
+                    default: throw new ArgumentOutOfRangeException("index");
+                }
+            }
+
+            public void GetPosition(int index, out Vector3 position)
+            {
+                switch (index)
+                {
+                    case 0: position = Position0; return;
+                    case 1: position = Position1; return;
+                    case 2: position = Position2; return;
+                    case 3: position = Position3; return;
+                    default: throw new ArgumentOutOfRangeException("index");
+                }
+            }
+        }
+
+        #endregion
+
         static readonly IMetric defaultMetric = new SquaredMetric();
 
         public const float DefaultDisplacement = 1;
@@ -22,8 +63,6 @@ namespace Willcraftia.Xna.Framework.Noise
         float frequency = DefaultFrequency;
 
         bool distanceEnabled;
-
-        VoronoiTypes voronoiType = VoronoiTypes.First;
 
         IMetric metric = defaultMetric;
 
@@ -51,12 +90,6 @@ namespace Willcraftia.Xna.Framework.Noise
             set { distanceEnabled = value; }
         }
 
-        public VoronoiTypes VoronoiType
-        {
-            get { return voronoiType; }
-            set { voronoiType = value; }
-        }
-
         public IMetric Metric
         {
             get { return metric; }
@@ -70,135 +103,14 @@ namespace Willcraftia.Xna.Framework.Noise
             y *= frequency;
             z *= frequency;
 
-            return Calculate(x, y, z, voronoiType);
+            return Calculate(x, y, z);
         }
 
-        float Calculate(float x, float y, float z, VoronoiTypes type)
+        protected abstract float Calculate(float x, float y, float z);
+
+        protected void CalculateDistance(float x, float y, float z, out VoronoiDistance result)
         {
-            Result distanceResult;
-
-            int xci = 0;
-            int yci = 0;
-            int zci = 0;
-
-            float value = 0;
-
-            switch (type)
-            {
-                case VoronoiTypes.First:
-                    {
-                        Calculate(x, y, z, out distanceResult);
-
-                        xci = MathExtension.Floor(distanceResult.Position0.X);
-                        yci = MathExtension.Floor(distanceResult.Position0.Y);
-                        zci = MathExtension.Floor(distanceResult.Position0.Z);
-
-                        if (distanceEnabled)
-                            value = distanceResult.Distance0;
-
-                        return value + displacement * GetPosition(xci, yci, zci, 0);
-                    }
-                case VoronoiTypes.Second:
-                    {
-                        Calculate(x, y, z, out distanceResult);
-
-                        xci = MathExtension.Floor(distanceResult.Position1.X);
-                        yci = MathExtension.Floor(distanceResult.Position1.Y);
-                        zci = MathExtension.Floor(distanceResult.Position1.Z);
-
-                        if (distanceEnabled)
-                            value = distanceResult.Distance1;
-
-                        return value + displacement * GetPosition(xci, yci, zci, 0);
-                    }
-                case VoronoiTypes.Third:
-                    {
-                        Calculate(x, y, z, out distanceResult);
-
-                        xci = MathExtension.Floor(distanceResult.Position2.X);
-                        yci = MathExtension.Floor(distanceResult.Position2.Y);
-                        zci = MathExtension.Floor(distanceResult.Position2.Z);
-
-                        if (distanceEnabled)
-                            value = distanceResult.Distance2;
-
-                        return value + displacement * GetPosition(xci, yci, zci, 0);
-                    }
-                case VoronoiTypes.Fourth:
-                    {
-                        Calculate(x, y, z, out distanceResult);
-
-                        xci = MathExtension.Floor(distanceResult.Position3.X);
-                        yci = MathExtension.Floor(distanceResult.Position3.Y);
-                        zci = MathExtension.Floor(distanceResult.Position3.Z);
-
-                        if (distanceEnabled)
-                            value = distanceResult.Distance3;
-
-                        return value + displacement * GetPosition(xci, yci, zci, 0);
-                    }
-                case VoronoiTypes.Difference21:
-                    {
-                        Calculate(x, y, z, out distanceResult);
-
-                        var p = distanceResult.Position1 - distanceResult.Position0;
-                        p *= 0.5f;
-
-                        xci = MathExtension.Floor(p.X);
-                        yci = MathExtension.Floor(p.Y);
-                        zci = MathExtension.Floor(p.Z);
-
-                        if (distanceEnabled)
-                            value = distanceResult.Distance1 - distanceResult.Distance0;
-
-                        return value + displacement * GetPosition(xci, yci, zci, 0);
-                    }
-                case VoronoiTypes.Difference32:
-                    {
-                        Calculate(x, y, z, out distanceResult);
-
-                        var p = distanceResult.Position2 - distanceResult.Position1;
-                        p *= 0.5f;
-
-                        xci = MathExtension.Floor(p.X);
-                        yci = MathExtension.Floor(p.Y);
-                        zci = MathExtension.Floor(p.Z);
-
-                        if (distanceEnabled)
-                            value = distanceResult.Distance2 - distanceResult.Distance1;
-
-                        return value + displacement * GetPosition(xci, yci, zci, 0);
-                    }
-                case VoronoiTypes.Crackle:
-                    {
-                        var d = 10 * Calculate(x, y, z, VoronoiTypes.Difference21);
-                        return (1 < d) ? 1 : d;
-                    }
-            }
-
-            throw new InvalidOperationException("An unknown VoronoiType is specified.");
-        }
-
-        #region Result
-
-        struct Result
-        {
-            public float Distance0;
-            public float Distance1;
-            public float Distance2;
-            public float Distance3;
-
-            public Vector3 Position0;
-            public Vector3 Position1;
-            public Vector3 Position2;
-            public Vector3 Position3;
-        }
-
-        #endregion
-
-        void Calculate(float x, float y, float z, out Result result)
-        {
-            result = new Result
+            result = new VoronoiDistance
             {
                 Distance0 = float.MaxValue,
                 Distance1 = float.MaxValue,
@@ -291,7 +203,7 @@ namespace Willcraftia.Xna.Framework.Noise
             }
         }
 
-        float GetPosition(int x, int y, int z, int seed)
+        protected float GetPosition(int x, int y, int z, int seed)
         {
             // 1073741824 = 1000000000000000000000000000000 (bit)
             return 1.0f - ((float) GetIntRandom(x, y, z, seed)) / 1073741824.0f;

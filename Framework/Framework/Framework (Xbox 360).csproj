@@ -154,6 +154,9 @@
     <Compile Include="Noise\Billow.cs" />
     <Compile Include="Noise\ChebychevMetric.cs" />
     <Compile Include="Noise\ClassicPerlin.cs" />
+    <Compile Include="Noise\CrackleVoronoi.cs" />
+    <Compile Include="Noise\Difference10Voronoi.cs" />
+    <Compile Include="Noise\Difference21Voronoi.cs" />
     <Compile Include="Noise\Gradients.cs" />
     <Compile Include="Noise\Heterofractal.cs" />
     <Compile Include="Noise\HybridMultifractal.cs" />
@@ -179,6 +182,7 @@
     <Compile Include="Noise\SCurve3.cs" />
     <Compile Include="Noise\SCurve5.cs" />
     <Compile Include="Noise\Select.cs" />
+    <Compile Include="Noise\SimpleVoronoi.cs" />
     <Compile Include="Noise\Simplex.cs" />
     <Compile Include="Noise\SinFractal.cs" />
     <Compile Include="Noise\SquaredMetric.cs" />
