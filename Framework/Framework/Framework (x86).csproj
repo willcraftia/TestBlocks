@@ -112,7 +112,6 @@
     <Compile Include="Component\AliasTypeRegistory.cs" />
     <Compile Include="Component\BundleEntryDefinition.cs" />
     <Compile Include="Component\ComponentInfo.cs" />
-    <Compile Include="Component\ComponentInfoCollection.cs" />
     <Compile Include="Component\PropertyIgnoredAttribute.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />
     <Compile Include="IO\ContentResource.cs" />

@@ -35,6 +35,18 @@ namespace Willcraftia.Xna.Framework.Component
 
         #endregion
 
+        #region ComponentInfoCollection
+
+        class ComponentInfoCollection : KeyedCollection<Type, ComponentInfo>
+        {
+            protected override Type GetKeyForItem(ComponentInfo item)
+            {
+                return item.ComponentType;
+            }
+        }
+
+        #endregion
+
         ITypeRegistory typeRegistory = DefaultTypeRegistory.Instance;
 
         ComponentInfoCollection componentInfoCache = new ComponentInfoCollection();

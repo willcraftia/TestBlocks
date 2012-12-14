@@ -115,7 +115,6 @@
     <Compile Include="Component\ComponentDefinition.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\ComponentInfo.cs" />
-    <Compile Include="Component\ComponentInfoCollection.cs" />
     <Compile Include="Component\DefaultTypeRegistory.cs" />
     <Compile Include="Component\ITypeRegistory.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />
