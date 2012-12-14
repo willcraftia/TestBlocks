@@ -75,6 +75,7 @@
     <Compile Include="Models\IAsset.cs" />
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\NoiseBiome.cs" />
+    <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Serialization\NoiseDefinition.cs" />
     <Compile Include="Assets\TileCatalogLoader.cs" />
     <Compile Include="Assets\TileLoader.cs" />

@@ -20,10 +20,7 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var definition = (BundleDefinition) serializer.Deserialize(resource);
 
-            var biomeTemplate = new BiomeTemplate
-            {
-                Resource = resource
-            };
+            var biomeTemplate = new BiomeTemplate { Resource = resource };
 
             biomeTemplate.ComponentFactory.AddBundleDefinition(ref definition);
             biomeTemplate.ComponentFactory.Build();

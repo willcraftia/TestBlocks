@@ -126,6 +126,7 @@
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />
     <Compile Include="Models\NoiseBiome.cs" />
+    <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\RegionManager.cs" />
     <Compile Include="Models\StorageChunkStore.cs" />

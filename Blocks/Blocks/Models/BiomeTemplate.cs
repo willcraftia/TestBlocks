@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class BiomeTemplate : IAsset
     {
-        public const string ComponentName = "BiomeTemplate";
+        public const string ComponentName = "Component";
 
         // block unit
         public const int SizeX = 256;
@@ -45,9 +45,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static BiomeTemplate()
         {
-            typeRegistory.SetTypeAlias(typeof(Perlin));
-            typeRegistory.SetTypeAlias(typeof(SumFractal));
-            typeRegistory.SetTypeAlias(typeof(BiomeTemplateComponent), "BiomeTemplate");
+            NoiseHelper.SetTypeAliases(typeRegistory);
+            typeRegistory.SetTypeAlias(typeof(BiomeTemplateComponent));
         }
 
         public BiomeTemplate()

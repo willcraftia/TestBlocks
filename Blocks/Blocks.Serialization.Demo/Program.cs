@@ -10,6 +10,7 @@ using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
+using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
@@ -36,17 +37,17 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             // TileDefinition
 
             Console.WriteLine("TileDefinition");
-            var tile = new TileDefinition
             {
-                Name = "Default Tile",
-                Texture = "DefaultTile.png",
-                Translucent = false,
-                DiffuseColor = Color.White.PackedValue,
-                EmissiveColor = Color.Black.PackedValue,
-                SpecularColor = Color.Black.PackedValue,
-                SpecularPower = 0
-            };
-            {
+                var tile = new TileDefinition
+                {
+                    Name = "Default Tile",
+                    Texture = "DefaultTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
                 var jsonResource = SerializeToJson<TileDefinition>("DefaultTile", tile);
                 var xmlResource = SerializeToXml<TileDefinition>("DefaultTile", tile);
                 var fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
@@ -58,10 +59,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             // TileCatalogDefinition
 
             Console.WriteLine("TileCatalogDefinition");
-            var tileCatalog = new TileCatalogDefinition
             {
-                Name = "Default Tile Catalog",
-                Entries = new TileIndexDefinition[]
+                var tileCatalog = new TileCatalogDefinition
+                {
+                    Name = "Default Tile Catalog",
+                    Entries = new TileIndexDefinition[]
                 {
                     new TileIndexDefinition
                     {
@@ -69,8 +71,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         Tile = "DefaultTile.json"
                     }
                 }
-            };
-            {
+                };
                 var jsonResource = SerializeToJson<TileCatalogDefinition>("DefaultTileCatalog", tileCatalog);
                 var xmlResource = SerializeToXml<TileCatalogDefinition>("DefaultTileCatalog", tileCatalog);
                 var fromJson = DeserializeFromJson<TileCatalogDefinition>(jsonResource);
@@ -82,25 +83,25 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             // BlockDefinition
 
             Console.WriteLine("BlockDefinition");
-            var block = new BlockDefinition
             {
-                Name = "Default Block",
-                Mesh = "Cube.json",
-                TopTile = "DefaultTile.json",
-                BottomTile = "DefaultTile.json",
-                FrontTile = "DefaultTile.json",
-                BackTile = "DefaultTile.json",
-                LeftTile = "DefaultTile.json",
-                RightTile = "DefaultTile.json",
-                Fluid = false,
-                ShadowCasting = true,
-                Shape = BlockShape.Cube,
-                Mass = 1,
-                StaticFriction = 0.5f,
-                DynamicFriction = 0.5f,
-                Restitution = 0.5f
-            };
-            {
+                var block = new BlockDefinition
+                {
+                    Name = "Default Block",
+                    Mesh = "Cube.json",
+                    TopTile = "DefaultTile.json",
+                    BottomTile = "DefaultTile.json",
+                    FrontTile = "DefaultTile.json",
+                    BackTile = "DefaultTile.json",
+                    LeftTile = "DefaultTile.json",
+                    RightTile = "DefaultTile.json",
+                    Fluid = false,
+                    ShadowCasting = true,
+                    Shape = BlockShape.Cube,
+                    Mass = 1,
+                    StaticFriction = 0.5f,
+                    DynamicFriction = 0.5f,
+                    Restitution = 0.5f
+                };
                 var jsonResource = SerializeToJson<BlockDefinition>("DefaultBlock", block);
                 var xmlResource = SerializeToXml<BlockDefinition>("DefaultBlock", block);
                 var fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
@@ -112,19 +113,18 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             // BlockCatalogDefinition
 
             Console.WriteLine("BlockCatalogDefinition");
-            var blockCatalog = new BlockCatalogDefinition
             {
-                Name = "Default Block",
-                Entries = new BlockIndexDefinition[]
+                var blockCatalog = new BlockCatalogDefinition
                 {
-                    new BlockIndexDefinition
+                    Name = "Default Block",
+                    Entries = new BlockIndexDefinition[]
                     {
-                        Index = 1,
-                        Block = "DefaultBlock.json"
+                        new BlockIndexDefinition
+                        {
+                            Index = 1, Block = "DefaultBlock.json"
+                        }
                     }
-                }
-            };
-            {
+                };
                 var jsonResource = SerializeToJson<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
                 var xmlResource = SerializeToXml<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
                 var fromJson = DeserializeFromJson<BlockCatalogDefinition>(jsonResource);
@@ -136,31 +136,28 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             // BundleDefinition (BiomeTemplateComponent)
 
             Console.WriteLine("BundleDefinition (BiomeTemplateComponent)");
-            var biomeTemplate = new BundleDefinition
             {
-                Entries = new BundleEntryDefinition[]
-                {
-                    new BundleEntryDefinition
-                    {
-                        Name = "BiomeTemplate",
-                        Component = new ComponentDefinition
-                        {
-                            Type = "BiomeTemplate",
-                            Properties = new PropertyDefinition[]
-                            {
-                                new PropertyDefinition
-                                {
-                                    Name = "Name",
-                                    Value = "Default Biome Template"
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-            {
-                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiomeTemplate", biomeTemplate);
-                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiomeTemplate", biomeTemplate);
+                var biomeTemplate = new BiomeTemplate();
+                biomeTemplate.ComponentFactory.AddComponent("Component", "BiomeTemplateComponent");
+                biomeTemplate.ComponentFactory.SetPropertyValue("Component", "Name", "Default Biome Template");
+                biomeTemplate.ComponentFactory.SetPropertyValue("Component", "HumidityNoise", "HumidityNoise");
+                biomeTemplate.ComponentFactory.SetPropertyValue("Component", "TemperatureNoise", "TemperatureNoise");
+
+                biomeTemplate.ComponentFactory.AddComponent("HumidityNoise", "SumFractal");
+                biomeTemplate.ComponentFactory.SetPropertyValue("HumidityNoise", "Source", "HumidityPerlin");
+                biomeTemplate.ComponentFactory.AddComponent("HumidityPerlin", "Perlin");
+                biomeTemplate.ComponentFactory.SetPropertyValue("HumidityPerlin", "Seed", 0);
+
+                biomeTemplate.ComponentFactory.AddComponent("TemperatureNoise", "SumFractal");
+                biomeTemplate.ComponentFactory.SetPropertyValue("TemperatureNoise", "Source", "TemperaturePerlin");
+                biomeTemplate.ComponentFactory.AddComponent("TemperaturePerlin", "Perlin");
+                biomeTemplate.ComponentFactory.SetPropertyValue("TemperaturePerlin", "Seed", 1);
+
+                BundleDefinition biomeTemplateBundle;
+                biomeTemplate.ComponentFactory.GetDefinition(out biomeTemplateBundle);
+
+                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiomeTemplate", biomeTemplateBundle);
+                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiomeTemplate", biomeTemplateBundle);
                 var fromJson = DeserializeFromJson<BundleDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<BundleDefinition>(xmlResource);
             }
@@ -170,29 +167,14 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             // RegionDefinition
 
             Console.WriteLine("RegionDefinition");
-            var region = new RegionDefinition
             {
-                Name = "Default Region",
-                Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
-                TileCatalog = "DefaultTileCatalog.json",
-                BlockCatalog = "DefaultBlockCatalog.json",
-                //ChunkProcedures = new ProcedureDefinition[]
-                //{
-                //    new ProcedureDefinition
-                //    {
-                //        Type = "Willcraftia.Xna.Blocks.Models.FlatTerrainBuilder",
-                //        Properties = new PropertyDefinition[]
-                //        {
-                //            new PropertyDefinition
-                //            {
-                //                Name = "Property1",
-                //                Value = "1"
-                //            }
-                //        }
-                //    }
-                //}
-            };
-            {
+                var region = new RegionDefinition
+                {
+                    Name = "Default Region",
+                    Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
+                    TileCatalog = "DefaultTileCatalog.json",
+                    BlockCatalog = "DefaultBlockCatalog.json",
+                };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlResource = SerializeToXml<RegionDefinition>("DefaultRegion", region);
                 var fromJson = DeserializeFromJson<RegionDefinition>(jsonResource);
@@ -204,8 +186,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             // MeshDefinition
 
             Console.WriteLine("MeshDefinition (Cube)");
-            var cubeMesh = CreateCubeMeshDefinition();
             {
+                var cubeMesh = CreateCubeMeshDefinition();
+
                 var jsonResource = SerializeToJson<MeshDefinition>("Cube", cubeMesh);
                 var xmlResource = SerializeToXml<MeshDefinition>("Cube", cubeMesh);
                 var fromJson = DeserializeFromJson<MeshDefinition>(jsonResource);
