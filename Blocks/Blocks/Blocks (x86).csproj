@@ -75,6 +75,7 @@
     <Compile Include="Models\ChunkProcedureComponent.cs" />
     <Compile Include="Models\FlatTerrainProcedureComponent.cs" />
     <Compile Include="Models\IAsset.cs" />
+    <Compile Include="Models\IBiomeComponent.cs" />
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />

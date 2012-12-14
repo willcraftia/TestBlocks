@@ -221,7 +221,7 @@ namespace Willcraftia.Xna.Framework.Component
                 for (int i = 0; i < propertyDefinitions.Length; i++)
                     PopulateProperty(componentInfo, component, ref propertyDefinitions[i]);
 
-                var initializable = component as IComponentInitializable;
+                var initializable = component as IInitializingComponent;
                 if (initializable != null) initializable.Initialize();
             }
         }

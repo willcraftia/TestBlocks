@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Component
 {
-    public interface IComponentInitializable
+    public interface IInitializingComponent
     {
         void Initialize();
     }
