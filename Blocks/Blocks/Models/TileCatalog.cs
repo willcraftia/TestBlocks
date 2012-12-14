@@ -3,13 +3,14 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class TileCatalog : IAsset
+    public sealed class TileCatalog : KeyedList<byte, Tile>, IAsset
     {
         public const int TextureSize = 256;
 
@@ -24,8 +25,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public TileCollection Tiles { get; private set; }
-
         public Texture2D TileMap { get; private set; }
 
         public Texture2D DiffuseColorMap { get; private set; }
@@ -35,10 +34,10 @@ namespace Willcraftia.Xna.Blocks.Models
         public Texture2D SpecularColorMap { get; private set; }
 
         public TileCatalog(GraphicsDevice graphicsDevice, int capacity)
+            : base(capacity)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
-            Tiles = new TileCollection(capacity);
             TileMap = CreateMap(graphicsDevice);
             DiffuseColorMap = CreateMap(graphicsDevice);
             EmissiveColorMap = CreateMap(graphicsDevice);
@@ -53,13 +52,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void DrawMaps()
         {
-            foreach (var tile in Tiles)
+            foreach (var tile in this)
                 DrawMaps(tile.Index);
         }
 
         public void DrawMaps(byte index)
         {
-            var tile = Tiles[index];
+            var tile = this[index];
 
             Rectangle bounds;
             CalculateTileBounds(index, out bounds);
@@ -110,6 +109,11 @@ namespace Willcraftia.Xna.Blocks.Models
             SetColorBuffer(DiffuseColorMap, ref bounds);
             SetColorBuffer(EmissiveColorMap, ref bounds);
             SetColorBuffer(SpecularColorMap, ref bounds);
+        }
+
+        protected override byte GetKeyForItem(Tile item)
+        {
+            return item.Index;
         }
 
         Texture2D CreateMap(GraphicsDevice graphicsDevice)

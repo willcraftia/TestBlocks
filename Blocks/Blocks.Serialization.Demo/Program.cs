@@ -63,12 +63,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var tileCatalog = new TileCatalogDefinition
                 {
                     Name = "Default Tile Catalog",
-                    Entries = new TileIndexDefinition[]
+                    Entries = new IndexedUriDefinition[]
                 {
-                    new TileIndexDefinition
+                    new IndexedUriDefinition
                     {
-                        Index = 0,
-                        Tile = "DefaultTile.json"
+                        Index = 0, Uri = "DefaultTile.json"
                     }
                 }
                 };
@@ -117,11 +116,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var blockCatalog = new BlockCatalogDefinition
                 {
                     Name = "Default Block",
-                    Entries = new BlockIndexDefinition[]
+                    Entries = new IndexedUriDefinition[]
                     {
-                        new BlockIndexDefinition
+                        new IndexedUriDefinition
                         {
-                            Index = 1, Block = "DefaultBlock.json"
+                            Index = 1, Uri = "DefaultBlock.json"
                         }
                     }
                 };
@@ -133,31 +132,31 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine();
 
             //================================================================
-            // BundleDefinition (BiomeTemplateComponent)
+            // BiomeComponent (BundleDefinition)
 
-            Console.WriteLine("BundleDefinition (BiomeTemplateComponent)");
+            Console.WriteLine("BiomeComponent (BundleDefinition)");
             {
-                var biomeTemplate = new BiomeTemplate();
-                biomeTemplate.ComponentFactory.AddComponent("Component", "BiomeTemplateComponent");
-                biomeTemplate.ComponentFactory.SetPropertyValue("Component", "Name", "Default Biome Template");
-                biomeTemplate.ComponentFactory.SetPropertyValue("Component", "HumidityNoise", "HumidityNoise");
-                biomeTemplate.ComponentFactory.SetPropertyValue("Component", "TemperatureNoise", "TemperatureNoise");
+                var biome = new Biome();
+                biome.ComponentFactory.AddComponent("Component", "BiomeComponent");
+                biome.ComponentFactory.SetPropertyValue("Component", "Name", "Default Biome Template");
+                biome.ComponentFactory.SetPropertyValue("Component", "HumidityNoise", "HumidityNoise");
+                biome.ComponentFactory.SetPropertyValue("Component", "TemperatureNoise", "TemperatureNoise");
 
-                biomeTemplate.ComponentFactory.AddComponent("HumidityNoise", "SumFractal");
-                biomeTemplate.ComponentFactory.SetPropertyValue("HumidityNoise", "Source", "HumidityPerlin");
-                biomeTemplate.ComponentFactory.AddComponent("HumidityPerlin", "Perlin");
-                biomeTemplate.ComponentFactory.SetPropertyValue("HumidityPerlin", "Seed", 0);
+                biome.ComponentFactory.AddComponent("HumidityNoise", "SumFractal");
+                biome.ComponentFactory.SetPropertyValue("HumidityNoise", "Source", "HumidityPerlin");
+                biome.ComponentFactory.AddComponent("HumidityPerlin", "Perlin");
+                biome.ComponentFactory.SetPropertyValue("HumidityPerlin", "Seed", 0);
 
-                biomeTemplate.ComponentFactory.AddComponent("TemperatureNoise", "SumFractal");
-                biomeTemplate.ComponentFactory.SetPropertyValue("TemperatureNoise", "Source", "TemperaturePerlin");
-                biomeTemplate.ComponentFactory.AddComponent("TemperaturePerlin", "Perlin");
-                biomeTemplate.ComponentFactory.SetPropertyValue("TemperaturePerlin", "Seed", 1);
+                biome.ComponentFactory.AddComponent("TemperatureNoise", "SumFractal");
+                biome.ComponentFactory.SetPropertyValue("TemperatureNoise", "Source", "TemperaturePerlin");
+                biome.ComponentFactory.AddComponent("TemperaturePerlin", "Perlin");
+                biome.ComponentFactory.SetPropertyValue("TemperaturePerlin", "Seed", 1);
 
-                BundleDefinition biomeTemplateBundle;
-                biomeTemplate.ComponentFactory.GetDefinition(out biomeTemplateBundle);
+                BundleDefinition biomeBundle;
+                biome.ComponentFactory.GetDefinition(out biomeBundle);
 
-                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiomeTemplate", biomeTemplateBundle);
-                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiomeTemplate", biomeTemplateBundle);
+                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiomeTemplate", biomeBundle);
+                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiomeTemplate", biomeBundle);
                 var fromJson = DeserializeFromJson<BundleDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<BundleDefinition>(xmlResource);
             }

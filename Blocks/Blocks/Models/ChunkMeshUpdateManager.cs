@@ -177,7 +177,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         // 編集できないようにブロックすることが妥当と思われる。
                         // 少なくとも、個々の処理について同期を考えることは非現実的である。
                         //
-                        var block = region.BlockCatalog.Blocks[blockIndex];
+                        var block = region.BlockCatalog[blockIndex];
 
                         BuildChunkMesh(chunk, x, y, z, block);
                     }
@@ -240,7 +240,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (Block.EmptyIndex == nearbyBlockIndex)
                 return true;
 
-            var nearbyBlock = region.BlockCatalog.Blocks[nearbyBlockIndex];
+            var nearbyBlock = region.BlockCatalog[nearbyBlockIndex];
             if (nearbyBlock.Fluid && block.Fluid)
                 return false;
 

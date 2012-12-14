@@ -2,9 +2,9 @@
 <TileCatalogDefinition>
 	<Name>Default Tile Catalog</Name>
 	<Entries>
-		<TileIndexDefinition>
+		<IndexedUriDefinition>
 			<Index>0</Index>
-			<Tile>DefaultTile.json</Tile>
-		</TileIndexDefinition>
+			<Uri>DefaultTile.json</Uri>
+		</IndexedUriDefinition>
 	</Entries>
 </TileCatalogDefinition>

@@ -33,11 +33,11 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             foreach (var entry in definition.Entries)
             {
-                var block = Load<Block>(resource, entry.Block);
+                var block = Load<Block>(resource, entry.Uri);
                 if (block != null)
                 {
                     block.Index = entry.Index;
-                    blockCatalog.Blocks.Add(block);
+                    blockCatalog.Add(block);
                 }
             }
 
@@ -52,16 +52,16 @@ namespace Willcraftia.Xna.Blocks.Assets
             var definition = new BlockCatalogDefinition
             {
                 Name = blockCatalog.Name,
-                Entries = new BlockIndexDefinition[blockCatalog.Blocks.Count]
+                Entries = new IndexedUriDefinition[blockCatalog.Count]
             };
 
-            for (int i = 0; i < blockCatalog.Blocks.Count; i++)
+            for (int i = 0; i < blockCatalog.Count; i++)
             {
-                var block = blockCatalog.Blocks[i];
-                definition.Entries[i] = new BlockIndexDefinition
+                var block = blockCatalog[i];
+                definition.Entries[i] = new IndexedUriDefinition
                 {
                     Index = block.Index,
-                    Block = ToUri(resource, block)
+                    Uri = ToUri(resource, block)
                 };
             }
 

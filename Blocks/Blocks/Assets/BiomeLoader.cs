@@ -12,7 +12,7 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class BiomeTemplateLoader : IAssetLoader
+    public sealed class BiomeLoader : IAssetLoader
     {
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(BundleDefinition));
 
@@ -20,24 +20,24 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var definition = (BundleDefinition) serializer.Deserialize(resource);
 
-            var biomeTemplate = new BiomeTemplate { Resource = resource };
+            var biome = new Biome { Resource = resource };
 
-            biomeTemplate.ComponentFactory.AddBundleDefinition(ref definition);
-            biomeTemplate.ComponentFactory.Build();
+            biome.ComponentFactory.AddBundleDefinition(ref definition);
+            biome.ComponentFactory.Build();
             
-            return biomeTemplate;
+            return biome;
         }
 
         public void Save(IResource resource, object asset)
         {
-            var biomeTemplate = asset as BiomeTemplate;
+            var biome = asset as Biome;
 
             BundleDefinition definition;
-            biomeTemplate.ComponentFactory.GetDefinition(out definition);
+            biome.ComponentFactory.GetDefinition(out definition);
 
             serializer.Serialize(resource, definition);
 
-            biomeTemplate.Resource = resource;
+            biome.Resource = resource;
         }
     }
 }

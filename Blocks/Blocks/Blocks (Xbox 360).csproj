@@ -92,7 +92,8 @@
     <Reference Include="System.Xml.Serialization, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\BiomeTemplateLoader.cs" />
+    <Compile Include="Assets\BiomeCatalogLoader.cs" />
+    <Compile Include="Assets\BiomeLoader.cs" />
     <Compile Include="Assets\BlockCatalogLoader.cs" />
     <Compile Include="Assets\BlockLoader.cs" />
     <Compile Include="Assets\Image2DLoader.cs" />
@@ -105,12 +106,12 @@
     <Compile Include="Landscape\ChunkPartitionManager.cs" />
     <Compile Include="Landscape\ChunkRenderer.cs" />
     <Compile Include="Models\Biome.cs" />
+    <Compile Include="Models\BiomeBounds.cs" />
+    <Compile Include="Models\BiomeCatalog.cs" />
+    <Compile Include="Models\BiomeComponent.cs" />
     <Compile Include="Models\BiomeElement.cs" />
-    <Compile Include="Models\BiomeTemplate.cs" />
-    <Compile Include="Models\BiomeTemplateComponent.cs" />
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\BlockCatalog.cs" />
-    <Compile Include="Models\BlockCollection.cs" />
     <Compile Include="Models\Chunk.cs" />
     <Compile Include="Models\ChunkCollection.cs" />
     <Compile Include="Models\ChunkManager.cs" />
@@ -125,26 +126,24 @@
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />
-    <Compile Include="Models\NoiseBiome.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\RegionManager.cs" />
     <Compile Include="Models\StorageChunkStore.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Models\TileCatalog.cs" />
-    <Compile Include="Models\TileCollection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
-    <Compile Include="Serialization\BlockIndexDefinition.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
+    <Compile Include="Serialization\IndexedUriDefinition.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\NoiseDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
-    <Compile Include="Serialization\TileIndexDefinition.cs" />
     <Compile Include="Side.cs" />
   </ItemGroup>
   <ItemGroup>

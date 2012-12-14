@@ -16,6 +16,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
         //----------------------------
         // Entries
 
-        public BlockIndexDefinition[] Entries;
+        public IndexedUriDefinition[] Entries;
     }
 }

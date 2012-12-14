@@ -6,10 +6,10 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public struct BlockIndexDefinition
+    public sealed class IndexedUriDefinition
     {
         public byte Index;
 
-        public string Block;
+        public string Uri;
     }
 }

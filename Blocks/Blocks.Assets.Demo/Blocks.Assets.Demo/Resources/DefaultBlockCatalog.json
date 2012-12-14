@@ -3,7 +3,7 @@
   "Entries": [
     {
       "Index": 1,
-      "Block": "DefaultBlock.json"
+      "Uri": "DefaultBlock.json"
     }
   ]
 }

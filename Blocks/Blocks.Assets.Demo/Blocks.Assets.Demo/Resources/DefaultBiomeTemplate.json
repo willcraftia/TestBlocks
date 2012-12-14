@@ -3,7 +3,7 @@
     {
       "Name": "Component",
       "Component": {
-        "Type": "BiomeTemplateComponent",
+        "Type": "BiomeComponent",
         "Properties": [
           {
             "Name": "Name",

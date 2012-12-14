@@ -1,7 +1,6 @@
 ﻿#region Using
 
 using System;
-using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Assets;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
@@ -11,11 +10,9 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class TileCatalogLoader : IAssetLoader, IAssetManagerAware, IResourceManagerAware
+    public sealed class BiomeCatalogLoader : IAssetLoader, IAssetManagerAware, IResourceManagerAware
     {
-        DefinitionSerializer serializer = new DefinitionSerializer(typeof(TileCatalogDefinition));
-
-        GraphicsDevice graphicsDevice;
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(BiomeCatalogDefinition));
 
         // I/F
         public AssetManager AssetManager { private get; set; }
@@ -23,19 +20,11 @@ namespace Willcraftia.Xna.Blocks.Assets
         // I/F
         public ResourceManager ResourceManager { private get; set; }
 
-        public TileCatalogLoader(GraphicsDevice graphicsDevice)
-        {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-
-            this.graphicsDevice = graphicsDevice;
-        }
-
-        // I/F
         public object Load(IResource resource)
         {
-            var definition = (TileCatalogDefinition) serializer.Deserialize(resource);
+            var definition = (BiomeCatalogDefinition) serializer.Deserialize(resource);
 
-            var tileCatalog = new TileCatalog(graphicsDevice, definition.Entries.Length)
+            var biomeCatalog = new BiomeCatalog(definition.Entries.Length)
             {
                 Resource = resource,
                 Name = definition.Name
@@ -43,41 +32,40 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             foreach (var entry in definition.Entries)
             {
-                var tile = Load<Tile>(resource, entry.Uri);
-                if (tile != null)
+                var biome = Load<Biome>(resource, entry.Uri);
+                if (biome != null)
                 {
-                    tile.Index = entry.Index;
-                    tileCatalog.Add(tile);
+                    biome.Index = entry.Index;
+                    biomeCatalog.Add(biome);
                 }
             }
 
-            return tileCatalog;
+            return biomeCatalog;
         }
 
-        // I/F
         public void Save(IResource resource, object asset)
         {
-            var tileCatalog = asset as TileCatalog;
+            var biomeCatalog = asset as BiomeCatalog;
 
-            var definition = new TileCatalogDefinition
+            var definition = new BiomeCatalogDefinition
             {
-                Name = tileCatalog.Name,
-                Entries = new IndexedUriDefinition[tileCatalog.Count]
+                Name = biomeCatalog.Name,
+                Entries = new IndexedUriDefinition[biomeCatalog.Count]
             };
 
-            for (int i = 0; i < tileCatalog.Count; i++)
+            for (int i = 0; i < biomeCatalog.Count; i++)
             {
-                var tile = tileCatalog[i];
+                var biome = biomeCatalog[i];
                 definition.Entries[i] = new IndexedUriDefinition
                 {
-                    Index = tile.Index,
-                    Uri = ToUri(resource, tile)
+                    Index = biome.Index,
+                    Uri = ToUri(resource, biome)
                 };
             }
 
             serializer.Serialize(resource, definition);
 
-            tileCatalog.Resource = resource;
+            biomeCatalog.Resource = resource;
         }
 
         T Load<T>(IResource baseResource, string uri) where T : class

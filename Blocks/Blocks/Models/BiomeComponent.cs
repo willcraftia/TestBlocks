@@ -9,7 +9,7 @@ using Willcraftia.Xna.Framework.Noise;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class BiomeTemplateComponent : IComponentInitializable
+    public sealed class BiomeComponent : IComponentInitializable
     {
         public string Name { get; set; }
 
@@ -26,15 +26,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public float GetHumidity(int x, int z)
         {
-            float xf = x / (float) BiomeTemplate.SizeX;
-            float zf = z / (float) BiomeTemplate.SizeZ;
+            float xf = x / (float) Biome.SizeX;
+            float zf = z / (float) Biome.SizeZ;
             return MathExtension.Saturate(HumidityNoise.Sample(xf, 0, zf));
         }
 
         public float GetTemperature(int x, int z)
         {
-            float xf = x / (float) BiomeTemplate.SizeX;
-            float zf = z / (float) BiomeTemplate.SizeZ;
+            float xf = x / (float) Biome.SizeX;
+            float zf = z / (float) Biome.SizeZ;
             return MathExtension.Saturate(HumidityNoise.Sample(xf, 0, zf));
         }
 

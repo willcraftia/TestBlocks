@@ -8,19 +8,19 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class BlockCatalog : KeyedList<byte, Block>, IAsset
+    public sealed class BiomeCatalog : KeyedList<byte, Biome>, IAsset
     {
         // I/F
         public IResource Resource { get; set; }
 
         public string Name { get; set; }
 
-        public BlockCatalog(int capacity)
+        public BiomeCatalog(int capacity)
             : base(capacity)
         {
         }
 
-        protected override byte GetKeyForItem(Block item)
+        protected override byte GetKeyForItem(Biome item)
         {
             return item.Index;
         }
