@@ -104,7 +104,7 @@
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
-    <Compile Include="Component\IComponentInitializable.cs" />
+    <Compile Include="Component\IInitializingComponent.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\BundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />

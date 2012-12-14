@@ -115,7 +115,7 @@
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\ComponentInfo.cs" />
     <Compile Include="Component\ComponentTypeRegistory.cs" />
-    <Compile Include="Component\IComponentInitializable.cs" />
+    <Compile Include="Component\IInitializingComponent.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />
     <Compile Include="Component\PropertyIgnoredAttribute.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
