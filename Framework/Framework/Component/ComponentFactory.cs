@@ -49,23 +49,15 @@ namespace Willcraftia.Xna.Framework.Component
 
         static readonly TypeHandler defaultTypeHandler = new TypeHandler();
 
-        static readonly PropertyHandler defaultPropertyHandler = new PropertyHandler();
-
         ComponentTypeRegistory typeRegistory;
 
         Dictionary<Type, ITypeHandler> typeHandlerMap;
 
-        IPropertyHandler propertyHandler = defaultPropertyHandler;
+        IPropertyHandler propertyHandler;
 
         ComponentInfoCollection componentInfoCache = new ComponentInfoCollection();
 
         HolderCollection holders = new HolderCollection();
-
-        public IPropertyHandler PropertyHandler
-        {
-            get { return propertyHandler; }
-            set { propertyHandler = value ?? defaultPropertyHandler; }
-        }
 
         public object this[string componentName]
         {
@@ -77,10 +69,17 @@ namespace Willcraftia.Xna.Framework.Component
         }
 
         public ComponentFactory(ComponentTypeRegistory typeRegistory)
+            : this(typeRegistory, null)
+        {
+        }
+
+        public ComponentFactory(ComponentTypeRegistory typeRegistory, IPropertyHandler propertyHandler)
         {
             if (typeRegistory == null) throw new ArgumentNullException("typeRegistory");
 
             this.typeRegistory = typeRegistory;
+            this.propertyHandler = propertyHandler ?? new PropertyHandler();
+            this.propertyHandler.ComponentFactory = this;
         }
 
         public void AddTypeHandler(Type type, ITypeHandler typeHandler)
@@ -267,7 +266,7 @@ namespace Willcraftia.Xna.Framework.Component
             var property = componentInfo.GetProperty(propertyName);
             var propertyValue = propertyDefinition.Value;
 
-            if (!propertyHandler.SetPropertyValue(this, component, property, propertyValue))
+            if (!propertyHandler.SetPropertyValue(component, property, propertyValue))
                 throw new InvalidOperationException("Property not handled: " + propertyName);
         }
 

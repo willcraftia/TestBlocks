@@ -9,6 +9,8 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public interface IPropertyHandler
     {
-        bool SetPropertyValue(ComponentFactory factory, object component, PropertyInfo property, string propertyValue);
+        ComponentFactory ComponentFactory { set; }
+
+        bool SetPropertyValue(object component, PropertyInfo property, string propertyValue);
     }
 }

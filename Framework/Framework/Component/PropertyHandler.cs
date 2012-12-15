@@ -9,7 +9,11 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public class PropertyHandler : IPropertyHandler
     {
-        public virtual bool SetPropertyValue(ComponentFactory factory, object component, PropertyInfo property, string propertyValue)
+        // I/F
+        public ComponentFactory ComponentFactory { private get; set; }
+
+        // I/F
+        public virtual bool SetPropertyValue(object component, PropertyInfo property, string propertyValue)
         {
             var propertyType = property.PropertyType;
 
@@ -33,9 +37,9 @@ namespace Willcraftia.Xna.Framework.Component
                 return true;
             }
 
-            if (factory.ContainsComponentName(propertyValue))
+            if (ComponentFactory.ContainsComponentName(propertyValue))
             {
-                var referencedComponent = factory[propertyValue];
+                var referencedComponent = ComponentFactory[propertyValue];
                 if (propertyType.IsAssignableFrom(referencedComponent.GetType()))
                 {
                     property.SetValue(component, referencedComponent, null);
