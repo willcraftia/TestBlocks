@@ -14,8 +14,6 @@ namespace Willcraftia.Xna.Framework.Assets
     {
         static readonly Logger logger = new Logger(typeof(AssetManager).Name);
 
-        ResourceManager resourceManager;
-
         NoCacheContentManager contentManager;
 
         AssetHolderCollection holders = new AssetHolderCollection();
@@ -28,12 +26,9 @@ namespace Willcraftia.Xna.Framework.Assets
             set { contentManager.RootDirectory = value; }
         }
 
-        public AssetManager(IServiceProvider serviceProvider, ResourceManager resourceManager)
+        public AssetManager(IServiceProvider serviceProvider)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
-            if (resourceManager == null) throw new ArgumentNullException("resourceManager");
-
-            this.resourceManager = resourceManager;
 
             contentManager = new NoCacheContentManager(serviceProvider);
             contentManager.RootDirectory = "Content";
@@ -46,9 +41,6 @@ namespace Willcraftia.Xna.Framework.Assets
 
             var assetManagerAware = loader as IAssetManagerAware;
             if (assetManagerAware != null) assetManagerAware.AssetManager = this;
-
-            var resourceManagerAware = loader as IResourceManagerAware;
-            if (resourceManagerAware != null) resourceManagerAware.ResourceManager = resourceManager;
         }
 
         public bool Unregister(Type type)
@@ -58,9 +50,6 @@ namespace Willcraftia.Xna.Framework.Assets
             {
                 var assetManagerAware = loader as IAssetManagerAware;
                 if (assetManagerAware != null) assetManagerAware.AssetManager = null;
-
-                var resourceManagerAware = loader as IResourceManagerAware;
-                if (resourceManagerAware != null) resourceManagerAware.ResourceManager = null;
                 
                 loaderMap.Remove(type);
                 return true;

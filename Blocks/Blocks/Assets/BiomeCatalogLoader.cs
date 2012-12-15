@@ -10,15 +10,21 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class BiomeCatalogLoader : IAssetLoader, IAssetManagerAware, IResourceManagerAware
+    public sealed class BiomeCatalogLoader : IAssetLoader, IAssetManagerAware
     {
+        ResourceManager resourceManager;
+
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(BiomeCatalogDefinition));
 
         // I/F
         public AssetManager AssetManager { private get; set; }
 
-        // I/F
-        public ResourceManager ResourceManager { private get; set; }
+        public BiomeCatalogLoader(ResourceManager resourceManager)
+        {
+            if (resourceManager == null) throw new ArgumentNullException("resourceManager");
+
+            this.resourceManager = resourceManager;
+        }
 
         public object Load(IResource resource)
         {
@@ -72,7 +78,7 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             if (string.IsNullOrEmpty(uri)) return null;
 
-            var resource = ResourceManager.Load(baseResource, uri);
+            var resource = resourceManager.Load(baseResource, uri);
             return AssetManager.Load<T>(resource);
         }
 
@@ -80,7 +86,7 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             if (asset == null || asset.Resource == null) return null;
 
-            return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
+            return resourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
     }
 }

@@ -11,22 +11,23 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class TileCatalogLoader : IAssetLoader, IAssetManagerAware, IResourceManagerAware
+    public sealed class TileCatalogLoader : IAssetLoader, IAssetManagerAware
     {
-        DefinitionSerializer serializer = new DefinitionSerializer(typeof(TileCatalogDefinition));
+        ResourceManager resourceManager;
 
         GraphicsDevice graphicsDevice;
+
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(TileCatalogDefinition));
 
         // I/F
         public AssetManager AssetManager { private get; set; }
 
-        // I/F
-        public ResourceManager ResourceManager { private get; set; }
-
-        public TileCatalogLoader(GraphicsDevice graphicsDevice)
+        public TileCatalogLoader(ResourceManager resourceManager, GraphicsDevice graphicsDevice)
         {
+            if (resourceManager == null) throw new ArgumentNullException("resourceManager");
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
+            this.resourceManager = resourceManager;
             this.graphicsDevice = graphicsDevice;
         }
 
@@ -84,7 +85,7 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             if (string.IsNullOrEmpty(uri)) return null;
 
-            var resource = ResourceManager.Load(baseResource, uri);
+            var resource = resourceManager.Load(baseResource, uri);
             return AssetManager.Load<T>(resource);
         }
 
@@ -92,7 +93,7 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             if (asset == null || asset.Resource == null) return null;
 
-            return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
+            return resourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
     }
 }

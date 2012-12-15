@@ -53,11 +53,11 @@ namespace Willcraftia.Xna.Framework.Component
 
         Dictionary<Type, ITypeHandler> typeHandlerMap;
 
-        IPropertyHandler propertyHandler;
-
         ComponentInfoCollection componentInfoCache = new ComponentInfoCollection();
 
         HolderCollection holders = new HolderCollection();
+
+        public List<IPropertyHandler> PropertyHandlers { get; private set; }
 
         public object this[string componentName]
         {
@@ -78,8 +78,10 @@ namespace Willcraftia.Xna.Framework.Component
             if (typeRegistory == null) throw new ArgumentNullException("typeRegistory");
 
             this.typeRegistory = typeRegistory;
-            this.propertyHandler = propertyHandler ?? new PropertyHandler();
-            this.propertyHandler.ComponentFactory = this;
+
+            PropertyHandlers = new List<IPropertyHandler>();
+            PropertyHandlers.Add(DefaultPropertyHandler.Instance);
+            PropertyHandlers.Add(new ComponentNamePropertyHandler(this));
         }
 
         public void AddTypeHandler(Type type, ITypeHandler typeHandler)
@@ -272,8 +274,13 @@ namespace Willcraftia.Xna.Framework.Component
             var property = componentInfo.GetProperty(propertyName);
             var propertyValue = propertyDefinition.Value;
 
-            if (!propertyHandler.SetPropertyValue(component, property, propertyValue))
-                throw new InvalidOperationException("Property not handled: " + propertyName);
+            foreach (var handler in PropertyHandlers)
+            {
+                if (handler.SetPropertyValue(component, property, propertyValue))
+                    return;
+            }
+
+            throw new InvalidOperationException("Property not handled: " + propertyName);
         }
 
         //

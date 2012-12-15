@@ -93,7 +93,6 @@
     <Compile Include="Assets\AssetManager.cs" />
     <Compile Include="Assets\IAssetLoader.cs" />
     <Compile Include="Assets\IAssetManagerAware.cs" />
-    <Compile Include="Assets\IResourceManagerAware.cs" />
     <Compile Include="Assets\NoCacheContentManager.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="Cameras\PerspectiveFov.cs" />
@@ -104,9 +103,10 @@
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
+    <Compile Include="Component\ComponentNamePropertyHandler.cs" />
     <Compile Include="Component\IPropertyHandler.cs" />
     <Compile Include="Component\ITypeHandler.cs" />
-    <Compile Include="Component\PropertyHandler.cs" />
+    <Compile Include="Component\DefaultPropertyHandler.cs" />
     <Compile Include="Component\TypeHandler.cs" />
     <Compile Include="Component\IInitializingComponent.cs" />
     <Compile Include="Component\ComponentFactory.cs" />

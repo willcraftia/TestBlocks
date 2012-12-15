@@ -14,17 +14,23 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Assets
 {
-    public sealed class RegionLoader : IAssetLoader, IAssetManagerAware, IResourceManagerAware
+    public sealed class RegionLoader : IAssetLoader, IAssetManagerAware
     {
         static readonly Logger logger = new Logger(typeof(RegionLoader).Name);
+
+        ResourceManager resourceManager;
 
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
 
         // I/F
         public AssetManager AssetManager { private get; set; }
 
-        // I/F
-        public ResourceManager ResourceManager { private get; set; }
+        public RegionLoader(ResourceManager resourceManager)
+        {
+            if (resourceManager == null) throw new ArgumentNullException("resourceManager");
+
+            this.resourceManager = resourceManager;
+        }
 
         // I/F
         public object Load(IResource resource)
@@ -69,14 +75,14 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             if (string.IsNullOrEmpty(uri)) return null;
 
-            return ResourceManager.Load(baseResource, uri);
+            return resourceManager.Load(baseResource, uri);
         }
 
         T Load<T>(IResource baseResource, string uri) where T : class
         {
             if (string.IsNullOrEmpty(uri)) return null;
 
-            var resource = ResourceManager.Load(baseResource, uri);
+            var resource = resourceManager.Load(baseResource, uri);
             return AssetManager.Load<T>(resource);
         }
 
@@ -84,14 +90,14 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             if (resource == null) return null;
 
-            return ResourceManager.CreateRelativeUri(baseResource, resource);
+            return resourceManager.CreateRelativeUri(baseResource, resource);
         }
 
         string ToUri(IResource baseResource, IAsset asset)
         {
             if (asset == null || asset.Resource == null) return null;
 
-            return ResourceManager.CreateRelativeUri(baseResource, asset.Resource);
+            return resourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
 
         List<ChunkProcedure> ToChunkProcedures(BundleDefinition[] definitions)

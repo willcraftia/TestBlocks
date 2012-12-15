@@ -7,13 +7,14 @@ using System.Reflection;
 
 namespace Willcraftia.Xna.Framework.Component
 {
-    public class PropertyHandler : IPropertyHandler
+    public sealed class DefaultPropertyHandler : IPropertyHandler
     {
-        // I/F
-        public ComponentFactory ComponentFactory { private get; set; }
+        public static readonly DefaultPropertyHandler Instance = new DefaultPropertyHandler();
+
+        DefaultPropertyHandler() { }
 
         // I/F
-        public virtual bool SetPropertyValue(object component, PropertyInfo property, string propertyValue)
+        public bool SetPropertyValue(object component, PropertyInfo property, string propertyValue)
         {
             var propertyType = property.PropertyType;
 
@@ -35,16 +36,6 @@ namespace Willcraftia.Xna.Framework.Component
                 var convertedValue = Convert.ChangeType(propertyValue, propertyType, null);
                 property.SetValue(component, convertedValue, null);
                 return true;
-            }
-
-            if (ComponentFactory.ContainsComponentName(propertyValue))
-            {
-                var referencedComponent = ComponentFactory[propertyValue];
-                if (propertyType.IsAssignableFrom(referencedComponent.GetType()))
-                {
-                    property.SetValue(component, referencedComponent, null);
-                    return true;
-                }
             }
 
             return false;

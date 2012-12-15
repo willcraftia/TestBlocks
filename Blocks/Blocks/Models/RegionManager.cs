@@ -72,16 +72,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var resource = resourceManager.Load(uri);
 
-            var assetManager = new AssetManager(serviceProvider, resourceManager);
-            assetManager.RegisterLoader(typeof(Region), new RegionLoader());
+            var assetManager = new AssetManager(serviceProvider);
+            assetManager.RegisterLoader(typeof(Region), new RegionLoader(resourceManager));
             assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(graphicsDevice));
             assetManager.RegisterLoader(typeof(Mesh), new MeshLoader());
-            assetManager.RegisterLoader(typeof(Tile), new TileLoader());
-            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(graphicsDevice));
-            assetManager.RegisterLoader(typeof(Block), new BlockLoader());
-            assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader());
+            assetManager.RegisterLoader(typeof(Tile), new TileLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(resourceManager, graphicsDevice));
+            assetManager.RegisterLoader(typeof(Block), new BlockLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader(resourceManager));
             assetManager.RegisterLoader(typeof(Biome), new BiomeLoader());
-            assetManager.RegisterLoader(typeof(BiomeCatalog), new BiomeCatalogLoader());
+            assetManager.RegisterLoader(typeof(BiomeCatalog), new BiomeCatalogLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
             region.ChunkSize = ChunkSize;
