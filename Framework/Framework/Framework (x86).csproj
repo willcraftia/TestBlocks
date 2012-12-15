@@ -88,6 +88,8 @@
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
+    <Compile Include="Component\ComponentBundleBuilder.cs" />
+    <Compile Include="Component\ComponentInfoManager.cs" />
     <Compile Include="Content\AssetHolder.cs" />
     <Compile Include="Content\AssetHolderCollection.cs" />
     <Compile Include="Content\AssetManager.cs" />

@@ -20,15 +20,23 @@ namespace Willcraftia.Xna.Blocks.Content
 
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(ComponentBundleDefinition));
 
+        ComponentInfoManager componentInfoManager = new ComponentInfoManager(ComponentTypeRegistory);
+
+        // スレッド セーフではない使い方をします。
+        ComponentFactory componentFactory;
+
         static BiomeLoader()
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
-
             NoiseHelper.SetTypeDefinitionNames(ComponentTypeRegistory);
-
             // 利用可能な実体の型を全て登録しておく。
             ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiomeCore));
             ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiomeCore.Range));
+        }
+
+        public BiomeLoader()
+        {
+            componentFactory = new ComponentFactory(componentInfoManager);
         }
 
         public object Load(IResource resource)
@@ -37,11 +45,10 @@ namespace Willcraftia.Xna.Blocks.Content
 
             var biome = new Biome { Resource = resource };
 
-            var factory = new ComponentFactory(ComponentTypeRegistory);
-            factory.Build(ref definition);
-            biome.Core = factory[ComponentName] as IBiomeCore;
-            biome.ComponentFactory = factory;
-            
+            componentFactory.Build(ref definition);
+            biome.Core = componentFactory[ComponentName] as IBiomeCore;
+            componentFactory.Clear();
+
             return biome;
         }
 

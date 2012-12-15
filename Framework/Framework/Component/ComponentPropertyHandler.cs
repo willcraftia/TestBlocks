@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Component
         {
             if (propertyValue == null) return false;
 
-            if (componentFactory.ContainsComponentName(propertyValue))
+            if (componentFactory.Contains(propertyValue))
             {
                 var propertyType = property.PropertyType;
                 var referencedComponent = componentFactory[propertyValue];

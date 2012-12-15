@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework.Noise;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
 using Willcraftia.Xna.Blocks.Content;
@@ -137,25 +138,25 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             Console.WriteLine("BiomeComponent (BundleDefinition)");
             {
-                var componentFactory = new ComponentFactory(BiomeLoader.ComponentTypeRegistory);
+                var biomeCore = new DefaultBiomeCore
+                {
+                    Name = "Default Biome",
+                    HumidityNoise = new SumFractal
+                    {
+                        Source = new Perlin { Seed = 0 }
+                    },
+                    TemperatureNoise = new SumFractal
+                    {
+                        Source = new Perlin { Seed = 1 }
+                    }
+                };
 
-                componentFactory.AddComponent("Target", "DefaultBiomeCore");
-                componentFactory.SetPropertyValue("Target", "Name", "Default Biome");
-                componentFactory.SetPropertyValue("Target", "HumidityNoise", "HumidityNoise");
-                componentFactory.SetPropertyValue("Target", "TemperatureNoise", "TemperatureNoise");
-
-                componentFactory.AddComponent("HumidityNoise", "SumFractal");
-                componentFactory.SetPropertyValue("HumidityNoise", "Source", "HumidityPerlin");
-                componentFactory.AddComponent("HumidityPerlin", "Perlin");
-                componentFactory.SetPropertyValue("HumidityPerlin", "Seed", 0);
-
-                componentFactory.AddComponent("TemperatureNoise", "SumFractal");
-                componentFactory.SetPropertyValue("TemperatureNoise", "Source", "TemperaturePerlin");
-                componentFactory.AddComponent("TemperaturePerlin", "Perlin");
-                componentFactory.SetPropertyValue("TemperaturePerlin", "Seed", 1);
+                var componentInfoManager = new ComponentInfoManager(BiomeLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+                builder.Add("Target", biomeCore);
 
                 ComponentBundleDefinition biomeBundle;
-                componentFactory.GetComponentBundleDefinition(out biomeBundle);
+                builder.BuildDefinition(out biomeBundle);
 
                 var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultBiome", biomeBundle);
                 var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultBiome", biomeBundle);

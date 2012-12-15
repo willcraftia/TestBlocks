@@ -14,6 +14,11 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (typeRegistory == null) throw new ArgumentNullException("typeRegistory");
 
+            // Face curves.
+            typeRegistory.SetTypeDefinitionName(typeof(NoFadeCurve));
+            typeRegistory.SetTypeDefinitionName(typeof(SCurve3));
+            typeRegistory.SetTypeDefinitionName(typeof(SCurve5));
+
             // Gradient noises.
             typeRegistory.SetTypeDefinitionName(typeof(Perlin));
             typeRegistory.SetTypeDefinitionName(typeof(ClassicPerlin));

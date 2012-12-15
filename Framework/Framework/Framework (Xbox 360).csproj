@@ -102,10 +102,12 @@
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
+    <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentBundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\ComponentInfo.cs" />
+    <Compile Include="Component\ComponentInfoManager.cs" />
     <Compile Include="Component\ComponentPropertyHandler.cs" />
     <Compile Include="Component\ComponentTypeRegistory.cs" />
     <Compile Include="Component\DefaultPropertyHandler.cs" />

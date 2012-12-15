@@ -28,24 +28,32 @@ namespace Willcraftia.Xna.Framework.Component.Demo
 
             //================================================================
             //
-            // NamedComponentFactory
+            // ComponentInfoManager
             //
 
-            var factory = new ComponentFactory(typeRegistory);
+            var componentInfoManager = new ComponentInfoManager(typeRegistory);
 
-            factory.AddComponent("scurve5", "SCurve5");
-            factory.AddComponent("perlin", "Perlin");
-            factory.SetPropertyValue("perlin", "Seed", 300);
-            factory.SetPropertyValue("perlin", "FadeCurve", "scurve5");
+            //================================================================
+            //
+            // ComponentBundleBuilder
+            //
 
-            factory.AddComponent("sumFractal", "SumFractal");
-            factory.SetPropertyValue("sumFractal", "Source", "perlin");
+            var myNoise = new ScaleBias
+            {
+                Scale = 0.5f,
+                Bias = 0.5f,
+                Source = new SumFractal
+                {
+                    Source = new Perlin
+                    {
+                        Seed = 300,
+                        FadeCurve = new SCurve5()
+                    }
+                }
+            };
 
-            factory.AddComponent("scaleBias", "ScaleBias");
-            factory.SetPropertyValue("scaleBias", "Scale", 0.5f);
-            factory.SetPropertyValue("scaleBias", "Bias", 0.5f);
-            factory.SetPropertyValue("scaleBias", "Source", "sumFractal");
-            factory.Build();
+            var builder = new ComponentBundleBuilder(componentInfoManager);
+            builder.Add("scaleBias", myNoise);
 
             //================================================================
             //
@@ -53,7 +61,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             //
 
             ComponentBundleDefinition definition;
-            factory.GetComponentBundleDefinition(out definition);
+            builder.BuildDefinition(out definition);
 
             var xmlSerializer = new XmlSerializerAdapter(typeof(ComponentBundleDefinition));
             xmlSerializer.WriterSettings.Indent = true;
@@ -75,19 +83,6 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             {
                 deserializedDefinition = (ComponentBundleDefinition) xmlSerializer.Deserialize(stream, null);
             }
-
-            //================================================================
-            //
-            // Other NamedComponentFactory
-            //
-
-            var otherFactory = new ComponentFactory(typeRegistory);
-            otherFactory.AddComponentBundleDefinition(ref deserializedDefinition);
-            otherFactory.Build();
-
-            // just debug
-            var noise = otherFactory["scaleBias"] as INoiseSource;
-            var signal = noise.Sample(0.5f, 0.5f, 0.5f);
 
             //================================================================
             //

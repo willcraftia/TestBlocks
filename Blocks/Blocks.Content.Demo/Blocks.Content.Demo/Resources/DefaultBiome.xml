@@ -3,28 +3,85 @@
 		<Component Name="Target" Type="DefaultBiomeCore">
 			<Properties>
 				<Property Name="Name" Value="Default Biome" />
-				<Property Name="HumidityNoise" Value="HumidityNoise" />
-				<Property Name="TemperatureNoise" Value="TemperatureNoise" />
+				<Property Name="HumidityNoise" Value="Target_HumidityNoise" />
+				<Property Name="TemperatureNoise" Value="Target_TemperatureNoise" />
+				<Property Name="BaseElement" Value="Forest" />
+				<Property Name="DesertRange" Value="Target_DesertRange" />
+				<Property Name="PlainsRange" Value="Target_PlainsRange" />
+				<Property Name="SnowRange" Value="Target_SnowRange" />
+				<Property Name="MountainsRange" Value="Target_MountainsRange" />
+				<Property Name="ForestRange" Value="Target_ForestRange" />
 			</Properties>
 		</Component>
-		<Component Name="HumidityNoise" Type="SumFractal">
+		<Component Name="Target_HumidityNoise" Type="SumFractal">
 			<Properties>
-				<Property Name="Source" Value="HumidityPerlin" />
+				<Property Name="Source" Value="Target_HumidityNoise_Source" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="6" />
 			</Properties>
 		</Component>
-		<Component Name="HumidityPerlin" Type="Perlin">
+		<Component Name="Target_HumidityNoise_Source" Type="Perlin">
 			<Properties>
 				<Property Name="Seed" Value="0" />
+				<Property Name="FadeCurve" Value="Target_HumidityNoise_Source_FadeCurve" />
 			</Properties>
 		</Component>
-		<Component Name="TemperatureNoise" Type="SumFractal">
+		<Component Name="Target_HumidityNoise_Source_FadeCurve" Type="SCurve3" />
+		<Component Name="Target_TemperatureNoise" Type="SumFractal">
 			<Properties>
-				<Property Name="Source" Value="TemperaturePerlin" />
+				<Property Name="Source" Value="Target_TemperatureNoise_Source" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="6" />
 			</Properties>
 		</Component>
-		<Component Name="TemperaturePerlin" Type="Perlin">
+		<Component Name="Target_TemperatureNoise_Source" Type="Perlin">
 			<Properties>
 				<Property Name="Seed" Value="1" />
+				<Property Name="FadeCurve" Value="Target_HumidityNoise_Source_FadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="Target_DesertRange" Type="Range">
+			<Properties>
+				<Property Name="MinTemperature" Value="0.5" />
+				<Property Name="MaxTemperature" Value="1" />
+				<Property Name="MinHumidity" Value="0" />
+				<Property Name="MaxHumidity" Value="0.3" />
+			</Properties>
+		</Component>
+		<Component Name="Target_PlainsRange" Type="Range">
+			<Properties>
+				<Property Name="MinTemperature" Value="0.5" />
+				<Property Name="MaxTemperature" Value="1" />
+				<Property Name="MinHumidity" Value="0.3" />
+				<Property Name="MaxHumidity" Value="0.6" />
+			</Properties>
+		</Component>
+		<Component Name="Target_SnowRange" Type="Range">
+			<Properties>
+				<Property Name="MinTemperature" Value="0" />
+				<Property Name="MaxTemperature" Value="0.3" />
+				<Property Name="MinHumidity" Value="0.6" />
+				<Property Name="MaxHumidity" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="Target_MountainsRange" Type="Range">
+			<Properties>
+				<Property Name="MinTemperature" Value="0" />
+				<Property Name="MaxTemperature" Value="0.5" />
+				<Property Name="MinHumidity" Value="0" />
+				<Property Name="MaxHumidity" Value="0.6" />
+			</Properties>
+		</Component>
+		<Component Name="Target_ForestRange" Type="Range">
+			<Properties>
+				<Property Name="MinTemperature" Value="0.3" />
+				<Property Name="MaxTemperature" Value="1" />
+				<Property Name="MinHumidity" Value="0.6" />
+				<Property Name="MaxHumidity" Value="1" />
 			</Properties>
 		</Component>
 	</Components>

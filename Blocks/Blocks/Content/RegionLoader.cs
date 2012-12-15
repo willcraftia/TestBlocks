@@ -26,13 +26,17 @@ namespace Willcraftia.Xna.Blocks.Content
 
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(RegionDefinition));
 
+        ComponentInfoManager componentInfoManager = new ComponentInfoManager(ComponentTypeRegistory);
+
+        // スレッド セーフではない使い方をします。
+        ComponentFactory componentFactory;
+
         // I/F
         public AssetManager AssetManager { private get; set; }
-        
+
         static RegionLoader()
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
-
             ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureComponent), "FlatTerrain");
         }
 
@@ -41,6 +45,8 @@ namespace Willcraftia.Xna.Blocks.Content
             if (resourceManager == null) throw new ArgumentNullException("resourceManager");
 
             this.resourceManager = resourceManager;
+
+            componentFactory = new ComponentFactory(componentInfoManager);
         }
 
         // I/F
@@ -120,11 +126,9 @@ namespace Willcraftia.Xna.Blocks.Content
             {
                 var procedure = new ChunkProcedure();
 
-                var factory = new ComponentFactory(ComponentTypeRegistory);
-                factory.Build(ref definitions[i]);
-
-                procedure.Component = factory[ComponentName] as ChunkProcedureComponent;
-                procedure.ComponentFactory = factory;
+                componentFactory.Build(ref definitions[i]);
+                procedure.Component = componentFactory[ComponentName] as ChunkProcedureComponent;
+                componentFactory.Clear();
 
                 list.Add(procedure);
             }

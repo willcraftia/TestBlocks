@@ -75,9 +75,11 @@ namespace Willcraftia.Xna.Framework.Component
             return properties[index];
         }
 
-        bool IsIgnoredProperty(PropertyInfo property)
+        public PropertyInfo GetProperty(int index)
         {
-            return Attribute.IsDefined(property, typeof(PropertyIgnoredAttribute));
+            if (index < 0 || PropertyCount <= index) throw new ArgumentOutOfRangeException("index");
+
+            return properties[index];
         }
     }
 }
