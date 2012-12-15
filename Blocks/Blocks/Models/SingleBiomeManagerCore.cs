@@ -9,7 +9,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SingleBiomeManagerComponent : IBiomeManagerComponent
+    public sealed class SingleBiomeManagerCore : IBiomeManagerCore
     {
         public string BiomeUri { get; set; }
 

@@ -7,7 +7,7 @@ using Willcraftia.Xna.Framework.Component;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class RandomBiomeManagerComponent : CatalogedBiomeManagerComponent, IInitializingComponent
+    public sealed class RandomBiomeManagerCore : CatalogedBiomeManagerCore, IInitializingComponent
     {
         int seed = Environment.TickCount;
 

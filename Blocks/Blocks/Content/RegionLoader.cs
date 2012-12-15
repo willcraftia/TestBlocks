@@ -37,7 +37,7 @@ namespace Willcraftia.Xna.Blocks.Content
         static RegionLoader()
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureComponent), "FlatTerrain");
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureCore), "FlatTerrain");
         }
 
         public RegionLoader(ResourceManager resourceManager)
@@ -127,7 +127,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 var procedure = new ChunkProcedure();
 
                 componentFactory.Build(ref definitions[i]);
-                procedure.Component = componentFactory[ComponentName] as ChunkProcedureComponent;
+                procedure.Component = componentFactory[ComponentName] as ChunkProcedureCore;
                 componentFactory.Clear();
 
                 list.Add(procedure);

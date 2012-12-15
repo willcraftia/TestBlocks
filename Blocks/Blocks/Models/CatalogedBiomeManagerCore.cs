@@ -8,7 +8,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public abstract class CatalogedBiomeManagerComponent : IBiomeManagerComponent
+    public abstract class CatalogedBiomeManagerCore : IBiomeManagerCore
     {
         public string BiomeCatalogUri { get; set; }
 

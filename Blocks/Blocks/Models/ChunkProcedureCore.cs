@@ -6,8 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public interface IBiomeManagerComponent
+    public abstract class ChunkProcedureCore
     {
-        Biome GetBiome(Chunk chunk);
     }
 }

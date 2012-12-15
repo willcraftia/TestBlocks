@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkProcedure
     {
-        public ChunkProcedureComponent Component { get; set; }
+        public ChunkProcedureCore Component { get; set; }
 
         public Region Region { get; set; }
 

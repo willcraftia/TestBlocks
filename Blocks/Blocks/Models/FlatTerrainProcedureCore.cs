@@ -7,7 +7,7 @@ using Willcraftia.Xna.Framework.Component;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class FlatTerrainProcedureComponent : ChunkProcedureComponent
+    public sealed class FlatTerrainProcedureCore : ChunkProcedureCore
     {
         public void Generate(Chunk instance)
         {
