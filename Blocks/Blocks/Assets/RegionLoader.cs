@@ -16,7 +16,11 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class RegionLoader : IAssetLoader, IAssetManagerAware
     {
+        public const string ComponentName = "Target";
+
         static readonly Logger logger = new Logger(typeof(RegionLoader).Name);
+
+        static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
 
         ResourceManager resourceManager;
 
@@ -24,6 +28,11 @@ namespace Willcraftia.Xna.Blocks.Assets
 
         // I/F
         public AssetManager AssetManager { private get; set; }
+        
+        static RegionLoader()
+        {
+            componentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureComponent), "FlatTerrain");
+        }
 
         public RegionLoader(ResourceManager resourceManager)
         {
@@ -107,12 +116,15 @@ namespace Willcraftia.Xna.Blocks.Assets
             var list = new List<ChunkProcedure>(definitions.Length);
             for (int i = 0; i < definitions.Length; i++)
             {
-                var chunkProcedure = new ChunkProcedure();
+                var procedure = new ChunkProcedure();
 
-                chunkProcedure.ComponentFactory.Build(ref definitions[i]);
-                chunkProcedure.Component = chunkProcedure.ComponentFactory[ChunkProcedure.ComponentName] as ChunkProcedureComponent;
+                var factory = new ComponentFactory(componentTypeRegistory);
+                factory.Build(ref definitions[i]);
 
-                list.Add(chunkProcedure);
+                procedure.Component = factory[ComponentName] as ChunkProcedureComponent;
+                procedure.ComponentFactory = factory;
+
+                list.Add(procedure);
             }
 
             return list;
@@ -124,7 +136,18 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             var definitions = new BundleDefinition[procedures.Count];
             for (int i = 0; i < procedures.Count; i++)
-                procedures[i].ComponentFactory.GetDefinition(out definitions[i]);
+            {
+                var procedure = procedures[i];
+
+                var factory = procedure.ComponentFactory;
+                if (factory == null)
+                {
+                    factory = new ComponentFactory(componentTypeRegistory);
+                    procedure.ComponentFactory = factory;
+                }
+
+                factory.GetDefinition(out definitions[i]);
+            }
 
             return definitions;
         }

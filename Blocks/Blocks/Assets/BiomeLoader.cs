@@ -14,7 +14,20 @@ namespace Willcraftia.Xna.Blocks.Assets
 {
     public sealed class BiomeLoader : IAssetLoader
     {
+        public const string ComponentName = "Target";
+
+        static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
+
         DefinitionSerializer serializer = new DefinitionSerializer(typeof(BundleDefinition));
+
+        static BiomeLoader()
+        {
+            NoiseHelper.SetTypeDefinitionNames(componentTypeRegistory);
+
+            // 利用可能な実体の型を全て登録しておく。
+            componentTypeRegistory.SetTypeDefinitionName(typeof(BiomeComponent));
+            componentTypeRegistory.SetTypeDefinitionName(typeof(BiomeComponent.Range));
+        }
 
         public object Load(IResource resource)
         {
@@ -22,8 +35,11 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             var biome = new Biome { Resource = resource };
 
-            biome.ComponentFactory.Build(ref definition);
-            biome.Component = biome.ComponentFactory[Biome.ComponentName] as IBiomeComponent;
+            var factory = new ComponentFactory(componentTypeRegistory);
+            factory.Build(ref definition);
+
+            biome.Component = factory[ComponentName] as IBiomeComponent;
+            biome.ComponentFactory = factory;
             
             return biome;
         }
@@ -32,8 +48,15 @@ namespace Willcraftia.Xna.Blocks.Assets
         {
             var biome = asset as Biome;
 
+            var factory = biome.ComponentFactory;
+            if (factory == null)
+            {
+                factory = new ComponentFactory(componentTypeRegistory);
+                biome.ComponentFactory = factory;
+            }
+
             BundleDefinition definition;
-            biome.ComponentFactory.GetDefinition(out definition);
+            factory.GetDefinition(out definition);
 
             serializer.Serialize(resource, definition);
 
