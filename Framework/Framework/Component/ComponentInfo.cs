@@ -11,119 +11,45 @@ namespace Willcraftia.Xna.Framework.Component
 {
     public sealed class ComponentInfo
     {
-        static readonly PropertyInfo[] emptryProperties = new PropertyInfo[0];
-
         static readonly string[] emptyPropertyNames = new string[0];
 
-        static readonly ReadOnlyCollection<string> emptyReadOnlyPropertyNames = new ReadOnlyCollection<string>(emptyPropertyNames);
+        ITypeHandler typeHandler;
 
         PropertyInfo[] properties;
 
         string[] propertyNames;
 
-        ReadOnlyCollection<string> readOnlyPropertyNames;
-
         public Type ComponentType { get; private set; }
-
-        public IList<string> PropertyNames
-        {
-            get
-            {
-                if (readOnlyPropertyNames == null)
-                {
-                    if (propertyNames.Length == 0)
-                    {
-                        readOnlyPropertyNames = emptyReadOnlyPropertyNames;
-                    }
-                    else
-                    {
-                        readOnlyPropertyNames = new ReadOnlyCollection<string>(propertyNames);
-                    }
-                }
-                return readOnlyPropertyNames;
-            }
-        }
 
         public int PropertyCount
         {
             get { return properties.Length; }
         }
 
-        public ComponentInfo(Type componentType)
+        public ComponentInfo(Type componentType, ITypeHandler typeHandler)
         {
             if (componentType == null) throw new ArgumentNullException("componentType");
+            if (typeHandler == null) throw new ArgumentNullException("typeHandler");
 
             ComponentType = componentType;
+            this.typeHandler = typeHandler;
 
-            var definedProperties = componentType.GetProperties();
-
-            int validPropertyCount = 0;
-            for (int i = 0; i < definedProperties.Length; i++)
+            properties = typeHandler.GetProperties(componentType);
+            if (properties.Length == 0)
             {
-                var property = definedProperties[i];
-                if (!property.CanRead || !property.CanWrite || IsIgnoredProperty(property))
-                {
-                    // 後の処理を省くために、無効なプロパティのインデックスに null を設定する。
-                    // null ならば無効なプロパティであったということ。
-                    definedProperties[i] = null;
-                }
-                else
-                {
-                    // 有効なプロパティを数えておく。
-                    validPropertyCount++;
-                }
-            }
-
-            if (validPropertyCount == definedProperties.Length)
-            {
-                // 同じサイズならば properties には definedProperties をそのまま設定し、
-                // propertyNames を新たに作成する。
-
-                properties = definedProperties;
-                propertyNames = new string[validPropertyCount];
-
-                int index = 0;
-                foreach (var property in definedProperties)
-                {
-                    if (property != null)
-                    {
-                        propertyNames[index] = property.Name;
-                        index++;
-                    }
-                }
-            }
-            else if (validPropertyCount == 0)
-            {
-                // 異なるサイズかつ有効なプロパティがないならば、
-                // properties/propertyNames には空配列を設定する。
-
-                properties = emptryProperties;
                 propertyNames = emptyPropertyNames;
             }
             else
             {
-                // 異なるサイズかつ有効なプロパティがあるならば、
-                // properties/propertyNames を新たに作成する。
-
-                properties = new PropertyInfo[validPropertyCount];
-                propertyNames = new string[validPropertyCount];
-
-                int index = 0;
-                foreach (var property in definedProperties)
-                {
-                    if (property != null)
-                    {
-                        properties[index] = property;
-                        propertyNames[index] = property.Name;
-                        index++;
-                    }
-                }
+                propertyNames = new string[properties.Length];
+                for (int i = 0; i < properties.Length; i++)
+                    propertyNames[i] = properties[i].Name;
             }
         }
 
         public object CreateInstance()
         {
-            return ComponentType.InvokeMember(null, BindingFlags.CreateInstance, null, null, null);
+            return typeHandler.CreateInstance(ComponentType);
         }
 
         public bool PropertyExists(string propertyName)

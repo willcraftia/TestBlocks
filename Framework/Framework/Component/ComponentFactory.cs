@@ -47,7 +47,11 @@ namespace Willcraftia.Xna.Framework.Component
 
         #endregion
 
+        static readonly TypeHandler defaultTypeHandler = new TypeHandler();
+
         ComponentTypeRegistory typeRegistory;
+
+        Dictionary<Type, ITypeHandler> typeHandlerMap;
 
         ComponentInfoCollection componentInfoCache = new ComponentInfoCollection();
 
@@ -69,6 +73,24 @@ namespace Willcraftia.Xna.Framework.Component
             this.typeRegistory = typeRegistory;
         }
 
+        public void AddTypeHandler(Type type, ITypeHandler typeHandler)
+        {
+            if (type == null) throw new ArgumentNullException("type");
+            if (typeHandler == null) throw new ArgumentNullException("typeHandler");
+
+            if (typeHandlerMap == null) typeHandlerMap = new Dictionary<Type, ITypeHandler>();
+            typeHandlerMap[type] = typeHandler;
+        }
+
+        ITypeHandler GetTypeHandler(Type type)
+        {
+            ITypeHandler typeHandler;
+            if (typeHandlerMap == null || !typeHandlerMap.TryGetValue(type, out typeHandler))
+                typeHandler = defaultTypeHandler;
+
+            return typeHandler;
+        }
+
         public ComponentInfo GetComponentInfo(string typeName)
         {
             if (typeName == null) throw new ArgumentNullException("typeName");
@@ -83,7 +105,8 @@ namespace Willcraftia.Xna.Framework.Component
 
             if (componentInfoCache.Contains(type)) return componentInfoCache[type];
 
-            var componentInfo = new ComponentInfo(type);
+            var typeHandler = GetTypeHandler(type);
+            var componentInfo = new ComponentInfo(type, typeHandler);
             componentInfoCache.Add(componentInfo);
             return componentInfo;
         }

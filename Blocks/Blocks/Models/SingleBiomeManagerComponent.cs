@@ -16,6 +16,12 @@ namespace Willcraftia.Xna.Blocks.Models
         public Biome Biome { get; private set; }
 
         // I/F
+        public void Initialize()
+        {
+            throw new NotImplementedException();
+        }
+
+        // I/F
         public void BindAssets(AssetManager assetManager, ResourceManager resourceManager, IResource componentResource)
         {
             var resource = resourceManager.Load(componentResource, BiomeUri);

@@ -116,8 +116,10 @@
     <Compile Include="Component\ComponentInfo.cs" />
     <Compile Include="Component\ComponentTypeRegistory.cs" />
     <Compile Include="Component\IInitializingComponent.cs" />
+    <Compile Include="Component\ITypeHandler.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />
     <Compile Include="Component\PropertyIgnoredAttribute.cs" />
+    <Compile Include="Component\TypeHandler.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />
     <Compile Include="Diagnostics\DebugLayout.cs" />
