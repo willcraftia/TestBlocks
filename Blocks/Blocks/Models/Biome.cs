@@ -16,8 +16,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte Index { get; set; }
 
-        public ComponentFactory ComponentFactory { get; set; }
-
         public IBiomeCore Core { get; set; }
 
         public float GetTemperature(int x, int z)
