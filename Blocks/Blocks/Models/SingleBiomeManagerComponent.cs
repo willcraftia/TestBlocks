@@ -9,24 +9,11 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SingleBiomeManagerComponent : IBiomeManagerComponent, IAssetReferencingComponent, IInitializingComponent
+    public sealed class SingleBiomeManagerComponent : IBiomeManagerComponent
     {
         public string BiomeUri { get; set; }
 
         public Biome Biome { get; private set; }
-
-        // I/F
-        public void Initialize()
-        {
-            throw new NotImplementedException();
-        }
-
-        // I/F
-        public void BindAssets(AssetManager assetManager, ResourceManager resourceManager, IResource componentResource)
-        {
-            var resource = resourceManager.Load(componentResource, BiomeUri);
-            Biome = assetManager.Load<Biome>(resource);
-        }
 
         // I/F
         public Biome GetBiome(Chunk chunk)

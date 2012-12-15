@@ -126,7 +126,6 @@
     <Compile Include="Models\DefinedBiomeManagerComponent.cs" />
     <Compile Include="Models\FlatTerrainProcedureComponent.cs" />
     <Compile Include="Models\IAsset.cs" />
-    <Compile Include="Models\IAssetReferencingComponent.cs" />
     <Compile Include="Models\IBiomeCore.cs" />
     <Compile Include="Models\IBiomeManagerComponent.cs" />
     <Compile Include="Models\IChunkStore.cs" />
