@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockShape.cs" />
+    <Compile Include="Component\AssetPropertyHandler.cs" />
     <Compile Include="Content\BiomeCatalogLoader.cs" />
     <Compile Include="Content\BiomeLoader.cs" />
     <Compile Include="Content\BlockCatalogLoader.cs" />

@@ -103,7 +103,7 @@
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
-    <Compile Include="Component\ComponentNamePropertyHandler.cs" />
+    <Compile Include="Component\ComponentPropertyHandler.cs" />
     <Compile Include="Component\IPropertyHandler.cs" />
     <Compile Include="Component\ITypeHandler.cs" />
     <Compile Include="Component\DefaultPropertyHandler.cs" />

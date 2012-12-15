@@ -59,6 +59,7 @@
     <XnaCompressContent>false</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Component\AssetPropertyHandler.cs" />
     <Compile Include="Content\BiomeCatalogLoader.cs" />
     <Compile Include="Content\BiomeLoader.cs" />
     <Compile Include="Content\BlockCatalogLoader.cs" />
@@ -183,9 +184,7 @@
       <Name>Framework %28x86%29</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Component\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

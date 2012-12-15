@@ -60,15 +60,20 @@ namespace Willcraftia.Xna.Framework.Content
 
         public T Load<T>(IResource resource)
         {
+            return (T) Load(resource, typeof(T));
+        }
+
+        public object Load(IResource resource, Type type)
+        {
             if (resource == null) throw new ArgumentNullException("resource");
 
             AssetHolder holder;
-            if (!holders.TryGetItem(resource, out holder)) holder = LoadNew<T>(resource);
+            if (!holders.TryGetItem(resource, out holder)) holder = LoadNew(resource, type);
 
-            return (T) holder.Asset;
+            return holder.Asset;
         }
 
-        AssetHolder LoadNew<T>(IResource resource)
+        AssetHolder LoadNew(IResource resource, Type type)
         {
             logger.InfoBegin("LoadNew: {0}", resource);
 
@@ -77,13 +82,13 @@ namespace Willcraftia.Xna.Framework.Content
             if (resource is ContentResource)
             {
                 // XNA content framework
-                asset = contentManager.Load<T>(resource.AbsolutePath);
+                asset = contentManager.Load<object>(resource.AbsolutePath);
                 loader = null;
             }
             else
             {
                 // My asset framework
-                loader = GetLoader(typeof(T));
+                loader = GetLoader(type);
                 asset = loader.Load(resource);
             }
 

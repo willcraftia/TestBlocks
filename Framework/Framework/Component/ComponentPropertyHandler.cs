@@ -7,11 +7,11 @@ using System.Reflection;
 
 namespace Willcraftia.Xna.Framework.Component
 {
-    public sealed class ComponentNamePropertyHandler : IPropertyHandler
+    public sealed class ComponentPropertyHandler : IPropertyHandler
     {
         ComponentFactory componentFactory;
 
-        public ComponentNamePropertyHandler(ComponentFactory componentFactory)
+        public ComponentPropertyHandler(ComponentFactory componentFactory)
         {
             if (componentFactory == null) throw new ArgumentNullException("componentFactory");
 
@@ -21,6 +21,8 @@ namespace Willcraftia.Xna.Framework.Component
         // I/F
         public bool SetPropertyValue(object component, PropertyInfo property, string propertyValue)
         {
+            if (propertyValue == null) return false;
+
             if (componentFactory.ContainsComponentName(propertyValue))
             {
                 var propertyType = property.PropertyType;
