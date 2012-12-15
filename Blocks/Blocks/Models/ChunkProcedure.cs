@@ -13,19 +13,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
 
-        ChunkProcedureComponent component;
-
         public ComponentFactory ComponentFactory { get; private set; }
 
-        public ChunkProcedureComponent Component
-        {
-            get
-            {
-                if (component == null)
-                    component = ComponentFactory[ComponentName] as ChunkProcedureComponent;
-                return component;
-            }
-        }
+        public ChunkProcedureComponent Component { get; set; }
 
         public Region Region { get; set; }
 

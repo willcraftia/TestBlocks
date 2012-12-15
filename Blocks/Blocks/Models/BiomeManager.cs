@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static BiomeManager()
         {
-            NoiseHelper.SetTypeAliases(componentTypeRegistory);
+            NoiseHelper.SetTypeDefinitionNames(componentTypeRegistory);
 
             // 利用可能な実体の型を全て登録しておく。
             //componentTypeRegistory.SetTypeDefinitionName(typeof(BiomeComponent));

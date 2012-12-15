@@ -22,8 +22,8 @@ namespace Willcraftia.Xna.Blocks.Assets
 
             var biome = new Biome { Resource = resource };
 
-            biome.ComponentFactory.AddBundleDefinition(ref definition);
-            biome.ComponentFactory.Build();
+            biome.ComponentFactory.Build(ref definition);
+            biome.Component = biome.ComponentFactory[Biome.ComponentName] as IBiomeComponent;
             
             return biome;
         }

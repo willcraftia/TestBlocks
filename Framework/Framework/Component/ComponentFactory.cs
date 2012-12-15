@@ -234,6 +234,12 @@ namespace Willcraftia.Xna.Framework.Component
             holders.Clear();
         }
 
+        public void Build(ref BundleDefinition definition)
+        {
+            AddBundleDefinition(ref definition);
+            Build();
+        }
+
         public void Build()
         {
             foreach (var holder in holders)

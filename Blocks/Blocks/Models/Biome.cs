@@ -15,8 +15,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
 
-        IBiomeComponent component;
-
         // I/F
         public IResource Resource { get; set; }
 
@@ -24,19 +22,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ComponentFactory ComponentFactory { get; private set; }
 
-        public IBiomeComponent Component
-        {
-            get
-            {
-                if (component == null)
-                    component = ComponentFactory[ComponentName] as IBiomeComponent;
-                return component;
-            }
-        }
+        public IBiomeComponent Component { get; set; }
 
         static Biome()
         {
-            NoiseHelper.SetTypeAliases(componentTypeRegistory);
+            NoiseHelper.SetTypeDefinitionNames(componentTypeRegistory);
 
             // 利用可能な実体の型を全て登録しておく。
             componentTypeRegistory.SetTypeDefinitionName(typeof(BiomeComponent));
@@ -50,17 +40,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public float GetTemperature(int x, int z)
         {
-            return component.GetTemperature(x, z);
+            return Component.GetTemperature(x, z);
         }
 
         public float GetHumidity(int x, int z)
         {
-            return component.GetHumidity(x, z);
+            return Component.GetHumidity(x, z);
         }
 
         public BiomeElement GetBiomeElement(int x, int z)
         {
-            return component.GetBiomeElement(x, z);
+            return Component.GetBiomeElement(x, z);
         }
     }
 }

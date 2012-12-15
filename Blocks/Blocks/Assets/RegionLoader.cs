@@ -103,8 +103,8 @@ namespace Willcraftia.Xna.Blocks.Assets
             {
                 var chunkProcedure = new ChunkProcedure();
 
-                chunkProcedure.ComponentFactory.AddBundleDefinition(ref definitions[i]);
-                chunkProcedure.ComponentFactory.Build();
+                chunkProcedure.ComponentFactory.Build(ref definitions[i]);
+                chunkProcedure.Component = chunkProcedure.ComponentFactory[ChunkProcedure.ComponentName] as ChunkProcedureComponent;
 
                 list.Add(chunkProcedure);
             }

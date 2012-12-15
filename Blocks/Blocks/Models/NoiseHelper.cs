@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public static class NoiseHelper
     {
-        public static void SetTypeAliases(ComponentTypeRegistory typeRegistory)
+        public static void SetTypeDefinitionNames(ComponentTypeRegistory typeRegistory)
         {
             if (typeRegistory == null) throw new ArgumentNullException("typeRegistory");
 
