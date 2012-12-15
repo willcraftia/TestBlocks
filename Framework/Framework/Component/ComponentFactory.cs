@@ -49,13 +49,23 @@ namespace Willcraftia.Xna.Framework.Component
 
         static readonly TypeHandler defaultTypeHandler = new TypeHandler();
 
+        static readonly PropertyHandler defaultPropertyHandler = new PropertyHandler();
+
         ComponentTypeRegistory typeRegistory;
 
         Dictionary<Type, ITypeHandler> typeHandlerMap;
 
+        IPropertyHandler propertyHandler = defaultPropertyHandler;
+
         ComponentInfoCollection componentInfoCache = new ComponentInfoCollection();
 
         HolderCollection holders = new HolderCollection();
+
+        public IPropertyHandler PropertyHandler
+        {
+            get { return propertyHandler; }
+            set { propertyHandler = value ?? defaultPropertyHandler; }
+        }
 
         public object this[string componentName]
         {
@@ -255,38 +265,9 @@ namespace Willcraftia.Xna.Framework.Component
             if (string.IsNullOrEmpty(propertyName)) return;
 
             var property = componentInfo.GetProperty(propertyName);
-            var propertyType = property.PropertyType;
             var propertyValue = propertyDefinition.Value;
 
-            bool propertyHandled = false;
-            if (propertyType == typeof(string))
-            {
-                property.SetValue(component, propertyValue, null);
-                propertyHandled = true;
-            }
-            else if (propertyType.IsEnum)
-            {
-                var convertedValue = Enum.Parse(propertyType, propertyValue, true);
-                property.SetValue(component, convertedValue, null);
-                propertyHandled = true;
-            }
-            else if (typeof(IConvertible).IsAssignableFrom(propertyType))
-            {
-                var convertedValue = Convert.ChangeType(propertyValue, propertyType, null);
-                property.SetValue(component, convertedValue, null);
-                propertyHandled = true;
-            }
-            else if (ContainsComponentName(propertyValue))
-            {
-                var referencedComponent = this[propertyValue];
-                if (propertyType.IsAssignableFrom(referencedComponent.GetType()))
-                {
-                    property.SetValue(component, referencedComponent, null);
-                    propertyHandled = true;
-                }
-            }
-
-            if (!propertyHandled)
+            if (!propertyHandler.SetPropertyValue(this, component, property, propertyValue))
                 throw new InvalidOperationException("Property not handled: " + propertyName);
         }
 
