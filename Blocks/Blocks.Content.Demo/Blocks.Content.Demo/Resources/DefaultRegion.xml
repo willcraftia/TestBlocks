@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RegionDefinition>
+	<Name>Default Region</Name>
+	<Bounds>
+		<Min>
+			<X>0</X>
+			<Y>0</Y>
+			<Z>0</Z>
+		</Min>
+		<Max>
+			<X>1</X>
+			<Y>1</Y>
+			<Z>1</Z>
+		</Max>
+	</Bounds>
+	<TileCatalog>DefaultTileCatalog.json</TileCatalog>
+	<BlockCatalog>DefaultBlockCatalog.json</BlockCatalog>
+	<BiomeCatalog>DefaultBiomeCatalog.json</BiomeCatalog>
+</RegionDefinition>

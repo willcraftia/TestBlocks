@@ -88,12 +88,12 @@
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
-    <Compile Include="Assets\AssetHolder.cs" />
-    <Compile Include="Assets\AssetHolderCollection.cs" />
-    <Compile Include="Assets\AssetManager.cs" />
-    <Compile Include="Assets\IAssetLoader.cs" />
-    <Compile Include="Assets\IAssetManagerAware.cs" />
-    <Compile Include="Assets\NoCacheContentManager.cs" />
+    <Compile Include="Content\AssetHolder.cs" />
+    <Compile Include="Content\AssetHolderCollection.cs" />
+    <Compile Include="Content\AssetManager.cs" />
+    <Compile Include="Content\IAssetLoader.cs" />
+    <Compile Include="Content\IAssetManagerAware.cs" />
+    <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="Cameras\PerspectiveFov.cs" />
     <Compile Include="Cameras\ProjectionBase.cs" />

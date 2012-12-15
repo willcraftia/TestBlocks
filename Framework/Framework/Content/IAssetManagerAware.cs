@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Assets
+namespace Willcraftia.Xna.Framework.Content
 {
     public interface IAssetManagerAware
     {

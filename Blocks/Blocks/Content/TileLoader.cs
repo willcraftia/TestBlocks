@@ -3,14 +3,14 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
 #endregion
 
-namespace Willcraftia.Xna.Blocks.Assets
+namespace Willcraftia.Xna.Blocks.Content
 {
     public sealed class TileLoader : IAssetLoader, IAssetManagerAware
     {

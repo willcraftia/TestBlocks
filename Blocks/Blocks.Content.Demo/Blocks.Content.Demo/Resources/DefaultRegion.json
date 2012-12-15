@@ -1,0 +1,20 @@
+{
+  "Name": "Default Region",
+  "Bounds": {
+    "Min": {
+      "X": 0,
+      "Y": 0,
+      "Z": 0
+    },
+    "Max": {
+      "X": 1,
+      "Y": 1,
+      "Z": 1
+    }
+  },
+  "TileCatalog": "DefaultTileCatalog.json",
+  "BlockCatalog": "DefaultBlockCatalog.json",
+  "BiomeCatalog": "DefaultBiomeCatalog.json",
+  "ChunkBundle": null,
+  "ChunkProcedures": null
+}

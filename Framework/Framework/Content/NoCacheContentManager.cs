@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Content;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Assets
+namespace Willcraftia.Xna.Framework.Content
 {
     public sealed class NoCacheContentManager : ContentManager
     {

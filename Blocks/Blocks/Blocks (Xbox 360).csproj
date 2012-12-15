@@ -92,16 +92,16 @@
     <Reference Include="System.Xml.Serialization, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\BiomeCatalogLoader.cs" />
-    <Compile Include="Assets\BiomeLoader.cs" />
-    <Compile Include="Assets\BlockCatalogLoader.cs" />
-    <Compile Include="Assets\BlockLoader.cs" />
-    <Compile Include="Assets\Image2DLoader.cs" />
-    <Compile Include="Assets\MeshLoader.cs" />
-    <Compile Include="Assets\RegionLoader.cs" />
-    <Compile Include="Assets\TileCatalogLoader.cs" />
-    <Compile Include="Assets\TileLoader.cs" />
     <Compile Include="BlockShape.cs" />
+    <Compile Include="Content\BiomeCatalogLoader.cs" />
+    <Compile Include="Content\BiomeLoader.cs" />
+    <Compile Include="Content\BlockCatalogLoader.cs" />
+    <Compile Include="Content\BlockLoader.cs" />
+    <Compile Include="Content\Image2DLoader.cs" />
+    <Compile Include="Content\MeshLoader.cs" />
+    <Compile Include="Content\RegionLoader.cs" />
+    <Compile Include="Content\TileCatalogLoader.cs" />
+    <Compile Include="Content\TileLoader.cs" />
     <Compile Include="Landscape\ChunkPartition.cs" />
     <Compile Include="Landscape\ChunkPartitionManager.cs" />
     <Compile Include="Landscape\ChunkRenderer.cs" />

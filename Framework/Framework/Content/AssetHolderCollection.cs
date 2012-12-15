@@ -6,7 +6,7 @@ using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Assets
+namespace Willcraftia.Xna.Framework.Content
 {
     public sealed class AssetHolderCollection : KeyedList<IResource, AssetHolder>
     {

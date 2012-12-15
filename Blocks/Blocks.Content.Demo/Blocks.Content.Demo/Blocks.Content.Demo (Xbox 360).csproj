@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">Xbox 360</Platform>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Willcraftia.Xna.Blocks.Assets.Demo</RootNamespace>
-    <AssemblyName>Willcraftia.Xna.Blocks.Assets.Demo</AssemblyName>
+    <RootNamespace>Willcraftia.Xna.Blocks.Content.Demo</RootNamespace>
+    <AssemblyName>Willcraftia.Xna.Blocks.Content.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
@@ -76,11 +76,6 @@
     <ProjectReference Include="..\..\Blocks\Blocks (Xbox 360).csproj">
       <Project>{6F699127-8EF0-4697-BE6A-A8B8580C5D61}</Project>
       <Name>Blocks (Xbox 360)</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Blocks.Assets.DemoContent\Blocks.Assets.DemoContent.contentproj">
-      <Name>Blocks.Assets.DemoContent %28Content%29</Name>
-      <XnaReferenceType>Content</XnaReferenceType>
-      <Project>{ABF2DB96-8055-4A99-B756-5CBE375AC1E8}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,9 @@
+{
+  "Name": "Default Biome Catalog",
+  "Entries": [
+    {
+      "Index": 1,
+      "Uri": "DefaultBiome.json"
+    }
+  ]
+}

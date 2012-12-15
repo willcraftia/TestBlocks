@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Willcraftia.Xna.Blocks.Assets.Demo</RootNamespace>
-    <AssemblyName>Willcraftia.Xna.Blocks.Assets.Demo</AssemblyName>
+    <RootNamespace>Willcraftia.Xna.Blocks.Content.Demo</RootNamespace>
+    <AssemblyName>Willcraftia.Xna.Blocks.Content.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
@@ -156,8 +156,8 @@
       <Project>{2FE63614-021F-46F0-9669-B7745639525E}</Project>
       <Name>Blocks %28x86%29</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Blocks.Assets.DemoContent\Blocks.Assets.DemoContent.contentproj">
-      <Name>Blocks.Assets.DemoContent %28Content%29</Name>
+    <ProjectReference Include="..\Blocks.Content.DemoContent\Blocks.Content.DemoContent.contentproj">
+      <Name>Blocks.Content.DemoContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
       <Project>{ABF2DB96-8055-4A99-B756-5CBE375AC1E8}</Project>
     </ProjectReference>

@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
-using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
-using Willcraftia.Xna.Blocks.Assets;
+using Willcraftia.Xna.Blocks.Content;
 using Willcraftia.Xna.Blocks.Serialization;
 
 #endregion

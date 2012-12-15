@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BlockCatalogDefinition>
+	<Name>Default Block Catalog</Name>
+	<Entries>
+		<IndexedUriDefinition>
+			<Index>1</Index>
+			<Uri>DefaultBlock.json</Uri>
+		</IndexedUriDefinition>
+	</Entries>
+</BlockCatalogDefinition>

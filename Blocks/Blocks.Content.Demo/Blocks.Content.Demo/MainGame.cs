@@ -15,7 +15,7 @@ using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
-namespace Willcraftia.Xna.Blocks.Assets.Demo
+namespace Willcraftia.Xna.Blocks.Content.Demo
 {
     public class MainGame : Game
     {

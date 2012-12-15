@@ -1,7 +1,7 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework.Assets;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Noise;
@@ -10,7 +10,7 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 #endregion
 
-namespace Willcraftia.Xna.Blocks.Assets
+namespace Willcraftia.Xna.Blocks.Content
 {
     public sealed class BiomeLoader : IAssetLoader
     {
