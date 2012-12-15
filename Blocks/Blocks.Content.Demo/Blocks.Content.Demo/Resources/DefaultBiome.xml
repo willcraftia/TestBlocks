@@ -1,42 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Bundle>
-	<Entries>
-		<Entry Name="Target">
-			<Component Type="BiomeComponent">
-				<Properties>
-					<Property Name="Name" Value="Default Biome Component" />
-					<Property Name="HumidityNoise" Value="HumidityNoise" />
-					<Property Name="TemperatureNoise" Value="TemperatureNoise" />
-				</Properties>
-			</Component>
-		</Entry>
-		<Entry Name="HumidityNoise">
-			<Component Type="SumFractal">
-				<Properties>
-					<Property Name="Source" Value="HumidityPerlin" />
-				</Properties>
-			</Component>
-		</Entry>
-		<Entry Name="HumidityPerlin">
-			<Component Type="Perlin">
-				<Properties>
-					<Property Name="Seed" Value="0" />
-				</Properties>
-			</Component>
-		</Entry>
-		<Entry Name="TemperatureNoise">
-			<Component Type="SumFractal">
-				<Properties>
-					<Property Name="Source" Value="TemperaturePerlin" />
-				</Properties>
-			</Component>
-		</Entry>
-		<Entry Name="TemperaturePerlin">
-			<Component Type="Perlin">
-				<Properties>
-					<Property Name="Seed" Value="1" />
-				</Properties>
-			</Component>
-		</Entry>
-	</Entries>
+﻿<Bundle>
+	<Components>
+		<Component Name="Target" Type="DefaultBiomeCore">
+			<Properties>
+				<Property Name="Name" Value="Default Biome" />
+				<Property Name="HumidityNoise" Value="HumidityNoise" />
+				<Property Name="TemperatureNoise" Value="TemperatureNoise" />
+			</Properties>
+		</Component>
+		<Component Name="HumidityNoise" Type="SumFractal">
+			<Properties>
+				<Property Name="Source" Value="HumidityPerlin" />
+			</Properties>
+		</Component>
+		<Component Name="HumidityPerlin" Type="Perlin">
+			<Properties>
+				<Property Name="Seed" Value="0" />
+			</Properties>
+		</Component>
+		<Component Name="TemperatureNoise" Type="SumFractal">
+			<Properties>
+				<Property Name="Source" Value="TemperaturePerlin" />
+			</Properties>
+		</Component>
+		<Component Name="TemperaturePerlin" Type="Perlin">
+			<Properties>
+				<Property Name="Seed" Value="1" />
+			</Properties>
+		</Component>
+	</Components>
 </Bundle>

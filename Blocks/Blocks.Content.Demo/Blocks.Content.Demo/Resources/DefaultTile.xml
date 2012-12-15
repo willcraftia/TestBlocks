@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TileDefinition>
+﻿<TileDefinition>
 	<Name>Default Tile</Name>
 	<Texture>DefaultTile.png</Texture>
 	<Translucent>false</Translucent>

@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Framework.Component
 
         class Holder
         {
-            public BundleEntryDefinition BundleEntryDefinition;
+            public ComponentDefinition ComponentDefinition;
 
             public ComponentInfo ComponentInfo;
 
@@ -29,7 +29,7 @@ namespace Willcraftia.Xna.Framework.Component
         {
             protected override string GetKeyForItem(Holder item)
             {
-                return item.BundleEntryDefinition.Name;
+                return item.ComponentDefinition.Name;
             }
         }
 
@@ -147,7 +147,7 @@ namespace Willcraftia.Xna.Framework.Component
 
             foreach (var holder in holders)
             {
-                if (holder.Component == component) return holder.BundleEntryDefinition.Name;
+                if (holder.Component == component) return holder.ComponentDefinition.Name;
             }
 
             throw new ArgumentException("Component not found.");
@@ -190,14 +190,11 @@ namespace Willcraftia.Xna.Framework.Component
 
             var holder = new Holder
             {
-                BundleEntryDefinition = new BundleEntryDefinition
+                ComponentDefinition = new ComponentDefinition
                 {
                     Name = componentName,
-                    Component = new ComponentDefinition
-                    {
-                        Type = typeDefinitionName,
-                        Properties = propertyDefinitions
-                    }
+                    Type = typeDefinitionName,
+                    Properties = propertyDefinitions
                 },
                 ComponentInfo = componentInfo
             };
@@ -217,8 +214,8 @@ namespace Willcraftia.Xna.Framework.Component
             var propertyIndex = componentInfo.GetPropertyIndex(propertyName);
             if (propertyIndex < 0) throw new ArgumentNullException("Property not found: " + propertyName);
 
-            holder.BundleEntryDefinition.Component.Properties[propertyIndex].Name = propertyName;
-            holder.BundleEntryDefinition.Component.Properties[propertyIndex].Value = Convert.ToString(propertyValue);
+            holder.ComponentDefinition.Properties[propertyIndex].Name = propertyName;
+            holder.ComponentDefinition.Properties[propertyIndex].Value = Convert.ToString(propertyValue);
         }
 
         public void SetComponentReference(string componentName, string propertyName, string referenceName)
@@ -236,9 +233,9 @@ namespace Willcraftia.Xna.Framework.Component
             holders.Clear();
         }
 
-        public void Build(ref BundleDefinition definition)
+        public void Build(ref ComponentBundleDefinition definition)
         {
-            AddBundleDefinition(ref definition);
+            AddComponentBundleDefinition(ref definition);
             Build();
         }
 
@@ -255,7 +252,7 @@ namespace Willcraftia.Xna.Framework.Component
                 var componentInfo = holder.ComponentInfo;
                 var component = holder.Component;
 
-                var propertyDefinitions = holder.BundleEntryDefinition.Component.Properties;
+                var propertyDefinitions = holder.ComponentDefinition.Properties;
                 if (ArrayHelper.IsNullOrEmpty(propertyDefinitions)) continue;
 
                 for (int i = 0; i < propertyDefinitions.Length; i++)
@@ -291,42 +288,32 @@ namespace Willcraftia.Xna.Framework.Component
         // For deserialization.
         //
 
-        public void AddBundleDefinition(ref BundleDefinition definition)
+        public void AddComponentBundleDefinition(ref ComponentBundleDefinition definition)
         {
-            if (ArrayHelper.IsNullOrEmpty(definition.Entries)) return;
+            if (ArrayHelper.IsNullOrEmpty(definition.Components)) return;
 
-            AddBundleEntryDefinitions(definition.Entries);
+            for (int i = 0; i < definition.Components.Length; i++)
+                AddComponentDefinition(ref definition.Components[i]);
         }
 
-        public void AddBundleEntryDefinitions(BundleEntryDefinition[] definitions)
-        {
-            if (definitions == null) throw new ArgumentNullException("definitions");
-
-            for (int i = 0; i < definitions.Length; i++)
-                AddBundleEntryDefinition(ref definitions[i]);
-        }
-
-        public void AddBundleEntryDefinition(ref BundleEntryDefinition definition)
+        public void AddComponentDefinition(ref ComponentDefinition definition)
         {
             if (ContainsComponentName(definition.Name))
                 throw new ArgumentException("Component name duplicated: " + definition.Name);
 
-            var internalDefinition = new BundleEntryDefinition
+            var internalDefinition = new ComponentDefinition
             {
                 Name = definition.Name,
-                Component = new ComponentDefinition
-                {
-                    Type = definition.Component.Type
-                }
+                Type = definition.Type
             };
 
-            var componentInfo = GetComponentInfo(definition.Component.Type);
+            var componentInfo = GetComponentInfo(definition.Type);
 
             if (0 < componentInfo.PropertyCount)
             {
-                internalDefinition.Component.Properties = new PropertyDefinition[componentInfo.PropertyCount];
+                internalDefinition.Properties = new PropertyDefinition[componentInfo.PropertyCount];
 
-                var propertyDefinitions = definition.Component.Properties;
+                var propertyDefinitions = definition.Properties;
                 if (!ArrayHelper.IsNullOrEmpty(propertyDefinitions))
                 {
                     for (int i = 0; i < propertyDefinitions.Length; i++)
@@ -335,7 +322,7 @@ namespace Willcraftia.Xna.Framework.Component
                         var propertyValue = propertyDefinitions[i].Value;
 
                         var propertyIndex = componentInfo.GetPropertyIndex(propertyName);
-                        internalDefinition.Component.Properties[propertyIndex] = new PropertyDefinition
+                        internalDefinition.Properties[propertyIndex] = new PropertyDefinition
                         {
                             Name = propertyName,
                             Value = propertyValue
@@ -346,8 +333,8 @@ namespace Willcraftia.Xna.Framework.Component
 
             var holder = new Holder
             {
-                BundleEntryDefinition = internalDefinition,
-                ComponentInfo = GetComponentInfo(definition.Component.Type)
+                ComponentDefinition = internalDefinition,
+                ComponentInfo = GetComponentInfo(definition.Type)
             };
 
             holders.Add(holder);
@@ -361,23 +348,20 @@ namespace Willcraftia.Xna.Framework.Component
         // For serialization
         //
 
-        public void GetDefinition(out BundleDefinition definition)
+        public void GetComponentBundleDefinition(out ComponentBundleDefinition definition)
         {
-            definition = new BundleDefinition();
+            definition = new ComponentBundleDefinition();
 
             if (!CollectionHelper.IsNullOrEmpty(holders))
             {
-                definition.Entries = new BundleEntryDefinition[holders.Count];
+                definition.Components = new ComponentDefinition[holders.Count];
 
                 for (int i = 0; i < holders.Count; i++)
                 {
-                    definition.Entries[i] = new BundleEntryDefinition
+                    definition.Components[i] = new ComponentDefinition
                     {
-                        Name = holders[i].BundleEntryDefinition.Name,
-                        Component = new ComponentDefinition
-                        {
-                            Type = holders[i].BundleEntryDefinition.Component.Type
-                        }
+                        Name = holders[i].ComponentDefinition.Name,
+                        Type = holders[i].ComponentDefinition.Type
                     };
 
                     //
@@ -388,7 +372,7 @@ namespace Willcraftia.Xna.Framework.Component
                     // 上書きするプロパティ値を意味する。
                     //
 
-                    var propertyDefinitions = holders[i].BundleEntryDefinition.Component.Properties;
+                    var propertyDefinitions = holders[i].ComponentDefinition.Properties;
                     if (!ArrayHelper.IsNullOrEmpty(propertyDefinitions))
                     {
                         int definedPropertyCount = 0;
@@ -398,12 +382,12 @@ namespace Willcraftia.Xna.Framework.Component
                                 definedPropertyCount++;
                         }
 
-                        definition.Entries[i].Component.Properties = new PropertyDefinition[definedPropertyCount];
+                        definition.Components[i].Properties = new PropertyDefinition[definedPropertyCount];
                         for (int j = 0, k = 0; j < propertyDefinitions.Length; j++, k++)
                         {
                             if (!string.IsNullOrEmpty(propertyDefinitions[j].Name))
                             {
-                                definition.Entries[i].Component.Properties[k] = new PropertyDefinition
+                                definition.Components[i].Properties[k] = new PropertyDefinition
                                 {
                                     Name = propertyDefinitions[j].Name,
                                     Value = propertyDefinitions[j].Value

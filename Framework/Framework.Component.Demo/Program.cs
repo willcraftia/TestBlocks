@@ -52,10 +52,10 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Serialization
             //
 
-            BundleDefinition definition;
-            factory.GetDefinition(out definition);
+            ComponentBundleDefinition definition;
+            factory.GetComponentBundleDefinition(out definition);
 
-            var xmlSerializer = new XmlSerializerAdapter(typeof(BundleDefinition));
+            var xmlSerializer = new XmlSerializerAdapter(typeof(ComponentBundleDefinition));
             xmlSerializer.WriterSettings.Indent = true;
             xmlSerializer.WriterSettings.OmitXmlDeclaration = true;
 
@@ -70,10 +70,10 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             // Deserialization
             //
 
-            BundleDefinition deserializedDefinition;
+            ComponentBundleDefinition deserializedDefinition;
             using (var stream = resource.Open())
             {
-                deserializedDefinition = (BundleDefinition) xmlSerializer.Deserialize(stream, null);
+                deserializedDefinition = (ComponentBundleDefinition) xmlSerializer.Deserialize(stream, null);
             }
 
             //================================================================
@@ -82,7 +82,7 @@ namespace Willcraftia.Xna.Framework.Component.Demo
             //
 
             var otherFactory = new ComponentFactory(typeRegistory);
-            otherFactory.AddBundleDefinition(ref deserializedDefinition);
+            otherFactory.AddComponentBundleDefinition(ref deserializedDefinition);
             otherFactory.Build();
 
             // just debug

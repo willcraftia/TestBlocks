@@ -110,10 +110,9 @@
     <Compile Include="Component\TypeHandler.cs" />
     <Compile Include="Component\IInitializingComponent.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
-    <Compile Include="Component\BundleDefinition.cs" />
+    <Compile Include="Component\ComponentBundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />
     <Compile Include="Component\ComponentTypeRegistory.cs" />
-    <Compile Include="Component\BundleEntryDefinition.cs" />
     <Compile Include="Component\ComponentInfo.cs" />
     <Compile Include="Component\PropertyIgnoredAttribute.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />

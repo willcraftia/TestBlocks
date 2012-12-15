@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public interface IBiomeComponent
+    public interface IBiomeCore
     {
         float GetTemperature(int x, int z);
 

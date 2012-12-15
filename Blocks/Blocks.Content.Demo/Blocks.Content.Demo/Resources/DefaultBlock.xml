@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<BlockDefinition>
+﻿<BlockDefinition>
 	<Name>Default Block</Name>
 	<Mesh>Cube.json</Mesh>
 	<TopTile>DefaultTile.json</TopTile>

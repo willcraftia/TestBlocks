@@ -16,29 +16,30 @@ namespace Willcraftia.Xna.Blocks.Content
     {
         public const string ComponentName = "Target";
 
-        static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
+        public static ComponentTypeRegistory ComponentTypeRegistory { get; private set; }
 
-        DefinitionSerializer serializer = new DefinitionSerializer(typeof(BundleDefinition));
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(ComponentBundleDefinition));
 
         static BiomeLoader()
         {
-            NoiseHelper.SetTypeDefinitionNames(componentTypeRegistory);
+            ComponentTypeRegistory = new ComponentTypeRegistory();
+
+            NoiseHelper.SetTypeDefinitionNames(ComponentTypeRegistory);
 
             // 利用可能な実体の型を全て登録しておく。
-            componentTypeRegistory.SetTypeDefinitionName(typeof(BiomeComponent));
-            componentTypeRegistory.SetTypeDefinitionName(typeof(BiomeComponent.Range));
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiomeCore));
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiomeCore.Range));
         }
 
         public object Load(IResource resource)
         {
-            var definition = (BundleDefinition) serializer.Deserialize(resource);
+            var definition = (ComponentBundleDefinition) serializer.Deserialize(resource);
 
             var biome = new Biome { Resource = resource };
 
-            var factory = new ComponentFactory(componentTypeRegistory);
+            var factory = new ComponentFactory(ComponentTypeRegistory);
             factory.Build(ref definition);
-
-            biome.Component = factory[ComponentName] as IBiomeComponent;
+            biome.Core = factory[ComponentName] as IBiomeCore;
             biome.ComponentFactory = factory;
             
             return biome;
@@ -48,17 +49,17 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var biome = asset as Biome;
 
-            var factory = biome.ComponentFactory;
-            if (factory == null)
-            {
-                factory = new ComponentFactory(componentTypeRegistory);
-                biome.ComponentFactory = factory;
-            }
+            //var factory = biome.ComponentFactory;
+            //if (factory == null)
+            //{
+            //    factory = new ComponentFactory(componentTypeRegistory);
+            //    biome.ComponentFactory = factory;
+            //}
 
-            BundleDefinition definition;
-            factory.GetDefinition(out definition);
+            //BundleDefinition definition;
+            //factory.GetDefinition(out definition);
 
-            serializer.Serialize(resource, definition);
+            //serializer.Serialize(resource, definition);
 
             biome.Resource = resource;
         }

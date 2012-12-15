@@ -9,7 +9,7 @@ using Willcraftia.Xna.Framework.Noise;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class BiomeComponent : IBiomeComponent, IInitializingComponent
+    public sealed class DefaultBiomeCore : IBiomeCore, IInitializingComponent
     {
         public sealed class Range
         {
@@ -71,7 +71,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Range ForestRange { get; set; }
 
-        public BiomeComponent()
+        public DefaultBiomeCore()
         {
             BaseElement = BiomeElement.Forest;
             DesertRange = new Range

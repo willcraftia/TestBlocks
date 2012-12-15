@@ -7,9 +7,11 @@ using System.Xml.Serialization;
 
 namespace Willcraftia.Xna.Framework.Component
 {
-    [XmlRoot("Component")]
     public struct ComponentDefinition
     {
+        [XmlAttribute]
+        public string Name;
+
         [XmlAttribute]
         public string Type;
 

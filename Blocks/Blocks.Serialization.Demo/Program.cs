@@ -10,6 +10,7 @@ using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
+using Willcraftia.Xna.Blocks.Content;
 using Willcraftia.Xna.Blocks.Models;
 
 #endregion
@@ -136,29 +137,30 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             Console.WriteLine("BiomeComponent (BundleDefinition)");
             {
-                var biome = new Biome();
-                biome.ComponentFactory.AddComponent("Target", "BiomeComponent");
-                biome.ComponentFactory.SetPropertyValue("Target", "Name", "Default Biome Component");
-                biome.ComponentFactory.SetPropertyValue("Target", "HumidityNoise", "HumidityNoise");
-                biome.ComponentFactory.SetPropertyValue("Target", "TemperatureNoise", "TemperatureNoise");
+                var componentFactory = new ComponentFactory(BiomeLoader.ComponentTypeRegistory);
 
-                biome.ComponentFactory.AddComponent("HumidityNoise", "SumFractal");
-                biome.ComponentFactory.SetPropertyValue("HumidityNoise", "Source", "HumidityPerlin");
-                biome.ComponentFactory.AddComponent("HumidityPerlin", "Perlin");
-                biome.ComponentFactory.SetPropertyValue("HumidityPerlin", "Seed", 0);
+                componentFactory.AddComponent("Target", "DefaultBiomeCore");
+                componentFactory.SetPropertyValue("Target", "Name", "Default Biome");
+                componentFactory.SetPropertyValue("Target", "HumidityNoise", "HumidityNoise");
+                componentFactory.SetPropertyValue("Target", "TemperatureNoise", "TemperatureNoise");
 
-                biome.ComponentFactory.AddComponent("TemperatureNoise", "SumFractal");
-                biome.ComponentFactory.SetPropertyValue("TemperatureNoise", "Source", "TemperaturePerlin");
-                biome.ComponentFactory.AddComponent("TemperaturePerlin", "Perlin");
-                biome.ComponentFactory.SetPropertyValue("TemperaturePerlin", "Seed", 1);
+                componentFactory.AddComponent("HumidityNoise", "SumFractal");
+                componentFactory.SetPropertyValue("HumidityNoise", "Source", "HumidityPerlin");
+                componentFactory.AddComponent("HumidityPerlin", "Perlin");
+                componentFactory.SetPropertyValue("HumidityPerlin", "Seed", 0);
 
-                BundleDefinition biomeBundle;
-                biome.ComponentFactory.GetDefinition(out biomeBundle);
+                componentFactory.AddComponent("TemperatureNoise", "SumFractal");
+                componentFactory.SetPropertyValue("TemperatureNoise", "Source", "TemperaturePerlin");
+                componentFactory.AddComponent("TemperaturePerlin", "Perlin");
+                componentFactory.SetPropertyValue("TemperaturePerlin", "Seed", 1);
 
-                var jsonResource = SerializeToJson<BundleDefinition>("DefaultBiome", biomeBundle);
-                var xmlResource = SerializeToXml<BundleDefinition>("DefaultBiome", biomeBundle);
-                var fromJson = DeserializeFromJson<BundleDefinition>(jsonResource);
-                var fromXml = DeserializeFromXml<BundleDefinition>(xmlResource);
+                ComponentBundleDefinition biomeBundle;
+                componentFactory.GetComponentBundleDefinition(out biomeBundle);
+
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultBiome", biomeBundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultBiome", biomeBundle);
+                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
             }
             Console.WriteLine();
 
@@ -246,6 +248,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             var serializer = new XmlSerializerAdapter(typeof(T));
             serializer.WriterSettings.Indent = true;
             serializer.WriterSettings.IndentChars = "\t";
+            serializer.WriterSettings.OmitXmlDeclaration = true;
 
             var resource = FileResourceLoader.Instance.LoadResource("file:///" + directoryPath + "/" + baseFileName + ".xml");
             using (var stream = resource.Create())

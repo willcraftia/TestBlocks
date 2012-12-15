@@ -71,7 +71,7 @@
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\Biome.cs" />
-    <Compile Include="Models\BiomeComponent.cs" />
+    <Compile Include="Models\DefaultBiomeCore.cs" />
     <Compile Include="Models\BiomeManager.cs" />
     <Compile Include="Models\CatalogedBiomeManagerComponent.cs" />
     <Compile Include="Models\ChunkProcedure.cs" />
@@ -80,7 +80,7 @@
     <Compile Include="Models\FlatTerrainProcedureComponent.cs" />
     <Compile Include="Models\IAsset.cs" />
     <Compile Include="Models\IAssetReferencingComponent.cs" />
-    <Compile Include="Models\IBiomeComponent.cs" />
+    <Compile Include="Models\IBiomeCore.cs" />
     <Compile Include="Models\IBiomeManagerComponent.cs" />
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
@@ -88,7 +88,6 @@
     <Compile Include="Models\SingleBiomeManagerComponent.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
-    <Compile Include="Serialization\NoiseDefinition.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
     <Compile Include="Content\TileLoader.cs" />
     <Compile Include="BlockShape.cs" />

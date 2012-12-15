@@ -8,9 +8,9 @@ using System.Xml.Serialization;
 namespace Willcraftia.Xna.Framework.Component
 {
     [XmlRoot("Bundle")]
-    public struct BundleDefinition
+    public struct ComponentBundleDefinition
     {
-        [XmlArrayItem("Entry")]
-        public BundleEntryDefinition[] Entries;
+        [XmlArrayItem("Component")]
+        public ComponentDefinition[] Components;
     }
 }

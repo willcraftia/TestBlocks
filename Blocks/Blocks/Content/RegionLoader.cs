@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Blocks.Content
 
         static readonly Logger logger = new Logger(typeof(RegionLoader).Name);
 
-        static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
+        public static ComponentTypeRegistory ComponentTypeRegistory { get; private set; }
 
         ResourceManager resourceManager;
 
@@ -31,7 +31,9 @@ namespace Willcraftia.Xna.Blocks.Content
         
         static RegionLoader()
         {
-            componentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureComponent), "FlatTerrain");
+            ComponentTypeRegistory = new ComponentTypeRegistory();
+
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureComponent), "FlatTerrain");
         }
 
         public RegionLoader(ResourceManager resourceManager)
@@ -109,7 +111,7 @@ namespace Willcraftia.Xna.Blocks.Content
             return resourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
 
-        List<ChunkProcedure> ToChunkProcedures(BundleDefinition[] definitions)
+        List<ChunkProcedure> ToChunkProcedures(ComponentBundleDefinition[] definitions)
         {
             if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<ChunkProcedure>(0);
 
@@ -118,7 +120,7 @@ namespace Willcraftia.Xna.Blocks.Content
             {
                 var procedure = new ChunkProcedure();
 
-                var factory = new ComponentFactory(componentTypeRegistory);
+                var factory = new ComponentFactory(ComponentTypeRegistory);
                 factory.Build(ref definitions[i]);
 
                 procedure.Component = factory[ComponentName] as ChunkProcedureComponent;
@@ -130,23 +132,23 @@ namespace Willcraftia.Xna.Blocks.Content
             return list;
         }
 
-        BundleDefinition[] ToChunkProcedureDefinition(List<ChunkProcedure> procedures)
+        ComponentBundleDefinition[] ToChunkProcedureDefinition(List<ChunkProcedure> procedures)
         {
             if (CollectionHelper.IsNullOrEmpty(procedures)) return null;
 
-            var definitions = new BundleDefinition[procedures.Count];
+            var definitions = new ComponentBundleDefinition[procedures.Count];
             for (int i = 0; i < procedures.Count; i++)
             {
                 var procedure = procedures[i];
 
-                var factory = procedure.ComponentFactory;
-                if (factory == null)
-                {
-                    factory = new ComponentFactory(componentTypeRegistory);
-                    procedure.ComponentFactory = factory;
-                }
+                //var factory = procedure.ComponentFactory;
+                //if (factory == null)
+                //{
+                //    factory = new ComponentFactory(ComponentTypeRegistory);
+                //    procedure.ComponentFactory = factory;
+                //}
 
-                factory.GetDefinition(out definitions[i]);
+                //factory.GetDefinition(out definitions[i]);
             }
 
             return definitions;

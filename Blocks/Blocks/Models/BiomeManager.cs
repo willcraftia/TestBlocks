@@ -15,7 +15,7 @@ namespace Willcraftia.Xna.Blocks.Models
         
         public ComponentFactory ComponentFactory { get; set; }
 
-        public IBiomeComponent Component { get; set; }
+        public IBiomeCore Component { get; set; }
 
         public Biome GetBiome(Chunk chunk)
         {

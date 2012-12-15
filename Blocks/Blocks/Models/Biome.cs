@@ -18,21 +18,21 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ComponentFactory ComponentFactory { get; set; }
 
-        public IBiomeComponent Component { get; set; }
+        public IBiomeCore Core { get; set; }
 
         public float GetTemperature(int x, int z)
         {
-            return Component.GetTemperature(x, z);
+            return Core.GetTemperature(x, z);
         }
 
         public float GetHumidity(int x, int z)
         {
-            return Component.GetHumidity(x, z);
+            return Core.GetHumidity(x, z);
         }
 
         public BiomeElement GetBiomeElement(int x, int z)
         {
-            return Component.GetBiomeElement(x, z);
+            return Core.GetBiomeElement(x, z);
         }
     }
 }
