@@ -10,26 +10,16 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class BiomeManager : IAsset
     {
-        public const string ComponentName = "Component";
+        public const string ComponentName = "Target";
 
         static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
-
-        IBiomeManagerComponent component;
 
         // I/F
         public IResource Resource { get; set; }
         
         public ComponentFactory ComponentFactory { get; private set; }
 
-        public IBiomeManagerComponent Component
-        {
-            get
-            {
-                if (component == null)
-                    component = ComponentFactory[ComponentName] as IBiomeManagerComponent;
-                return component;
-            }
-        }
+        public IBiomeComponent Component { get; set; }
 
         static BiomeManager()
         {

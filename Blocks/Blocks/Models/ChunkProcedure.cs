@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkProcedure
     {
-        public const string ComponentName = "ChunkProcedure";
+        public const string ComponentName = "Target";
 
         static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
 

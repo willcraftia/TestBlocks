@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Biome : IAsset
     {
-        public const string ComponentName = "Component";
+        public const string ComponentName = "Target";
 
         static readonly ComponentTypeRegistory componentTypeRegistory = new ComponentTypeRegistory();
 

@@ -137,10 +137,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine("BiomeComponent (BundleDefinition)");
             {
                 var biome = new Biome();
-                biome.ComponentFactory.AddComponent("Component", "BiomeComponent");
-                biome.ComponentFactory.SetPropertyValue("Component", "Name", "Default Biome Component");
-                biome.ComponentFactory.SetPropertyValue("Component", "HumidityNoise", "HumidityNoise");
-                biome.ComponentFactory.SetPropertyValue("Component", "TemperatureNoise", "TemperatureNoise");
+                biome.ComponentFactory.AddComponent("Target", "BiomeComponent");
+                biome.ComponentFactory.SetPropertyValue("Target", "Name", "Default Biome Component");
+                biome.ComponentFactory.SetPropertyValue("Target", "HumidityNoise", "HumidityNoise");
+                biome.ComponentFactory.SetPropertyValue("Target", "TemperatureNoise", "TemperatureNoise");
 
                 biome.ComponentFactory.AddComponent("HumidityNoise", "SumFractal");
                 biome.ComponentFactory.SetPropertyValue("HumidityNoise", "Source", "HumidityPerlin");

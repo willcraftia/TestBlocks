@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Bundle>
 	<Entries>
-		<Entry Name="Component">
+		<Entry Name="Target">
 			<Component Type="BiomeComponent">
 				<Properties>
 					<Property Name="Name" Value="Default Biome Component" />
