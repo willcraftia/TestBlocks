@@ -19,6 +19,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         IChunkStore chunkStore;
 
+        VectorI3 chunkSize;
+
         // TODO
         // 初期容量の調整。
         //
@@ -33,15 +35,21 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-        public ChunkManager(Region region, IChunkStore chunkStore)
+        public VectorI3 ChunkSize
+        {
+            get { return chunkSize; }
+        }
+
+        public ChunkManager(Region region, IChunkStore chunkStore, VectorI3 chunkSize)
         {
             if (region == null) throw new ArgumentNullException("region");
             if (chunkStore == null) throw new ArgumentNullException("chunkStore");
 
             this.region = region;
             this.chunkStore = chunkStore;
+            this.chunkSize = chunkSize;
 
-            chunkPool = new Pool<Chunk>(() => { return new Chunk(region.ChunkSize); });
+            chunkPool = new Pool<Chunk>(() => { return new Chunk(chunkSize); });
             chunkMeshPool = new Pool<ChunkMesh>(() => { return new ChunkMesh(); });
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
         }
@@ -163,7 +171,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 return baseChunk[position.X, position.Y, position.Z];
 
             // position が baseChunk に含まれない場合は、それを含むアクティブな Chunk を探す。
-            var chunkSize = region.ChunkSize;
             var chunkPosition = baseChunk.Position;
             chunkPosition.X += position.X / chunkSize.X;
             chunkPosition.Y += position.Y / chunkSize.Y;

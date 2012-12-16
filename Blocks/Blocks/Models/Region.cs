@@ -13,16 +13,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Region : IAsset
     {
-        //====================================================================
-        // Efficiency
-
-        public VectorI3 ChunkSize;
-
-        public BoundingBoxI Bounds;
-
-        //
-        //====================================================================
-
         ChunkManager chunkManager;
 
         // I/F
@@ -33,6 +23,8 @@ namespace Willcraftia.Xna.Blocks.Models
         public IChunkStore ChunkStore { get; set; }
 
         public string Name { get; set; }
+
+        public BoundingBoxI Bounds { get; set; }
 
         public TileCatalog TileCatalog { get; set; }
 
@@ -46,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Initialize()
         {
-            chunkManager = new ChunkManager(this, ChunkStore);
+            chunkManager = new ChunkManager(this, ChunkStore, RegionManager.ChunkSize);
         }
 
         public void Update()

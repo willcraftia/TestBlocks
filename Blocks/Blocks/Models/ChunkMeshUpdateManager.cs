@@ -57,6 +57,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager chunkManager;
 
+        VectorI3 chunkSize;
+
         // TODO
         // プール サイズは、メモリ占有量の観点で決定する。
         Pool<Task> taskPool;
@@ -76,6 +78,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.region = region;
             this.chunkManager = chunkManager;
+
+            chunkSize = chunkManager.ChunkSize;
 
             taskPool = new Pool<Task>(() => { return new Task(this); });
         }
@@ -156,11 +160,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void BuildChunkMesh(Chunk chunk)
         {
-            for (int z = 0; z < region.ChunkSize.Z; z++)
+            for (int z = 0; z < chunkSize.Z; z++)
             {
-                for (int y = 0; y < region.ChunkSize.Y; y++)
+                for (int y = 0; y < chunkSize.Y; y++)
                 {
-                    for (int x = 0; x < region.ChunkSize.X; x++)
+                    for (int x = 0; x < chunkSize.X; x++)
                     {
                         var blockIndex = chunk[x, y, z];
                         if (Block.EmptyIndex == blockIndex)
@@ -252,8 +256,56 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool IsTranslucentSurface(Block block, Side side)
         {
-            var tile = block.GetTile(side);
+            var tile = GetTile(block, side);
             return tile != null && tile.Translucent;
+        }
+
+        Tile GetTile(Block block, Side side)
+        {
+            switch (side)
+            {
+                case Side.Top:
+                    return block.TopTile;
+                case Side.Bottom:
+                    return block.BottomTile;
+                case Side.Front:
+                    return block.FrontTile;
+                case Side.Back:
+                    return block.BackTile;
+                case Side.Left:
+                    return block.LeftTile;
+                case Side.Right:
+                    return block.RightTile;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        void SetTile(Block block, Side side, Tile tile)
+        {
+            switch (side)
+            {
+                case Side.Top:
+                    block.TopTile = tile;
+                    break;
+                case Side.Bottom:
+                    block.BottomTile = tile;
+                    break;
+                case Side.Front:
+                    block.FrontTile = tile;
+                    break;
+                case Side.Back:
+                    block.BackTile = tile;
+                    break;
+                case Side.Left:
+                    block.LeftTile = tile;
+                    break;
+                case Side.Right:
+                    block.RightTile = tile;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
         }
     }
 }

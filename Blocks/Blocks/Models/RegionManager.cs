@@ -24,7 +24,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         // TODO
         // どこで管理する？
-        public VectorI3 ChunkSize = new VectorI3(16, 16, 16);
+        public static VectorI3 ChunkSize = new VectorI3(16, 16, 16);
 
         //
         //====================================================================
@@ -85,7 +85,6 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(BiomeCatalog), new BiomeCatalogLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
-            region.ChunkSize = ChunkSize;
             region.AssetManager = assetManager;
             region.ChunkStore = new StorageChunkStore(resource);
             region.Initialize();
