@@ -81,6 +81,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(Block), new BlockLoader(resourceManager));
             assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader(resourceManager));
             assetManager.RegisterLoader(typeof(IBiome), new BiomeLoader());
+            assetManager.RegisterLoader(typeof(IBiomeManager), new BiomeManagerLoader(resourceManager));
             assetManager.RegisterLoader(typeof(BiomeCatalog), new BiomeCatalogLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);

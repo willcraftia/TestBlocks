@@ -1,10 +1,10 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Component;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
-using Willcraftia.Xna.Framework.Noise;
+using Willcraftia.Xna.Blocks.Component;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -12,7 +12,7 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Content
 {
-    public sealed class BiomeLoader : IAssetLoader
+    public sealed class BiomeManagerLoader : IAssetLoader, IAssetManagerAware
     {
         public const string ComponentName = "Target";
 
@@ -28,18 +28,32 @@ namespace Willcraftia.Xna.Blocks.Content
         // 非スレッド セーフ
         ComponentBundleBuilder componentBundleBuilder;
 
-        static BiomeLoader()
+        // 非スレッド セーフ
+        AssetPropertyHandler assetPropertyHandler = new AssetPropertyHandler();
+
+        // I/F
+        public AssetManager AssetManager
         {
-            ComponentTypeRegistory = new ComponentTypeRegistory();
-            NoiseHelper.SetTypeDefinitionNames(ComponentTypeRegistory);
-            // 利用可能な実体の型を全て登録しておく。
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiome));
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiome.Range));
+            set
+            {
+                assetPropertyHandler.AssetManager = value;
+            }
         }
 
-        public BiomeLoader()
+        static BiomeManagerLoader()
         {
+            ComponentTypeRegistory = new ComponentTypeRegistory();
+            // 利用可能な実体の型を全て登録しておく。
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(SingleBiomeManager));
+        }
+
+        public BiomeManagerLoader(ResourceManager resourceManager)
+        {
+            assetPropertyHandler.ResourceManager = resourceManager;
+
             componentFactory = new ComponentFactory(componentInfoManager);
+            componentFactory.PropertyHandlers.Add(assetPropertyHandler);
+            
             componentBundleBuilder = new ComponentBundleBuilder(componentInfoManager);
         }
 
@@ -47,29 +61,31 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (ComponentBundleDefinition) serializer.Deserialize(resource);
 
+            assetPropertyHandler.BaseResource = resource;
             componentFactory.Build(ref definition);
 
-            var biome = componentFactory[ComponentName] as IBiome;
-            
+            var biomeManager = componentFactory[ComponentName] as IBiomeManager;
+
             componentFactory.Clear();
+            assetPropertyHandler.BaseResource = null;
 
-            biome.Resource = resource;
+            biomeManager.Resource = resource;
 
-            return biome;
+            return biomeManager;
         }
 
         public void Save(IResource resource, object asset)
         {
-            var biome = asset as IBiome;
+            var biomeManager = asset as IBiomeManager;
 
-            componentBundleBuilder.Add(ComponentName, biome);
+            componentBundleBuilder.Add(ComponentName, biomeManager);
 
             ComponentBundleDefinition definition;
             componentBundleBuilder.BuildDefinition(out definition);
 
             serializer.Serialize(resource, definition);
 
-            biome.Resource = resource;
+            biomeManager.Resource = resource;
         }
     }
 }

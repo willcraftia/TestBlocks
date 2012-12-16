@@ -15,6 +15,8 @@ namespace Willcraftia.Xna.Framework.Component
 
         Dictionary<string, object> nameComponentMap = new Dictionary<string, object>();
 
+        Dictionary<object, string> externalReferenceMap;
+
         public ComponentBundleBuilder(ComponentInfoManager componentInfoManager)
         {
             if (componentInfoManager == null) throw new ArgumentNullException("componentInfoManager");
@@ -31,6 +33,15 @@ namespace Willcraftia.Xna.Framework.Component
 
             components.Add(component);
             nameComponentMap[name] = component;
+        }
+
+        public void AddExternalReference(object component, string uri)
+        {
+            if (component == null) throw new ArgumentNullException("component");
+            if (uri == null) throw new ArgumentNullException("uri");
+
+            if (externalReferenceMap == null) externalReferenceMap = new Dictionary<object, string>();
+            externalReferenceMap[component] = uri;
         }
 
         public bool Contains(string name)
@@ -52,6 +63,7 @@ namespace Willcraftia.Xna.Framework.Component
         {
             components.Clear();
             nameComponentMap.Clear();
+            if (externalReferenceMap != null) externalReferenceMap.Clear();
         }
 
         public string GetName(object component)
@@ -114,6 +126,10 @@ namespace Willcraftia.Xna.Framework.Component
                     {
                         stringValue = GetName(propertyValue);
                     }
+                    else if (externalReferenceMap != null && externalReferenceMap.ContainsKey(propertyValue))
+                    {
+                        stringValue = externalReferenceMap[propertyValue];
+                    }
 
                     definition.Components[i].Properties[j] = new PropertyDefinition
                     {
@@ -154,6 +170,9 @@ namespace Willcraftia.Xna.Framework.Component
                     continue;
 
                 if (components.Contains(propertyValue))
+                    continue;
+
+                if (externalReferenceMap != null && externalReferenceMap.ContainsKey(propertyValue))
                     continue;
 
                 var ownerComponentName = GetName(component);

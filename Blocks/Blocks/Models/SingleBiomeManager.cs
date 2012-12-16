@@ -11,6 +11,8 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class SingleBiomeManager : IBiomeManager
     {
+        public string Name { get; set; }
+
         public IBiome Biome { get; set; }
 
         // I/F

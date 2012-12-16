@@ -20,6 +20,19 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 {
     class Program
     {
+        class MockBiome : IBiome
+        {
+            public byte Index { get; set; }
+
+            public IResource Resource { get; set; }
+
+            public float GetTemperature(int x, int z) { throw new NotImplementedException(); }
+
+            public float GetHumidity(int x, int z) { throw new NotImplementedException(); }
+
+            public BiomeElement GetBiomeElement(int x, int z) { throw new NotImplementedException(); }
+        }
+
         static string directoryPath;
 
         static void Main(string[] args)
@@ -189,6 +202,32 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine();
 
             //================================================================
+            // SingleBiomeManager (ComponentBundleDefinition)
+
+            Console.WriteLine("SingleBiomeManager (ComponentBundleDefinition)");
+            {
+                var biomeManager = new SingleBiomeManager
+                {
+                    Name = "Default Biome Manager",
+                    Biome = new MockBiome()
+                };
+
+                var componentInfoManager = new ComponentInfoManager(BiomeManagerLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+                builder.AddExternalReference(biomeManager.Biome, "DefaultBiome.json");
+                builder.Add("Target", biomeManager);
+
+                ComponentBundleDefinition biomeBundle;
+                builder.BuildDefinition(out biomeBundle);
+
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultBiomeManager", biomeBundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultBiomeManager", biomeBundle);
+                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            //================================================================
             // RegionDefinition
 
             Console.WriteLine("RegionDefinition");
@@ -199,7 +238,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
                     TileCatalog = "DefaultTileCatalog.json",
                     BlockCatalog = "DefaultBlockCatalog.json",
-                    BiomeCatalog = "DefaultBiomeCatalog.json"
+                    BiomeManager = "DefaultBiomeManager.json"
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlResource = SerializeToXml<RegionDefinition>("DefaultRegion", region);

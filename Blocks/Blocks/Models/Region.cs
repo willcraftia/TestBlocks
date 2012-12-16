@@ -38,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public BlockCatalog BlockCatalog { get; set; }
 
-        public BiomeCatalog BiomeCatalog { get; set; }
+        public IBiomeManager BiomeManager { get; set; }
 
         public IResource ChunkBundleResource { get; set; }
 

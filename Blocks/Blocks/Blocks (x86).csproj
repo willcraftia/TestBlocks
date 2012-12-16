@@ -62,6 +62,7 @@
     <Compile Include="Component\AssetPropertyHandler.cs" />
     <Compile Include="Content\BiomeCatalogLoader.cs" />
     <Compile Include="Content\BiomeLoader.cs" />
+    <Compile Include="Content\BiomeManagerLoader.cs" />
     <Compile Include="Content\BlockCatalogLoader.cs" />
     <Compile Include="Content\BlockLoader.cs" />
     <Compile Include="Content\Image2DLoader.cs" />

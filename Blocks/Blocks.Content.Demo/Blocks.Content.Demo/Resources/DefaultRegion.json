@@ -14,7 +14,7 @@
   },
   "TileCatalog": "DefaultTileCatalog.json",
   "BlockCatalog": "DefaultBlockCatalog.json",
-  "BiomeCatalog": "DefaultBiomeCatalog.json",
+  "BiomeManager": "DefaultBiomeManager.json",
   "ChunkBundle": null,
   "ChunkProcedures": null
 }

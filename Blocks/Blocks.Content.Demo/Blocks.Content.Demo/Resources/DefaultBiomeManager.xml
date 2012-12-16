@@ -1,0 +1,10 @@
+﻿<Bundle>
+	<Components>
+		<Component Name="Target" Type="SingleBiomeManager">
+			<Properties>
+				<Property Name="Name" Value="Default Biome Manager" />
+				<Property Name="Biome" Value="DefaultBiome.json" />
+			</Properties>
+		</Component>
+	</Components>
+</Bundle>

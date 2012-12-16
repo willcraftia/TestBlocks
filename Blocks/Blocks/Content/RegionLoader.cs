@@ -28,10 +28,10 @@ namespace Willcraftia.Xna.Blocks.Content
 
         ComponentInfoManager componentInfoManager = new ComponentInfoManager(ComponentTypeRegistory);
 
-        // スレッド セーフではない使い方をします。
+        // 非スレッド セーフ
         ComponentFactory componentFactory;
 
-        // スレッド セーフではない使い方をします。
+        // 非スレッド セーフ
         ComponentBundleBuilder componentBundleBuilder;
 
         // I/F
@@ -65,7 +65,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 Bounds = definition.Bounds,
                 TileCatalog = Load<TileCatalog>(resource, definition.TileCatalog),
                 BlockCatalog = Load<BlockCatalog>(resource, definition.BlockCatalog),
-                BiomeCatalog = Load<BiomeCatalog>(resource, definition.BiomeCatalog),
+                BiomeManager = Load<IBiomeManager>(resource, definition.BiomeManager),
                 ChunkBundleResource = Load(resource, definition.ChunkBundle),
                 ChunkProcesures = ToChunkProcedures(definition.ChunkProcedures)
             };
@@ -82,7 +82,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 Bounds = region.Bounds,
                 TileCatalog = ToUri(resource, region.TileCatalog),
                 BlockCatalog = ToUri(resource, region.BlockCatalog),
-                BiomeCatalog = ToUri(resource, region.BiomeCatalog),
+                BiomeManager = ToUri(resource, region.BiomeManager),
                 ChunkBundle = ToUri(resource, region.ChunkBundleResource),
                 ChunkProcedures = ToChunkProcedureDefinition(region.ChunkProcesures)
             };

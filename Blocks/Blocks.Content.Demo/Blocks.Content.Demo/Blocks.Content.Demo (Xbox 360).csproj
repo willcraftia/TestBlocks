@@ -49,6 +49,7 @@
     <None Include="Resources\Cube.json" />
     <None Include="Resources\DefaultBiome.json" />
     <None Include="Resources\DefaultBiomeCatalog.json" />
+    <None Include="Resources\DefaultBiomeManager.json" />
     <None Include="Resources\DefaultBlock.json" />
     <None Include="Resources\DefaultBlockCatalog.json" />
     <None Include="Resources\DefaultRegion.json" />
@@ -66,6 +67,7 @@
     <Content Include="Resources\Cube.xml" />
     <Content Include="Resources\DefaultBiome.xml" />
     <Content Include="Resources\DefaultBiomeCatalog.xml" />
+    <Content Include="Resources\DefaultBiomeManager.xml" />
     <Content Include="Resources\DefaultBlock.xml" />
     <Content Include="Resources\DefaultBlockCatalog.xml" />
     <Content Include="Resources\DefaultRegion.xml" />

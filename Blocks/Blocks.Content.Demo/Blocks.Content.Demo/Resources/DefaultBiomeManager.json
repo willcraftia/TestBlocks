@@ -1,0 +1,18 @@
+{
+  "Components": [
+    {
+      "Name": "Target",
+      "Type": "SingleBiomeManager",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Default Biome Manager"
+        },
+        {
+          "Name": "Biome",
+          "Value": "DefaultBiome.json"
+        }
+      ]
+    }
+  ]
+}
