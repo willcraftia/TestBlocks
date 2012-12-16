@@ -3,14 +3,17 @@
 using System;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Component;
+using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Noise;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class DefaultBiomeCore : IBiomeCore, IInitializingComponent
+    public sealed class DefaultBiome : IBiome, IInitializingComponent
     {
+        #region Range
+
         public sealed class Range
         {
             float minTemperature;
@@ -53,6 +56,13 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        #endregion
+
+        //====================================================================
+        //
+        // Persistent Properties
+        //
+
         public string Name { get; set; }
 
         public INoiseSource HumidityNoise { get; set; }
@@ -71,7 +81,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Range ForestRange { get; set; }
 
-        public DefaultBiomeCore()
+        //
+        //====================================================================
+
+        // I/F
+        [PropertyIgnored]
+        public IResource Resource { get; set; }
+
+        [PropertyIgnored]
+        public byte Index { get; set; }
+
+        public DefaultBiome()
         {
             BaseElement = BiomeElement.Forest;
             DesertRange = new Range

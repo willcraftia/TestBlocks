@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class DefinedBiomeManagerCore : CatalogedBiomeManagerCore
+    public sealed class DefinedBiomeManager : CatalogedBiomeManager
     {
         protected override byte GetBiomeIndex(Chunk chunk)
         {

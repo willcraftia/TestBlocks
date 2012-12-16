@@ -2,7 +2,7 @@
 	<Name>Default Biome Catalog</Name>
 	<Entries>
 		<IndexedUriDefinition>
-			<Index>1</Index>
+			<Index>0</Index>
 			<Uri>DefaultBiome.json</Uri>
 		</IndexedUriDefinition>
 	</Entries>

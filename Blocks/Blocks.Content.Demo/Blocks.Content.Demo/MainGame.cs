@@ -75,19 +75,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             logger.InfoEnd("Initialize");
         }
 
-        class DelegateTarget
-        {
-            public int TestFunction(int value)
-            {
-                return value;
-            }
-        }
-
-        class DelegateOwner
-        {
-            public Func<int, int> Func { get; set; }
-        }
-
         protected override void LoadContent()
         {
             logger.InfoBegin("LoadContent");
@@ -103,25 +90,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             var spriteFontUri = ContentResourceLoader.Instance.LoadResource("content:Fonts/Demo");
             var spriteFont = region.AssetManager.Load<SpriteFont>(spriteFontUri);
-
-            DelegateTarget target = new DelegateTarget();
-            DelegateOwner owner = new DelegateOwner
-            {
-                Func = target.TestFunction
-            };
-
-            var properties = owner.GetType().GetProperties();
-            foreach (var property in properties)
-            {
-                if (typeof(Delegate).IsAssignableFrom(property.PropertyType))
-                {
-                    var d = property.GetValue(owner, null) as Delegate;
-                    var t = d.Target;
-                    Console.WriteLine("t = " + t);
-                }
-            }
-
-            var value = Convert.ToString(owner);
 
             logger.InfoEnd("LoadContent");
         }

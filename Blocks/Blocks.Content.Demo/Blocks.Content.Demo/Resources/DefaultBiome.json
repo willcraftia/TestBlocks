@@ -2,7 +2,7 @@
   "Components": [
     {
       "Name": "Target",
-      "Type": "DefaultBiomeCore",
+      "Type": "DefaultBiome",
       "Properties": [
         {
           "Name": "Name",

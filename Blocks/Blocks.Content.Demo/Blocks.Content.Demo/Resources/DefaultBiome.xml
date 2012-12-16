@@ -1,6 +1,6 @@
 ﻿<Bundle>
 	<Components>
-		<Component Name="Target" Type="DefaultBiomeCore">
+		<Component Name="Target" Type="DefaultBiome">
 			<Properties>
 				<Property Name="Name" Value="Default Biome" />
 				<Property Name="HumidityNoise" Value="Target_HumidityNoise" />

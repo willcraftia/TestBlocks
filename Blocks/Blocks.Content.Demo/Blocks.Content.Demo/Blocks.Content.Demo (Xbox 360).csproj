@@ -46,8 +46,14 @@
     <None Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </None>
+    <None Include="Resources\Cube.json" />
     <None Include="Resources\DefaultBiome.json" />
     <None Include="Resources\DefaultBiomeCatalog.json" />
+    <None Include="Resources\DefaultBlock.json" />
+    <None Include="Resources\DefaultBlockCatalog.json" />
+    <None Include="Resources\DefaultRegion.json" />
+    <None Include="Resources\DefaultTile.json" />
+    <None Include="Resources\DefaultTileCatalog.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -57,8 +63,15 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="Resources\Cube.xml" />
     <Content Include="Resources\DefaultBiome.xml" />
     <Content Include="Resources\DefaultBiomeCatalog.xml" />
+    <Content Include="Resources\DefaultBlock.xml" />
+    <Content Include="Resources\DefaultBlockCatalog.xml" />
+    <Content Include="Resources\DefaultRegion.xml" />
+    <Content Include="Resources\DefaultTile.png" />
+    <Content Include="Resources\DefaultTile.xml" />
+    <Content Include="Resources\DefaultTileCatalog.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Framework.IO.Compression\Framework.IO.Compression\Framework.IO.Compression (Xbox 360).csproj">

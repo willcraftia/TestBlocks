@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 
@@ -8,14 +9,16 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public abstract class CatalogedBiomeManagerCore : IBiomeManagerCore
+    public abstract class CatalogedBiomeManager : IBiomeManager
     {
-        public string BiomeCatalogUri { get; set; }
-
         public BiomeCatalog BiomeCatalog { get; private set; }
 
         // I/F
-        public Biome GetBiome(Chunk chunk)
+        [PropertyIgnored]
+        public IResource Resource { get; set; }
+
+        // I/F
+        public IBiome GetBiome(Chunk chunk)
         {
             return BiomeCatalog[GetBiomeIndex(chunk)];
         }

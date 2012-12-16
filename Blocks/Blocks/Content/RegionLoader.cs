@@ -31,13 +31,16 @@ namespace Willcraftia.Xna.Blocks.Content
         // スレッド セーフではない使い方をします。
         ComponentFactory componentFactory;
 
+        // スレッド セーフではない使い方をします。
+        ComponentBundleBuilder componentBundleBuilder;
+
         // I/F
         public AssetManager AssetManager { private get; set; }
 
         static RegionLoader()
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedureCore), "FlatTerrain");
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedure), "FlatTerrain");
         }
 
         public RegionLoader(ResourceManager resourceManager)
@@ -47,6 +50,7 @@ namespace Willcraftia.Xna.Blocks.Content
             this.resourceManager = resourceManager;
 
             componentFactory = new ComponentFactory(componentInfoManager);
+            componentBundleBuilder = new ComponentBundleBuilder(componentInfoManager);
         }
 
         // I/F
@@ -117,42 +121,34 @@ namespace Willcraftia.Xna.Blocks.Content
             return resourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
 
-        List<ChunkProcedure> ToChunkProcedures(ComponentBundleDefinition[] definitions)
+        List<IChunkProcedure> ToChunkProcedures(ComponentBundleDefinition[] definitions)
         {
-            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<ChunkProcedure>(0);
+            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<IChunkProcedure>(0);
 
-            var list = new List<ChunkProcedure>(definitions.Length);
+            var list = new List<IChunkProcedure>(definitions.Length);
             for (int i = 0; i < definitions.Length; i++)
             {
-                var procedure = new ChunkProcedure();
-
                 componentFactory.Build(ref definitions[i]);
-                procedure.Component = componentFactory[ComponentName] as ChunkProcedureCore;
-                componentFactory.Clear();
-
+                
+                var procedure = componentFactory[ComponentName] as IChunkProcedure;
                 list.Add(procedure);
+                
+                componentFactory.Clear();
             }
 
             return list;
         }
 
-        ComponentBundleDefinition[] ToChunkProcedureDefinition(List<ChunkProcedure> procedures)
+        ComponentBundleDefinition[] ToChunkProcedureDefinition(List<IChunkProcedure> procedures)
         {
             if (CollectionHelper.IsNullOrEmpty(procedures)) return null;
 
             var definitions = new ComponentBundleDefinition[procedures.Count];
             for (int i = 0; i < procedures.Count; i++)
             {
-                var procedure = procedures[i];
-
-                //var factory = procedure.ComponentFactory;
-                //if (factory == null)
-                //{
-                //    factory = new ComponentFactory(ComponentTypeRegistory);
-                //    procedure.ComponentFactory = factory;
-                //}
-
-                //factory.GetDefinition(out definitions[i]);
+                componentBundleBuilder.Add(ComponentName, procedures[i]);
+                componentBundleBuilder.BuildDefinition(out definitions[i]);
+                componentBundleBuilder.Clear();
             }
 
             return definitions;

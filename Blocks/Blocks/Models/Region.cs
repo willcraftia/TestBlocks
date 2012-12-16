@@ -42,7 +42,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public IResource ChunkBundleResource { get; set; }
 
-        public List<ChunkProcedure> ChunkProcesures { get; set; }
+        public List<IChunkProcedure> ChunkProcesures { get; set; }
 
         public void Initialize()
         {

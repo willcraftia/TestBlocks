@@ -38,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Content
 
             foreach (var entry in definition.Entries)
             {
-                var biome = Load<Biome>(resource, entry.Uri);
+                var biome = Load<IBiome>(resource, entry.Uri);
                 if (biome != null)
                 {
                     biome.Index = entry.Index;

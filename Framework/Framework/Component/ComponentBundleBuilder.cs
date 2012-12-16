@@ -48,6 +48,12 @@ namespace Willcraftia.Xna.Framework.Component
             }
         }
 
+        public void Clear()
+        {
+            components.Clear();
+            nameComponentMap.Clear();
+        }
+
         public string GetName(object component)
         {
             foreach (var nameComponentPair in nameComponentMap)

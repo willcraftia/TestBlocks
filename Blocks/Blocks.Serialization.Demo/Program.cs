@@ -134,11 +134,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine();
 
             //================================================================
-            // BiomeComponent (BundleDefinition)
+            // DefaultBiome (ComponentBundleDefinition)
 
-            Console.WriteLine("BiomeComponent (BundleDefinition)");
+            Console.WriteLine("DefaultBiome (ComponentBundleDefinition)");
             {
-                var biomeCore = new DefaultBiomeCore
+                var biome = new DefaultBiome
                 {
                     Name = "Default Biome",
                     HumidityNoise = new SumFractal
@@ -153,7 +153,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 var componentInfoManager = new ComponentInfoManager(BiomeLoader.ComponentTypeRegistory);
                 var builder = new ComponentBundleBuilder(componentInfoManager);
-                builder.Add("Target", biomeCore);
+                builder.Add("Target", biome);
 
                 ComponentBundleDefinition biomeBundle;
                 builder.BuildDefinition(out biomeBundle);
@@ -177,7 +177,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     {
                         new IndexedUriDefinition
                         {
-                            Index = 1, Uri = "DefaultBiome.json"
+                            Index = 0, Uri = "DefaultBiome.json"
                         }
                     }
                 };

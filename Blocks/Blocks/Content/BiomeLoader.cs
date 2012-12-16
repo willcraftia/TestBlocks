@@ -25,48 +25,49 @@ namespace Willcraftia.Xna.Blocks.Content
         // スレッド セーフではない使い方をします。
         ComponentFactory componentFactory;
 
+        // スレッド セーフではない使い方をします。
+        ComponentBundleBuilder componentBundleBuilder;
+
         static BiomeLoader()
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
             NoiseHelper.SetTypeDefinitionNames(ComponentTypeRegistory);
             // 利用可能な実体の型を全て登録しておく。
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiomeCore));
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiomeCore.Range));
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiome));
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(DefaultBiome.Range));
         }
 
         public BiomeLoader()
         {
             componentFactory = new ComponentFactory(componentInfoManager);
+            componentBundleBuilder = new ComponentBundleBuilder(componentInfoManager);
         }
 
         public object Load(IResource resource)
         {
             var definition = (ComponentBundleDefinition) serializer.Deserialize(resource);
 
-            var biome = new Biome { Resource = resource };
-
             componentFactory.Build(ref definition);
-            biome.Core = componentFactory[ComponentName] as IBiomeCore;
+
+            var biome = componentFactory[ComponentName] as IBiome;
+            
             componentFactory.Clear();
+
+            biome.Resource = resource;
 
             return biome;
         }
 
         public void Save(IResource resource, object asset)
         {
-            var biome = asset as Biome;
+            var biome = asset as IBiome;
 
-            //var factory = biome.ComponentFactory;
-            //if (factory == null)
-            //{
-            //    factory = new ComponentFactory(componentTypeRegistory);
-            //    biome.ComponentFactory = factory;
-            //}
+            componentBundleBuilder.Add(ComponentName, biome);
 
-            //BundleDefinition definition;
-            //factory.GetDefinition(out definition);
+            ComponentBundleDefinition definition;
+            componentBundleBuilder.BuildDefinition(out definition);
 
-            //serializer.Serialize(resource, definition);
+            serializer.Serialize(resource, definition);
 
             biome.Resource = resource;
         }
