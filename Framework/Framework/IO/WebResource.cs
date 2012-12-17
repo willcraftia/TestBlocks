@@ -3,13 +3,23 @@
 using System;
 using System.IO;
 
+#if WINDOWS
+using System.Net;
+#endif
+
 #endregion
 
 namespace Willcraftia.Xna.Framework.IO
 {
-    public sealed class ContentResource : IResource, IEquatable<ContentResource>
+    public sealed class WebResource : IResource, IEquatable<WebResource>
     {
-        public const string ContentScheme = "content";
+        public const string HttpScheme = "http";
+
+        public const string HttpsScheme = "https";
+
+        string extension;
+
+        object extensionLock = new object();
 
         string baseUri;
 
@@ -19,10 +29,7 @@ namespace Willcraftia.Xna.Framework.IO
         public string AbsoluteUri { get; internal set; }
 
         // I/F
-        public string Scheme
-        {
-            get { return ContentScheme; }
-        }
+        public string Scheme { get; internal set; }
 
         // I/F
         public string AbsolutePath { get; internal set; }
@@ -30,7 +37,15 @@ namespace Willcraftia.Xna.Framework.IO
         // I/F
         public string Extension
         {
-            get { return string.Empty; }
+            get
+            {
+                lock (extensionLock)
+                {
+                    if (extension == null)
+                        extension = Path.GetExtension(AbsolutePath);
+                    return extension;
+                }
+            }
         }
 
         // I/F
@@ -51,28 +66,46 @@ namespace Willcraftia.Xna.Framework.IO
                         var lastSlash = AbsolutePath.LastIndexOf('/');
                         if (lastSlash < 0) lastSlash = 0;
                         var basePath = AbsolutePath.Substring(0, lastSlash + 1);
-                        baseUri = ContentScheme + ":" + basePath;
+                        baseUri = Scheme + "://" + basePath;
                     }
                     return baseUri;
                 }
             }
         }
 
-        internal ContentResource() { }
+        public StorageResource LocalResource { get; internal set; }
+
+        internal WebResource() { }
 
         // I/F
-        public Stream Open() { throw new NotSupportedException(); }
+        public Stream Open()
+        {
+#if WINDOWS
+            var request = WebRequest.Create(AbsoluteUri);
+            var response = request.GetResponse();
+
+            return response.GetResponseStream();
+#else
+            throw new NotSupportedException();
+#endif
+        }
 
         // I/F
-        public Stream Create() { throw new NotSupportedException(); }
+        public Stream Create()
+        {
+            throw new NotSupportedException();
+        }
 
         // I/F
-        public void Delete() { throw new NotSupportedException(); }
+        public void Delete()
+        {
+            throw new NotSupportedException();
+        }
 
         #region Equatable
 
         // I/F
-        public bool Equals(ContentResource other)
+        public bool Equals(WebResource other)
         {
             return AbsoluteUri == other.AbsoluteUri;
         }
@@ -81,7 +114,7 @@ namespace Willcraftia.Xna.Framework.IO
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((ContentResource) obj);
+            return Equals((WebResource) obj);
         }
 
         public override int GetHashCode()

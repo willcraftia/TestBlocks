@@ -93,8 +93,13 @@
     <Compile Include="Content\AssetHolder.cs" />
     <Compile Include="Content\AssetHolderCollection.cs" />
     <Compile Include="Content\AssetManager.cs" />
+    <Compile Include="Content\DownloadDefinition.cs" />
+    <Compile Include="Content\DownloadInfo.cs" />
+    <Compile Include="Content\DownloadInfoCollection.cs" />
+    <Compile Include="Content\DownloadListDefinition.cs" />
     <Compile Include="Content\IAssetLoader.cs" />
     <Compile Include="Content\IAssetManagerAware.cs" />
+    <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="Cameras\PerspectiveFov.cs" />
@@ -118,6 +123,7 @@
     <Compile Include="Component\ComponentInfo.cs" />
     <Compile Include="Component\PropertyIgnoredAttribute.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />
+    <Compile Include="Content\WebAssetManager.cs" />
     <Compile Include="IO\ContentResource.cs" />
     <Compile Include="IO\ContentResourceLoader.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
@@ -140,6 +146,8 @@
     <Compile Include="Graphics\WritableVertexBuffer.cs" />
     <Compile Include="IO\IResource.cs" />
     <Compile Include="IO\ResourceLoader.cs" />
+    <Compile Include="IO\WebResource.cs" />
+    <Compile Include="IO\WebResourceLoader.cs" />
     <Compile Include="Noise\ChebychevMetric.cs" />
     <Compile Include="Noise\CrackleVoronoi.cs" />
     <Compile Include="Noise\Difference10Voronoi.cs" />

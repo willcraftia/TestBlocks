@@ -5,7 +5,7 @@ using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
-namespace Willcraftia.Xna.Blocks.Models
+namespace Willcraftia.Xna.Framework.Content
 {
     public interface IAsset
     {

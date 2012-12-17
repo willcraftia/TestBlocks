@@ -76,7 +76,6 @@
     <Compile Include="Models\IChunkProcedure.cs" />
     <Compile Include="Models\DefinedBiomeManager.cs" />
     <Compile Include="Models\FlatTerrainProcedure.cs" />
-    <Compile Include="Models\IAsset.cs" />
     <Compile Include="Models\IBiome.cs" />
     <Compile Include="Models\IBiomeManager.cs" />
     <Compile Include="Models\Image2D.cs" />

@@ -16,6 +16,10 @@ namespace Willcraftia.Xna.Framework.Content
 
         NoCacheContentManager contentManager;
 
+#if WINDOWS
+        WebAssetManager webAssetManager;
+#endif
+
         AssetHolderCollection holders = new AssetHolderCollection();
 
         Dictionary<Type, IAssetLoader> loaderMap;
@@ -33,6 +37,10 @@ namespace Willcraftia.Xna.Framework.Content
             contentManager = new NoCacheContentManager(serviceProvider);
             contentManager.RootDirectory = "Content";
             loaderMap = new Dictionary<Type, IAssetLoader>();
+
+#if WINDOWS
+            webAssetManager = new WebAssetManager(this);
+#endif
         }
 
         public void RegisterLoader(Type type, IAssetLoader loader)
@@ -78,19 +86,28 @@ namespace Willcraftia.Xna.Framework.Content
             logger.InfoBegin("LoadNew: {0}", resource);
 
             object asset;
-            IAssetLoader loader;
             if (resource is ContentResource)
             {
                 // XNA content framework
                 asset = contentManager.Load<object>(resource.AbsolutePath);
-                loader = null;
+            }
+            else if (resource is WebResource)
+            {
+                // Web resource.
+#if WINDOWS
+                asset = webAssetManager.Load(resource as WebResource, type);
+#else
+                throw new NotSupportedException();
+#endif
             }
             else
             {
                 // My asset framework
-                loader = GetLoader(type);
-                asset = loader.Load(resource);
+                asset = GetLoader(type).Load(resource);
             }
+
+            var assetInterface = asset as IAsset;
+            if (assetInterface != null) assetInterface.Resource = resource;
 
             // Cache
             var holder = new AssetHolder { Resource = resource, Asset = asset };

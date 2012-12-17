@@ -46,6 +46,20 @@ namespace Willcraftia.Xna.Framework.IO
         }
 
         // I/F
+        public bool ReadOnly
+        {
+            get
+            {
+#if XBOX
+                return true;
+#else
+                var attributes = File.GetAttributes(AbsolutePath);
+                return (attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
+#endif
+            }
+        }
+
+        // I/F
         public string BaseUri
         {
             get
@@ -64,18 +78,9 @@ namespace Willcraftia.Xna.Framework.IO
             }
         }
 
-        // I/F
-        public bool ReadOnly
+        public bool Exists()
         {
-            get
-            {
-#if XBOX
-                return true;
-#else
-                var attributes = File.GetAttributes(AbsolutePath);
-                return (attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
-#endif
-            }
+            return File.Exists(AbsolutePath);
         }
 
         internal FileResource() { }
@@ -99,16 +104,6 @@ namespace Willcraftia.Xna.Framework.IO
         }
 
         #region Equatable
-
-        public static bool operator ==(FileResource p1, FileResource p2)
-        {
-            return p1.Equals(p2);
-        }
-
-        public static bool operator !=(FileResource p1, FileResource p2)
-        {
-            return !p1.Equals(p2);
-        }
 
         // I/F
         public bool Equals(FileResource other)

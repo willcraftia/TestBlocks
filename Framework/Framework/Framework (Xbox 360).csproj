@@ -120,9 +120,15 @@
     <Compile Include="Content\AssetHolder.cs" />
     <Compile Include="Content\AssetHolderCollection.cs" />
     <Compile Include="Content\AssetManager.cs" />
+    <Compile Include="Content\DownloadDefinition.cs" />
+    <Compile Include="Content\DownloadInfo.cs" />
+    <Compile Include="Content\DownloadInfoCollection.cs" />
+    <Compile Include="Content\DownloadListDefinition.cs" />
+    <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\IAssetLoader.cs" />
     <Compile Include="Content\IAssetManagerAware.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
+    <Compile Include="Content\WebAssetManager.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />
     <Compile Include="Diagnostics\DebugLayout.cs" />
@@ -150,6 +156,8 @@
     <Compile Include="IO\StorageResourceLoader.cs" />
     <Compile Include="IO\TitleResource.cs" />
     <Compile Include="IO\TitleResourceLoader.cs" />
+    <Compile Include="IO\WebResource.cs" />
+    <Compile Include="IO\WebResourceLoader.cs" />
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionCollection.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />

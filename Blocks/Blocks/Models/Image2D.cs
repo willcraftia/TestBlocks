@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 
 #endregion

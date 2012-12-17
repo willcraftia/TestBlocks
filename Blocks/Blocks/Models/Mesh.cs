@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 
 #endregion

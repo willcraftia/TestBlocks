@@ -87,16 +87,6 @@ namespace Willcraftia.Xna.Framework.IO
 
         #region Equatable
 
-        public static bool operator ==(TitleResource p1, TitleResource p2)
-        {
-            return p1.Equals(p2);
-        }
-
-        public static bool operator !=(TitleResource p1, TitleResource p2)
-        {
-            return !p1.Equals(p2);
-        }
-
         // I/F
         public bool Equals(TitleResource other)
         {

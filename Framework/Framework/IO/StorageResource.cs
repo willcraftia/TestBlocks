@@ -70,6 +70,12 @@ namespace Willcraftia.Xna.Framework.IO
             }
         }
 
+        public bool Exists()
+        {
+            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
+            return storageContainer.FileExists(AbsolutePath);
+        }
+
         internal StorageResource() { }
 
         // I/F
@@ -99,16 +105,6 @@ namespace Willcraftia.Xna.Framework.IO
         }
 
         #region Equatable
-
-        public static bool operator ==(StorageResource p1, StorageResource p2)
-        {
-            return p1.Equals(p2);
-        }
-
-        public static bool operator !=(StorageResource p1, StorageResource p2)
-        {
-            return !p1.Equals(p2);
-        }
 
         // I/F
         public bool Equals(StorageResource other)
