@@ -31,7 +31,7 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public void Generate(Chunk instance)
+        public void Generate(Chunk chunk)
         {
             var grassIndex = ResolveBlockIndex(TerrainBlockTypes.Grass);
             var dirtIndex = ResolveBlockIndex(TerrainBlockTypes.Dirt);
@@ -40,16 +40,16 @@ namespace Willcraftia.Xna.Blocks.Models
             var snowIndex = ResolveBlockIndex(TerrainBlockTypes.Snow);
             var stoneIndex = ResolveBlockIndex(TerrainBlockTypes.Stone);
 
-            var biome = Region.BiomeManager.GetBiome(instance);
+            var biome = Region.BiomeManager.GetBiome(chunk);
 
-            var size = instance.Size;
+            var size = chunk.Size;
 
             for (int x = 0; x < size.X; x++)
             {
                 for (int z = 0; z < size.Z; z++)
                 {
-                    var absoluteX = instance.CalculateBlockPositionX(x);
-                    var absoluteZ = instance.CalculateBlockPositionZ(z);
+                    var absoluteX = chunk.CalculateBlockPositionX(x);
+                    var absoluteZ = chunk.CalculateBlockPositionZ(z);
                     var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
 
                     for (int y = 0; y < size.Y; y++)
@@ -101,7 +101,7 @@ namespace Willcraftia.Xna.Blocks.Models
                             }
                         }
 
-                        instance[x, y, z] = blockIndex;
+                        chunk[x, y, z] = blockIndex;
                     }
                 }
             }
