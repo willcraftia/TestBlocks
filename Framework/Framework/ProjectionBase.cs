@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Cameras
+namespace Willcraftia.Xna.Framework
 {
     /// <summary>
     /// Projection 実装の基底クラスです。

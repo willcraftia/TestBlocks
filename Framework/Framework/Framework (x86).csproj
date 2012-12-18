@@ -102,9 +102,9 @@
     <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="BoundingBoxI.cs" />
-    <Compile Include="Cameras\PerspectiveFov.cs" />
-    <Compile Include="Cameras\ProjectionBase.cs" />
-    <Compile Include="Cameras\ViewBase.cs" />
+    <Compile Include="PerspectiveFov.cs" />
+    <Compile Include="ProjectionBase.cs" />
+    <Compile Include="ViewBase.cs" />
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="Collections\ListBase.cs" />

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework.Cameras
+namespace Willcraftia.Xna.Framework
 {
     /// <summary>
     /// 視野に基づいた Perspective 行列を管理するクラスです。
