@@ -1,4 +1,4 @@
-﻿<BlockDefinition>
+﻿<Block>
 	<Name>Default Block</Name>
 	<Mesh>Cube.json</Mesh>
 	<TopTile>DefaultTile.json</TopTile>
@@ -14,4 +14,4 @@
 	<StaticFriction>0.5</StaticFriction>
 	<DynamicFriction>0.5</DynamicFriction>
 	<Restitution>0.5</Restitution>
-</BlockDefinition>
+</Block>

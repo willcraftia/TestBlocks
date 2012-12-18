@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Xml.Serialization;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Component;
 
@@ -8,6 +9,7 @@ using Willcraftia.Xna.Framework.Component;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
+    [XmlRoot("Region")]
     public struct RegionDefinition
     {
         //----------------------------
@@ -40,6 +42,8 @@ namespace Willcraftia.Xna.Blocks.Serialization
         // URI
         public string ChunkBundle;
 
-        public ComponentBundleDefinition[] ChunkProcedures;
+        // URI
+        [XmlArrayItem("Procedure")]
+        public string[] ChunkProcedures;
     }
 }

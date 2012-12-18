@@ -23,6 +23,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         byte[] blockIndices;
 
+        public VectorI3 Size
+        {
+            get { return size; }
+        }
+
         public byte this[int x, int y, int z]
         {
             get
@@ -67,6 +72,21 @@ namespace Willcraftia.Xna.Blocks.Models
             this.size = size;
 
             blockIndices = new byte[size.X * size.Y * size.Z];
+        }
+
+        public int CalculateBlockPositionX(int x)
+        {
+            return Position.X * size.X + x;
+        }
+
+        public int CalculateBlockPositionY(int y)
+        {
+            return Position.Y * size.Y + y;
+        }
+
+        public int CalculateBlockPositionZ(int z)
+        {
+            return Position.Z * size.Z + z;
         }
 
         public void Read(BinaryReader reader)

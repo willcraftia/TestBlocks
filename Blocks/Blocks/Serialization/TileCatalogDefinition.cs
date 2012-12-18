@@ -1,11 +1,13 @@
 ﻿#region Using
 
 using System;
+using System.Xml.Serialization;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
+    [XmlRoot("TileCatalog")]
     public struct TileCatalogDefinition
     {
         //----------------------------
@@ -16,6 +18,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
         //----------------------------
         // Entries
 
+        [XmlArrayItem("Entry")]
         public IndexedUriDefinition[] Entries;
     }
 }

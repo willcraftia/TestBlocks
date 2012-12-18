@@ -37,6 +37,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
         static void Main(string[] args)
         {
+            #region Setup
+
             //================================================================
             // Setup
 
@@ -47,6 +49,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             Console.WriteLine("Press Enter to serialize/deserialize resources.");
             Console.ReadLine();
+
+            #endregion
+
+            #region TileDefinition
 
             //================================================================
             // TileDefinition
@@ -70,6 +76,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             }
             Console.WriteLine();
 
+            #endregion
+
+            #region TileCatalogDefinition
+
             //================================================================
             // TileCatalogDefinition
 
@@ -92,6 +102,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var fromXml = DeserializeFromXml<TileCatalogDefinition>(xmlResource);
             }
             Console.WriteLine();
+
+            #endregion
+
+            #region BlockDefinition
 
             //================================================================
             // BlockDefinition
@@ -123,6 +137,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             }
             Console.WriteLine();
 
+            #endregion
+
+            #region BlockDefinition
+
             //================================================================
             // BlockCatalogDefinition
 
@@ -145,6 +163,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var fromXml = DeserializeFromXml<BlockCatalogDefinition>(xmlResource);
             }
             Console.WriteLine();
+
+            #endregion
+
+            #region DefaultBiome (ComponentBundleDefinition)
 
             //================================================================
             // DefaultBiome (ComponentBundleDefinition)
@@ -178,6 +200,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             }
             Console.WriteLine();
 
+            #endregion
+
+            #region BiomeCatalogDefinition
+
             //================================================================
             // BiomeCatalogDefinition
 
@@ -201,6 +227,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             }
             Console.WriteLine();
 
+            #endregion
+
+            #region SingleBiomeManager (ComponentBundleDefinition)
+
             //================================================================
             // SingleBiomeManager (ComponentBundleDefinition)
 
@@ -217,15 +247,48 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 builder.AddExternalReference(biomeManager.Biome, "DefaultBiome.json");
                 builder.Add("Target", biomeManager);
 
-                ComponentBundleDefinition biomeBundle;
-                builder.BuildDefinition(out biomeBundle);
+                ComponentBundleDefinition bundle;
+                builder.BuildDefinition(out bundle);
 
-                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultBiomeManager", biomeBundle);
-                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultBiomeManager", biomeBundle);
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultBiomeManager", bundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultBiomeManager", bundle);
                 var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
             }
             Console.WriteLine();
+
+            #endregion
+
+            #region FlatTerrainProcedure (ComponentBundleDefinition)
+
+            //================================================================
+            // FlatTerrainProcedure (ComponentBundleDefinition)
+
+            Console.WriteLine("FlatTerrainProcedure (ComponentBundleDefinition)");
+            {
+                var procedure = new FlatTerrainProcedure
+                {
+                    Name = "Default Flat Terrain Procedure",
+                    Height = 156
+                };
+
+                var componentInfoManager = new ComponentInfoManager(ChunkProcedureLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+                builder.Add("Target", procedure);
+
+                ComponentBundleDefinition bundle;
+                builder.BuildDefinition(out bundle);
+
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultFlatTerrainProcedure", bundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultFlatTerrainProcedure", bundle);
+                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
+            #region RegionDefinition
 
             //================================================================
             // RegionDefinition
@@ -238,7 +301,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
                     TileCatalog = "DefaultTileCatalog.json",
                     BlockCatalog = "DefaultBlockCatalog.json",
-                    BiomeManager = "DefaultBiomeManager.json"
+                    BiomeManager = "DefaultBiomeManager.json",
+                    ChunkProcedures = new string[]
+                    {
+                        "DefaultFlatTerrainProcedure.json"
+                    }
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlResource = SerializeToXml<RegionDefinition>("DefaultRegion", region);
@@ -246,6 +313,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var fromXml = DeserializeFromXml<RegionDefinition>(xmlResource);
             }
             Console.WriteLine();
+
+            #endregion
+
+            #region MeshDefinition
 
             //================================================================
             // MeshDefinition
@@ -261,12 +332,20 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             }
             Console.WriteLine();
 
+            #endregion
+
+            #region Exit
+
             //================================================================
             // Exit
 
             Console.WriteLine("Press Enter to exit.");
             Console.ReadLine();
+
+            #endregion
         }
+
+        #region Serialization/Deserialization Helpers
 
         static IResource SerializeToJson<T>(string baseFileName, T instance)
         {
@@ -326,6 +405,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             Console.WriteLine("Deserialized: " + Path.GetFileName(resource.AbsoluteUri));
             return result;
         }
+
+        #endregion
+
+        #region Utilities
 
         static MeshDefinition CreateCubeMeshDefinition()
         {
@@ -519,5 +602,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             };
             return mesh;
         }
+
+        #endregion
     }
 }

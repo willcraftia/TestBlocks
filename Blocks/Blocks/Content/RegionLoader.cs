@@ -58,17 +58,18 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (RegionDefinition) serializer.Deserialize(resource);
 
-            return new Region
+            var region = new Region
             {
-                Resource = resource,
                 Name = definition.Name,
                 Bounds = definition.Bounds,
                 TileCatalog = Load<TileCatalog>(resource, definition.TileCatalog),
                 BlockCatalog = Load<BlockCatalog>(resource, definition.BlockCatalog),
                 BiomeManager = Load<IBiomeManager>(resource, definition.BiomeManager),
-                ChunkBundleResource = Load(resource, definition.ChunkBundle),
-                ChunkProcesures = ToChunkProcedures(definition.ChunkProcedures)
+                ChunkBundleResource = Load(resource, definition.ChunkBundle)
             };
+            region.ChunkProcesures = ToChunkProcedures(resource, definition.ChunkProcedures, region);
+
+            return region;
         }
 
         // I/F
@@ -84,7 +85,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 BlockCatalog = ToUri(resource, region.BlockCatalog),
                 BiomeManager = ToUri(resource, region.BiomeManager),
                 ChunkBundle = ToUri(resource, region.ChunkBundleResource),
-                ChunkProcedures = ToChunkProcedureDefinition(region.ChunkProcesures)
+                ChunkProcedures = ToUri(resource, region.ChunkProcesures)
             };
 
             serializer.Serialize(resource, definition);
@@ -121,37 +122,33 @@ namespace Willcraftia.Xna.Blocks.Content
             return resourceManager.CreateRelativeUri(baseResource, asset.Resource);
         }
 
-        List<IChunkProcedure> ToChunkProcedures(ComponentBundleDefinition[] definitions)
+        List<IChunkProcedure> ToChunkProcedures(IResource baseResource, string[] chunkProcedureUris, Region region)
         {
-            if (ArrayHelper.IsNullOrEmpty(definitions)) return new List<IChunkProcedure>(0);
+            if (ArrayHelper.IsNullOrEmpty(chunkProcedureUris)) return new List<IChunkProcedure>(0);
 
-            var list = new List<IChunkProcedure>(definitions.Length);
-            for (int i = 0; i < definitions.Length; i++)
+            var list = new List<IChunkProcedure>(chunkProcedureUris.Length);
+            for (int i = 0; i < chunkProcedureUris.Length; i++)
             {
-                componentFactory.Build(ref definitions[i]);
+                var procedure = Load<IChunkProcedure>(baseResource, chunkProcedureUris[i]);
                 
-                var procedure = componentFactory[ComponentName] as IChunkProcedure;
+                // TODO: コンテキストを設定し、コンテキスト経由で Region を得るように変更。
+                procedure.Region = region;
+
                 list.Add(procedure);
-                
-                componentFactory.Clear();
             }
 
             return list;
         }
 
-        ComponentBundleDefinition[] ToChunkProcedureDefinition(List<IChunkProcedure> procedures)
+        string[] ToUri(IResource baseResource, List<IChunkProcedure> procedures)
         {
             if (CollectionHelper.IsNullOrEmpty(procedures)) return null;
 
-            var definitions = new ComponentBundleDefinition[procedures.Count];
+            var uris = new string[procedures.Count];
             for (int i = 0; i < procedures.Count; i++)
-            {
-                componentBundleBuilder.Add(ComponentName, procedures[i]);
-                componentBundleBuilder.BuildDefinition(out definitions[i]);
-                componentBundleBuilder.Clear();
-            }
+                uris[i] = ToUri(baseResource, procedures[i].Resource);
 
-            return definitions;
+            return uris;
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿<BiomeCatalogDefinition>
+﻿<BiomeCatalog>
 	<Name>Default Biome Catalog</Name>
 	<Entries>
-		<IndexedUriDefinition>
+		<Entry>
 			<Index>0</Index>
 			<Uri>DefaultBiome.json</Uri>
-		</IndexedUriDefinition>
+		</Entry>
 	</Entries>
-</BiomeCatalogDefinition>
+</BiomeCatalog>

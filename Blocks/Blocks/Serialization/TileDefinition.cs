@@ -1,11 +1,13 @@
 ﻿#region Using
 
 using System;
+using System.Xml.Serialization;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
+    [XmlRoot("Tile")]
     public struct TileDefinition
     {
         //----------------------------

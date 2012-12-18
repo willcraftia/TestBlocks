@@ -1,0 +1,18 @@
+{
+  "Components": [
+    {
+      "Name": "Target",
+      "Type": "FlatTerrainProcedure",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Default Flat Terrain Procedure"
+        },
+        {
+          "Name": "Height",
+          "Value": "156"
+        }
+      ]
+    }
+  ]
+}

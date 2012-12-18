@@ -83,6 +83,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(IBiome), new BiomeLoader());
             assetManager.RegisterLoader(typeof(IBiomeManager), new BiomeManagerLoader(resourceManager));
             assetManager.RegisterLoader(typeof(BiomeCatalog), new BiomeCatalogLoader(resourceManager));
+            assetManager.RegisterLoader(typeof(IChunkProcedure), new ChunkProcedureLoader());
 
             var region = assetManager.Load<Region>(resource);
             region.AssetManager = assetManager;

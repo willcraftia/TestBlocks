@@ -1,10 +1,9 @@
 ﻿#region Using
 
 using System;
-using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.Content;
+using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.IO;
-using Willcraftia.Xna.Blocks.Component;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
 
@@ -12,7 +11,7 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Content
 {
-    public sealed class BiomeManagerLoader : IAssetLoader, IAssetManagerAware
+    public sealed class ChunkProcedureLoader : IAssetLoader
     {
         public const string ComponentName = "Target";
 
@@ -28,32 +27,16 @@ namespace Willcraftia.Xna.Blocks.Content
         // 非スレッド セーフ
         ComponentBundleBuilder componentBundleBuilder;
 
-        // 非スレッド セーフ
-        AssetPropertyHandler assetPropertyHandler = new AssetPropertyHandler();
-
-        // I/F
-        public AssetManager AssetManager
-        {
-            set
-            {
-                assetPropertyHandler.AssetManager = value;
-            }
-        }
-
-        static BiomeManagerLoader()
+        static ChunkProcedureLoader()
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
             // 利用可能な実体の型を全て登録しておく。
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(SingleBiomeManager));
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedure));
         }
 
-        public BiomeManagerLoader(ResourceManager resourceManager)
+        public ChunkProcedureLoader()
         {
-            assetPropertyHandler.ResourceManager = resourceManager;
-
             componentFactory = new ComponentFactory(componentInfoManager);
-            componentFactory.PropertyHandlers.Add(assetPropertyHandler);
-            
             componentBundleBuilder = new ComponentBundleBuilder(componentInfoManager);
         }
 
@@ -61,22 +44,20 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (ComponentBundleDefinition) serializer.Deserialize(resource);
 
-            assetPropertyHandler.BaseResource = resource;
             componentFactory.Build(ref definition);
 
-            var biomeManager = componentFactory[ComponentName] as IBiomeManager;
+            var procedure = componentFactory[ComponentName] as IChunkProcedure;
 
             componentFactory.Clear();
-            assetPropertyHandler.BaseResource = null;
 
-            return biomeManager;
+            return procedure;
         }
 
         public void Save(IResource resource, object asset)
         {
-            var biomeManager = asset as IBiomeManager;
+            var procedure = asset as IChunkProcedure;
 
-            componentBundleBuilder.Add(ComponentName, biomeManager);
+            componentBundleBuilder.Add(ComponentName, procedure);
 
             ComponentBundleDefinition definition;
             componentBundleBuilder.BuildDefinition(out definition);

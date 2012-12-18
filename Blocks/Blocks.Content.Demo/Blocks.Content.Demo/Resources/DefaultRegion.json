@@ -16,5 +16,7 @@
   "BlockCatalog": "DefaultBlockCatalog.json",
   "BiomeManager": "DefaultBiomeManager.json",
   "ChunkBundle": null,
-  "ChunkProcedures": null
+  "ChunkProcedures": [
+    "DefaultFlatTerrainProcedure.json"
+  ]
 }

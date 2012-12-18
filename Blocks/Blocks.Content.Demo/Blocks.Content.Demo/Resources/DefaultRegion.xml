@@ -1,4 +1,4 @@
-﻿<RegionDefinition>
+﻿<Region>
 	<Name>Default Region</Name>
 	<Bounds>
 		<Min>
@@ -15,4 +15,7 @@
 	<TileCatalog>DefaultTileCatalog.json</TileCatalog>
 	<BlockCatalog>DefaultBlockCatalog.json</BlockCatalog>
 	<BiomeManager>DefaultBiomeManager.json</BiomeManager>
-</RegionDefinition>
+	<ChunkProcedures>
+		<Procedure>DefaultFlatTerrainProcedure.json</Procedure>
+	</ChunkProcedures>
+</Region>

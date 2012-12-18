@@ -1,9 +1,9 @@
-﻿<BlockCatalogDefinition>
+﻿<BlockCatalog>
 	<Name>Default Block Catalog</Name>
 	<Entries>
-		<IndexedUriDefinition>
+		<Entry>
 			<Index>1</Index>
 			<Uri>DefaultBlock.json</Uri>
-		</IndexedUriDefinition>
+		</Entry>
 	</Entries>
-</BlockCatalogDefinition>
+</BlockCatalog>

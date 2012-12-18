@@ -206,6 +206,9 @@ namespace Willcraftia.Xna.Framework.Content
             // Cache.
             holders.Add(newHolder);
 
+            var assetInterface = asset as IAsset;
+            if (assetInterface != null) assetInterface.Resource = resource;
+
             logger.InfoEnd("Save: {0}", resource);
         }
 
