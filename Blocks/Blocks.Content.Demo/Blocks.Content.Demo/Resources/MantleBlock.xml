@@ -1,0 +1,17 @@
+﻿<Block>
+	<Name>Mantle Block</Name>
+	<Mesh>Cube.json</Mesh>
+	<TopTile>MantleTile.json</TopTile>
+	<BottomTile>MantleTile.json</BottomTile>
+	<FrontTile>MantleTile.json</FrontTile>
+	<BackTile>MantleTile.json</BackTile>
+	<LeftTile>MantleTile.json</LeftTile>
+	<RightTile>MantleTile.json</RightTile>
+	<Fluid>false</Fluid>
+	<ShadowCasting>true</ShadowCasting>
+	<Shape>Cube</Shape>
+	<Mass>1</Mass>
+	<StaticFriction>0.5</StaticFriction>
+	<DynamicFriction>0.5</DynamicFriction>
+	<Restitution>0.5</Restitution>
+</Block>

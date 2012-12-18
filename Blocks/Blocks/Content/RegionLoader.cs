@@ -89,8 +89,6 @@ namespace Willcraftia.Xna.Blocks.Content
             };
 
             serializer.Serialize(resource, definition);
-
-            region.Resource = resource;
         }
 
         IResource Load(IResource baseResource, string uri)

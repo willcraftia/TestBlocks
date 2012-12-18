@@ -41,5 +41,14 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         #endregion
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri=" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

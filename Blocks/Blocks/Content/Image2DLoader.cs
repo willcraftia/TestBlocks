@@ -26,7 +26,6 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             return new Image2D
             {
-                Resource = resource,
                 Texture = LoadTexture(resource)
             };
         }
@@ -37,8 +36,6 @@ namespace Willcraftia.Xna.Blocks.Content
             var image = asset as Image2D;
 
             SaveTexture(resource, image.Texture);
-
-            image.Resource = resource;
         }
 
         Texture2D LoadTexture(IResource resource)

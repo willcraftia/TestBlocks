@@ -20,7 +20,6 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = (MeshDefinition) serializer.Deserialize(resource);
             return new Mesh
             {
-                Resource = resource,
                 Name = definition.Name,
                 Top = ToMeshPart(definition.Top),
                 Bottom = ToMeshPart(definition.Bottom),
@@ -48,8 +47,6 @@ namespace Willcraftia.Xna.Blocks.Content
             };
 
             serializer.Serialize(resource, definition);
-
-            mesh.Resource = resource;
         }
 
         MeshPart ToMeshPart(MeshPartDefinition meshPartDefinition)

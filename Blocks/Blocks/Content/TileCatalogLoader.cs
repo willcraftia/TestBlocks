@@ -38,7 +38,6 @@ namespace Willcraftia.Xna.Blocks.Content
 
             var tileCatalog = new TileCatalog(graphicsDevice, definition.Entries.Length)
             {
-                Resource = resource,
                 Name = definition.Name
             };
 
@@ -77,8 +76,6 @@ namespace Willcraftia.Xna.Blocks.Content
             }
 
             serializer.Serialize(resource, definition);
-
-            tileCatalog.Resource = resource;
         }
 
         T Load<T>(IResource baseResource, string uri) where T : class

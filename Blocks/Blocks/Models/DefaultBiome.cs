@@ -54,6 +54,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 return minTemperature <= temperature && temperature <= maxTemperature &&
                     minHumidity <= humidity && humidity <= maxHumidity;
             }
+
+            #region ToString
+
+            public override string ToString()
+            {
+                return "[" + minTemperature + " <= temperature <= " + maxTemperature +
+                    ", " + minHumidity + " <= humidity <= " + maxHumidity + "]";
+            }
+
+            #endregion
         }
 
         #endregion
@@ -177,5 +187,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
             return BaseElement;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri=" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + ", Index=" + Index + "]";
+        }
+
+        #endregion
     }
 }

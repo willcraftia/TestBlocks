@@ -33,8 +33,13 @@ namespace Willcraftia.Xna.Blocks.Content
 
             var blockCatalog = new BlockCatalog(definition.Entries.Length)
             {
-                Resource = resource,
-                Name = definition.Name
+                Name = definition.Name,
+                DirtIndex = definition.Dirt,
+                GrassIndex = definition.Grass,
+                MantleIndex = definition.Mantle,
+                SandIndex = definition.Sand,
+                SnowIndex = definition.Snow,
+                StoneIndex = definition.Stone
             };
 
             foreach (var entry in definition.Entries)
@@ -58,7 +63,13 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new BlockCatalogDefinition
             {
                 Name = blockCatalog.Name,
-                Entries = new IndexedUriDefinition[blockCatalog.Count]
+                Entries = new IndexedUriDefinition[blockCatalog.Count],
+                Dirt = blockCatalog.DirtIndex,
+                Grass = blockCatalog.GrassIndex,
+                Mantle = blockCatalog.MantleIndex,
+                Sand = blockCatalog.SandIndex,
+                Snow = blockCatalog.SnowIndex,
+                Stone = blockCatalog.StoneIndex
             };
 
             for (int i = 0; i < blockCatalog.Count; i++)
@@ -72,8 +83,6 @@ namespace Willcraftia.Xna.Blocks.Content
             }
 
             serializer.Serialize(resource, definition);
-
-            blockCatalog.Resource = resource;
         }
 
         T Load<T>(IResource baseResource, string uri) where T : class

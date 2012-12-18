@@ -56,5 +56,14 @@ namespace Willcraftia.Xna.Blocks.Models
         public float DynamicFriction { get; set; }
 
         public float Restitution { get; set; }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri=" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + ", Index=" + Index + "]";
+        }
+
+        #endregion
     }
 }

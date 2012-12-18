@@ -16,6 +16,30 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
+        public byte DirtIndex { get; set; }
+
+        public byte GrassIndex { get; set; }
+
+        public byte MantleIndex { get; set; }
+
+        public byte SandIndex { get; set; }
+
+        public byte SnowIndex { get; set; }
+
+        public byte StoneIndex { get; set; }
+
+        public Block Dirt { get { return this[DirtIndex]; } }
+
+        public Block Grass { get { return this[GrassIndex]; } }
+
+        public Block Mantle { get { return this[MantleIndex]; } }
+
+        public Block Sand { get { return this[SandIndex]; } }
+
+        public Block Snow { get { return this[SnowIndex]; } }
+
+        public Block Stone { get { return this[StoneIndex]; } }
+
         public BlockCatalog(int capacity)
             : base(capacity)
         {
@@ -25,5 +49,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             return item.Index;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri=" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

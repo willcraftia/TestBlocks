@@ -1,0 +1,17 @@
+﻿<Block>
+	<Name>Stone Block</Name>
+	<Mesh>Cube.json</Mesh>
+	<TopTile>StoneTile.json</TopTile>
+	<BottomTile>StoneTile.json</BottomTile>
+	<FrontTile>StoneTile.json</FrontTile>
+	<BackTile>StoneTile.json</BackTile>
+	<LeftTile>StoneTile.json</LeftTile>
+	<RightTile>StoneTile.json</RightTile>
+	<Fluid>false</Fluid>
+	<ShadowCasting>true</ShadowCasting>
+	<Shape>Cube</Shape>
+	<Mass>1</Mass>
+	<StaticFriction>0.5</StaticFriction>
+	<DynamicFriction>0.5</DynamicFriction>
+	<Restitution>0.5</Restitution>
+</Block>

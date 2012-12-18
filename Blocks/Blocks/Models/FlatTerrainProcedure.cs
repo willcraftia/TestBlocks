@@ -33,13 +33,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void Generate(Chunk chunk)
         {
-            var grassIndex = ResolveBlockIndex(TerrainBlockTypes.Grass);
-            var dirtIndex = ResolveBlockIndex(TerrainBlockTypes.Dirt);
-            var mantleIndex = ResolveBlockIndex(TerrainBlockTypes.Mantle);
-            var sandIndex = ResolveBlockIndex(TerrainBlockTypes.Sand);
-            var snowIndex = ResolveBlockIndex(TerrainBlockTypes.Snow);
-            var stoneIndex = ResolveBlockIndex(TerrainBlockTypes.Stone);
-
             var biome = Region.BiomeManager.GetBiome(chunk);
 
             var size = chunk.Size;
@@ -62,19 +55,19 @@ namespace Willcraftia.Xna.Blocks.Models
                             switch (biomeElement)
                             {
                                 case BiomeElement.Desert:
-                                    blockIndex = sandIndex;
+                                    blockIndex = Region.BlockCatalog.SandIndex;
                                     break;
                                 case BiomeElement.Forest:
-                                    blockIndex = dirtIndex;
+                                    blockIndex = Region.BlockCatalog.DirtIndex;
                                     break;
                                 case BiomeElement.Mountains:
-                                    blockIndex = stoneIndex;
+                                    blockIndex = Region.BlockCatalog.StoneIndex;
                                     break;
                                 case BiomeElement.Plains:
-                                    blockIndex = grassIndex;
+                                    blockIndex = Region.BlockCatalog.GrassIndex;
                                     break;
                                 case BiomeElement.Snow:
-                                    blockIndex = snowIndex;
+                                    blockIndex = Region.BlockCatalog.SnowIndex;
                                     break;
                             }
                         }
@@ -84,19 +77,19 @@ namespace Willcraftia.Xna.Blocks.Models
                             switch (biomeElement)
                             {
                                 case BiomeElement.Desert:
-                                    blockIndex = sandIndex;
+                                    blockIndex = Region.BlockCatalog.SandIndex;
                                     break;
                                 case BiomeElement.Forest:
-                                    blockIndex = dirtIndex;
+                                    blockIndex = Region.BlockCatalog.DirtIndex;
                                     break;
                                 case BiomeElement.Mountains:
-                                    blockIndex = stoneIndex;
+                                    blockIndex = Region.BlockCatalog.StoneIndex;
                                     break;
                                 case BiomeElement.Plains:
-                                    blockIndex = dirtIndex;
+                                    blockIndex = Region.BlockCatalog.DirtIndex;
                                     break;
                                 case BiomeElement.Snow:
-                                    blockIndex = snowIndex;
+                                    blockIndex = Region.BlockCatalog.SnowIndex;
                                     break;
                             }
                         }
@@ -105,15 +98,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     }
                 }
             }
-        }
-
-        byte ResolveBlockIndex(TerrainBlockTypes terrainBlockType)
-        {
-            var byteType = (byte) terrainBlockType;
-            if (Region.BlockCatalog.Contains(byteType))
-                return byteType;
-
-            return Block.EmptyIndex;
         }
     }
 }

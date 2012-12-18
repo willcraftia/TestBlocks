@@ -24,5 +24,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             return Biome;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri=" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

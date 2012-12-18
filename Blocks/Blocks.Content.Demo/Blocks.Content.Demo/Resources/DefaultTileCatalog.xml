@@ -5,5 +5,37 @@
 			<Index>0</Index>
 			<Uri>DefaultTile.json</Uri>
 		</Entry>
+		<Entry>
+			<Index>1</Index>
+			<Uri>DirtTile.json</Uri>
+		</Entry>
+		<Entry>
+			<Index>2</Index>
+			<Uri>GrassBottomTile.json</Uri>
+		</Entry>
+		<Entry>
+			<Index>3</Index>
+			<Uri>GrassSideTile.json</Uri>
+		</Entry>
+		<Entry>
+			<Index>4</Index>
+			<Uri>GrassTopTile.json</Uri>
+		</Entry>
+		<Entry>
+			<Index>5</Index>
+			<Uri>MantleTile.json</Uri>
+		</Entry>
+		<Entry>
+			<Index>6</Index>
+			<Uri>SandTile.json</Uri>
+		</Entry>
+		<Entry>
+			<Index>7</Index>
+			<Uri>SnowTile.json</Uri>
+		</Entry>
+		<Entry>
+			<Index>8</Index>
+			<Uri>StoneTile.json</Uri>
+		</Entry>
 	</Entries>
 </TileCatalog>

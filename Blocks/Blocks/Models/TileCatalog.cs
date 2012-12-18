@@ -160,5 +160,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             for (int i = 0; i < colorBuffer.Length; i++) colorBuffer[i] = Color.Black;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri=" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

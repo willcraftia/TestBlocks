@@ -4,6 +4,38 @@
     {
       "Index": 0,
       "Uri": "DefaultTile.json"
+    },
+    {
+      "Index": 1,
+      "Uri": "DirtTile.json"
+    },
+    {
+      "Index": 2,
+      "Uri": "GrassBottomTile.json"
+    },
+    {
+      "Index": 3,
+      "Uri": "GrassSideTile.json"
+    },
+    {
+      "Index": 4,
+      "Uri": "GrassTopTile.json"
+    },
+    {
+      "Index": 5,
+      "Uri": "MantleTile.json"
+    },
+    {
+      "Index": 6,
+      "Uri": "SandTile.json"
+    },
+    {
+      "Index": 7,
+      "Uri": "SnowTile.json"
+    },
+    {
+      "Index": 8,
+      "Uri": "StoneTile.json"
     }
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "Name": "Stone Block",
+  "Mesh": "Cube.json",
+  "TopTile": "StoneTile.json",
+  "BottomTile": "StoneTile.json",
+  "FrontTile": "StoneTile.json",
+  "BackTile": "StoneTile.json",
+  "LeftTile": "StoneTile.json",
+  "RightTile": "StoneTile.json",
+  "Fluid": false,
+  "ShadowCasting": true,
+  "Shape": 0,
+  "Mass": 1.0,
+  "StaticFriction": 0.5,
+  "DynamicFriction": 0.5,
+  "Restitution": 0.5
+}

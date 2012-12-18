@@ -1,0 +1,17 @@
+{
+  "Name": "Dirt Block",
+  "Mesh": "Cube.json",
+  "TopTile": "DirtTile.json",
+  "BottomTile": "DirtTile.json",
+  "FrontTile": "DirtTile.json",
+  "BackTile": "DirtTile.json",
+  "LeftTile": "DirtTile.json",
+  "RightTile": "DirtTile.json",
+  "Fluid": false,
+  "ShadowCasting": true,
+  "Shape": 0,
+  "Mass": 1.0,
+  "StaticFriction": 0.5,
+  "DynamicFriction": 0.5,
+  "Restitution": 0.5
+}

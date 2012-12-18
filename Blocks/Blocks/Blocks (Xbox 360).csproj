@@ -136,7 +136,6 @@
     <Compile Include="Models\RegionManager.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\StorageChunkStore.cs" />
-    <Compile Include="Models\TerrainBlockTypes.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Models\TileCatalog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -73,6 +73,126 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var xmlResource = SerializeToXml<TileDefinition>("DefaultTile", tile);
                 var fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var dirt = new TileDefinition
+                {
+                    Name = "Dirt Tile",
+                    Texture = "DirtTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("DirtTile", dirt);
+                xmlResource = SerializeToXml<TileDefinition>("DirtTile", dirt);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var grassBottom = new TileDefinition
+                {
+                    Name = "Grass Bottom Tile",
+                    Texture = "GrassBottomTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("GrassBottomTile", grassBottom);
+                xmlResource = SerializeToXml<TileDefinition>("GrassBottomTile", grassBottom);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var grassSide = new TileDefinition
+                {
+                    Name = "Grass Side Tile",
+                    Texture = "GrassSideTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("GrassSideTile", grassSide);
+                xmlResource = SerializeToXml<TileDefinition>("GrassSideTile", grassSide);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var grassTop = new TileDefinition
+                {
+                    Name = "Grass Top Tile",
+                    Texture = "GrassTopTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("GrassTopTile", grassTop);
+                xmlResource = SerializeToXml<TileDefinition>("GrassTopTile", grassTop);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var mantle = new TileDefinition
+                {
+                    Name = "Mantle Tile",
+                    Texture = "MantleTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("MantleTile", mantle);
+                xmlResource = SerializeToXml<TileDefinition>("MantleTile", mantle);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var sand = new TileDefinition
+                {
+                    Name = "Sand Tile",
+                    Texture = "SandTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("SandTile", sand);
+                xmlResource = SerializeToXml<TileDefinition>("SandTile", sand);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var snow = new TileDefinition
+                {
+                    Name = "Snow Tile",
+                    Texture = "SnowTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("SnowTile", snow);
+                xmlResource = SerializeToXml<TileDefinition>("SnowTile", snow);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
+
+                var stone = new TileDefinition
+                {
+                    Name = "Stone Tile",
+                    Texture = "StoneTile.png",
+                    Translucent = false,
+                    DiffuseColor = Color.White.PackedValue,
+                    EmissiveColor = Color.Black.PackedValue,
+                    SpecularColor = Color.Black.PackedValue,
+                    SpecularPower = 0
+                };
+                jsonResource = SerializeToJson<TileDefinition>("StoneTile", stone);
+                xmlResource = SerializeToXml<TileDefinition>("StoneTile", stone);
+                fromJson = DeserializeFromJson<TileDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<TileDefinition>(xmlResource);
             }
             Console.WriteLine();
 
@@ -90,10 +210,15 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Tile Catalog",
                     Entries = new IndexedUriDefinition[]
                 {
-                    new IndexedUriDefinition
-                    {
-                        Index = 0, Uri = "DefaultTile.json"
-                    }
+                    new IndexedUriDefinition { Index = 0, Uri = "DefaultTile.json" },
+                    new IndexedUriDefinition { Index = 1, Uri = "DirtTile.json" },
+                    new IndexedUriDefinition { Index = 2, Uri = "GrassBottomTile.json" },
+                    new IndexedUriDefinition { Index = 3, Uri = "GrassSideTile.json" },
+                    new IndexedUriDefinition { Index = 4, Uri = "GrassTopTile.json" },
+                    new IndexedUriDefinition { Index = 5, Uri = "MantleTile.json" },
+                    new IndexedUriDefinition { Index = 6, Uri = "SandTile.json" },
+                    new IndexedUriDefinition { Index = 7, Uri = "SnowTile.json" },
+                    new IndexedUriDefinition { Index = 8, Uri = "StoneTile.json" }
                 }
                 };
                 var jsonResource = SerializeToJson<TileCatalogDefinition>("DefaultTileCatalog", tileCatalog);
@@ -134,12 +259,150 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var xmlResource = SerializeToXml<BlockDefinition>("DefaultBlock", block);
                 var fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<BlockDefinition>(xmlResource);
+
+                var dirt = new BlockDefinition
+                {
+                    Name = "Dirt Block",
+                    Mesh = "Cube.json",
+                    TopTile = "DirtTile.json",
+                    BottomTile = "DirtTile.json",
+                    FrontTile = "DirtTile.json",
+                    BackTile = "DirtTile.json",
+                    LeftTile = "DirtTile.json",
+                    RightTile = "DirtTile.json",
+                    Fluid = false,
+                    ShadowCasting = true,
+                    Shape = BlockShape.Cube,
+                    Mass = 1,
+                    StaticFriction = 0.5f,
+                    DynamicFriction = 0.5f,
+                    Restitution = 0.5f
+                };
+                jsonResource = SerializeToJson<BlockDefinition>("DirtBlock", dirt);
+                xmlResource = SerializeToXml<BlockDefinition>("DirtBlock", dirt);
+                fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<BlockDefinition>(xmlResource);
+
+                var grass = new BlockDefinition
+                {
+                    Name = "Grass Block",
+                    Mesh = "Cube.json",
+                    TopTile = "GrassTopTile.json",
+                    BottomTile = "GrassBottomTile.json",
+                    FrontTile = "GrassSideTile.json",
+                    BackTile = "GrassSideTile.json",
+                    LeftTile = "GrassSideTile.json",
+                    RightTile = "GrassSideTile.json",
+                    Fluid = false,
+                    ShadowCasting = true,
+                    Shape = BlockShape.Cube,
+                    Mass = 1,
+                    StaticFriction = 0.5f,
+                    DynamicFriction = 0.5f,
+                    Restitution = 0.5f
+                };
+                jsonResource = SerializeToJson<BlockDefinition>("GrassBlock", grass);
+                xmlResource = SerializeToXml<BlockDefinition>("GrassBlock", grass);
+                fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<BlockDefinition>(xmlResource);
+
+                var mantle = new BlockDefinition
+                {
+                    Name = "Mantle Block",
+                    Mesh = "Cube.json",
+                    TopTile = "MantleTile.json",
+                    BottomTile = "MantleTile.json",
+                    FrontTile = "MantleTile.json",
+                    BackTile = "MantleTile.json",
+                    LeftTile = "MantleTile.json",
+                    RightTile = "MantleTile.json",
+                    Fluid = false,
+                    ShadowCasting = true,
+                    Shape = BlockShape.Cube,
+                    Mass = 1,
+                    StaticFriction = 0.5f,
+                    DynamicFriction = 0.5f,
+                    Restitution = 0.5f
+                };
+                jsonResource = SerializeToJson<BlockDefinition>("MantleBlock", mantle);
+                xmlResource = SerializeToXml<BlockDefinition>("MantleBlock", mantle);
+                fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<BlockDefinition>(xmlResource);
+
+                var sand = new BlockDefinition
+                {
+                    Name = "Sand Block",
+                    Mesh = "Cube.json",
+                    TopTile = "SandTile.json",
+                    BottomTile = "SandTile.json",
+                    FrontTile = "SandTile.json",
+                    BackTile = "SandTile.json",
+                    LeftTile = "SandTile.json",
+                    RightTile = "SandTile.json",
+                    Fluid = false,
+                    ShadowCasting = true,
+                    Shape = BlockShape.Cube,
+                    Mass = 1,
+                    StaticFriction = 0.5f,
+                    DynamicFriction = 0.5f,
+                    Restitution = 0.5f
+                };
+                jsonResource = SerializeToJson<BlockDefinition>("SandBlock", sand);
+                xmlResource = SerializeToXml<BlockDefinition>("SandBlock", sand);
+                fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<BlockDefinition>(xmlResource);
+
+                var snow = new BlockDefinition
+                {
+                    Name = "Snow Block",
+                    Mesh = "Cube.json",
+                    TopTile = "SnowTile.json",
+                    BottomTile = "SnowTile.json",
+                    FrontTile = "SnowTile.json",
+                    BackTile = "SnowTile.json",
+                    LeftTile = "SnowTile.json",
+                    RightTile = "SnowTile.json",
+                    Fluid = false,
+                    ShadowCasting = true,
+                    Shape = BlockShape.Cube,
+                    Mass = 1,
+                    StaticFriction = 0.5f,
+                    DynamicFriction = 0.5f,
+                    Restitution = 0.5f
+                };
+                jsonResource = SerializeToJson<BlockDefinition>("SnowBlock", snow);
+                xmlResource = SerializeToXml<BlockDefinition>("SnowBlock", snow);
+                fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<BlockDefinition>(xmlResource);
+
+                var stone = new BlockDefinition
+                {
+                    Name = "Stone Block",
+                    Mesh = "Cube.json",
+                    TopTile = "StoneTile.json",
+                    BottomTile = "StoneTile.json",
+                    FrontTile = "StoneTile.json",
+                    BackTile = "StoneTile.json",
+                    LeftTile = "StoneTile.json",
+                    RightTile = "StoneTile.json",
+                    Fluid = false,
+                    ShadowCasting = true,
+                    Shape = BlockShape.Cube,
+                    Mass = 1,
+                    StaticFriction = 0.5f,
+                    DynamicFriction = 0.5f,
+                    Restitution = 0.5f
+                };
+                jsonResource = SerializeToJson<BlockDefinition>("StoneBlock", stone);
+                xmlResource = SerializeToXml<BlockDefinition>("StoneBlock", stone);
+                fromJson = DeserializeFromJson<BlockDefinition>(jsonResource);
+                fromXml = DeserializeFromXml<BlockDefinition>(xmlResource);
             }
             Console.WriteLine();
 
             #endregion
 
-            #region BlockDefinition
+            #region BlockCatalogDefinition
 
             //================================================================
             // BlockCatalogDefinition
@@ -151,11 +414,20 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Block Catalog",
                     Entries = new IndexedUriDefinition[]
                     {
-                        new IndexedUriDefinition
-                        {
-                            Index = 1, Uri = "DefaultBlock.json"
-                        }
-                    }
+                        new IndexedUriDefinition { Index = 1, Uri = "DefaultBlock.json" },
+                        new IndexedUriDefinition { Index = 2, Uri = "DirtBlock.json" },
+                        new IndexedUriDefinition { Index = 3, Uri = "GrassBlock.json" },
+                        new IndexedUriDefinition { Index = 4, Uri = "MantleBlock.json" },
+                        new IndexedUriDefinition { Index = 5, Uri = "SandBlock.json" },
+                        new IndexedUriDefinition { Index = 6, Uri = "SnowBlock.json" },
+                        new IndexedUriDefinition { Index = 7, Uri = "StoneBlock.json" }
+                    },
+                    Dirt = 2,
+                    Grass = 3,
+                    Mantle = 4,
+                    Sand = 5,
+                    Snow = 6,
+                    Stone = 7
                 };
                 var jsonResource = SerializeToJson<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
                 var xmlResource = SerializeToXml<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);

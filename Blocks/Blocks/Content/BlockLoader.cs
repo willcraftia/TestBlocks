@@ -32,7 +32,6 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = (BlockDefinition) serializer.Deserialize(resource);
             return new Block
             {
-                Resource = resource,
                 Name = definition.Name,
                 Mesh = Load<Mesh>(resource, definition.Mesh),
                 TopTile = Load<Tile>(resource, definition.TopTile),
@@ -76,8 +75,6 @@ namespace Willcraftia.Xna.Blocks.Content
             };
 
             serializer.Serialize(resource, definition);
-
-            block.Resource = resource;
         }
 
         T Load<T>(IResource baseResource, string uri) where T : class

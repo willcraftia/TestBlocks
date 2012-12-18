@@ -32,7 +32,6 @@ namespace Willcraftia.Xna.Blocks.Content
 
             var biomeCatalog = new BiomeCatalog(definition.Entries.Length)
             {
-                Resource = resource,
                 Name = definition.Name
             };
 
@@ -70,8 +69,6 @@ namespace Willcraftia.Xna.Blocks.Content
             }
 
             serializer.Serialize(resource, definition);
-
-            biomeCatalog.Resource = resource;
         }
 
         T Load<T>(IResource baseResource, string uri) where T : class

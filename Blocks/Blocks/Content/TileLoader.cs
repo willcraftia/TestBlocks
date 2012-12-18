@@ -34,7 +34,6 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = (TileDefinition) serializer.Deserialize(resource);
             return new Tile
             {
-                Resource = resource,
                 Name = definition.Name,
                 Texture = Load<Image2D>(resource, definition.Texture),
                 Translucent = definition.Translucent,
@@ -62,8 +61,6 @@ namespace Willcraftia.Xna.Blocks.Content
             };
 
             serializer.Serialize(resource, definition);
-
-            tile.Resource = resource;
         }
 
         T Load<T>(IResource baseResource, string uri) where T : class

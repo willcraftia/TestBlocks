@@ -1,0 +1,17 @@
+﻿<Block>
+	<Name>Dirt Block</Name>
+	<Mesh>Cube.json</Mesh>
+	<TopTile>DirtTile.json</TopTile>
+	<BottomTile>DirtTile.json</BottomTile>
+	<FrontTile>DirtTile.json</FrontTile>
+	<BackTile>DirtTile.json</BackTile>
+	<LeftTile>DirtTile.json</LeftTile>
+	<RightTile>DirtTile.json</RightTile>
+	<Fluid>false</Fluid>
+	<ShadowCasting>true</ShadowCasting>
+	<Shape>Cube</Shape>
+	<Mass>1</Mass>
+	<StaticFriction>0.5</StaticFriction>
+	<DynamicFriction>0.5</DynamicFriction>
+	<Restitution>0.5</Restitution>
+</Block>

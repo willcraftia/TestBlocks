@@ -53,8 +53,6 @@ namespace Willcraftia.Xna.Blocks.Content
             
             componentFactory.Clear();
 
-            biome.Resource = resource;
-
             return biome;
         }
 
@@ -68,8 +66,6 @@ namespace Willcraftia.Xna.Blocks.Content
             componentBundleBuilder.BuildDefinition(out definition);
 
             serializer.Serialize(resource, definition);
-
-            biome.Resource = resource;
         }
     }
 }
