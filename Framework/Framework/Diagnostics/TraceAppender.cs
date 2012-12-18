@@ -23,19 +23,22 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         public void Append(ref LogEvent logEvent)
         {
 #if WINDOWS
-            Trace.Write(logEvent.DateTime.ToString("HH:mm:ss.fffffff"));
-            Trace.Write(" [");
-            Trace.Write(logEvent.ThreadId);
-            Trace.Write("] ");
-            Trace.Write(string.Format("{0} ", levelStrings[(int) logEvent.Level]));
-            Trace.Write(" ");
-            Trace.Write(logEvent.Category);
-            Trace.Write(" - ");
-            Trace.WriteLine(logEvent.Message);
+            lock (this)
+            {
+                Trace.Write(logEvent.DateTime.ToString("HH:mm:ss.fffffff"));
+                Trace.Write(" [");
+                Trace.Write(logEvent.ThreadId);
+                Trace.Write("] ");
+                Trace.Write(string.Format("{0} ", levelStrings[(int) logEvent.Level]));
+                Trace.Write(" ");
+                Trace.Write(logEvent.Category);
+                Trace.Write(" - ");
+                Trace.WriteLine(logEvent.Message);
 
-            if (logEvent.Exception != null) AppendException(logEvent.Exception);
+                if (logEvent.Exception != null) AppendException(logEvent.Exception);
 
-            Trace.Flush();
+                Trace.Flush();
+            }
 #endif
         }
 

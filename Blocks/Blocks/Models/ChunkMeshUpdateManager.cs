@@ -112,7 +112,7 @@ namespace Willcraftia.Xna.Blocks.Models
         void CheckCompletedTasks()
         {
             int index = 0;
-            while (0 < activeTasks.Count)
+            while (index < activeTasks.Count)
             {
                 var task = activeTasks[index];
                 if (!task.IsCompleted)

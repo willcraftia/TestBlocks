@@ -52,9 +52,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         PartitionCollection activePartitions = new PartitionCollection();
 
-        List<Partition> activatingPartitions = new List<Partition>();
+        PartitionCollection activatingPartitions = new PartitionCollection();
 
-        List<Partition> passivatingPartitions = new List<Partition>();
+        PartitionCollection passivatingPartitions = new PartitionCollection();
 
         TaskQueue taskQueue = new TaskQueue();
 
@@ -63,6 +63,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         int passivationRange = DefaultPassivationRange;
 
         VectorI3 eyeGridPosition;
+
+        public bool Closing { get; private set; }
+
+        public bool Closed { get; private set; }
 
         public int TaskQueueSlotCount
         {
@@ -109,18 +113,52 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public void Update(ref Vector3 eyeWorldPosition)
         {
+            if (Closed) return;
+
             eyeGridPosition.X = Floor(eyeWorldPosition.X * inversePartitionSize.X);
             eyeGridPosition.Y = Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
             eyeGridPosition.Z = Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
 
-            // Update the load task queue.
+            // Update the task queue.
             taskQueue.Update();
 
-            // Try to load/unload partitions.
+            // Try to activate/passivate partitions.
             CheckPassivationCompleted();
             CheckActivationCompleted();
-            PassivatePartitions();
-            ActivatePartitions();
+
+            if (!Closing)
+            {
+                PassivatePartitions();
+                ActivatePartitions();
+            }
+            else
+            {
+                // Complete ?
+
+                // Passivating some partitions yet.
+                if (passivatingPartitions.Count != 0) return;
+
+                // Activating some partitions yet.
+                if (activatingPartitions.Count != 0) return;
+
+                // Some partitions still remain in active ones.
+                if (activePartitions.Count != 0)
+                {
+                    ForcePassivatePartitions();
+                    return;
+                }
+
+                // Passivated all partitions.
+                Closing = false;
+                Closed = true;
+            }
+        }
+
+        public void Close()
+        {
+            if (Closing || Closed) return;
+
+            Closing = true;
         }
 
         protected abstract Partition CreatePartition();
@@ -177,6 +215,20 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
+        void ForcePassivatePartitions()
+        {
+            int index = 0;
+            while (index < activePartitions.Count)
+            {
+                var partition = activePartitions[index];
+
+                activePartitions.Remove(partition);
+                passivatingPartitions.Add(partition);
+
+                taskQueue.Enqueue(partition.Passivate);
+            }
+        }
+
         void PassivatePartitions()
         {
             //
@@ -190,7 +242,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var partition = activePartitions[index];
 
-                if (bounds.Contains(partition.GridPosition) == ContainmentType.Contains)
+                if (!Closing && bounds.Contains(partition.GridPosition) == ContainmentType.Contains)
                 {
                     index++;
                     continue;
@@ -222,8 +274,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     for (gridPosition.X = bounds.Min.X; gridPosition.X < bounds.Max.X; gridPosition.X++)
                     {
-                        // The partition at the specified position is alreadt activated.
+                        // This partition is already activated.
                         if (activePartitions.Contains(gridPosition)) continue;
+
+                        // An activation thread is handling this partition now.
+                        if (activatingPartitions.Contains(gridPosition)) continue;
+
+                        // An passivation thread is handling this partition now.
+                        if (passivatingPartitions.Contains(gridPosition)) continue;
 
                         // No partition is needed.
                         if (!CanActivatePartition(ref gridPosition)) continue;
@@ -298,6 +356,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (disposed) return;
 
             //================================================================
+            // Subclass
+
+            DisposeOverride(disposing);
+
+            //================================================================
             // Dispose all partitions.
 
             DisposePartitions(partitionPool);
@@ -316,11 +379,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             // Clear all tasks just in case.
 
             taskQueue.Clear();
-
-            //================================================================
-            // Subclass
-
-            DisposeOverride(disposing);
 
             disposed = true;
         }

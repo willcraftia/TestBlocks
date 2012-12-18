@@ -78,6 +78,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FreeView.cs" />
+    <Compile Include="FreeViewInput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="MainGame.cs" />

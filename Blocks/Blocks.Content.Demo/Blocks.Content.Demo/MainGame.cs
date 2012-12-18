@@ -11,6 +11,7 @@ using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
+using Willcraftia.Xna.Blocks.Landscape;
 using Willcraftia.Xna.Blocks.Models;
 
 #endregion
@@ -22,6 +23,26 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         static readonly Logger logger = new Logger(typeof(MainGame).Name);
 
         GraphicsDeviceManager graphics;
+
+        FreeView view = new FreeView();
+
+        PerspectiveFov projection = new PerspectiveFov();
+
+        FreeViewInput viewInput = new FreeViewInput();
+
+        float moveVelocity = 1000;
+        
+        float dashFactor = 2;
+
+        float farPlaneDistance = 300000;
+
+        RegionManager regionManager;
+
+        ChunkPartitionManager partitionManager;
+
+        RasterizerState defaultRasterizerState = new RasterizerState();
+
+        Vector4 backgroundColor = Color.CornflowerBlue.ToVector4();
 
         public MainGame()
         {
@@ -68,6 +89,53 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             ResourceLoader.Register(FileResourceLoader.Instance);
 
             //================================================================
+            // RegionManager
+
+            regionManager = new RegionManager(Services);
+
+            //================================================================
+            // ChunkPartitionManager
+
+            partitionManager = new ChunkPartitionManager(regionManager);
+
+            //================================================================
+            // Camera Settings
+
+            var viewport = GraphicsDevice.Viewport;
+            viewInput.InitialMousePositionX = viewport.Width / 2;
+            viewInput.InitialMousePositionY = viewport.Height / 2;
+            viewInput.FreeView = view;
+            viewInput.MoveVelocity = moveVelocity;
+            viewInput.DashFactor = dashFactor;
+
+            view.Position = new Vector3(50, 30, 50);
+            //view.Position = new Vector3(-150000.0f, 30, -150000.0f);
+            view.Yaw(MathHelper.PiOver4 * 5);
+            view.Update();
+
+            projection.FarPlaneDistance = farPlaneDistance;
+            projection.Update();
+
+            //================================================================
+            // Default RasterizerState
+
+            defaultRasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
+            defaultRasterizerState.FillMode = FillMode.Solid;
+
+#if DEBUG
+            //================================================================
+            // DEBUG: FpsCounter
+
+            var fpsCounter = new FpsCounter(this);
+            fpsCounter.Content.RootDirectory = "Content";
+            fpsCounter.HorizontalAlignment = DebugHorizontalAlignment.Right;
+            fpsCounter.SampleSpan = TimeSpan.FromSeconds(2);
+            //fpsCounter.Enabled = false;
+            //fpsCounter.Visible = false;
+            Components.Add(fpsCounter);
+#endif
+
+            //================================================================
             // Others
 
             base.Initialize();
@@ -82,7 +150,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Region
 
-            var regionManager = new RegionManager(Services);
             var region = regionManager.LoadRegion("title:Resources/DefaultRegion.json");
 
             //================================================================
@@ -100,16 +167,59 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         protected override void Update(GameTime gameTime)
         {
+            if (!IsActive) return;
+
             var keyboardState = Keyboard.GetState();
+
+            //================================================================
+            // Exit
+
             if (keyboardState.IsKeyDown(Keys.Escape))
+                partitionManager.Close();
+
+            if (partitionManager.Closed)
                 Exit();
+
+            //================================================================
+            // ViewInput
+
+            viewInput.Update(gameTime);
+
+            if (keyboardState.IsKeyDown(Keys.PageUp))
+                viewInput.MoveVelocity += 10;
+            if (keyboardState.IsKeyDown(Keys.PageDown))
+            {
+                viewInput.MoveVelocity -= 10;
+                if (viewInput.MoveVelocity < 10) viewInput.MoveVelocity = 10;
+            }
+
+            //================================================================
+            // View/Projection
+
+            view.Update();
+            projection.Update();
+
+            //================================================================
+            // PartitionManager
+
+            var eyePosition = view.Position;
+            partitionManager.Update(ref eyePosition);
+
+            //================================================================
+            // RegionManager
+
+            regionManager.Update();
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, backgroundColor, 1, 0);
+            GraphicsDevice.RasterizerState = defaultRasterizerState;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            regionManager.Draw();
 
             base.Draw(gameTime);
         }

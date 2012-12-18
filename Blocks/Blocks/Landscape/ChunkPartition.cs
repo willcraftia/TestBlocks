@@ -34,13 +34,6 @@ namespace Willcraftia.Xna.Blocks.Landscape
             base.InitializeOverride();
         }
 
-        //public override void Update()
-        //{
-        //    region.UpdateChunk(ref GridPosition);
-
-        //    base.Update();
-        //}
-
         protected override void ActivateOverride()
         {
             if (!regionManager.TryGetRegion(ref GridPosition, out region))

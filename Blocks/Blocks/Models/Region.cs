@@ -46,6 +46,11 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkManager.Update();
         }
 
+        public void Draw()
+        {
+            chunkManager.Draw();
+        }
+
         public bool ContainsGridPosition(ref VectorI3 gridPosition)
         {
             ContainmentType result;

@@ -68,7 +68,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 workingChunks.Capacity = activeChunks.Count;
 
                 for (int i = 0; i < activeChunks.Count; i++)
-                    workingChunks[i] = activeChunks[i];
+                    workingChunks.Add(activeChunks[i]);
             }
 
             foreach (var chunk in workingChunks)
@@ -113,6 +113,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 更新処理を実行。
             chunkMeshUpdateManager.Update();
+        }
+
+        public void Draw()
+        {
         }
 
         // 非同期呼び出し。

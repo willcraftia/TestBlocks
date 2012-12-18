@@ -108,7 +108,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             // Wait.
             asyncCallEvent.WaitOne();
 
-            Passivate();
+            // Dispose 中にパッシベートするのは危険。
+            // パッシベートでファイルへの永続化を行うなどの場合、
+            // 永続化を担うクラス、例えば、StorageContainer などが、
+            // その時点で既に Dispose されている可能性がある。
+            //Passivate();
             DisposeOverride(disposing);
 
             asyncCallEvent.Dispose();

@@ -129,5 +129,11 @@ namespace Willcraftia.Xna.Blocks.Models
             foreach (var region in regions)
                 region.Update();
         }
+
+        public void Draw()
+        {
+            foreach (var region in regions)
+                region.Draw();
+        }
     }
 }

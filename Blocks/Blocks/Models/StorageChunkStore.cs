@@ -57,12 +57,12 @@ namespace Willcraftia.Xna.Blocks.Models
             bool result;
             if (!storageContainer.FileExists(filePath))
             {
-                logger.Info("No file exists: ", filePath);
+                logger.Info("No chunk cache exists: {0}", filePath);
                 result = false;
             }
             else
             {
-                logger.Info("File exists: {0}", filePath);
+                logger.Info("Chunk cache exists: {0}", filePath);
 
                 using (var stream = storageContainer.OpenFile(filePath, FileMode.Open))
                 using (var reader = new BinaryReader(stream))
@@ -92,7 +92,7 @@ namespace Willcraftia.Xna.Blocks.Models
             
             var filePath = ResolveFilePath(chunk.Position);
 
-            logger.Info("File: {0}", filePath);
+            logger.Info("Chunk cache: {0}", filePath);
 
             using (var stream = storageContainer.CreateFile(filePath))
             using (var writer = new BinaryWriter(stream))
