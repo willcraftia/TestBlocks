@@ -45,7 +45,7 @@ namespace Willcraftia.Xna.Framework.Plugins
         {
             if (initialized) throw new InvalidOperationException("PluginManager is already initialized.");
 
-            logger.InfoBegin("Initialize");
+            logger.Info("Initialize");
 
             var pluginDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Plugins");
             if (!Directory.Exists(pluginDirectoryPath))
@@ -92,8 +92,6 @@ namespace Willcraftia.Xna.Framework.Plugins
             }
 
             initialized = true;
-
-            logger.InfoEnd("Initialize");
         }
     }
 }

@@ -128,7 +128,7 @@ namespace Willcraftia.Xna.Framework.Content
 
         public void Download(WebResource resource)
         {
-            logger.InfoBegin("Download: {0}", resource.AbsoluteUri);
+            logger.Info("Download: {0}", resource.AbsoluteUri);
 
             var request = WebRequest.Create(resource.AbsoluteUri);
             request.Timeout = Timeout;
@@ -152,8 +152,6 @@ namespace Willcraftia.Xna.Framework.Content
                 var downloadInfo = GetDownloadInfo(resource);
                 downloadInfo.LastModified = response.LastModified.Ticks;
             }
-
-            logger.InfoEnd("Download: {0}", resource.AbsoluteUri);
         }
 
         DownloadInfo GetDownloadInfo(WebResource resource)

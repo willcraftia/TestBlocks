@@ -83,7 +83,7 @@ namespace Willcraftia.Xna.Framework.Content
 
         AssetHolder LoadNew(IResource resource, Type type)
         {
-            logger.InfoBegin("LoadNew: {0}", resource);
+            logger.Info("LoadNew: {0}", resource);
 
             object asset;
             if (resource is ContentResource)
@@ -113,14 +113,12 @@ namespace Willcraftia.Xna.Framework.Content
             var holder = new AssetHolder { Resource = resource, Asset = asset };
             holders.Add(holder);
 
-            logger.InfoEnd("LoadNew: {0}", resource);
-
             return holder;
         }
 
         public void Unload(IResource resource)
         {
-            logger.InfoBegin("Unload: {0}", resource);
+            logger.Info("Unload: {0}", resource);
 
             AssetHolder holder;
             if (holders.TryGetItem(resource, out holder))
@@ -130,8 +128,6 @@ namespace Willcraftia.Xna.Framework.Content
                 holder.Resource = null;
                 holder.Asset = null;
             }
-
-            logger.InfoEnd("Unload: {0}", resource);
         }
 
         public void Unload()
@@ -169,7 +165,7 @@ namespace Willcraftia.Xna.Framework.Content
             if (asset == null) throw new ArgumentNullException("asset");
             if (resource.ReadOnly) throw new InvalidOperationException("Read-only resource: " + resource);
 
-            logger.InfoBegin("Save: {0}", resource);
+            logger.Info("Save: {0}", resource);
 
             // Protect.
             AssetHolder testHolder;
@@ -208,8 +204,6 @@ namespace Willcraftia.Xna.Framework.Content
 
             var assetInterface = asset as IAsset;
             if (assetInterface != null) assetInterface.Resource = resource;
-
-            logger.InfoEnd("Save: {0}", resource);
         }
 
         IAssetLoader GetLoader(Type type)

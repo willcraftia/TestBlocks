@@ -49,7 +49,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool GetChunk(ref VectorI3 position, Chunk chunk)
         {
-            logger.InfoBegin("GetChunk: {0}", position);
+            logger.Debug("GetChunk: {0}", position);
 
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePath = ResolveFilePath(position);
@@ -57,12 +57,11 @@ namespace Willcraftia.Xna.Blocks.Models
             bool result;
             if (!storageContainer.FileExists(filePath))
             {
-                logger.Info("No chunk cache exists: {0}", filePath);
                 result = false;
             }
             else
             {
-                logger.Info("Chunk cache exists: {0}", filePath);
+                logger.Info("Activate: {0}", filePath);
 
                 using (var stream = storageContainer.OpenFile(filePath, FileMode.Open))
                 using (var reader = new BinaryReader(stream))
@@ -73,14 +72,12 @@ namespace Willcraftia.Xna.Blocks.Models
                 result = true;
             }
 
-            logger.InfoEnd("GetChunk: {0}", position);
-
             return result;
         }
 
         public void AddChunk(Chunk chunk)
         {
-            logger.InfoBegin("AddChunk: {0}", chunk.Position);
+            logger.Debug("AddChunk: {0}", chunk.Position);
 
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
@@ -92,15 +89,13 @@ namespace Willcraftia.Xna.Blocks.Models
             
             var filePath = ResolveFilePath(chunk.Position);
 
-            logger.Info("Chunk cache: {0}", filePath);
+            logger.Info("Passivate: {0}", filePath);
 
             using (var stream = storageContainer.CreateFile(filePath))
             using (var writer = new BinaryWriter(stream))
             {
                 chunk.Write(writer);
             }
-
-            logger.InfoEnd("AddChunk: {0}", chunk.Position);
         }
 
         public void DeleteChunk(Chunk chunk)

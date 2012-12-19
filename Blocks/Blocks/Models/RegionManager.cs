@@ -66,7 +66,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // Region 丸ごと別スレッドでロードするつもり。
         public Region LoadRegion(string uri)
         {
-            logger.InfoBegin("LoadRegion: {0}", uri);
+            logger.Info("LoadRegion: {0}", uri);
 
             var resourceManager = new ResourceManager();
 
@@ -92,8 +92,6 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 regions.Add(region);
             }
-
-            logger.InfoEnd("LoadRegion: {0}", uri);
 
             return region;
         }

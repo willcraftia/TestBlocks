@@ -70,7 +70,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         {
             //================================================================
             // Logging
-            logger.InfoBegin("Initialize");
+            logger.Info("Initialize");
 
             EnvironmentLog.Info();
             GraphicsAdapterLog.Info();
@@ -139,13 +139,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // Others
 
             base.Initialize();
-
-            logger.InfoEnd("Initialize");
         }
 
         protected override void LoadContent()
         {
-            logger.InfoBegin("LoadContent");
+            logger.Info("LoadContent");
 
             //================================================================
             // Region
@@ -157,8 +155,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             var spriteFontUri = ContentResourceLoader.Instance.LoadResource("content:Fonts/Demo");
             var spriteFont = region.AssetManager.Load<SpriteFont>(spriteFontUri);
-
-            logger.InfoEnd("LoadContent");
         }
 
         protected override void UnloadContent()
