@@ -41,63 +41,71 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 for (int z = 0; z < size.Z; z++)
                 {
-                    var absoluteX = chunk.CalculateBlockPositionX(x);
-                    var absoluteZ = chunk.CalculateBlockPositionZ(z);
-                    var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
+                    var biomeElement = GetBiomeElement(chunk, biome, x, z);
 
                     for (int y = 0; y < size.Y; y++)
-                    {
-                        byte blockIndex = Block.EmptyIndex;
-
-                        if (Height == y)
-                        {
-                            // Horizon.
-                            switch (biomeElement)
-                            {
-                                case BiomeElement.Desert:
-                                    blockIndex = Region.BlockCatalog.SandIndex;
-                                    break;
-                                case BiomeElement.Forest:
-                                    blockIndex = Region.BlockCatalog.DirtIndex;
-                                    break;
-                                case BiomeElement.Mountains:
-                                    blockIndex = Region.BlockCatalog.StoneIndex;
-                                    break;
-                                case BiomeElement.Plains:
-                                    blockIndex = Region.BlockCatalog.GrassIndex;
-                                    break;
-                                case BiomeElement.Snow:
-                                    blockIndex = Region.BlockCatalog.SnowIndex;
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            // Below the horizon.
-                            switch (biomeElement)
-                            {
-                                case BiomeElement.Desert:
-                                    blockIndex = Region.BlockCatalog.SandIndex;
-                                    break;
-                                case BiomeElement.Forest:
-                                    blockIndex = Region.BlockCatalog.DirtIndex;
-                                    break;
-                                case BiomeElement.Mountains:
-                                    blockIndex = Region.BlockCatalog.StoneIndex;
-                                    break;
-                                case BiomeElement.Plains:
-                                    blockIndex = Region.BlockCatalog.DirtIndex;
-                                    break;
-                                case BiomeElement.Snow:
-                                    blockIndex = Region.BlockCatalog.SnowIndex;
-                                    break;
-                            }
-                        }
-
-                        chunk[x, y, z] = blockIndex;
-                    }
+                        Generate(chunk, x, y, z, biomeElement);
                 }
             }
+        }
+
+        BiomeElement GetBiomeElement(Chunk chunk, IBiome biome, int x, int z)
+        {
+            var absoluteX = chunk.CalculateBlockPositionX(x);
+            var absoluteZ = chunk.CalculateBlockPositionZ(z);
+            return biome.GetBiomeElement(absoluteX, absoluteZ);
+        }
+
+        void Generate(Chunk chunk, int x, int y, int z, BiomeElement biomeElement)
+        {
+            byte index = Block.EmptyIndex;
+
+            if (Height == y)
+            {
+                // Horizon.
+                switch (biomeElement)
+                {
+                    case BiomeElement.Desert:
+                        index = Region.BlockCatalog.SandIndex;
+                        break;
+                    case BiomeElement.Forest:
+                        index = Region.BlockCatalog.DirtIndex;
+                        break;
+                    case BiomeElement.Mountains:
+                        index = Region.BlockCatalog.StoneIndex;
+                        break;
+                    case BiomeElement.Plains:
+                        index = Region.BlockCatalog.GrassIndex;
+                        break;
+                    case BiomeElement.Snow:
+                        index = Region.BlockCatalog.SnowIndex;
+                        break;
+                }
+            }
+            else
+            {
+                // Below the horizon.
+                switch (biomeElement)
+                {
+                    case BiomeElement.Desert:
+                        index = Region.BlockCatalog.SandIndex;
+                        break;
+                    case BiomeElement.Forest:
+                        index = Region.BlockCatalog.DirtIndex;
+                        break;
+                    case BiomeElement.Mountains:
+                        index = Region.BlockCatalog.StoneIndex;
+                        break;
+                    case BiomeElement.Plains:
+                        index = Region.BlockCatalog.DirtIndex;
+                        break;
+                    case BiomeElement.Snow:
+                        index = Region.BlockCatalog.SnowIndex;
+                        break;
+                }
+            }
+
+            chunk[x, y, z] = index;
         }
     }
 }

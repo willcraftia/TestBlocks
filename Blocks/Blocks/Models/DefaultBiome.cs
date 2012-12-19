@@ -68,6 +68,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        const float inverseSizeX = 1 / (float) BiomeBounds.SizeX;
+
+        const float inverseSizeZ = 1 / (float) BiomeBounds.SizeZ;
+
         //====================================================================
         //
         // Persistent Properties
@@ -75,9 +79,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public INoiseSource HumidityNoise { get; set; }
-
         public INoiseSource TemperatureNoise { get; set; }
+
+        public INoiseSource HumidityNoise { get; set; }
 
         public BiomeElement BaseElement { get; set; }
 
@@ -144,23 +148,23 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void Initialize()
         {
-            if (HumidityNoise == null) throw new InvalidOperationException("HumidityNoise is null.");
             if (TemperatureNoise == null) throw new InvalidOperationException("TemperatureNoise is null.");
+            if (HumidityNoise == null) throw new InvalidOperationException("HumidityNoise is null.");
         }
 
         // I/F
         public float GetTemperature(int x, int z)
         {
-            float xf = x / (float) BiomeBounds.SizeX;
-            float zf = z / (float) BiomeBounds.SizeZ;
-            return MathExtension.Saturate(HumidityNoise.Sample(xf, 0, zf));
+            float xf = x * inverseSizeX;
+            float zf = z * inverseSizeZ;
+            return MathExtension.Saturate(TemperatureNoise.Sample(xf, 0, zf));
         }
 
         // I/F
         public float GetHumidity(int x, int z)
         {
-            float xf = x / (float) BiomeBounds.SizeX;
-            float zf = z / (float) BiomeBounds.SizeZ;
+            float xf = x * inverseSizeX;
+            float zf = z * inverseSizeZ;
             return MathExtension.Saturate(HumidityNoise.Sample(xf, 0, zf));
         }
 

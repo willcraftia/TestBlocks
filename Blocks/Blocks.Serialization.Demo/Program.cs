@@ -20,6 +20,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 {
     class Program
     {
+        #region MockBiome
+
         class MockBiome : IBiome
         {
             public byte Index { get; set; }
@@ -32,6 +34,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             public BiomeElement GetBiomeElement(int x, int z) { throw new NotImplementedException(); }
         }
+
+        #endregion
 
         static string directoryPath;
 
@@ -448,13 +452,23 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var biome = new DefaultBiome
                 {
                     Name = "Default Biome",
-                    HumidityNoise = new SumFractal
+                    HumidityNoise = new ScaleBias
                     {
-                        Source = new Perlin { Seed = 0 }
+                        Scale = 0.5f,
+                        Bias = 0.5f,
+                        Source = new SumFractal
+                        {
+                            Source = new ClassicPerlin { Seed = 300 }
+                        }
                     },
-                    TemperatureNoise = new SumFractal
+                    TemperatureNoise = new ScaleBias
                     {
-                        Source = new Perlin { Seed = 1 }
+                        Scale = 0.5f,
+                        Bias = 0.5f,
+                        Source = new SumFractal
+                        {
+                            Source = new ClassicPerlin { Seed = 301 }
+                        }
                     }
                 };
 
