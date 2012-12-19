@@ -93,8 +93,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
                     // 古い ActiveMesh をプールへ戻す。
                     var oldMesh = chunk.ActiveMesh;
-                    oldMesh.Clear();
-                    chunkMeshPool.Return(oldMesh);
+                    if (oldMesh != null)
+                    {
+                        oldMesh.Clear();
+                        chunkMeshPool.Return(oldMesh);
+                    }
 
                     // PendingMesh を新しい ActiveMesh として設定する。
                     chunk.ActiveMesh = chunk.PendingMesh;
@@ -187,6 +190,9 @@ namespace Willcraftia.Xna.Blocks.Models
             var relativeX = position.X % chunkSize.X;
             var relativeY = position.Y % chunkSize.Y;
             var relativeZ = position.Z % chunkSize.Z;
+            if (relativeX < 0) relativeX += chunkSize.X;
+            if (relativeY < 0) relativeY += chunkSize.Y;
+            if (relativeZ < 0) relativeZ += chunkSize.Z;
             return targetChunk[relativeX, relativeY, relativeZ];
         }
     }

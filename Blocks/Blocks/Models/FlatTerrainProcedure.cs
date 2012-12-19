@@ -107,5 +107,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunk[x, y, z] = index;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri:" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

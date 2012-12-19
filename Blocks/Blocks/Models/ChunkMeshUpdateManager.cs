@@ -106,6 +106,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
+            // Update the task queue.
+            taskQueue.Update();
+
             CheckCompletedTasks();
         }
 

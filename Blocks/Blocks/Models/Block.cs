@@ -61,7 +61,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public override string ToString()
         {
-            return "[Uri=" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + ", Index=" + Index + "]";
+            return "[Uri:" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + ", Index:" + Index + "]";
         }
 
         #endregion
