@@ -8,7 +8,7 @@ using Willcraftia.Xna.Framework.Diagnostics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMeshPart
+    public sealed class ChunkMeshPart : IDisposable
     {
         static readonly Logger logger = new Logger(typeof(ChunkMeshPart).Name);
 
@@ -30,6 +30,12 @@ namespace Willcraftia.Xna.Blocks.Models
         int vertexCount;
 
         int indexCount;
+
+        DynamicVertexBuffer vertexBuffer;
+
+        DynamicIndexBuffer indexBuffer;
+
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
         public int VertexCount
         {
@@ -85,8 +91,12 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public ChunkMeshPart()
+        public ChunkMeshPart(GraphicsDevice graphicsDevice)
         {
+            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+
+            GraphicsDevice = graphicsDevice;
+
             vertices = new VertexPositionNormalTexture[defaultVertexCapacity];
             indices = new ushort[defaultIndexCapacity];
         }
@@ -107,6 +117,27 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             vertexCount = 0;
             indexCount = 0;
+        }
+
+        public void BuildBuffer()
+        {
+            if (vertexCount == 0 || indexCount == 0) return;
+
+            if (vertexBuffer == null) vertexBuffer = CreateVertexBuffer();
+            if (indexBuffer == null) indexBuffer = CreateIndexBuffer();
+
+            vertexBuffer.SetData(vertices, 0, vertexCount, SetDataOptions.Discard);
+            indexBuffer.SetData(indices, 0, indexCount, SetDataOptions.Discard);
+        }
+
+        DynamicVertexBuffer CreateVertexBuffer()
+        {
+            return new DynamicVertexBuffer(GraphicsDevice, typeof(VertexPositionNormalTexture), defaultVertexCapacity, BufferUsage.WriteOnly);
+        }
+
+        DynamicIndexBuffer CreateIndexBuffer()
+        {
+            return new DynamicIndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
         }
 
         public void PopulateVertexBuffer(VertexBuffer vertexBuffer)
@@ -146,5 +177,32 @@ namespace Willcraftia.Xna.Blocks.Models
                 logger.Warn("EnsureIndexCapacity: newCapacity={0}", newCapacity);
             }
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~ChunkMeshPart()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (vertexBuffer != null) vertexBuffer.Dispose();
+            if (indexBuffer != null) indexBuffer.Dispose();
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }

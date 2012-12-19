@@ -63,7 +63,7 @@ namespace Willcraftia.Xna.Blocks.Models
             this.chunkSize = chunkSize;
 
             chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(chunkSize); });
-            chunkMeshPool = new ConcurrentPool<ChunkMesh>(() => { return new ChunkMesh(); });
+            chunkMeshPool = new ConcurrentPool<ChunkMesh>(() => { return new ChunkMesh(region.GraphicsDevice); });
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
         }
 
@@ -116,9 +116,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     chunk.ActiveMesh = chunk.PendingMesh;
                     chunk.PendingMesh = null;
 
-                    // TODO
-                    // vertexbuffer への反映
-
+                    // VertexBuffer/IndexBuffer への反映
+                    chunk.ActiveMesh.BuildBuffers();
 
                     // Dirty フラグを倒す。
                     chunk.Dirty = false;

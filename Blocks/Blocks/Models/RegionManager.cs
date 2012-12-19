@@ -86,9 +86,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(IChunkProcedure), new ChunkProcedureLoader());
 
             var region = assetManager.Load<Region>(resource);
-            region.AssetManager = assetManager;
-            region.ChunkStore = new StorageChunkStore(resource);
-            region.Initialize();
+            region.Initialize(graphicsDevice, assetManager, new StorageChunkStore(resource));
 
             lock (regions)
             {

@@ -17,7 +17,7 @@ namespace Willcraftia.Xna.Framework.Collections
 
         Func<T> createFunction;
 
-        Stack<T> objects = new Stack<T>();
+        Queue<T> objects = new Queue<T>();
 
         public int Count
         {
@@ -51,7 +51,7 @@ namespace Willcraftia.Xna.Framework.Collections
             MaxCapacity = DefaultMaxCapacity;
 
             for (int i = 0; i < initialCapacity; i++)
-                objects.Push(CreateObject());
+                objects.Enqueue(CreateObject());
         }
 
         public T Borrow()
@@ -59,10 +59,14 @@ namespace Willcraftia.Xna.Framework.Collections
             lock (objects)
             {
                 while (0 < MaxCapacity && MaxCapacity < TotalObjectCount && 0 < objects.Count)
-                    objects.Pop();
+                {
+                    var obj = objects.Dequeue();
+                    var disposable = obj as IDisposable;
+                    if (disposable != null) disposable.Dispose();
+                }
 
                 if (0 < objects.Count)
-                    return objects.Pop();
+                    return objects.Dequeue();
 
                 return CreateObject();
             }
@@ -73,7 +77,7 @@ namespace Willcraftia.Xna.Framework.Collections
             lock (objects)
             {
                 if (TotalObjectCount <= MaxCapacity)
-                    objects.Push(obj);
+                    objects.Enqueue(obj);
             }
         }
 
@@ -81,6 +85,12 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             lock (objects)
             {
+                foreach (var obj in objects)
+                {
+                    var disposable = obj as IDisposable;
+                    if (disposable != null) disposable.Dispose();
+                }
+
                 objects.Clear();
             }
         }

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
@@ -18,9 +19,9 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public IResource Resource { get; set; }
 
-        public AssetManager AssetManager { get; set; }
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public IChunkStore ChunkStore { get; set; }
+        public AssetManager AssetManager { get; private set; }
 
         public string Name { get; set; }
 
@@ -36,9 +37,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public List<IChunkProcedure> ChunkProcesures { get; set; }
 
-        public void Initialize()
+        public void Initialize(GraphicsDevice graphicsDevice, AssetManager assetManager, IChunkStore chunkStore)
         {
-            chunkManager = new ChunkManager(this, ChunkStore, RegionManager.ChunkSize);
+            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (assetManager == null) throw new ArgumentNullException("assetManager");
+            if (chunkStore == null) throw new ArgumentNullException("chunkStore");
+
+            GraphicsDevice = graphicsDevice;
+            AssetManager = assetManager;
+
+            chunkManager = new ChunkManager(this, chunkStore, RegionManager.ChunkSize);
         }
 
         public void Update()
