@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Threading;
 
 #endregion
@@ -381,6 +382,15 @@ namespace Willcraftia.Xna.Framework.Landscape
             taskQueue.Clear();
 
             disposed = true;
+        }
+
+        void DisposePartitions(Pool<Partition> partitions)
+        {
+            while (0 < partitions.Count)
+            {
+                var partition = partitions.Borrow();
+                partition.Dispose();
+            }
         }
 
         void DisposePartitions(IEnumerable<Partition> partitions)

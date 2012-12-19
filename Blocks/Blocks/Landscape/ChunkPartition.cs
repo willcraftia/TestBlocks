@@ -37,7 +37,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
         protected override void ActivateOverride()
         {
             if (!regionManager.TryGetRegion(ref GridPosition, out region))
-                throw new InvalidOperationException("The specified region can not be found.");
+                throw new InvalidOperationException("Region not found: " + GridPosition);
 
             region.ActivateChunk(ref GridPosition);
 

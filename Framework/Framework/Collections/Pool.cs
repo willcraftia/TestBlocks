@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 #endregion
 
-namespace Willcraftia.Xna.Framework
+namespace Willcraftia.Xna.Framework.Collections
 {
-    public sealed class Pool<T> : IEnumerable<T> where T : class
+    public sealed class Pool<T> where T : class
     {
         public const int DefaultInitialCapacity = 0;
 
@@ -19,16 +19,16 @@ namespace Willcraftia.Xna.Framework
 
         Stack<T> objects = new Stack<T>();
 
+        public int Count
+        {
+            get { return objects.Count; }
+        }
+
         public int InitialCapacity { get; private set; }
 
         public int MaxCapacity { get; set; }
 
         public int TotalObjectCount { get; private set; }
-
-        public int FreeObjectCount
-        {
-            get { return objects.Count; }
-        }
 
         public Pool(Func<T> createFunction)
             : this(createFunction, DefaultInitialCapacity)
@@ -68,18 +68,6 @@ namespace Willcraftia.Xna.Framework
         public void Clear()
         {
             objects.Clear();
-        }
-
-        // I/F
-        public IEnumerator<T> GetEnumerator()
-        {
-            return objects.GetEnumerator();
-        }
-
-        // I/F
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return objects.GetEnumerator();
         }
 
         T CreateObject()

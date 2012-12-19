@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Threading;
 
@@ -29,9 +30,21 @@ namespace Willcraftia.Xna.Blocks.Models
 
         List<Chunk> workingChunks = new List<Chunk>();
 
-        Pool<Chunk> chunkPool;
+        // Chunk 数は Partition 数に対応するため、
+        // Chunk Pool のサイズを ChunkManager で独自に設定することはできず、
+        // Partition.Activate から連なる ActiveChunk の呼び出しでは、
+        // 必ず Chunk を提供できなければならない。
 
-        Pool<ChunkMesh> chunkMeshPool;
+        ConcurrentPool<Chunk> chunkPool;
+
+        //
+        // Chunk.ActiveMesh と Chunk.PendingMesh の切替があるため、
+        // ChunkMesh 総数は Chunk 数の二倍まで到達しうる。
+        // そして、Chunk 総数をここで決定できないことから、
+        // 同様に ChunkMesh 総数をここで決定することもできない。
+        //
+
+        ConcurrentPool<ChunkMesh> chunkMeshPool;
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
@@ -49,8 +62,8 @@ namespace Willcraftia.Xna.Blocks.Models
             this.chunkStore = chunkStore;
             this.chunkSize = chunkSize;
 
-            chunkPool = new Pool<Chunk>(() => { return new Chunk(chunkSize); });
-            chunkMeshPool = new Pool<ChunkMesh>(() => { return new ChunkMesh(); });
+            chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(chunkSize); });
+            chunkMeshPool = new ConcurrentPool<ChunkMesh>(() => { return new ChunkMesh(); });
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
         }
 
@@ -126,7 +139,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public void ActivateChunk(ref VectorI3 position)
         {
             var chunk = chunkPool.Borrow();
-            if (chunk == null) throw new InvalidOperationException("Any new chunk can not be created.");
+            if (chunk == null) throw new InvalidOperationException("No pooled chunk exists.");
 
             if (!chunkStore.GetChunk(ref position, chunk))
             {
@@ -149,18 +162,29 @@ namespace Willcraftia.Xna.Blocks.Models
             Chunk chunk;
             if (!TryGetActiveChunk(ref position, out chunk)) return;
 
-            lock (chunk)
+            chunkStore.AddChunk(chunk);
+
+            // Deregister
+            lock (activeChunks)
             {
-                chunkStore.AddChunk(chunk);
-
-                // Deregister
-                lock (activeChunks)
-                {
-                    activeChunks.Remove(chunk);
-                }
-
-                chunk.Clear();
+                activeChunks.Remove(chunk);
             }
+
+            chunk.Clear();
+
+            if (chunk.ActiveMesh != null)
+            {
+                chunkMeshPool.Return(chunk.ActiveMesh);
+                chunk.ActiveMesh = null;
+            }
+
+            if (chunk.PendingMesh != null)
+            {
+                chunkMeshPool.Return(chunk.PendingMesh);
+                chunk.PendingMesh = null;
+            }
+
+            chunkPool.Return(chunk);
         }
 
         public bool TryGetActiveChunk(ref VectorI3 position, out Chunk chunk)

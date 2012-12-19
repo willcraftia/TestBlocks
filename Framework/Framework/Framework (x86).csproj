@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
+    <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentInfoManager.cs" />
     <Compile Include="Content\AssetHolder.cs" />
@@ -199,7 +200,7 @@
     <Compile Include="Plugins\PluginManager.cs" />
     <Compile Include="RectangleF.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
-    <Compile Include="Pool.cs" />
+    <Compile Include="Collections\Pool.cs" />
     <Compile Include="Projection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceProviderExtension.cs" />

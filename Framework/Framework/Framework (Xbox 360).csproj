@@ -95,10 +95,12 @@
     <Compile Include="ArrayHelper.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="CollectionHelper.cs" />
+    <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
+    <Compile Include="Collections\Pool.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentBundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />
@@ -203,7 +205,6 @@
     <Compile Include="Plugins\IPluginHostRegistory.cs" />
     <Compile Include="Plugins\PluginHostRegistory.cs" />
     <Compile Include="Plugins\PluginManager.cs" />
-    <Compile Include="Pool.cs" />
     <Compile Include="Projection.cs" />
     <Compile Include="ProjectionBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

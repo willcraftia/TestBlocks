@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Threading;
 
 #endregion
