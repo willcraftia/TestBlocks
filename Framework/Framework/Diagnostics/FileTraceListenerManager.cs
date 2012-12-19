@@ -24,7 +24,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             var directoryPath = Path.GetDirectoryName(fullPath);
             if (!Directory.Exists(directoryPath)) Directory.CreateDirectory(directoryPath);
 
-            var writer = new StreamWriter(filePath, append);
+            var writer = new StreamWriter(fullPath, append);
             var listener = new TextWriterTraceListener(writer);
             listener.Name = filePath;
             Trace.Listeners.Add(listener);

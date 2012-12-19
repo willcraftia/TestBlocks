@@ -13,14 +13,14 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 
         static readonly string[] levelStrings =
         {
-            "FATAL", "ERROR", "WARN ", "INFO ", "DEBUG"
+            "FATAL", "ERROR", "WARN", "INFO", "DEBUG"
         };
 
         DebugAppender() { }
 
         public void Append(ref LogEvent logEvent)
         {
-            Debug.WriteLine("{0:HH:mm:ss.fffffff} [{1}] {2} {3} - {4}",
+            Debug.WriteLine("{0:HH:mm:ss.fffffff} [{1,2}] {2,-5} {3} - {4}",
                 logEvent.DateTime,
                 logEvent.ThreadId,
                 levelStrings[(int) logEvent.Level],

@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 #if WINDOWS
         static readonly string[] levelStrings =
         {
-            "FATAL", "ERROR", "WARN ", "INFO ", "DEBUG"
+            "FATAL", "ERROR", "WARN", "INFO", "DEBUG"
         };
 #endif
 
@@ -26,10 +26,8 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             lock (this)
             {
                 Trace.Write(logEvent.DateTime.ToString("HH:mm:ss.fffffff"));
-                Trace.Write(" [");
-                Trace.Write(logEvent.ThreadId);
-                Trace.Write("] ");
-                Trace.Write(string.Format("{0} ", levelStrings[(int) logEvent.Level]));
+                Trace.Write(string.Format(" [{0,2}] ", logEvent.ThreadId));
+                Trace.Write(string.Format("{0,-5} ", levelStrings[(int) logEvent.Level]));
                 Trace.Write(" ");
                 Trace.Write(logEvent.Category);
                 Trace.Write(" - ");
