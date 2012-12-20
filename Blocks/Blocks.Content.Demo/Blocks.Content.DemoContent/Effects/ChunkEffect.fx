@@ -92,7 +92,7 @@ struct VSOutput
 //-----------------------------------------------------------------------------
 float CalculateFogFactor(float d)
 {
-    return clamp((d - FogStart) / (FogEnd - FogStart), 0, 1) * FogEnabled;
+    return saturate((d - FogStart) / (FogEnd - FogStart)) * FogEnabled;
 }
 
 //=============================================================================
