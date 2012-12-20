@@ -149,7 +149,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Texture2D CreateMap(GraphicsDevice graphicsDevice)
         {
-            return new Texture2D(graphicsDevice, TextureSize, TextureSize, false, SurfaceFormat.Color);
+            return new Texture2D(graphicsDevice, TextureSize, TextureSize, true, SurfaceFormat.Color);
         }
 
         void CalculateTileBounds(byte index, out Rectangle bounds)
