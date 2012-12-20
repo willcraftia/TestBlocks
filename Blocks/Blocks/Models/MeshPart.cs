@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 #endregion
@@ -20,6 +21,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
             Vertices = vertices;
             Indices = indices;
+        }
+
+        public MeshPart Create(ref Vector2 texCoordOffset)
+        {
+            var newVertices = new VertexPositionNormalTexture[Vertices.Length];
+            Array.Copy(Vertices, newVertices, newVertices.Length);
+            for (int j = 0; j < newVertices.Length; j++)
+            {
+                newVertices[j].TextureCoordinate.X += texCoordOffset.X;
+                newVertices[j].TextureCoordinate.Y += texCoordOffset.Y;
+            }
+
+            // 全てのメッシュで共通であるため配列を共有。
+            return new MeshPart(newVertices, Indices);
         }
     }
 }

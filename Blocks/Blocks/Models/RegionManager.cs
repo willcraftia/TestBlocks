@@ -126,10 +126,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 region.Update();
         }
 
-        public void Draw()
+        public void Draw(View view, Projection projection)
         {
             foreach (var region in regions)
-                region.Draw();
+                region.Draw(view, projection);
         }
     }
 }

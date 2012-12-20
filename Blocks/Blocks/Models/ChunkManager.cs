@@ -16,6 +16,47 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkManager
     {
+        #region ChunkDistanceComparer
+
+        class ChunkDistanceComparer : IComparer<Chunk>
+        {
+            VectorI3 chunkSize;
+
+            public Vector3 EyePosition;
+
+            public ChunkDistanceComparer(VectorI3 chunkSize)
+            {
+                this.chunkSize = chunkSize;
+            }
+
+            public int Compare(Chunk chunk0, Chunk chunk1)
+            {
+                float d0;
+                float d1;
+                CalculateDistanceSquared(chunk0, out d0);
+                CalculateDistanceSquared(chunk1, out d1);
+
+                if (d0 == d1) return 0;
+                return (d0 < d1) ? -1 : 1;
+            }
+
+            void CalculateDistanceSquared(Chunk chunk, out float distanceSquared)
+            {
+                var chunkPosition = chunk.Position.ToVector3();
+
+                chunkPosition.X *= chunkSize.X;
+                chunkPosition.Y *= chunkSize.Y;
+                chunkPosition.Z *= chunkSize.Z;
+                chunkPosition.X += 0.5f;
+                chunkPosition.Y += 0.5f;
+                chunkPosition.Z += 0.5f;
+
+                Vector3.DistanceSquared(ref EyePosition, ref chunkPosition, out distanceSquared);
+            }
+        }
+
+        #endregion
+
         Region region;
 
         IChunkStore chunkStore;
@@ -48,6 +89,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
+        BoundingFrustum viewFrustum = new BoundingFrustum(Matrix.Identity);
+
+        Vector3 eyePosition;
+
+        ChunkDistanceComparer chunkDistanceComparer;
+
+        List<Chunk> opaqueChunks = new List<Chunk>();
+
+        List<Chunk> translucentChunks = new List<Chunk>();
+
         public VectorI3 ChunkSize
         {
             get { return chunkSize; }
@@ -65,6 +116,7 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(chunkSize); });
             chunkMeshPool = new ConcurrentPool<ChunkMesh>(() => { return new ChunkMesh(region.GraphicsDevice); });
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
+            chunkDistanceComparer = new ChunkDistanceComparer(chunkSize);
         }
 
         //
@@ -130,8 +182,51 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkMeshUpdateManager.Update();
         }
 
-        public void Draw()
+        public void Draw(View view, Projection projection)
         {
+            // 長時間のロックを避けるために、一度、リストへコピーする。
+            lock (activeChunks)
+            {
+                // 複製ループに入る前に、十分な容量を先に保証しておく。
+                workingChunks.Capacity = activeChunks.Count;
+
+                for (int i = 0; i < activeChunks.Count; i++)
+                    workingChunks.Add(activeChunks[i]);
+            }
+
+            View.GetEyePosition(ref view.Matrix, out eyePosition);
+            viewFrustum.Matrix = view.Matrix * projection.Matrix;
+
+            for (int i = 0; i < workingChunks.Count; i++)
+            {
+                var chunk = workingChunks[i];
+
+                if (!IsInViewFrustum(chunk)) continue;
+
+                var activeMesh = chunk.ActiveMesh;
+                if (activeMesh == null) continue;
+
+                if (activeMesh.Opaque.VertexCount != 0)
+                    opaqueChunks.Add(chunk);
+
+                if (activeMesh.Translucent.VertexCount != 0)
+                    translucentChunks.Add(chunk);
+            }
+
+            opaqueChunks.Sort(chunkDistanceComparer);
+            translucentChunks.Sort(chunkDistanceComparer);
+
+            workingChunks.Clear();
+        }
+
+        bool IsInViewFrustum(Chunk chunk)
+        {
+            var box = chunk.BoundingBox;
+
+            ContainmentType containmentType;
+            viewFrustum.Contains(ref box, out containmentType);
+
+            return containmentType != ContainmentType.Disjoint;
         }
 
         // 非同期呼び出し。

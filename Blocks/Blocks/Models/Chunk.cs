@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 
 #endregion
@@ -11,21 +12,44 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Chunk
     {
-        //====================================================================
-        // Efficiency
-
-        public VectorI3 Position;
-
-        //
-        //====================================================================
-
         VectorI3 size;
+
+        VectorI3 position;
+
+        BoundingBox boundingBox;
 
         byte[] blockIndices;
 
         public VectorI3 Size
         {
             get { return size; }
+        }
+
+        public VectorI3 Position
+        {
+            get { return position; }
+            set
+            {
+                position = value;
+
+                boundingBox.Min = new Vector3
+                {
+                    X = position.X * size.X,
+                    Y = position.Y * size.Y,
+                    Z = position.Z * size.Z
+                };
+                boundingBox.Max = new Vector3
+                {
+                    X = boundingBox.Min.X + size.X,
+                    Y = boundingBox.Min.Y + size.Y,
+                    Z = boundingBox.Min.Z + size.Z
+                };
+            }
+        }
+
+        public BoundingBox BoundingBox
+        {
+            get { return boundingBox; }
         }
 
         public byte this[int x, int y, int z]
@@ -76,24 +100,24 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public int CalculateBlockPositionX(int x)
         {
-            return Position.X * size.X + x;
+            return position.X * size.X + x;
         }
 
         public int CalculateBlockPositionY(int y)
         {
-            return Position.Y * size.Y + y;
+            return position.Y * size.Y + y;
         }
 
         public int CalculateBlockPositionZ(int z)
         {
-            return Position.Z * size.Z + z;
+            return position.Z * size.Z + z;
         }
 
         public void Read(BinaryReader reader)
         {
-            Position.X = reader.ReadInt32();
-            Position.Y = reader.ReadInt32();
-            Position.Z = reader.ReadInt32();
+            position.X = reader.ReadInt32();
+            position.Y = reader.ReadInt32();
+            position.Z = reader.ReadInt32();
 
             for (int i = 0; i < blockIndices.Length; i++)
                 blockIndices[i] = reader.ReadByte();
@@ -103,9 +127,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Write(BinaryWriter writer)
         {
-            writer.Write(Position.X);
-            writer.Write(Position.Y);
-            writer.Write(Position.Z);
+            writer.Write(position.X);
+            writer.Write(position.Y);
+            writer.Write(position.Z);
 
             for (int i = 0; i < blockIndices.Length; i++)
                 writer.Write(blockIndices[i]);
@@ -117,11 +141,11 @@ namespace Willcraftia.Xna.Blocks.Models
             Dirty = true;
         }
 
-        public bool Contains(ref VectorI3 position)
+        public bool Contains(ref VectorI3 blockPosition)
         {
-            return 0 <= position.X && position.X < size.X &&
-                0 <= position.Y && position.Y < size.Y &&
-                0 <= position.Z && position.Z < size.Z;
+            return 0 <= blockPosition.X && blockPosition.X < size.X &&
+                0 <= blockPosition.Y && blockPosition.Y < size.Y &&
+                0 <= blockPosition.Z && blockPosition.Z < size.Z;
         }
     }
 }

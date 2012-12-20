@@ -215,7 +215,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             GraphicsDevice.RasterizerState = defaultRasterizerState;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            regionManager.Draw();
+            regionManager.Draw(view, projection);
 
             base.Draw(gameTime);
         }

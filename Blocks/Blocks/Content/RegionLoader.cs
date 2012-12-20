@@ -58,6 +58,11 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (RegionDefinition) serializer.Deserialize(resource);
 
+            //
+            // リージョンのロードでは、必ず、ブロック カタログよりもタイル カタログを先にロードする。
+            // これは、使用するタイルに合わせたブロック メッシュでのテクスチャ座標の調整に関係する。
+            //
+
             var region = new Region
             {
                 Name = definition.Name,

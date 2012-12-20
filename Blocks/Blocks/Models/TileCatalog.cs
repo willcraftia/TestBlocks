@@ -19,6 +19,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const int TileLineWidth = 16;
 
+        const float inverseTextureSize = 1 / 256f;
+
+        const float inverseTileSize = 1 / 16f;
+
+        const float inverseTileLineWidth = 1 / 16f;
+        
         Color[] colorBuffer;
 
         // I/F
@@ -112,9 +118,39 @@ namespace Willcraftia.Xna.Blocks.Models
             SetColorBuffer(SpecularColorMap, ref bounds);
         }
 
+        public void GetTexCoordOffset(byte index, out Vector2 offset)
+        {
+            offset = new Vector2
+            {
+                X = (index % TileLineWidth) * inverseTileLineWidth,
+                Y = (index / TileLineWidth) * inverseTileLineWidth
+            };
+        }
+
         protected override byte GetKeyForItem(Tile item)
         {
             return item.Index;
+        }
+
+        protected override void SetOverride(int index, Tile item)
+        {
+            item.Catalog = this;
+
+            base.SetOverride(index, item);
+        }
+
+        protected override void InsertOverride(int index, Tile item)
+        {
+            item.Catalog = this;
+
+            base.InsertOverride(index, item);
+        }
+
+        protected override void RemoveAtOverride(int index)
+        {
+            this[index].Catalog = null;
+
+            base.RemoveAtOverride(index);
         }
 
         Texture2D CreateMap(GraphicsDevice graphicsDevice)
@@ -126,8 +162,8 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             bounds = new Rectangle
             {
-                X = index % TileLineWidth,
-                Y = index / TileLineWidth,
+                X = (index % TileLineWidth) * TileSize,
+                Y = (index / TileLineWidth) * TileSize,
                 Width = TileSize,
                 Height = TileSize
             };

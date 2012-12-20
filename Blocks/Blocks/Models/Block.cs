@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Block : IAsset
     {
-        public const byte EmptyIndex = 0;
+        public const byte EmptyIndex = byte.MaxValue;
 
         // MEMO
         //
@@ -26,7 +26,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public Mesh Mesh { get; set; }
+        public Mesh MeshTemplate { get; set; }
 
         public Tile TopTile { get; set; }
         
@@ -56,6 +56,66 @@ namespace Willcraftia.Xna.Blocks.Models
         public float DynamicFriction { get; set; }
 
         public float Restitution { get; set; }
+
+        public BlockMesh Mesh { get; private set; }
+
+        public Block()
+        {
+            Index = EmptyIndex;
+        }
+
+        public void BuildMesh()
+        {
+            Mesh = BlockMesh.Create(this);
+        }
+
+        public Tile GetTile(Side side)
+        {
+            switch (side)
+            {
+                case Side.Top:
+                    return TopTile;
+                case Side.Bottom:
+                    return BottomTile;
+                case Side.Front:
+                    return FrontTile;
+                case Side.Back:
+                    return BackTile;
+                case Side.Left:
+                    return LeftTile;
+                case Side.Right:
+                    return RightTile;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        public void SetTile(Side side, Tile tile)
+        {
+            switch (side)
+            {
+                case Side.Top:
+                    TopTile = tile;
+                    break;
+                case Side.Bottom:
+                    BottomTile = tile;
+                    break;
+                case Side.Front:
+                    FrontTile = tile;
+                    break;
+                case Side.Back:
+                    BackTile = tile;
+                    break;
+                case Side.Left:
+                    LeftTile = tile;
+                    break;
+                case Side.Right:
+                    RightTile = tile;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
 
         #region ToString
 

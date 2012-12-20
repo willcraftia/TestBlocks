@@ -30,10 +30,11 @@ namespace Willcraftia.Xna.Blocks.Content
         public object Load(IResource resource)
         {
             var definition = (BlockDefinition) serializer.Deserialize(resource);
-            return new Block
+            
+            var block = new Block
             {
                 Name = definition.Name,
-                Mesh = Load<Mesh>(resource, definition.Mesh),
+                MeshTemplate = Load<Mesh>(resource, definition.Mesh),
                 TopTile = Load<Tile>(resource, definition.TopTile),
                 BottomTile = Load<Tile>(resource, definition.BottomTile),
                 FrontTile = Load<Tile>(resource, definition.FrontTile),
@@ -48,6 +49,9 @@ namespace Willcraftia.Xna.Blocks.Content
                 DynamicFriction = definition.DynamicFriction,
                 Restitution = definition.Restitution
             };
+            block.BuildMesh();
+
+            return block;
         }
 
         // I/F
@@ -58,7 +62,7 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new BlockDefinition
             {
                 Name = block.Name,
-                Mesh = ToUri(resource, block.Mesh),
+                Mesh = ToUri(resource, block.MeshTemplate),
                 TopTile = ToUri(resource, block.TopTile),
                 BottomTile = ToUri(resource, block.BottomTile),
                 FrontTile = ToUri(resource, block.FrontTile),

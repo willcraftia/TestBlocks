@@ -72,6 +72,7 @@
     <Compile Include="Models\BiomeCatalog.cs" />
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\BiomeBounds.cs" />
+    <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
     <Compile Include="Models\IChunkProcedure.cs" />
@@ -90,7 +91,7 @@
     <Compile Include="BlockShape.cs" />
     <Compile Include="Landscape\ChunkPartition.cs" />
     <Compile Include="Landscape\ChunkPartitionManager.cs" />
-    <Compile Include="Landscape\ChunkRenderer.cs" />
+    <Compile Include="Models\ChunkRenderer.cs" />
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\BlockCatalog.cs" />
     <Compile Include="Models\Chunk.cs" />

@@ -54,9 +54,9 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkManager.Update();
         }
 
-        public void Draw()
+        public void Draw(View view, Projection projection)
         {
-            chunkManager.Draw();
+            chunkManager.Draw(view, projection);
         }
 
         public bool ContainsGridPosition(ref VectorI3 gridPosition)

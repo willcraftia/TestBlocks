@@ -236,15 +236,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool ShouldDrawSurface(Chunk chunk, int x, int y, int z, Block block, Side side)
         {
-            if (block.Mesh[side] == null)
-                return false;
+            if (block.Mesh[side] == null) return false;
 
-            var nearbyPosition = nearbyBlockOffsets[(byte) side];
-            nearbyPosition.X += x;
-            nearbyPosition.Y += y;
-            nearbyPosition.Z += z;
+            var nearbyBlockPosition = nearbyBlockOffsets[(byte) side];
+            nearbyBlockPosition.X += x;
+            nearbyBlockPosition.Y += y;
+            nearbyBlockPosition.Z += z;
 
-            var nearbyBlockIndex = chunkManager.FindActiveBlockIndex(chunk, ref nearbyPosition);
+            var nearbyBlockIndex = chunkManager.FindActiveBlockIndex(chunk, ref nearbyBlockPosition);
             if (Block.EmptyIndex == nearbyBlockIndex)
                 return true;
 
@@ -260,56 +259,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool IsTranslucentSurface(Block block, Side side)
         {
-            var tile = GetTile(block, side);
+            var tile = block.GetTile(side);
             return tile != null && tile.Translucent;
-        }
-
-        Tile GetTile(Block block, Side side)
-        {
-            switch (side)
-            {
-                case Side.Top:
-                    return block.TopTile;
-                case Side.Bottom:
-                    return block.BottomTile;
-                case Side.Front:
-                    return block.FrontTile;
-                case Side.Back:
-                    return block.BackTile;
-                case Side.Left:
-                    return block.LeftTile;
-                case Side.Right:
-                    return block.RightTile;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
-
-        void SetTile(Block block, Side side, Tile tile)
-        {
-            switch (side)
-            {
-                case Side.Top:
-                    block.TopTile = tile;
-                    break;
-                case Side.Bottom:
-                    block.BottomTile = tile;
-                    break;
-                case Side.Front:
-                    block.FrontTile = tile;
-                    break;
-                case Side.Back:
-                    block.BackTile = tile;
-                    break;
-                case Side.Left:
-                    block.LeftTile = tile;
-                    break;
-                case Side.Right:
-                    block.RightTile = tile;
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
         }
     }
 }

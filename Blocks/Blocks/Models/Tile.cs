@@ -11,6 +11,8 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Tile : IAsset
     {
+        public const byte EmptyIndex = byte.MaxValue;
+
         Vector3 diffuseColor;
 
         Vector3 emissiveColor;
@@ -21,6 +23,8 @@ namespace Willcraftia.Xna.Blocks.Models
         public IResource Resource { get; set; }
 
         public byte Index { get; set; }
+
+        public TileCatalog Catalog { get; internal set; }
 
         public string Name { get; set; }
 
@@ -47,6 +51,23 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         public byte SpecularPower { get; set; }
+
+        public Tile()
+        {
+            Index = EmptyIndex;
+        }
+
+        public void GetTexCoordOffset(out Vector2 offset)
+        {
+            if (Catalog == null)
+            {
+                offset = Vector2.Zero;
+            }
+            else
+            {
+                Catalog.GetTexCoordOffset(Index, out offset);
+            }
+        }
 
         #region ToString
 
