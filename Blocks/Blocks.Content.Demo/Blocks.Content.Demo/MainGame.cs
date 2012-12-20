@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Logging
 
-            FileTraceListenerManager.Add(@"Logs\App.log", false);
+            //FileTraceListenerManager.Add(@"Logs\App.log", false);
             logger.InfoGameStarted();
 
             Thread.GetDomain().UnhandledException += new UnhandledExceptionEventHandler(OnUnhandledException);
@@ -108,9 +108,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             viewInput.MoveVelocity = moveVelocity;
             viewInput.DashFactor = dashFactor;
 
-            view.Position = new Vector3(0, 50, 0);
+            view.Position = new Vector3(0, 256, 0);
+            //view.Position = new Vector3(0, 50, 0);
             view.Yaw(MathHelper.Pi);
-            //view.Pitch(-MathHelper.PiOver4);
             view.Update();
 
             projection.FarPlaneDistance = farPlaneDistance;
@@ -164,8 +164,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Exit
 
-            if (keyboardState.IsKeyDown(Keys.Escape))
+            if (!partitionManager.Closing && !partitionManager.Closed && keyboardState.IsKeyDown(Keys.Escape))
+            {
                 partitionManager.Close();
+
+                logger.Info("Wait until all partitions are passivated...");
+            }
 
             if (partitionManager.Closed)
                 Exit();
