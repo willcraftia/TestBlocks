@@ -121,7 +121,6 @@
     <Compile Include="Models\ChunkMesh.cs" />
     <Compile Include="Models\ChunkMeshPart.cs" />
     <Compile Include="Models\ChunkMeshUpdateManager.cs" />
-    <Compile Include="Models\ChunkRenderer.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\DefinedBiomeManager.cs" />
     <Compile Include="Models\FlatTerrainProcedure.cs" />

@@ -92,7 +92,6 @@
     <Compile Include="BlockShape.cs" />
     <Compile Include="Landscape\ChunkPartition.cs" />
     <Compile Include="Landscape\ChunkPartitionManager.cs" />
-    <Compile Include="Models\ChunkRenderer.cs" />
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\BlockCatalog.cs" />
     <Compile Include="Models\Chunk.cs" />
