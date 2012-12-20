@@ -49,8 +49,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool GetChunk(ref VectorI3 position, Chunk chunk)
         {
-            logger.Debug("GetChunk: {0}", position);
-
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePath = ResolveFilePath(position);
 
@@ -61,8 +59,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
             else
             {
-                logger.Info("Activate: {0}", filePath);
-
                 using (var stream = storageContainer.OpenFile(filePath, FileMode.Open))
                 using (var reader = new BinaryReader(stream))
                 {
@@ -77,8 +73,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void AddChunk(Chunk chunk)
         {
-            logger.Debug("AddChunk: {0}", chunk.Position);
-
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
             if (!storageContainer.DirectoryExists(rootDirectory))
@@ -88,9 +82,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 storageContainer.CreateDirectory(regionDirectory);
             
             var filePath = ResolveFilePath(chunk.Position);
-
-            logger.Info("Passivate: {0}", filePath);
-
             using (var stream = storageContainer.CreateFile(filePath))
             using (var writer = new BinaryWriter(stream))
             {
