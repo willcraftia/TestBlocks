@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         
         float dashFactor = 2;
 
-        float farPlaneDistance = 30000;
+        float farPlaneDistance = 3000;
 
         RegionManager regionManager;
 
