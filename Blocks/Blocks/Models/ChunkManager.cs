@@ -89,7 +89,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-        BoundingFrustum viewFrustum = new BoundingFrustum(Matrix.Identity);
+        BoundingFrustum frustum = new BoundingFrustum(Matrix.Identity);
 
         Vector3 eyePosition;
 
@@ -195,16 +195,18 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             View.GetEyePosition(ref view.Matrix, out eyePosition);
-            viewFrustum.Matrix = view.Matrix * projection.Matrix;
+            frustum.Matrix = view.Matrix * projection.Matrix;
 
             for (int i = 0; i < workingChunks.Count; i++)
             {
                 var chunk = workingChunks[i];
 
-                if (!IsInViewFrustum(chunk)) continue;
-
+                // メッシュ未完のチャンクはスキップ。
                 var activeMesh = chunk.ActiveMesh;
                 if (activeMesh == null) continue;
+
+                // Frustum Culling.
+                if (!IsInViewFrustum(chunk)) continue;
 
                 if (activeMesh.Opaque.VertexCount != 0)
                     opaqueChunks.Add(chunk);
@@ -216,7 +218,19 @@ namespace Willcraftia.Xna.Blocks.Models
             opaqueChunks.Sort(chunkDistanceComparer);
             translucentChunks.Sort(chunkDistanceComparer);
 
+            foreach (var chunk in opaqueChunks)
+                DrawChunkMeshPart(chunk.ActiveMesh.Opaque);
+
+            foreach (var chunk in translucentChunks)
+                DrawChunkMeshPart(chunk.ActiveMesh.Translucent);
+
+            opaqueChunks.Clear();
+            translucentChunks.Clear();
             workingChunks.Clear();
+        }
+
+        void DrawChunkMeshPart(ChunkMeshPart chunkMeshPart)
+        {
         }
 
         bool IsInViewFrustum(Chunk chunk)
@@ -224,7 +238,7 @@ namespace Willcraftia.Xna.Blocks.Models
             var box = chunk.BoundingBox;
 
             ContainmentType containmentType;
-            viewFrustum.Contains(ref box, out containmentType);
+            frustum.Contains(ref box, out containmentType);
 
             return containmentType != ContainmentType.Disjoint;
         }

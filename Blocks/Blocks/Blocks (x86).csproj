@@ -73,6 +73,7 @@
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BlockMesh.cs" />
+    <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
     <Compile Include="Models\IChunkProcedure.cs" />

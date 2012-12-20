@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Component;
@@ -73,6 +74,9 @@ namespace Willcraftia.Xna.Blocks.Content
                 ChunkBundleResource = Load(resource, definition.ChunkBundle)
             };
             region.ChunkProcesures = ToChunkProcedures(resource, definition.ChunkProcedures, region);
+
+            var chunkEffectResource = resourceManager.Load("content:Effects/ChunkEffect");
+            region.ChunkEffect = new ChunkEffect(AssetManager.Load<Effect>(chunkEffectResource));
 
             return region;
         }

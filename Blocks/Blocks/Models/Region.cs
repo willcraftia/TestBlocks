@@ -37,6 +37,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public List<IChunkProcedure> ChunkProcesures { get; set; }
 
+        public ChunkEffect ChunkEffect { get; set; }
+
         public void Initialize(GraphicsDevice graphicsDevice, AssetManager assetManager, IChunkStore chunkStore)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
