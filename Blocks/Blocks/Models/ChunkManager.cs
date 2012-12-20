@@ -224,9 +224,6 @@ namespace Willcraftia.Xna.Blocks.Models
             opaqueChunks.Sort(chunkDistanceComparer);
             translucentChunks.Sort(chunkDistanceComparer);
 
-            Matrix viewProjection;
-            Matrix.Multiply(ref view.Matrix, ref projection.Matrix, out viewProjection);
-
             var pass = region.ChunkEffect.BackingEffect.CurrentTechnique.Passes[0];
 
             foreach (var chunk in opaqueChunks)
@@ -234,10 +231,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 Matrix world;
                 chunk.CreateWorldMatrix(out world);
 
-                Matrix worldViewProjection;
-                Matrix.Multiply(ref world, ref viewProjection, out worldViewProjection);
-
-                region.ChunkEffect.WorldViewProjection = worldViewProjection;
+                region.ChunkEffect.World = world;
                 
                 pass.Apply();
 

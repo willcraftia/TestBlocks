@@ -10,7 +10,9 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkEffect
     {
-        EffectParameter worldViewProjection;
+        EffectParameter world;
+
+        EffectParameter viewProjection;
 
         EffectParameter eyePosition;
 
@@ -40,10 +42,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Effect BackingEffect { get; private set; }
 
-        public Matrix WorldViewProjection
+        public Matrix World
         {
-            get { return worldViewProjection.GetValueMatrix(); }
-            set { worldViewProjection.SetValue(value); }
+            get { return world.GetValueMatrix(); }
+            set { world.SetValue(value); }
+        }
+
+        public Matrix ViewProjection
+        {
+            get { return viewProjection.GetValueMatrix(); }
+            set { viewProjection.SetValue(value); }
         }
 
         public Vector3 EyePosition
@@ -138,7 +146,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void CacheEffectParameters()
         {
-            worldViewProjection = BackingEffect.Parameters["WorldViewProjection"];
+            world = BackingEffect.Parameters["World"];
+            viewProjection = BackingEffect.Parameters["ViewProjection"];
 
             eyePosition = BackingEffect.Parameters["EyePosition"];
 

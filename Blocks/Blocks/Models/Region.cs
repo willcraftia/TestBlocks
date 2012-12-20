@@ -67,14 +67,18 @@ namespace Willcraftia.Xna.Blocks.Models
             Vector3 eyePosition;
             View.GetEyePosition(ref view.Matrix, out eyePosition);
 
+            Matrix viewProjection;
+            Matrix.Multiply(ref view.Matrix, ref projection.Matrix, out viewProjection);
+
             ChunkEffect.EyePosition = eyePosition;
-            ChunkEffect.AmbientLightColor = Vector3.Zero;
-            ChunkEffect.LightDirection = Vector3.One;
+            ChunkEffect.ViewProjection = viewProjection;
+            ChunkEffect.AmbientLightColor = Vector3.One;
+            ChunkEffect.LightDirection = Vector3.Down;
             ChunkEffect.LightDiffuseColor = Vector3.One;
             ChunkEffect.LightSpecularColor = Vector3.Zero;
             ChunkEffect.FogEnabled = true;
-            ChunkEffect.FogStart = 1000;
-            ChunkEffect.FogEnd = 30000;
+            ChunkEffect.FogStart = 50;
+            ChunkEffect.FogEnd = 200;
             ChunkEffect.FogColor = Vector3.One;
             ChunkEffect.TileMap = TileCatalog.TileMap;
             ChunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;

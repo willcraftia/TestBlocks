@@ -1,10 +1,10 @@
 //=============================================================================
 // Variables
 //-----------------------------------------------------------------------------
-//float4x4 World;
+float4x4 World;
 //float4x4 View;
 //float4x4 Projection;
-float4x4 WorldViewProjection;
+float4x4 ViewProjection;
 
 float3 EyePosition;
 
@@ -102,15 +102,13 @@ VSOutput VS(VSInput input)
 {
     VSOutput output;
 
-//    float4 worldPosition = mul(input.Position, World);
-//    float4 viewPosition = mul(worldPosition, View);
-//    output.Position = mul(viewPosition, Projection);
-    output.Position = mul(input.Position, WorldViewProjection);
+    float4 worldPosition = mul(input.Position, World);
 
+    output.Position = mul(worldPosition, ViewProjection);
     output.Normal = input.Normal;
     output.TexCoord = input.TexCoord;
 
-    float eyeDistance = distance(input.Position, EyePosition);
+    float eyeDistance = distance(worldPosition, EyePosition);
     output.FogFactor = CalculateFogFactor(eyeDistance);
 
     return output;
@@ -153,16 +151,14 @@ float4 PS(VSOutput input) : COLOR0
     color += tex2D(TileMapSampler, input.TexCoord);
 
     // Lighting
-/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLight(E, N, input.TexCoord);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
-*/
 
     // Fog
-//    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
+    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
 
     return color;
 }
