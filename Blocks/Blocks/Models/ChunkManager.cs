@@ -89,6 +89,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ConcurrentPool<ChunkMesh> chunkMeshPool;
 
+        ConcurrentPool<InterChunkMeshPart> interChunkMeshPartPool;
+
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
         BoundingFrustum frustum = new BoundingFrustum(Matrix.Identity);
@@ -119,10 +121,29 @@ namespace Willcraftia.Xna.Blocks.Models
             inverseChunkSize.Y = 1 / (float) chunkSize.Y;
             inverseChunkSize.Z = 1 / (float) chunkSize.Z;
 
-            chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(chunkSize); });
-            chunkMeshPool = new ConcurrentPool<ChunkMesh>(() => { return new ChunkMesh(region.GraphicsDevice); });
+            chunkPool = new ConcurrentPool<Chunk>(CreateChunk);
+            chunkMeshPool = new ConcurrentPool<ChunkMesh>(CreateChunkMesh);
+            interChunkMeshPartPool = new ConcurrentPool<InterChunkMeshPart>(CreateInterChunkMeshPart)
+            {
+                MaxCapacity = 20
+            };
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
             chunkDistanceComparer = new ChunkDistanceComparer(chunkSize);
+        }
+
+        Chunk CreateChunk()
+        {
+            return new Chunk(chunkSize);
+        }
+
+        ChunkMesh CreateChunkMesh()
+        {
+            return new ChunkMesh(region.GraphicsDevice);
+        }
+
+        InterChunkMeshPart CreateInterChunkMeshPart()
+        {
+            return new InterChunkMeshPart();
         }
 
         //
@@ -153,12 +174,30 @@ namespace Willcraftia.Xna.Blocks.Models
                     var chunkMesh = chunkMeshPool.Borrow();
                     if (chunkMesh == null) return;
 
+                    var interOpaquePart = interChunkMeshPartPool.Borrow();
+                    if (interOpaquePart == null)
+                    {
+                        chunkMeshPool.Return(chunkMesh);
+                        return;
+                    }
+
+                    var interTranslucentPart = interChunkMeshPartPool.Borrow();
+                    if (interOpaquePart == null)
+                    {
+                        chunkMeshPool.Return(chunkMesh);
+                        interChunkMeshPartPool.Return(interOpaquePart);
+                        return;
+                    }
+
+                    chunkMesh.Opaque.InterChunkMeshPart = interOpaquePart;
+                    chunkMesh.Translucent.InterChunkMeshPart = interTranslucentPart;
+
                     chunk.PendingMesh = chunkMesh;
 
                     // 非同期な更新要求を登録。
                     chunkMeshUpdateManager.EnqueueChunk(chunk);
                 }
-                else if (chunk.PendingMesh.IsLoaded)
+                else if (chunk.PendingMesh.Loaded)
                 {
                     // PendingMesh のロードが完了していれば、ActiveMesh を更新。
 
@@ -176,6 +215,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
                     // VertexBuffer/IndexBuffer への反映
                     chunk.ActiveMesh.BuildBuffers();
+
+                    chunk.ActiveMesh.Opaque.InterChunkMeshPart.Clear();
+                    interChunkMeshPartPool.Return(chunk.ActiveMesh.Opaque.InterChunkMeshPart);
+                    chunk.ActiveMesh.Opaque.InterChunkMeshPart = null;
+
+                    chunk.ActiveMesh.Translucent.InterChunkMeshPart.Clear();
+                    interChunkMeshPartPool.Return(chunk.ActiveMesh.Translucent.InterChunkMeshPart);
+                    chunk.ActiveMesh.Translucent.InterChunkMeshPart = null;
 
                     // Dirty フラグを倒す。
                     chunk.Dirty = false;

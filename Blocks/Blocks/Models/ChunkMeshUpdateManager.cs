@@ -136,7 +136,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 // 更新の完了した Chunk を記録から消し、完了マークを付ける。
                 updatingChunks.Remove(chunk);
-                chunk.PendingMesh.IsLoaded = true;
+                chunk.PendingMesh.Loaded = true;
             }
         }
 
@@ -217,7 +217,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void AddMesh(ChunkMeshPart chunkMeshPart, int x, int y, int z, MeshPart blockMeshPart)
         {
-            chunkMeshPart.AddIndices(blockMeshPart.Indices);
+            chunkMeshPart.InterChunkMeshPart.AddIndices(blockMeshPart.Indices);
 
             var vertices = blockMeshPart.Vertices;
             for (int i = 0; i < vertices.Length; i++)
@@ -226,7 +226,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 vertex.Position.X += x;
                 vertex.Position.Y += y;
                 vertex.Position.Z += z;
-                chunkMeshPart.AddVertex(ref vertex);
+                chunkMeshPart.InterChunkMeshPart.AddVertex(ref vertex);
             }
         }
 

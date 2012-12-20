@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int DefaultActivationRange = 10;
 
-        public const int DefaultPassivationRange = 15;
+        public const int DefaultPassivationRange = 12;
 
         static readonly VectorI3[] nearbyPartitionOffsets =
         {

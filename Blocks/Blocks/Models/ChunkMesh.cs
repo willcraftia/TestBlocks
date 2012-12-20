@@ -15,7 +15,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkMeshPart Opaque { get; private set; }
 
-        public bool IsLoaded { get; set; }
+        public bool Loaded { get; set; }
 
         public ChunkMesh(GraphicsDevice graphicsDevice)
         {
@@ -35,9 +35,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Clear()
         {
-            Translucent.Clear();
-            Opaque.Clear();
-            IsLoaded = false;
+            Loaded = false;
         }
 
         #region IDisposable

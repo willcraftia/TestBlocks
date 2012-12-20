@@ -97,6 +97,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // ChunkPartitionManager
 
             partitionManager = new ChunkPartitionManager(regionManager);
+            partitionManager.TaskQueueSlotCount = 10;
 
             //================================================================
             // Camera Settings

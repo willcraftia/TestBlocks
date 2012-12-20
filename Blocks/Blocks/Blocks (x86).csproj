@@ -82,6 +82,7 @@
     <Compile Include="Models\IBiome.cs" />
     <Compile Include="Models\IBiomeManager.cs" />
     <Compile Include="Models\Image2D.cs" />
+    <Compile Include="Models\InterChunkMeshPart.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
