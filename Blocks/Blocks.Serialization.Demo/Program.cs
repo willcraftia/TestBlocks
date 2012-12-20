@@ -584,7 +584,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var region = new RegionDefinition
                 {
                     Name = "Default Region",
-                    Bounds = new BoundingBoxI(VectorI3.Zero, VectorI3.One),
+                    Bounds = new BoundingBoxI
+                    {
+                        Min = VectorI3.Zero,
+                        Max = new VectorI3(16, 1, 16)
+                    },
                     TileCatalog = "DefaultTileCatalog.json",
                     BlockCatalog = "DefaultBlockCatalog.json",
                     BiomeManager = "DefaultBiomeManager.json",
@@ -698,195 +702,62 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
         static MeshDefinition CreateCubeMeshDefinition()
         {
+            Vector3[] normals =
+            {
+                new Vector3( 0,  1,  0),
+                new Vector3( 0, -1,  0),
+                new Vector3( 0,  0,  1),
+                new Vector3( 0,  0, -1),
+                new Vector3(-1,  0,  0),
+                new Vector3( 1,  0,  0)
+            };
+
+            ushort[] indices = { 0, 1, 2, 0, 2, 3 };
+
             var mesh = new MeshDefinition();
             mesh.Name = "Default Cube";
-            mesh.Top = new MeshPartDefinition
-            {
-                Vertices = new VertexPositionNormalTexture[]
-                {
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, 0.5f, 0.5f),
-                        Normal=new Vector3(0, 1, 0),
-                        TextureCoordinate =new Vector2(0, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, 0.5f, 0.5f),
-                        Normal = new Vector3(0, 1, 0),
-                        TextureCoordinate = new Vector2(1, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, 0.5f, -0.5f),
-                        Normal = new Vector3(0, 1, 0),
-                        TextureCoordinate = new Vector2(1, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, 0.5f, -0.5f),
-                        Normal = new Vector3(0, 1, 0),
-                        TextureCoordinate = new Vector2(0, 0)
-                    }
-                },
-                Indices = new ushort[] { 0, 1, 2, 0, 2, 3 }
-            };
-            mesh.Bottom = new MeshPartDefinition
-            {
-                Vertices = new VertexPositionNormalTexture[]
-                {
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, -0.5f, 0.5f),
-                        Normal = new Vector3(0, -1, 0),
-                        TextureCoordinate = new Vector2(1, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, -0.5f, -0.5f),
-                        Normal = new Vector3(0, -1, 0),
-                        TextureCoordinate = new Vector2(1, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, -0.5f, -0.5f),
-                        Normal = new Vector3(0, -1, 0),
-                        TextureCoordinate = new Vector2(0, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, -0.5f, 0.5f),
-                        Normal = new Vector3(0, -1, 0),
-                        TextureCoordinate = new Vector2(0, 1)
-                    }
-                },
-                Indices = new ushort[] { 0, 1, 2, 0, 2, 3 }
-            };
-            mesh.Front = new MeshPartDefinition
-            {
-                Vertices = new VertexPositionNormalTexture[]
-                {
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, 0.5f, 0.5f),
-                        Normal = new Vector3(0, 0, 1),
-                        TextureCoordinate = new Vector2(0, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, -0.5f, 0.5f),
-                        Normal = new Vector3(0, 0, 1),
-                        TextureCoordinate = new Vector2(0, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, -0.5f, 0.5f),
-                        Normal = new Vector3(0, 0, 1),
-                        TextureCoordinate = new Vector2(1, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, 0.5f, 0.5f),
-                        Normal = new Vector3(0, 0, 1),
-                        TextureCoordinate = new Vector2(1, 0)
-                    }
-                },
-                Indices = new ushort[] { 0, 1, 2, 0, 2, 3 }
-            };
-            mesh.Back = new MeshPartDefinition
-            {
-                Vertices = new VertexPositionNormalTexture[]
-                {
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, -0.5f, -0.5f),
-                        Normal = new Vector3(0, 0, -1),
-                        TextureCoordinate = new Vector2(1, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, 0.5f, -0.5f),
-                        Normal = new Vector3(0, 0, -1),
-                        TextureCoordinate = new Vector2(1, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, 0.5f, -0.5f),
-                        Normal = new Vector3(0, 0, -1),
-                        TextureCoordinate = new Vector2(0, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, -0.5f, -0.5f),
-                        Normal = new Vector3(0, 0, -1),
-                        TextureCoordinate = new Vector2(0, 1)
-                    }
-                },
-                Indices = new ushort[] { 0, 1, 2, 0, 2, 3 }
-            };
-            mesh.Left = new MeshPartDefinition
-            {
-                Vertices = new VertexPositionNormalTexture[]
-                {
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, -0.5f, 0.5f),
-                        Normal = new Vector3(-1, 0, 0),
-                        TextureCoordinate = new Vector2(1, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, 0.5f, 0.5f),
-                        Normal = new Vector3(-1, 0, 0),
-                        TextureCoordinate = new Vector2(1, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, 0.5f, -0.5f),
-                        Normal = new Vector3(-1, 0, 0),
-                        TextureCoordinate = new Vector2(0, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(-0.5f, -0.5f, -0.5f),
-                        Normal = new Vector3(-1, 0, 0),
-                        TextureCoordinate = new Vector2(0, 1)
-                    }
-                },
-                Indices = new ushort[] { 0, 1, 2, 0, 2, 3 }
-            };
-            mesh.Right = new MeshPartDefinition
-            {
-                Vertices = new VertexPositionNormalTexture[]
-                {
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, -0.5f, -0.5f),
-                        Normal = new Vector3(1, 0, 0),
-                        TextureCoordinate = new Vector2(1, 1)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, 0.5f, -0.5f),
-                        Normal = new Vector3(1, 0, 0),
-                        TextureCoordinate = new Vector2(1, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, 0.5f, 0.5f),
-                        Normal = new Vector3(1, 0, 0),
-                        TextureCoordinate = new Vector2(0, 0)
-                    },
-                    new VertexPositionNormalTexture
-                    {
-                        Position = new Vector3(0.5f, -0.5f, 0.5f),
-                        Normal = new Vector3(1, 0, 0),
-                        TextureCoordinate = new Vector2(0, 1)
-                    }
-                },
-                Indices = new ushort[] { 0, 1, 2, 0, 2, 3 }
-            };
+            CreateMeshPartDefinition(ref normals[0], out mesh.Top);
+            CreateMeshPartDefinition(ref normals[1], out mesh.Bottom);
+            CreateMeshPartDefinition(ref normals[2], out mesh.Front);
+            CreateMeshPartDefinition(ref normals[3], out mesh.Back);
+            CreateMeshPartDefinition(ref normals[4], out mesh.Left);
+            CreateMeshPartDefinition(ref normals[5], out mesh.Right);
+
             return mesh;
+        }
+
+        static void CreateMeshPartDefinition(ref Vector3 normal, out MeshPartDefinition result)
+        {
+            result = new MeshPartDefinition
+            {
+                Vertices = CreateVertexPositionNormalTexture(ref normal),
+                Indices = new ushort[] { 0, 1, 2, 0, 2, 3 }
+            };
+        }
+
+        static VertexPositionNormalTexture[] CreateVertexPositionNormalTexture(ref Vector3 normal)
+        {
+            var vertices = new VertexPositionNormalTexture[4];
+
+            var side1 = new Vector3(normal.Y, normal.Z, normal.X);
+            var side2 = Vector3.Cross(normal, side1);
+            
+            vertices[0].Position = (normal - side1 - side2) * 0.5f;
+            vertices[1].Position = (normal - side1 + side2) * 0.5f;
+            vertices[2].Position = (normal + side1 + side2) * 0.5f;
+            vertices[3].Position = (normal + side1 - side2) * 0.5f;
+
+            vertices[0].Normal = normal;
+            vertices[1].Normal = normal;
+            vertices[2].Normal = normal;
+            vertices[3].Normal = normal;
+
+            vertices[0].TextureCoordinate = new Vector2(0, 0);
+            vertices[1].TextureCoordinate = new Vector2(0, 1);
+            vertices[2].TextureCoordinate = new Vector2(1, 1);
+            vertices[3].TextureCoordinate = new Vector2(1, 0);
+
+            return vertices;
         }
 
         #endregion

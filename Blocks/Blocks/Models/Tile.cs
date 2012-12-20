@@ -11,6 +11,10 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Tile : IAsset
     {
+        public const int Size = 16;
+
+        public const float InverseSize = 1 / 16f;
+
         public const byte EmptyIndex = byte.MaxValue;
 
         Vector3 diffuseColor;

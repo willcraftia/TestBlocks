@@ -16,6 +16,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         VectorI3 position;
 
+        Vector3 worldPosition;
+
         BoundingBox boundingBox;
 
         byte[] blockIndices;
@@ -32,19 +34,23 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 position = value;
 
-                boundingBox.Min = new Vector3
-                {
-                    X = position.X * size.X,
-                    Y = position.Y * size.Y,
-                    Z = position.Z * size.Z
-                };
+                worldPosition.X = position.X * size.X;
+                worldPosition.Y = position.Y * size.Y;
+                worldPosition.Z = position.Z * size.Z;
+
+                boundingBox.Min = worldPosition;
                 boundingBox.Max = new Vector3
                 {
-                    X = boundingBox.Min.X + size.X,
-                    Y = boundingBox.Min.Y + size.Y,
-                    Z = boundingBox.Min.Z + size.Z
+                    X = worldPosition.X + size.X,
+                    Y = worldPosition.Y + size.Y,
+                    Z = worldPosition.Z + size.Z
                 };
             }
+        }
+
+        public Vector3 WorldPosition
+        {
+            get { return worldPosition; }
         }
 
         public BoundingBox BoundingBox
@@ -98,6 +104,11 @@ namespace Willcraftia.Xna.Blocks.Models
             blockIndices = new byte[size.X * size.Y * size.Z];
         }
 
+        public void CreateWorldMatrix(out Matrix result)
+        {
+            Matrix.CreateTranslation(ref worldPosition, out result);
+        }
+
         public int CalculateBlockPositionX(int x)
         {
             return position.X * size.X + x;
@@ -115,9 +126,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Read(BinaryReader reader)
         {
-            position.X = reader.ReadInt32();
-            position.Y = reader.ReadInt32();
-            position.Z = reader.ReadInt32();
+            var p = new VectorI3();
+
+            p.X = reader.ReadInt32();
+            p.Y = reader.ReadInt32();
+            p.Z = reader.ReadInt32();
+
+            Position = p;
 
             for (int i = 0; i < blockIndices.Length; i++)
                 blockIndices[i] = reader.ReadByte();

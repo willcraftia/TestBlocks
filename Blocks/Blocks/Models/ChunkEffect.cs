@@ -46,6 +46,12 @@ namespace Willcraftia.Xna.Blocks.Models
             set { worldViewProjection.SetValue(value); }
         }
 
+        public Vector3 EyePosition
+        {
+            get { return eyePosition.GetValueVector3(); }
+            set { eyePosition.SetValue(value); }
+        }
+
         public Vector3 AmbientLightColor
         {
             get { return ambientLightColor.GetValueVector3(); }

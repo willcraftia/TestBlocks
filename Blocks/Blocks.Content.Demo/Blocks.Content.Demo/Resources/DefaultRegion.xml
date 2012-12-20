@@ -7,9 +7,9 @@
 			<Z>0</Z>
 		</Min>
 		<Max>
-			<X>1</X>
+			<X>16</X>
 			<Y>1</Y>
-			<Z>1</Z>
+			<Z>16</Z>
 		</Max>
 	</Bounds>
 	<TileCatalog>DefaultTileCatalog.json</TileCatalog>

@@ -82,18 +82,35 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var side = (Side) i;
 
-                var meshPartTemplate = block.MeshTemplate[side];
-                if (meshPartTemplate == null) continue;
+                var prototype = block.MeshPrototype[side];
+                if (prototype == null) continue;
 
                 var texCoordOffset = Vector2.Zero;
 
                 var tile = block.GetTile(side);
                 if (tile != null) tile.GetTexCoordOffset(out texCoordOffset);
 
-                mesh[side] = meshPartTemplate.Create(ref texCoordOffset);
+                mesh[side] = Create(prototype, ref texCoordOffset);
             }
 
             return mesh;
+        }
+
+        static MeshPart Create(MeshPart prototype, ref Vector2 texCoordOffset)
+        {
+            var newVertices = new VertexPositionNormalTexture[prototype.Vertices.Length];
+            Array.Copy(prototype.Vertices, newVertices, newVertices.Length);
+
+            for (int j = 0; j < newVertices.Length; j++)
+            {
+                newVertices[j].TextureCoordinate.X *= Tile.InverseSize;
+                newVertices[j].TextureCoordinate.Y *= Tile.InverseSize;
+                newVertices[j].TextureCoordinate.X += texCoordOffset.X;
+                newVertices[j].TextureCoordinate.Y += texCoordOffset.Y;
+            }
+
+            // 全てのメッシュで共通であるため配列を共有。
+            return new MeshPart(newVertices, prototype.Indices);
         }
     }
 }

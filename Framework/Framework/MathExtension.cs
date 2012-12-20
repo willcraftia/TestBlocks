@@ -12,7 +12,7 @@ namespace Willcraftia.Xna.Framework
         public static int Floor(float value)
         {
             // Faster than using (int) Math.Floor(x).
-            return 0 < value ? (int) value : (int) value - 1;
+            return 0 <= value ? (int) value : (int) value - 1;
         }
 
         public static float Saturate(float value)

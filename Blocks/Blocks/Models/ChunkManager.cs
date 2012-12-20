@@ -63,6 +63,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         VectorI3 chunkSize;
 
+        Vector3 inverseChunkSize;
+
         // TODO
         // 初期容量の調整。
         //
@@ -112,6 +114,10 @@ namespace Willcraftia.Xna.Blocks.Models
             this.region = region;
             this.chunkStore = chunkStore;
             this.chunkSize = chunkSize;
+
+            inverseChunkSize.X = 1 / (float) chunkSize.X;
+            inverseChunkSize.Y = 1 / (float) chunkSize.Y;
+            inverseChunkSize.Z = 1 / (float) chunkSize.Z;
 
             chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(chunkSize); });
             chunkMeshPool = new ConcurrentPool<ChunkMesh>(() => { return new ChunkMesh(region.GraphicsDevice); });
@@ -218,19 +224,32 @@ namespace Willcraftia.Xna.Blocks.Models
             opaqueChunks.Sort(chunkDistanceComparer);
             translucentChunks.Sort(chunkDistanceComparer);
 
-            foreach (var chunk in opaqueChunks)
-                DrawChunkMeshPart(chunk.ActiveMesh.Opaque);
+            Matrix viewProjection;
+            Matrix.Multiply(ref view.Matrix, ref projection.Matrix, out viewProjection);
 
-            foreach (var chunk in translucentChunks)
-                DrawChunkMeshPart(chunk.ActiveMesh.Translucent);
+            var pass = region.ChunkEffect.BackingEffect.CurrentTechnique.Passes[0];
+
+            foreach (var chunk in opaqueChunks)
+            {
+                Matrix world;
+                chunk.CreateWorldMatrix(out world);
+
+                Matrix worldViewProjection;
+                Matrix.Multiply(ref world, ref viewProjection, out worldViewProjection);
+
+                region.ChunkEffect.WorldViewProjection = worldViewProjection;
+                
+                pass.Apply();
+
+                chunk.ActiveMesh.Opaque.Draw();
+            }
+
+            //foreach (var chunk in translucentChunks)
+            //    DrawChunkMeshPart(chunk.ActiveMesh.Translucent);
 
             opaqueChunks.Clear();
             translucentChunks.Clear();
             workingChunks.Clear();
-        }
-
-        void DrawChunkMeshPart(ChunkMeshPart chunkMeshPart)
-        {
         }
 
         bool IsInViewFrustum(Chunk chunk)
@@ -311,9 +330,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // position が baseChunk に含まれない場合は、それを含むアクティブな Chunk を探す。
             var chunkPosition = baseChunk.Position;
-            chunkPosition.X += position.X / chunkSize.X;
-            chunkPosition.Y += position.Y / chunkSize.Y;
-            chunkPosition.Z += position.Z / chunkSize.Z;
+            chunkPosition.X += MathExtension.Floor(position.X * inverseChunkSize.X);
+            chunkPosition.Y += MathExtension.Floor(position.Y * inverseChunkSize.Y);
+            chunkPosition.Z += MathExtension.Floor(position.Z * inverseChunkSize.Z);
 
             Chunk targetChunk;
             if (!TryGetActiveChunk(ref chunkPosition, out targetChunk))

@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Blocks.Content
             var block = new Block
             {
                 Name = definition.Name,
-                MeshTemplate = Load<Mesh>(resource, definition.Mesh),
+                MeshPrototype = Load<Mesh>(resource, definition.Mesh),
                 TopTile = Load<Tile>(resource, definition.TopTile),
                 BottomTile = Load<Tile>(resource, definition.BottomTile),
                 FrontTile = Load<Tile>(resource, definition.FrontTile),
@@ -62,7 +62,7 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new BlockDefinition
             {
                 Name = block.Name,
-                Mesh = ToUri(resource, block.MeshTemplate),
+                Mesh = ToUri(resource, block.MeshPrototype),
                 TopTile = ToUri(resource, block.TopTile),
                 BottomTile = ToUri(resource, block.BottomTile),
                 FrontTile = ToUri(resource, block.FrontTile),

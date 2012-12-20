@@ -16,6 +16,8 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         ChunkManager chunkManager;
 
+        BoundingBoxI bounds;
+
         // I/F
         public IResource Resource { get; set; }
 
@@ -25,7 +27,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public BoundingBoxI Bounds { get; set; }
+        public BoundingBoxI Bounds
+        {
+            get { return bounds; }
+            set { bounds = value; }
+        }
 
         public TileCatalog TileCatalog { get; set; }
 
@@ -58,14 +64,37 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw(View view, Projection projection)
         {
+            Vector3 eyePosition;
+            View.GetEyePosition(ref view.Matrix, out eyePosition);
+
+            ChunkEffect.EyePosition = eyePosition;
+            ChunkEffect.AmbientLightColor = Vector3.Zero;
+            ChunkEffect.LightDirection = Vector3.One;
+            ChunkEffect.LightDiffuseColor = Vector3.One;
+            ChunkEffect.LightSpecularColor = Vector3.Zero;
+            ChunkEffect.FogEnabled = true;
+            ChunkEffect.FogStart = 1000;
+            ChunkEffect.FogEnd = 30000;
+            ChunkEffect.FogColor = Vector3.One;
+            ChunkEffect.TileMap = TileCatalog.TileMap;
+            ChunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
+            ChunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
+            ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
+
+            ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.DefaultTequnique;
+
             chunkManager.Draw(view, projection);
         }
 
         public bool ContainsGridPosition(ref VectorI3 gridPosition)
         {
-            ContainmentType result;
-            Bounds.Contains(ref gridPosition, out result);
-            return ContainmentType.Contains == result;
+            // BoundingBoxI.Contains では Max 境界も含めてしまうため、
+            // それを用いずに判定する。
+            if (gridPosition.X < bounds.Min.X || gridPosition.Y < bounds.Min.Y || gridPosition.Z < bounds.Min.Z ||
+                bounds.Max.X <= gridPosition.X || bounds.Max.Y <= gridPosition.Y || bounds.Max.Z <= gridPosition.Z)
+                return false;
+
+            return true;
         }
 
         // 非同期呼び出し。

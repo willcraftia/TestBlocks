@@ -15,38 +15,6 @@
 				</Normal>
 				<TextureCoordinate>
 					<X>0</X>
-					<Y>1</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>0.5</X>
-					<Y>0.5</Y>
-					<Z>0.5</Z>
-				</Position>
-				<Normal>
-					<X>0</X>
-					<Y>1</Y>
-					<Z>0</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
-					<Y>1</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>0.5</X>
-					<Y>0.5</Y>
-					<Z>-0.5</Z>
-				</Position>
-				<Normal>
-					<X>0</X>
-					<Y>1</Y>
-					<Z>0</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
 					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
@@ -63,6 +31,38 @@
 				</Normal>
 				<TextureCoordinate>
 					<X>0</X>
+					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>0.5</X>
+					<Y>0.5</Y>
+					<Z>-0.5</Z>
+				</Position>
+				<Normal>
+					<X>0</X>
+					<Y>1</Y>
+					<Z>0</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>0.5</X>
+					<Y>0.5</Y>
+					<Z>0.5</Z>
+				</Position>
+				<Normal>
+					<X>0</X>
+					<Y>1</Y>
+					<Z>0</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
 					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
@@ -80,7 +80,7 @@
 		<Vertices>
 			<Vertex>
 				<Position>
-					<X>-0.5</X>
+					<X>0.5</X>
 					<Y>-0.5</Y>
 					<Z>0.5</Z>
 				</Position>
@@ -90,23 +90,7 @@
 					<Z>0</Z>
 				</Normal>
 				<TextureCoordinate>
-					<X>1</X>
-					<Y>1</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>-0.5</X>
-					<Y>-0.5</Y>
-					<Z>-0.5</Z>
-				</Position>
-				<Normal>
 					<X>0</X>
-					<Y>-1</Y>
-					<Z>0</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
 					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
@@ -123,12 +107,28 @@
 				</Normal>
 				<TextureCoordinate>
 					<X>0</X>
-					<Y>0</Y>
+					<Y>1</Y>
 				</TextureCoordinate>
 			</Vertex>
 			<Vertex>
 				<Position>
-					<X>0.5</X>
+					<X>-0.5</X>
+					<Y>-0.5</Y>
+					<Z>-0.5</Z>
+				</Position>
+				<Normal>
+					<X>0</X>
+					<Y>-1</Y>
+					<Z>0</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>-0.5</X>
 					<Y>-0.5</Y>
 					<Z>0.5</Z>
 				</Position>
@@ -138,8 +138,8 @@
 					<Z>0</Z>
 				</Normal>
 				<TextureCoordinate>
-					<X>0</X>
-					<Y>1</Y>
+					<X>1</X>
+					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
 		</Vertices>
@@ -156,8 +156,8 @@
 		<Vertices>
 			<Vertex>
 				<Position>
-					<X>-0.5</X>
-					<Y>0.5</Y>
+					<X>0.5</X>
+					<Y>-0.5</Y>
 					<Z>0.5</Z>
 				</Position>
 				<Normal>
@@ -188,8 +188,8 @@
 			</Vertex>
 			<Vertex>
 				<Position>
-					<X>0.5</X>
-					<Y>-0.5</Y>
+					<X>-0.5</X>
+					<Y>0.5</Y>
 					<Z>0.5</Z>
 				</Position>
 				<Normal>
@@ -232,38 +232,6 @@
 		<Vertices>
 			<Vertex>
 				<Position>
-					<X>-0.5</X>
-					<Y>-0.5</Y>
-					<Z>-0.5</Z>
-				</Position>
-				<Normal>
-					<X>0</X>
-					<Y>0</Y>
-					<Z>-1</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
-					<Y>1</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>-0.5</X>
-					<Y>0.5</Y>
-					<Z>-0.5</Z>
-				</Position>
-				<Normal>
-					<X>0</X>
-					<Y>0</Y>
-					<Z>-1</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
-					<Y>0</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
 					<X>0.5</X>
 					<Y>0.5</Y>
 					<Z>-0.5</Z>
@@ -280,8 +248,8 @@
 			</Vertex>
 			<Vertex>
 				<Position>
-					<X>0.5</X>
-					<Y>-0.5</Y>
+					<X>-0.5</X>
+					<Y>0.5</Y>
 					<Z>-0.5</Z>
 				</Position>
 				<Normal>
@@ -292,6 +260,38 @@
 				<TextureCoordinate>
 					<X>0</X>
 					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>-0.5</X>
+					<Y>-0.5</Y>
+					<Z>-0.5</Z>
+				</Position>
+				<Normal>
+					<X>0</X>
+					<Y>0</Y>
+					<Z>-1</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>0.5</X>
+					<Y>-0.5</Y>
+					<Z>-0.5</Z>
+				</Position>
+				<Normal>
+					<X>0</X>
+					<Y>0</Y>
+					<Z>-1</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
 		</Vertices>
@@ -309,40 +309,8 @@
 			<Vertex>
 				<Position>
 					<X>-0.5</X>
-					<Y>-0.5</Y>
-					<Z>0.5</Z>
-				</Position>
-				<Normal>
-					<X>-1</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
-					<Y>1</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>-0.5</X>
 					<Y>0.5</Y>
 					<Z>0.5</Z>
-				</Position>
-				<Normal>
-					<X>-1</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
-					<Y>0</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>-0.5</X>
-					<Y>0.5</Y>
-					<Z>-0.5</Z>
 				</Position>
 				<Normal>
 					<X>-1</X>
@@ -358,7 +326,7 @@
 				<Position>
 					<X>-0.5</X>
 					<Y>-0.5</Y>
-					<Z>-0.5</Z>
+					<Z>0.5</Z>
 				</Position>
 				<Normal>
 					<X>-1</X>
@@ -368,6 +336,38 @@
 				<TextureCoordinate>
 					<X>0</X>
 					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>-0.5</X>
+					<Y>-0.5</Y>
+					<Z>-0.5</Z>
+				</Position>
+				<Normal>
+					<X>-1</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>-0.5</X>
+					<Y>0.5</Y>
+					<Z>-0.5</Z>
+				</Position>
+				<Normal>
+					<X>-1</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
 		</Vertices>
@@ -385,40 +385,8 @@
 			<Vertex>
 				<Position>
 					<X>0.5</X>
-					<Y>-0.5</Y>
-					<Z>-0.5</Z>
-				</Position>
-				<Normal>
-					<X>1</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
-					<Y>1</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>0.5</X>
 					<Y>0.5</Y>
 					<Z>-0.5</Z>
-				</Position>
-				<Normal>
-					<X>1</X>
-					<Y>0</Y>
-					<Z>0</Z>
-				</Normal>
-				<TextureCoordinate>
-					<X>1</X>
-					<Y>0</Y>
-				</TextureCoordinate>
-			</Vertex>
-			<Vertex>
-				<Position>
-					<X>0.5</X>
-					<Y>0.5</Y>
-					<Z>0.5</Z>
 				</Position>
 				<Normal>
 					<X>1</X>
@@ -434,7 +402,7 @@
 				<Position>
 					<X>0.5</X>
 					<Y>-0.5</Y>
-					<Z>0.5</Z>
+					<Z>-0.5</Z>
 				</Position>
 				<Normal>
 					<X>1</X>
@@ -444,6 +412,38 @@
 				<TextureCoordinate>
 					<X>0</X>
 					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>0.5</X>
+					<Y>-0.5</Y>
+					<Z>0.5</Z>
+				</Position>
+				<Normal>
+					<X>1</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>1</Y>
+				</TextureCoordinate>
+			</Vertex>
+			<Vertex>
+				<Position>
+					<X>0.5</X>
+					<Y>0.5</Y>
+					<Z>0.5</Z>
+				</Position>
+				<Normal>
+					<X>1</X>
+					<Y>0</Y>
+					<Z>0</Z>
+				</Normal>
+				<TextureCoordinate>
+					<X>1</X>
+					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
 		</Vertices>

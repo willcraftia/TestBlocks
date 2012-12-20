@@ -31,10 +31,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         int indexCount;
 
-        DynamicVertexBuffer vertexBuffer;
-
-        DynamicIndexBuffer indexBuffer;
-
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public int VertexCount
@@ -91,6 +87,10 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public DynamicVertexBuffer VertexBuffer { get; private set; }
+
+        public DynamicIndexBuffer IndexBuffer { get; private set; }
+
         public ChunkMeshPart(GraphicsDevice graphicsDevice)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -101,16 +101,23 @@ namespace Willcraftia.Xna.Blocks.Models
             indices = new ushort[defaultIndexCapacity];
         }
 
-        public void AddVertex(ref VertexPositionNormalTexture vertex)
+        public void AddIndices(ushort[] indices)
         {
-            if (vertexCount == vertices.Length) EnsureVertexCapacity(vertexCount + 1);
-            vertices[vertexCount++] = vertex;
+            foreach (var index in indices) AddIndex(index);
         }
 
         public void AddIndex(ushort index)
         {
             if (indexCount == indices.Length) EnsureIndexCapacity(indexCount + 1);
-            indices[indexCount++] = index;
+
+            indices[indexCount++] = (ushort) (vertexCount + index);
+        }
+
+        public void AddVertex(ref VertexPositionNormalTexture vertex)
+        {
+            if (vertexCount == vertices.Length) EnsureVertexCapacity(vertexCount + 1);
+            
+            vertices[vertexCount++] = vertex;
         }
 
         public void Clear()
@@ -119,15 +126,22 @@ namespace Willcraftia.Xna.Blocks.Models
             indexCount = 0;
         }
 
+        public void Draw()
+        {
+            GraphicsDevice.SetVertexBuffer(VertexBuffer);
+            GraphicsDevice.Indices = IndexBuffer;
+            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, indexCount / 3);
+        }
+
         public void BuildBuffer()
         {
             if (vertexCount == 0 || indexCount == 0) return;
 
-            if (vertexBuffer == null) vertexBuffer = CreateVertexBuffer();
-            if (indexBuffer == null) indexBuffer = CreateIndexBuffer();
+            if (VertexBuffer == null) VertexBuffer = CreateVertexBuffer();
+            if (IndexBuffer == null) IndexBuffer = CreateIndexBuffer();
 
-            vertexBuffer.SetData(vertices, 0, vertexCount, SetDataOptions.Discard);
-            indexBuffer.SetData(indices, 0, indexCount, SetDataOptions.Discard);
+            VertexBuffer.SetData(vertices, 0, vertexCount, SetDataOptions.Discard);
+            IndexBuffer.SetData(indices, 0, indexCount, SetDataOptions.Discard);
         }
 
         DynamicVertexBuffer CreateVertexBuffer()
@@ -138,16 +152,6 @@ namespace Willcraftia.Xna.Blocks.Models
         DynamicIndexBuffer CreateIndexBuffer()
         {
             return new DynamicIndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
-        }
-
-        public void PopulateVertexBuffer(VertexBuffer vertexBuffer)
-        {
-            vertexBuffer.SetData(vertices, 0, vertexCount);
-        }
-
-        public void PopulateIndexBuffer(IndexBuffer indexBuffer)
-        {
-            indexBuffer.SetData(indices, 0, indexCount);
         }
 
         // TODO
@@ -197,8 +201,8 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (disposed) return;
 
-            if (vertexBuffer != null) vertexBuffer.Dispose();
-            if (indexBuffer != null) indexBuffer.Dispose();
+            if (VertexBuffer != null) VertexBuffer.Dispose();
+            if (IndexBuffer != null) IndexBuffer.Dispose();
 
             disposed = true;
         }

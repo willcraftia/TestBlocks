@@ -217,21 +217,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void AddMesh(ChunkMeshPart chunkMeshPart, int x, int y, int z, MeshPart blockMeshPart)
         {
-            var startIndex = chunkMeshPart.VertexCount;
+            chunkMeshPart.AddIndices(blockMeshPart.Indices);
 
             var vertices = blockMeshPart.Vertices;
             for (int i = 0; i < vertices.Length; i++)
             {
-                var adjustedVertex = vertices[i];
-                adjustedVertex.Position.X += x;
-                adjustedVertex.Position.Y += y;
-                adjustedVertex.Position.Z += z;
-                chunkMeshPart.AddVertex(ref adjustedVertex);
+                var vertex = vertices[i];
+                vertex.Position.X += x;
+                vertex.Position.Y += y;
+                vertex.Position.Z += z;
+                chunkMeshPart.AddVertex(ref vertex);
             }
-
-            var indices = blockMeshPart.Indices;
-            for (int i = 0; i < vertices.Length; i++)
-                chunkMeshPart.AddIndex((ushort) (indices[i] + startIndex));
         }
 
         bool ShouldDrawSurface(Chunk chunk, int x, int y, int z, Block block, Side side)

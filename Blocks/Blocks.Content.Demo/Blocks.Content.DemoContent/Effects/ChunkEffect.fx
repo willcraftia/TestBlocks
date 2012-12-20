@@ -153,14 +153,16 @@ float4 PS(VSOutput input) : COLOR0
     color += tex2D(TileMapSampler, input.TexCoord);
 
     // Lighting
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLight(E, N, input.TexCoord);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     // Fog
-    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
+//    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
 
     return color;
 }

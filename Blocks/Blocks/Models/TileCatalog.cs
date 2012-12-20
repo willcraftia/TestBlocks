@@ -15,15 +15,9 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public const int TextureSize = 256;
 
-        public const int TileSize = 16;
+        public const int TileLength = 16;
 
-        public const int TileLineWidth = 16;
-
-        const float inverseTextureSize = 1 / 256f;
-
-        const float inverseTileSize = 1 / 16f;
-
-        const float inverseTileLineWidth = 1 / 16f;
+        public const float InverseTileLength = 1 / 16f;
         
         Color[] colorBuffer;
 
@@ -122,8 +116,8 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             offset = new Vector2
             {
-                X = (index % TileLineWidth) * inverseTileLineWidth,
-                Y = (index / TileLineWidth) * inverseTileLineWidth
+                X = (index % TileLength) * InverseTileLength,
+                Y = (index / TileLength) * InverseTileLength
             };
         }
 
@@ -162,10 +156,10 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             bounds = new Rectangle
             {
-                X = (index % TileLineWidth) * TileSize,
-                Y = (index / TileLineWidth) * TileSize,
-                Width = TileSize,
-                Height = TileSize
+                X = (index % TileLength) * Tile.Size,
+                Y = (index / TileLength) * Tile.Size,
+                Width = Tile.Size,
+                Height = Tile.Size
             };
         }
 
@@ -189,7 +183,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void EnsureColorBuffer()
         {
-            if (colorBuffer == null) colorBuffer = new Color[TileSize * TileSize];
+            if (colorBuffer == null) colorBuffer = new Color[Tile.Size * Tile.Size];
         }
 
         void ClearColorBuffer()

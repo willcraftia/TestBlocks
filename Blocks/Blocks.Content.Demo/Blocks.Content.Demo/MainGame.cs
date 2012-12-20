@@ -30,11 +30,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         FreeViewInput viewInput = new FreeViewInput();
 
-        float moveVelocity = 1000;
+        float moveVelocity = 10;
         
         float dashFactor = 2;
 
-        float farPlaneDistance = 300000;
+        float farPlaneDistance = 30000;
 
         RegionManager regionManager;
 
@@ -108,9 +108,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             viewInput.MoveVelocity = moveVelocity;
             viewInput.DashFactor = dashFactor;
 
-            view.Position = new Vector3(50, 30, 50);
-            //view.Position = new Vector3(-150000.0f, 30, -150000.0f);
-            view.Yaw(MathHelper.PiOver4 * 5);
+            view.Position = new Vector3(0, 50, 0);
+            view.Yaw(MathHelper.Pi);
+            //view.Pitch(-MathHelper.PiOver4);
             view.Update();
 
             projection.FarPlaneDistance = farPlaneDistance;
@@ -148,13 +148,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Region
 
-            var region = regionManager.LoadRegion("title:Resources/DefaultRegion.json");
-
-            //================================================================
-            // SpriteFont via the asset manager of the region.
-
-            var spriteFontUri = ContentResourceLoader.Instance.LoadResource("content:Fonts/Demo");
-            var spriteFont = region.AssetManager.Load<SpriteFont>(spriteFontUri);
+            regionManager.LoadRegion("title:Resources/DefaultRegion.json");
         }
 
         protected override void UnloadContent()
@@ -215,7 +209,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             GraphicsDevice.RasterizerState = defaultRasterizerState;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            regionManager.Draw(view, projection);
+            if (!partitionManager.Closing && !partitionManager.Closed)
+                regionManager.Draw(view, projection);
 
             base.Draw(gameTime);
         }

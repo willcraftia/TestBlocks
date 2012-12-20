@@ -51,6 +51,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 }
             }
 
+            tileCatalog.DrawMaps();
+
             return tileCatalog;
         }
 

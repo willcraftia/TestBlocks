@@ -26,7 +26,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public Mesh MeshTemplate { get; set; }
+        public Mesh MeshPrototype { get; set; }
 
         public Tile TopTile { get; set; }
         
