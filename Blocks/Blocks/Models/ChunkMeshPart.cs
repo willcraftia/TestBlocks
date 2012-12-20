@@ -17,7 +17,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // 実行で最適と思われる値を調べて決定する。
         const ushort defaultVertexCapacity = 10000;
 
-        const int defaultIndexCapacity = ushort.MaxValue;
+        const int defaultIndexCapacity = 10000;
 
         static readonly VertexPositionNormalTexture[] emptyVertices = new VertexPositionNormalTexture[0];
         
