@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.IO;
@@ -57,6 +58,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        // TODO
+        //
+        // 実行で最適と思われる値を調べて決定する。
+        const ushort defaultVertexCapacity = 10000;
+
+        const ushort defaultIndexCapacity = 10000;
+
         Region region;
 
         IChunkStore chunkStore;
@@ -90,6 +98,10 @@ namespace Willcraftia.Xna.Blocks.Models
         ConcurrentPool<ChunkMesh> chunkMeshPool;
 
         ConcurrentPool<InterChunkMeshPart> interChunkMeshPartPool;
+
+        Pool<DynamicVertexBuffer> vertexBufferPool;
+
+        Pool<DynamicIndexBuffer> indexBufferPool;
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
@@ -127,6 +139,8 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 MaxCapacity = 20
             };
+            vertexBufferPool = new Pool<DynamicVertexBuffer>(CreateVertexBuffer);
+            indexBufferPool = new Pool<DynamicIndexBuffer>(CreateIndexBuffer);
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
             chunkDistanceComparer = new ChunkDistanceComparer(chunkSize);
         }
@@ -144,6 +158,16 @@ namespace Willcraftia.Xna.Blocks.Models
         InterChunkMeshPart CreateInterChunkMeshPart()
         {
             return new InterChunkMeshPart();
+        }
+
+        DynamicVertexBuffer CreateVertexBuffer()
+        {
+            return new DynamicVertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalTexture), defaultVertexCapacity, BufferUsage.WriteOnly);
+        }
+
+        DynamicIndexBuffer CreateIndexBuffer()
+        {
+            return new DynamicIndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
         }
 
         //
@@ -205,6 +229,28 @@ namespace Willcraftia.Xna.Blocks.Models
                     var oldMesh = chunk.ActiveMesh;
                     if (oldMesh != null)
                     {
+                        if (chunk.ActiveMesh.Opaque.VertexBuffer != null)
+                        {
+                            vertexBufferPool.Return(chunk.ActiveMesh.Opaque.VertexBuffer);
+                            chunk.ActiveMesh.Opaque.VertexBuffer = null;
+                        }
+                        if (chunk.ActiveMesh.Opaque.IndexBuffer != null)
+                        {
+                            indexBufferPool.Return(chunk.ActiveMesh.Opaque.IndexBuffer);
+                            chunk.ActiveMesh.Opaque.IndexBuffer = null;
+                        }
+
+                        if (chunk.ActiveMesh.Translucent.VertexBuffer != null)
+                        {
+                            vertexBufferPool.Return(chunk.ActiveMesh.Translucent.VertexBuffer);
+                            chunk.ActiveMesh.Translucent.VertexBuffer = null;
+                        }
+                        if (chunk.ActiveMesh.Translucent.IndexBuffer != null)
+                        {
+                            indexBufferPool.Return(chunk.ActiveMesh.Translucent.IndexBuffer);
+                            chunk.ActiveMesh.Translucent.IndexBuffer = null;
+                        }
+
                         oldMesh.Clear();
                         chunkMeshPool.Return(oldMesh);
                     }
@@ -214,7 +260,22 @@ namespace Willcraftia.Xna.Blocks.Models
                     chunk.PendingMesh = null;
 
                     // VertexBuffer/IndexBuffer への反映
-                    chunk.ActiveMesh.BuildBuffers();
+                    if (0 < chunk.ActiveMesh.Opaque.InterChunkMeshPart.VertexCount &&
+                        0 < chunk.ActiveMesh.Opaque.InterChunkMeshPart.IndexCount)
+                    {
+                        chunk.ActiveMesh.Opaque.VertexBuffer = vertexBufferPool.Borrow();
+                        chunk.ActiveMesh.Opaque.IndexBuffer = indexBufferPool.Borrow();
+                        chunk.ActiveMesh.Opaque.BuildBuffer();
+
+                    }
+
+                    if (0 < chunk.ActiveMesh.Translucent.InterChunkMeshPart.VertexCount &&
+                        0 < chunk.ActiveMesh.Translucent.InterChunkMeshPart.IndexCount)
+                    {
+                        chunk.ActiveMesh.Translucent.VertexBuffer = vertexBufferPool.Borrow();
+                        chunk.ActiveMesh.Translucent.IndexBuffer = indexBufferPool.Borrow();
+                        chunk.ActiveMesh.Translucent.BuildBuffer();
+                    }
 
                     chunk.ActiveMesh.Opaque.InterChunkMeshPart.Clear();
                     interChunkMeshPartPool.Return(chunk.ActiveMesh.Opaque.InterChunkMeshPart);

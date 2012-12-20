@@ -8,20 +8,13 @@ using Willcraftia.Xna.Framework.Diagnostics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMeshPart : IDisposable
+    public sealed class ChunkMeshPart
     {
-        // TODO
-        //
-        // 実行で最適と思われる値を調べて決定する。
-        const ushort defaultVertexCapacity = 10000;
-
-        const ushort defaultIndexCapacity = 10000;
-
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public DynamicVertexBuffer VertexBuffer { get; private set; }
+        public DynamicVertexBuffer VertexBuffer { get; internal set; }
 
-        public DynamicIndexBuffer IndexBuffer { get; private set; }
+        public DynamicIndexBuffer IndexBuffer { get; internal set; }
 
         public int VertexCount { get; private set; }
 
@@ -38,6 +31,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw()
         {
+            if (VertexBuffer == null || IndexBuffer == null) return;
+
             GraphicsDevice.SetVertexBuffer(VertexBuffer);
             GraphicsDevice.Indices = IndexBuffer;
             GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VertexBuffer.VertexCount, 0, IndexBuffer.IndexCount / 3);
@@ -45,55 +40,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void BuildBuffer()
         {
-            if (InterChunkMeshPart == null) return;
+            if (InterChunkMeshPart == null || VertexBuffer == null || IndexBuffer == null) return;
 
             VertexCount = InterChunkMeshPart.VertexCount;
             IndexCount = InterChunkMeshPart.IndexCount;
 
-            if (VertexCount == 0 || IndexCount == 0) return;
-
-            if (VertexBuffer == null) VertexBuffer = CreateVertexBuffer();
-            if (IndexBuffer == null) IndexBuffer = CreateIndexBuffer();
-
             InterChunkMeshPart.PopulateVertexBuffer(VertexBuffer);
             InterChunkMeshPart.PopulateIndexBuffer(IndexBuffer);
         }
-
-        DynamicVertexBuffer CreateVertexBuffer()
-        {
-            return new DynamicVertexBuffer(GraphicsDevice, typeof(VertexPositionNormalTexture), defaultVertexCapacity, BufferUsage.WriteOnly);
-        }
-
-        DynamicIndexBuffer CreateIndexBuffer()
-        {
-            return new DynamicIndexBuffer(GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
-        }
-
-        #region IDisposable
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        bool disposed;
-
-        ~ChunkMeshPart()
-        {
-            Dispose(false);
-        }
-
-        void Dispose(bool disposing)
-        {
-            if (disposed) return;
-
-            if (VertexBuffer != null) VertexBuffer.Dispose();
-            if (IndexBuffer != null) IndexBuffer.Dispose();
-
-            disposed = true;
-        }
-
-        #endregion
     }
 }

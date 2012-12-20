@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMesh : IDisposable
+    public sealed class ChunkMesh
     {
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -27,42 +27,9 @@ namespace Willcraftia.Xna.Blocks.Models
             Opaque = new ChunkMeshPart(graphicsDevice);
         }
 
-        public void BuildBuffers()
-        {
-            Translucent.BuildBuffer();
-            Opaque.BuildBuffer();
-        }
-
         public void Clear()
         {
             Loaded = false;
         }
-
-        #region IDisposable
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        bool disposed;
-
-        ~ChunkMesh()
-        {
-            Dispose(false);
-        }
-
-        void Dispose(bool disposing)
-        {
-            if (disposed) return;
-
-            Translucent.Dispose();
-            Opaque.Dispose();
-
-            disposed = true;
-        }
-
-        #endregion
     }
 }
