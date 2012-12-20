@@ -21,9 +21,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         // Partition は描画に関与せず、Partition 内で管理するクラスにて行う。
         //
 
-        public const int DefaultActivationRange = 5;
+        public const int DefaultActivationRange = 10;
 
-        public const int DefaultPassivationRange = 6;
+        public const int DefaultPassivationRange = 15;
 
         static readonly VectorI3[] nearbyPartitionOffsets =
         {
