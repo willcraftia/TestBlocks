@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Logging
 
-            FileTraceListenerManager.Add(@"Logs\App.log", false);
+            //FileTraceListenerManager.Add(@"Logs\App.log", false);
             logger.InfoGameStarted();
 
             Thread.GetDomain().UnhandledException += new UnhandledExceptionEventHandler(OnUnhandledException);

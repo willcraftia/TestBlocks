@@ -48,8 +48,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // 非同期に呼び出される。
-        // Activate() が呼び出される Partition は、PartitionManager の activatingParitions リスト内にある。
-        // activatingParitions リスト内の Partition は、Passivate() を呼び出されることはない。
         public void Activate()
         {
             asyncCallEvent.Reset();
@@ -62,11 +60,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // 非同期に呼び出される。
-        // UnloadContent() が呼び出される Partiton は、PartitionManager の passivatingPartitions リスト内にある。
-        // passivatingPartitions リスト内の Partition は、LoadContent() を呼び出されることはない。
-        //
-        // passivatingPartitions リスト内の Partition に対して、非同期な状態変更を行なってはならない。
-        // 
         public void Passivate()
         {
             asyncCallEvent.Reset();
@@ -78,9 +71,11 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (PassivateOverride())
                 {
                     IsPassivationCompleted = true;
+                    IsActivationCompleted = false;
                 }
                 else
                 {
+                    // リトライさせる。
                     IsPassivationFailed = true;
                 }
             }
