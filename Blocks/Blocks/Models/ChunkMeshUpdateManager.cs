@@ -202,6 +202,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 vertex.Position.X += x;
                 vertex.Position.Y += y;
                 vertex.Position.Z += z;
+                // Block の MeshPart はその中心に原点があるため、半 Block サイズだけずらす必要がある。
+                vertex.Position.X += 0.5f;
+                vertex.Position.Y += 0.5f;
+                vertex.Position.Z += 0.5f;
                 chunkMeshPart.InterChunkMeshPart.AddVertex(ref vertex);
             }
         }

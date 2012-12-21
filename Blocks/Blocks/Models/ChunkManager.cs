@@ -119,6 +119,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         List<Chunk> translucentChunks = new List<Chunk>();
 
+#if DEBUG
+        BasicEffect debugEffect;
+
+        BoundingBoxDrawer boundingBoxDrawer;
+#endif
+
         public VectorI3 ChunkSize
         {
             get { return chunkSize; }
@@ -147,6 +153,17 @@ namespace Willcraftia.Xna.Blocks.Models
             indexBufferPool = new Pool<DynamicIndexBuffer>(CreateIndexBuffer);
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
             chunkDistanceComparer = new ChunkDistanceComparer(chunkSize);
+
+            InitializeDebugTools();
+        }
+
+        [Conditional("DEBUG")]
+        void InitializeDebugTools()
+        {
+            debugEffect = new BasicEffect(region.GraphicsDevice);
+            debugEffect.AmbientLightColor = Vector3.One;
+            debugEffect.VertexColorEnabled = true;
+            boundingBoxDrawer = new BoundingBoxDrawer(region.GraphicsDevice);
         }
 
         Chunk CreateChunk()
@@ -173,11 +190,6 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             return new DynamicIndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
         }
-
-        //
-        // Chunk にブロックを設定する箇所でもロックが必要なんじゃなかろうか。
-        // サイズ変更は発生しないので、配列要素の byte ではプリミティブ型だからロック不要になるかな？
-        //
 
         ChunkMesh CreatePendingMesh()
         {
@@ -405,6 +417,8 @@ namespace Willcraftia.Xna.Blocks.Models
             //foreach (var chunk in translucentChunks)
             //    DrawChunkMeshPart(chunk.ActiveMesh.Translucent);
 
+            DrawChunkBoundingBoxes(view, projection);
+
             opaqueChunks.Clear();
             translucentChunks.Clear();
 
@@ -413,6 +427,23 @@ namespace Willcraftia.Xna.Blocks.Models
                 chunk.Drawing = false;
 
             workingChunks.Clear();
+        }
+
+        [Conditional("DEBUG")]
+        void DrawChunkBoundingBoxes(View view, Projection projection)
+        {
+            if (!region.ChunkBoundingBoxVisible) return;
+
+            debugEffect.View = view.Matrix;
+            debugEffect.Projection = projection.Matrix;
+
+            foreach (var chunk in workingChunks)
+            {
+                if (!chunk.Drawing) continue;
+
+                var box = chunk.BoundingBox;
+                boundingBoxDrawer.Draw(ref box, debugEffect);
+            }
         }
 
         // 非同期呼び出し。

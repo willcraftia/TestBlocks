@@ -143,7 +143,7 @@ ColorPair CalculateLight(float3 E, float3 N, float2 texCoord)
 //=============================================================================
 // Pixel shader
 //-----------------------------------------------------------------------------
-float4 PS(VSOutput input) : COLOR0
+float4 DefaultPS(VSOutput input) : COLOR0
 {
     float4 color = float4(0, 0, 0, 1);
 
@@ -163,6 +163,11 @@ float4 PS(VSOutput input) : COLOR0
     return color;
 }
 
+float4 WireframePS(VSOutput input) : COLOR0
+{
+    return float4(0, 0, 0, 1);
+}
+
 //=============================================================================
 // Technique
 //-----------------------------------------------------------------------------
@@ -170,7 +175,20 @@ technique Default
 {
     pass P0
     {
+        FillMode = SOLID;
+        CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 PS();
+        PixelShader = compile ps_3_0 DefaultPS();
+    }
+}
+
+technique Wireframe
+{
+    pass P0
+    {
+        FillMode = WIREFRAME;
+        CullMode = CCW;
+        VertexShader = compile vs_3_0 VS();
+        PixelShader = compile ps_3_0 WireframePS();
     }
 }

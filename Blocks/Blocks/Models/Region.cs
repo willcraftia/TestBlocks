@@ -45,6 +45,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkEffect ChunkEffect { get; set; }
 
+        public bool ChunkBoundingBoxVisible { get; set; }
+
         public void Initialize(GraphicsDevice graphicsDevice, AssetManager assetManager, IChunkStore chunkStore)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -55,6 +57,9 @@ namespace Willcraftia.Xna.Blocks.Models
             AssetManager = assetManager;
 
             chunkManager = new ChunkManager(this, chunkStore, RegionManager.ChunkSize);
+
+            // todo
+            ChunkBoundingBoxVisible = true;
         }
 
         public void Update()
@@ -77,8 +82,8 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.LightDiffuseColor = Vector3.One;
             ChunkEffect.LightSpecularColor = Vector3.Zero;
             ChunkEffect.FogEnabled = true;
-            ChunkEffect.FogStart = 50;
-            ChunkEffect.FogEnd = 150;
+            ChunkEffect.FogStart = 100;
+            ChunkEffect.FogEnd = 200;
             ChunkEffect.FogColor = Color.CornflowerBlue.ToVector3();
             ChunkEffect.TileMap = TileCatalog.TileMap;
             ChunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
@@ -86,6 +91,7 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
 
             ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.DefaultTequnique;
+            //ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.WireframeTequnique;
 
             chunkManager.Draw(view, projection);
         }

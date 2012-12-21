@@ -134,6 +134,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public EffectTechnique DefaultTequnique { get; private set; }
 
+        public EffectTechnique WireframeTequnique { get; private set; }
+
         public ChunkEffect(Effect backingEffect)
         {
             if (backingEffect == null) throw new ArgumentNullException("backingEffect");
@@ -170,6 +172,7 @@ namespace Willcraftia.Xna.Blocks.Models
         void CacheEffectTequniques()
         {
             DefaultTequnique = BackingEffect.Techniques["Default"];
+            WireframeTequnique = BackingEffect.Techniques["Wireframe"];
         }
     }
 }

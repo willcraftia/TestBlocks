@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         
         float dashFactor = 2;
 
-        float farPlaneDistance = 3000;
+        float farPlaneDistance = 200;
 
         RegionManager regionManager;
 
@@ -50,7 +50,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // GraphicsDeviceManager
 
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferMultiSampling = true;
+            //graphics.PreferMultiSampling = true;
 
             //================================================================
             // Logging

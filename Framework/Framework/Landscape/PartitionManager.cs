@@ -17,13 +17,9 @@ namespace Willcraftia.Xna.Framework.Landscape
     //
     public abstract class PartitionManager : IDisposable
     {
-        //
-        // Partition は描画に関与せず、Partition 内で管理するクラスにて行う。
-        //
+        public const int DefaultActivationRange = 12;
 
-        public const int DefaultActivationRange = 8;
-
-        public const int DefaultPassivationRange = 10;
+        public const int DefaultPassivationRange = 14;
 
         static readonly VectorI3[] nearbyPartitionOffsets =
         {
