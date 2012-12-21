@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
@@ -142,24 +143,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void UpdateChunk(Chunk chunk)
         {
-            if (!chunk.Dirty) return;
+            Debug.Assert(chunk.Active);
+            Debug.Assert(chunk.Updating);
+            Debug.Assert(chunk.Dirty);
 
-            //
-            // パッシベーションとの同期のためのロック。
-            // ロックを取れない場合は、パッシベーション中とみなし、処理を中断する。
-            // 仮に、パッシベーションによるものでなければ、次のゲーム更新で Chunk が再登録されるであろう。
-            //
-            if (Monitor.TryEnter(chunk))
-            {
-                try
-                {
-                    BuildChunkMesh(chunk);
-                }
-                finally
-                {
-                    Monitor.Exit(chunk);
-                }
-            }
+            BuildChunkMesh(chunk);
         }
 
         void BuildChunkMesh(Chunk chunk)
@@ -174,19 +162,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         if (Block.EmptyIndex == blockIndex)
                             continue;
 
-                        //
-                        // TODO
-                        //
-                        // エディタにおいて、このスレッドで処理している間に、
-                        // BlockCatalog の編集が行われた場合はどうするのか？
-                        // また、Block が編集されるのもまずい。
-                        //
-                        // エディタの場合は、このようなスレッドが全て終わるまで、
-                        // 編集できないようにブロックすることが妥当と思われる。
-                        // 少なくとも、個々の処理について同期を考えることは非現実的である。
-                        //
                         var block = region.BlockCatalog[blockIndex];
-
                         BuildChunkMesh(chunk, x, y, z, block);
                     }
                 }

@@ -44,13 +44,13 @@ namespace Willcraftia.Xna.Blocks.Landscape
             base.ActivateOverride();
         }
 
-        protected override void PassivateOverride()
+        protected override bool PassivateOverride()
         {
-            region.PassivateChunk(ref GridPosition);
+            if (!region.PassivateChunk(ref GridPosition))
+                return false;
 
             region = null;
-
-            base.PassivateOverride();
+            return base.PassivateOverride();
         }
     }
 }

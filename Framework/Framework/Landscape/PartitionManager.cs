@@ -21,9 +21,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         // Partition は描画に関与せず、Partition 内で管理するクラスにて行う。
         //
 
-        public const int DefaultActivationRange = 10;
+        public const int DefaultActivationRange = 8;
 
-        public const int DefaultPassivationRange = 12;
+        public const int DefaultPassivationRange = 10;
 
         static readonly VectorI3[] nearbyPartitionOffsets =
         {
@@ -175,6 +175,15 @@ namespace Willcraftia.Xna.Framework.Landscape
             while (index < passivatingPartitions.Count)
             {
                 var partition = passivatingPartitions[index];
+
+                if (partition.IsPassivationFailed)
+                {
+                    // 一旦アクティブ リストへ戻し、再パッシベート判定を行わせる。
+                    passivatingPartitions.RemoveAt(index);
+                    activePartitions.Add(partition);
+                    continue;
+                }
+
                 if (!partition.IsPassivationCompleted)
                 {
                     index++;

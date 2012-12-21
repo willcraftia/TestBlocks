@@ -97,6 +97,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkMesh PendingMesh { get; set; }
 
+        public bool Active { get; set; }
+
+        public bool Updating { get; set; }
+
+        public bool Drawing { get; set; }
+
         public Chunk(VectorI3 size)
         {
             this.size = size;

@@ -108,9 +108,9 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // 非同期呼び出し。
-        public void PassivateChunk(ref VectorI3 position)
+        public bool PassivateChunk(ref VectorI3 position)
         {
-            chunkManager.PassivateChunk(ref position);
+            return chunkManager.PassivateChunk(ref position);
         }
 
         #region ToString
