@@ -178,7 +178,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (partition.IsPassivationFailed)
                 {
-                    // 一旦アクティブ リストへ戻し、再パッシベート判定を行わせる。
+                    // 一旦アクティブ リストへ戻し、
+                    // 再度、パッシベート判定を行わせる。
                     passivatingPartitions.RemoveAt(index);
                     activePartitions.Add(partition);
                     continue;
@@ -204,6 +205,15 @@ namespace Willcraftia.Xna.Framework.Landscape
             while (index < activatingPartitions.Count)
             {
                 var partition = activatingPartitions[index];
+
+                if (partition.IsActivationFailed)
+                {
+                    // 一旦アクティベーション リストから削除し、
+                    // 再度、アクティベーション判定を行わせる。
+                    activatingPartitions.RemoveAt(index);
+                    continue;
+                }
+
                 if (!partition.IsActivationCompleted)
                 {
                     index++;

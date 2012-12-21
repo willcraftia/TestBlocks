@@ -102,9 +102,9 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // 非同期呼び出し。
-        public void ActivateChunk(ref VectorI3 position)
+        public bool ActivateChunk(ref VectorI3 position)
         {
-            chunkManager.ActivateChunk(ref position);
+            return chunkManager.ActivateChunk(ref position);
         }
 
         // 非同期呼び出し。

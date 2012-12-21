@@ -184,23 +184,20 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunkMesh = chunkMeshPool.Borrow();
             if (chunkMesh == null) return null;
 
-            var interOpaquePart = interChunkMeshPartPool.Borrow();
-            if (interOpaquePart == null)
+            chunkMesh.Opaque.InterChunkMeshPart = interChunkMeshPartPool.Borrow();
+            if (chunkMesh.Opaque.InterChunkMeshPart == null)
             {
                 chunkMeshPool.Return(chunkMesh);
                 return null;
             }
 
-            var interTranslucentPart = interChunkMeshPartPool.Borrow();
-            if (interOpaquePart == null)
+            chunkMesh.Translucent.InterChunkMeshPart = interChunkMeshPartPool.Borrow();
+            if (chunkMesh.Translucent.InterChunkMeshPart == null)
             {
                 chunkMeshPool.Return(chunkMesh);
-                interChunkMeshPartPool.Return(interOpaquePart);
+                interChunkMeshPartPool.Return(chunkMesh.Opaque.InterChunkMeshPart);
                 return null;
             }
-
-            chunkMesh.Opaque.InterChunkMeshPart = interOpaquePart;
-            chunkMesh.Translucent.InterChunkMeshPart = interTranslucentPart;
 
             return chunkMesh;
         }
@@ -419,17 +416,15 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // 非同期呼び出し。
-        public void ActivateChunk(ref VectorI3 position)
+        public bool ActivateChunk(ref VectorI3 position)
         {
             var chunk = chunkPool.Borrow();
-            if (chunk == null) throw new InvalidOperationException("No pooled chunk exists.");
+            if (chunk == null) return false;
 
             Debug.Assert(!chunk.Active);
 
             if (!chunkStore.GetChunk(ref position, chunk))
             {
-                logger.Info("Generate: {0}", position);
-
                 chunk.Position = position;
 
                 foreach (var procedure in region.ChunkProcesures)
@@ -439,9 +434,12 @@ namespace Willcraftia.Xna.Blocks.Models
             // Register
             lock (activeChunks)
             {
+                chunk.Dirty = true;
                 chunk.Active = true;
                 activeChunks.Add(chunk);
             }
+
+            return true;
         }
 
         // 非同期呼び出し。

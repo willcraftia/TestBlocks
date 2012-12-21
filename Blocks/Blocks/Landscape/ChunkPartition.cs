@@ -34,14 +34,15 @@ namespace Willcraftia.Xna.Blocks.Landscape
             base.InitializeOverride();
         }
 
-        protected override void ActivateOverride()
+        protected override bool ActivateOverride()
         {
             if (!regionManager.TryGetRegion(ref GridPosition, out region))
                 throw new InvalidOperationException("Region not found: " + GridPosition);
 
-            region.ActivateChunk(ref GridPosition);
+            if (!region.ActivateChunk(ref GridPosition))
+                return false;
 
-            base.ActivateOverride();
+            return base.ActivateOverride();
         }
 
         protected override bool PassivateOverride()

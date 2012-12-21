@@ -30,6 +30,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public bool IsActivationCompleted { get; private set; }
 
+        public bool IsActivationFailed { get; private set; }
+
         public bool IsPassivationCompleted { get; private set; }
 
         public bool IsPassivationFailed { get; private set; }
@@ -41,6 +43,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         public void Initialize()
         {
             IsActivationCompleted = false;
+            IsActivationFailed = false;
             IsPassivationCompleted = false;
             IsPassivationFailed = false;
 
@@ -52,9 +55,15 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             asyncCallEvent.Reset();
 
-            ActivateOverride();
-
-            IsActivationCompleted = true;
+            if (ActivateOverride())
+            {
+                IsActivationFailed = false;
+                IsActivationCompleted = true;
+            }
+            else
+            {
+                IsActivationFailed = true;
+            }
             
             asyncCallEvent.Set();
         }
@@ -66,10 +75,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             if (IsActivationCompleted)
             {
-                IsPassivationFailed = false;
-
                 if (PassivateOverride())
                 {
+                    IsPassivationFailed = false;
                     IsPassivationCompleted = true;
                     IsActivationCompleted = false;
                 }
@@ -87,7 +95,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         protected virtual void InitializeOverride() { }
 
-        protected virtual void ActivateOverride() { }
+        protected virtual bool ActivateOverride() { return true; }
 
         protected virtual bool PassivateOverride() { return true; }
 
