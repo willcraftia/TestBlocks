@@ -97,7 +97,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // ChunkPartitionManager
 
             partitionManager = new ChunkPartitionManager(regionManager);
-            partitionManager.TaskQueueSlotCount = 10;
+            //partitionManager.TaskQueueSlotCount = 20;
 
             //================================================================
             // Camera Settings
@@ -109,8 +109,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             viewInput.MoveVelocity = moveVelocity;
             viewInput.DashFactor = dashFactor;
 
-            view.Position = new Vector3(0, 256, 0);
-            //view.Position = new Vector3(0, 50, 0);
+            view.Position = new Vector3(0, 16 * 16, 0);
+            //view.Position = new Vector3(0, 16 * 4, 0);
             view.Yaw(MathHelper.Pi);
             view.Update();
 
@@ -212,6 +212,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         {
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, backgroundColor, 1, 0);
             GraphicsDevice.RasterizerState = defaultRasterizerState;
+            GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             if (!partitionManager.Closing && !partitionManager.Closed)

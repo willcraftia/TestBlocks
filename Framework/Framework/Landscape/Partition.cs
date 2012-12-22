@@ -19,14 +19,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
 
-        //====================================================================
-        // Efficiency
-
         // A position in the partition space.
-        public VectorI3 GridPosition;
-
-        //
-        //====================================================================
+        public VectorI3 GridPosition { get; internal set; }
 
         public bool IsActivationCompleted { get; private set; }
 

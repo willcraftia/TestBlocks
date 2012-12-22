@@ -21,6 +21,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int DefaultPassivationRange = 14;
 
+        public const int DefaultTaskQueueSlotCount = 20;
+
         static readonly VectorI3[] nearbyPartitionOffsets =
         {
             // Top
@@ -53,7 +55,15 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         PartitionCollection passivatingPartitions = new PartitionCollection();
 
-        TaskQueue taskQueue = new TaskQueue();
+        TaskQueue activationTaskQueue = new TaskQueue
+        {
+            SlotCount = DefaultTaskQueueSlotCount
+        };
+
+        TaskQueue passivationTaskQueue = new TaskQueue
+        {
+            SlotCount = DefaultTaskQueueSlotCount
+        };
 
         int activationRange = DefaultActivationRange;
         
@@ -65,10 +75,16 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public bool Closed { get; private set; }
 
-        public int TaskQueueSlotCount
+        public int ActivationTaskQueueSlotCount
         {
-            get { return taskQueue.SlotCount; }
-            set { taskQueue.SlotCount = value; }
+            get { return activationTaskQueue.SlotCount; }
+            set { activationTaskQueue.SlotCount = value; }
+        }
+
+        public int PassivationTaskQueueSlotCount
+        {
+            get { return passivationTaskQueue.SlotCount; }
+            set { passivationTaskQueue.SlotCount = value; }
         }
 
         public int PoolMaxCapacity
@@ -112,42 +128,43 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (Closed) return;
 
-            eyeGridPosition.X = Floor(eyeWorldPosition.X * inversePartitionSize.X);
-            eyeGridPosition.Y = Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
-            eyeGridPosition.Z = Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
-
-            // Update the task queue.
-            taskQueue.Update();
-
-            // Try to activate/passivate partitions.
-            CheckPassivationCompleted();
-            CheckActivationCompleted();
+            eyeGridPosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
+            eyeGridPosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
+            eyeGridPosition.Z = MathExtension.Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
 
             if (!Closing)
             {
+                activationTaskQueue.Update();
+                passivationTaskQueue.Update();
+
+                CheckPassivationCompleted();
+                CheckActivationCompleted();
+
                 PassivatePartitions();
                 ActivatePartitions();
             }
             else
             {
-                // Complete ?
+                // アクティベーション中のパーティションは破棄。
+                if (activationTaskQueue.QueueCount != 0)
+                    activationTaskQueue.Clear();
 
-                // Passivating some partitions yet.
-                if (passivatingPartitions.Count != 0) return;
+                if (activatingPartitions.Count != 0)
+                    activatingPartitions.Clear();
 
-                // Activating some partitions yet.
-                if (activatingPartitions.Count != 0) return;
+                // パッシベーション中のパーティションを処理。
+                passivationTaskQueue.Update();
+                CheckPassivationCompleted();
 
-                // Some partitions still remain in active ones.
-                if (activePartitions.Count != 0)
+                // アクティブなパーティションを全てパッシベート。
+                PassivatePartitions();
+
+                // 全パッシベーションが完了していればクローズ完了。
+                if (passivatingPartitions.Count == 0)
                 {
-                    ForcePassivatePartitions();
-                    return;
+                    Closing = false;
+                    Closed = true;
                 }
-
-                // Passivated all partitions.
-                Closing = false;
-                Closed = true;
             }
         }
 
@@ -221,27 +238,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 activePartitions.Add(partition);
 
                 // Notify that a neighbor is activated.
+                var position = partition.GridPosition;
                 for (int i = 0; i < 6; i++)
                 {
-                    var nearbyPosition = nearbyPartitionOffsets[i];
+                    var nearbyPosition = position + nearbyPartitionOffsets[i];
                     Partition neighbor;
                     if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
                         neighbor.OnNeighborActivated(partition);
                 }
-            }
-        }
-
-        void ForcePassivatePartitions()
-        {
-            int index = 0;
-            while (index < activePartitions.Count)
-            {
-                var partition = activePartitions[index];
-
-                activePartitions.Remove(partition);
-                passivatingPartitions.Add(partition);
-
-                taskQueue.Enqueue(partition.Passivate);
             }
         }
 
@@ -258,10 +262,17 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var partition = activePartitions[index];
 
-                if (!Closing && bounds.Contains(partition.GridPosition) == ContainmentType.Contains)
+                if (!Closing)
                 {
-                    index++;
-                    continue;
+                    var position = partition.GridPosition;
+                    ContainmentType containmentType;
+                    bounds.Contains(ref position, out containmentType);
+
+                    if (containmentType == ContainmentType.Contains)
+                    {
+                        index++;
+                        continue;
+                    }
                 }
 
                 // Remove this partition from collections of active partitions.
@@ -271,7 +282,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 passivatingPartitions.Add(partition);
 
                 // Unload this partition asynchronously.
-                taskQueue.Enqueue(partition.Passivate);
+                passivationTaskQueue.Enqueue(partition.Passivate);
             }
         }
 
@@ -313,7 +324,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                         // Add.
                         activatingPartitions.Add(partition);
-                        taskQueue.Enqueue(partition.Activate);
+                        activationTaskQueue.Enqueue(partition.Activate);
                     }
                 }
             }
@@ -342,12 +353,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                     Z = center.Z + range
                 }
             };
-        }
-
-        int Floor(float v)
-        {
-            // Faster than using (int) Math.Floor(x).
-            return 0 < v ? (int) v : (int) v - 1;
         }
 
         protected virtual void DisposeOverride(bool disposing) { }
@@ -392,9 +397,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             passivatingPartitions.Clear();
 
             //================================================================
-            // Clear all tasks just in case.
+            // Clear all tasks.
 
-            taskQueue.Clear();
+            activationTaskQueue.Clear();
+            passivationTaskQueue.Clear();
 
             disposed = true;
         }

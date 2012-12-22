@@ -137,7 +137,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 // 更新の完了した Chunk を記録から消し、完了マークを付ける。
                 updatingChunks.Remove(chunk);
-                chunk.PendingMesh.Loaded = true;
+                chunk.InterMesh.Completed = true;
             }
         }
 
@@ -171,7 +171,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void BuildChunkMesh(Chunk chunk, int x, int y, int z, Block block)
         {
-            var chunkMesh = chunk.PendingMesh;
+            var chunkMesh = chunk.InterMesh;
 
             for (int i = 0; i < 6; i++)
             {
@@ -182,20 +182,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (block.Fluid || IsTranslucentSurface(block, side))
                 {
-                    AddMesh(chunkMesh.Translucent, x, y, z, meshPart);
+                    AddMesh(x, y, z, meshPart, chunkMesh.Translucent);
                 }
                 else
                 {
-                    AddMesh(chunkMesh.Opaque, x, y, z, meshPart);
+                    AddMesh(x, y, z, meshPart, chunkMesh.Opaque);
                 }
             }
         }
 
-        void AddMesh(ChunkMeshPart chunkMeshPart, int x, int y, int z, MeshPart blockMeshPart)
+        void AddMesh(int x, int y, int z, MeshPart source, InterChunkMeshPart destination)
         {
-            chunkMeshPart.InterChunkMeshPart.AddIndices(blockMeshPart.Indices);
+            destination.AddIndices(source.Indices);
 
-            var vertices = blockMeshPart.Vertices;
+            var vertices = source.Vertices;
             for (int i = 0; i < vertices.Length; i++)
             {
                 var vertex = vertices[i];
@@ -206,7 +206,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 vertex.Position.X += 0.5f;
                 vertex.Position.Y += 0.5f;
                 vertex.Position.Z += 0.5f;
-                chunkMeshPart.InterChunkMeshPart.AddVertex(ref vertex);
+                destination.AddVertex(ref vertex);
             }
         }
 

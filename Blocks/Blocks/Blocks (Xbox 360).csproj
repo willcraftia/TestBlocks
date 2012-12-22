@@ -129,6 +129,7 @@
     <Compile Include="Models\IChunkProcedure.cs" />
     <Compile Include="Models\IChunkStore.cs" />
     <Compile Include="Models\Image2D.cs" />
+    <Compile Include="Models\InterChunkMesh.cs" />
     <Compile Include="Models\InterChunkMeshPart.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />

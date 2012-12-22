@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Diagnostics;
 using Willcraftia.Xna.Framework.Landscape;
 using Willcraftia.Xna.Blocks.Models;
 
@@ -22,6 +23,8 @@ namespace Willcraftia.Xna.Blocks.Landscape
 
         Region region;
 
+        Chunk chunk;
+
         public ChunkPartition(RegionManager regionManager)
         {
             if (regionManager == null) throw new ArgumentNullException("regionManager");
@@ -36,22 +39,36 @@ namespace Willcraftia.Xna.Blocks.Landscape
 
         protected override bool ActivateOverride()
         {
-            if (!regionManager.TryGetRegion(ref GridPosition, out region))
-                throw new InvalidOperationException("Region not found: " + GridPosition);
+            var position = GridPosition;
 
-            if (!region.ActivateChunk(ref GridPosition))
-                return false;
+            if (!regionManager.TryGetRegion(ref position, out region))
+                throw new InvalidOperationException("Region not found: " + position);
+
+            chunk = region.ActivateChunk(ref position);
+            if (chunk == null) return false;
 
             return base.ActivateOverride();
         }
 
         protected override bool PassivateOverride()
         {
-            if (!region.PassivateChunk(ref GridPosition))
-                return false;
+            Debug.Assert(chunk != null);
 
+            if (!region.PassivateChunk(chunk)) return false;
+
+            chunk = null;
             region = null;
+
             return base.PassivateOverride();
+        }
+
+        public override void OnNeighborActivated(Partition neighbor)
+        {
+            Debug.Assert(chunk != null);
+
+            chunk.Dirty = true;
+
+            base.OnNeighborActivated(neighbor);
         }
     }
 }

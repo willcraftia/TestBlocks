@@ -11,11 +11,9 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public ChunkMeshPart Translucent { get; private set; }
-
         public ChunkMeshPart Opaque { get; private set; }
 
-        public bool Loaded { get; set; }
+        public ChunkMeshPart Translucent { get; private set; }
 
         public ChunkMesh(GraphicsDevice graphicsDevice)
         {
@@ -25,11 +23,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             Translucent = new ChunkMeshPart(graphicsDevice);
             Opaque = new ChunkMeshPart(graphicsDevice);
-        }
-
-        public void Clear()
-        {
-            Loaded = false;
         }
     }
 }

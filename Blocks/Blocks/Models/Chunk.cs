@@ -93,9 +93,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool Dirty { get; set; }
 
-        public ChunkMesh ActiveMesh { get; set; }
+        public ChunkMesh Mesh { get; set; }
 
-        public ChunkMesh PendingMesh { get; set; }
+        public InterChunkMesh InterMesh { get; set; }
 
         public bool Active { get; set; }
 

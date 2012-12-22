@@ -90,8 +90,8 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
             ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
 
-            ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.DefaultTequnique;
-            //ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.WireframeTequnique;
+            //ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.DefaultTequnique;
+            ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.WireframeTequnique;
 
             chunkManager.Draw(view, projection);
         }
@@ -108,15 +108,15 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // 非同期呼び出し。
-        public bool ActivateChunk(ref VectorI3 position)
+        public Chunk ActivateChunk(ref VectorI3 position)
         {
             return chunkManager.ActivateChunk(ref position);
         }
 
         // 非同期呼び出し。
-        public bool PassivateChunk(ref VectorI3 position)
+        public bool PassivateChunk(Chunk chunk)
         {
-            return chunkManager.PassivateChunk(ref position);
+            return chunkManager.PassivateChunk(chunk);
         }
 
         #region ToString

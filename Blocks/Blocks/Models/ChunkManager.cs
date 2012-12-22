@@ -101,7 +101,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ConcurrentPool<ChunkMesh> chunkMeshPool;
 
-        ConcurrentPool<InterChunkMeshPart> interChunkMeshPartPool;
+        Pool<InterChunkMesh> interChunkMeshPool;
 
         Pool<DynamicVertexBuffer> vertexBufferPool;
 
@@ -114,6 +114,8 @@ namespace Willcraftia.Xna.Blocks.Models
         Vector3 eyePosition;
 
         ChunkDistanceComparer chunkDistanceComparer;
+
+        List<Chunk> occlusionQueryChunks = new List<Chunk>();
 
         List<Chunk> opaqueChunks = new List<Chunk>();
 
@@ -145,7 +147,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunkPool = new ConcurrentPool<Chunk>(CreateChunk);
             chunkMeshPool = new ConcurrentPool<ChunkMesh>(CreateChunkMesh);
-            interChunkMeshPartPool = new ConcurrentPool<InterChunkMeshPart>(CreateInterChunkMeshPart)
+            interChunkMeshPool = new Pool<InterChunkMesh>(CreateInterChunkMesh)
             {
                 MaxCapacity = 20
             };
@@ -176,9 +178,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return new ChunkMesh(region.GraphicsDevice);
         }
 
-        InterChunkMeshPart CreateInterChunkMeshPart()
+        InterChunkMesh CreateInterChunkMesh()
         {
-            return new InterChunkMeshPart();
+            return new InterChunkMesh();
         }
 
         DynamicVertexBuffer CreateVertexBuffer()
@@ -191,86 +193,107 @@ namespace Willcraftia.Xna.Blocks.Models
             return new DynamicIndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
         }
 
-        ChunkMesh CreatePendingMesh()
+        void ReturnChunk(Chunk chunk)
         {
-            var chunkMesh = chunkMeshPool.Borrow();
-            if (chunkMesh == null) return null;
+            chunk.Clear();
 
-            chunkMesh.Opaque.InterChunkMeshPart = interChunkMeshPartPool.Borrow();
-            if (chunkMesh.Opaque.InterChunkMeshPart == null)
-            {
-                chunkMeshPool.Return(chunkMesh);
-                return null;
-            }
+            ReturnChunkMesh(chunk);
+            ReturnInterChunkMesh(chunk);
 
-            chunkMesh.Translucent.InterChunkMeshPart = interChunkMeshPartPool.Borrow();
-            if (chunkMesh.Translucent.InterChunkMeshPart == null)
-            {
-                chunkMeshPool.Return(chunkMesh);
-                interChunkMeshPartPool.Return(chunkMesh.Opaque.InterChunkMeshPart);
-                return null;
-            }
-
-            return chunkMesh;
+            chunkPool.Return(chunk);
         }
 
-        void ReturnActiveMesh(ChunkMesh chunkMesh)
+        void BorrowBuffer(ChunkMeshPart meshPart)
         {
-            if (chunkMesh.Opaque.VertexBuffer != null)
-            {
-                vertexBufferPool.Return(chunkMesh.Opaque.VertexBuffer);
-                chunkMesh.Opaque.VertexBuffer = null;
-            }
-            if (chunkMesh.Opaque.IndexBuffer != null)
-            {
-                indexBufferPool.Return(chunkMesh.Opaque.IndexBuffer);
-                chunkMesh.Opaque.IndexBuffer = null;
-            }
+            if (meshPart.VertexBuffer == null)
+                meshPart.VertexBuffer = vertexBufferPool.Borrow();
+            if (meshPart.IndexBuffer == null)
+                meshPart.IndexBuffer = indexBufferPool.Borrow();
+        }
 
-            if (chunkMesh.Translucent.VertexBuffer != null)
+        void ReturnBuffer(ChunkMeshPart meshPart)
+        {
+            if (meshPart.VertexBuffer != null)
             {
-                vertexBufferPool.Return(chunkMesh.Translucent.VertexBuffer);
-                chunkMesh.Translucent.VertexBuffer = null;
+                vertexBufferPool.Return(meshPart.VertexBuffer);
+                meshPart.VertexBuffer = null;
             }
-            if (chunkMesh.Translucent.IndexBuffer != null)
+            if (meshPart.IndexBuffer != null)
             {
-                indexBufferPool.Return(chunkMesh.Translucent.IndexBuffer);
-                chunkMesh.Translucent.IndexBuffer = null;
+                indexBufferPool.Return(meshPart.IndexBuffer);
+                meshPart.IndexBuffer = null;
             }
+        }
 
-            chunkMesh.Clear();
+        bool BorrowChunkMesh(Chunk chunk)
+        {
+            if (chunk.Mesh == null)
+                chunk.Mesh = chunkMeshPool.Borrow();
+
+            return chunk.Mesh != null;
+        }
+
+        void ReturnChunkMesh(Chunk chunk)
+        {
+            if (chunk.Mesh != null)
+            {
+                ReturnChunkMesh(chunk.Mesh);
+                chunk.Mesh = null;
+            }
+        }
+
+        void ReturnChunkMesh(ChunkMesh chunkMesh)
+        {
+            ReturnBuffer(chunkMesh.Opaque);
+            ReturnBuffer(chunkMesh.Translucent);
+
             chunkMeshPool.Return(chunkMesh);
         }
 
-        void BuildActiveMeshBuffers(ChunkMesh chunkMesh)
+        bool BorrowInterChunkMesh(Chunk chunk)
         {
-            if (0 < chunkMesh.Opaque.InterChunkMeshPart.VertexCount &&
-                0 < chunkMesh.Opaque.InterChunkMeshPart.IndexCount)
-            {
-                chunkMesh.Opaque.VertexBuffer = vertexBufferPool.Borrow();
-                chunkMesh.Opaque.IndexBuffer = indexBufferPool.Borrow();
-                chunkMesh.Opaque.BuildBuffer();
+            if (chunk.InterMesh == null)
+                chunk.InterMesh = interChunkMeshPool.Borrow();
 
-            }
+            return chunk.InterMesh != null;
+        }
 
-            if (0 < chunkMesh.Translucent.InterChunkMeshPart.VertexCount &&
-                0 < chunkMesh.Translucent.InterChunkMeshPart.IndexCount)
+        void ReturnInterChunkMesh(Chunk chunk)
+        {
+            if (chunk.InterMesh != null)
             {
-                chunkMesh.Translucent.VertexBuffer = vertexBufferPool.Borrow();
-                chunkMesh.Translucent.IndexBuffer = indexBufferPool.Borrow();
-                chunkMesh.Translucent.BuildBuffer();
+                ReturnInterChunkMesh(chunk.InterMesh);
+                chunk.InterMesh = null;
             }
         }
 
-        void ReturnInterChunkMeshParts(ChunkMesh chunkMesh)
+        void ReturnInterChunkMesh(InterChunkMesh interChunkMesh)
         {
-            chunkMesh.Opaque.InterChunkMeshPart.Clear();
-            interChunkMeshPartPool.Return(chunkMesh.Opaque.InterChunkMeshPart);
-            chunkMesh.Opaque.InterChunkMeshPart = null;
+            interChunkMesh.Opaque.Clear();
+            interChunkMesh.Translucent.Clear();
+            interChunkMeshPool.Return(interChunkMesh);
+        }
 
-            chunkMesh.Translucent.InterChunkMeshPart.Clear();
-            interChunkMeshPartPool.Return(chunkMesh.Translucent.InterChunkMeshPart);
-            chunkMesh.Translucent.InterChunkMeshPart = null;
+        void UpdateChunkMeshBuffer(Chunk chunk)
+        {
+            var activeMesh = chunk.Mesh;
+            var pendingMesh = chunk.InterMesh;
+
+            UpdateChunkMeshPartBuffer(pendingMesh.Opaque, activeMesh.Opaque);
+            UpdateChunkMeshPartBuffer(pendingMesh.Translucent, activeMesh.Translucent);
+        }
+
+        void UpdateChunkMeshPartBuffer(InterChunkMeshPart source, ChunkMeshPart destination)
+        {
+            if (0 < source.VertexCount && 0 < source.IndexCount)
+            {
+                BorrowBuffer(destination);
+                source.Populate(destination.VertexBuffer, destination.IndexBuffer);
+            }
+            else
+            {
+                ReturnBuffer(destination);
+            }
         }
 
         public void Update()
@@ -302,38 +325,33 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                if (chunk.PendingMesh == null)
+                if (chunk.InterMesh == null)
                 {
-                    // PendingMesh 未設定ならば、更新要求を追加。
-                    chunk.PendingMesh = CreatePendingMesh();
-                    if (chunk.PendingMesh != null)
+                    // InterMesh 未設定ならば設定を試行。
+                    if (BorrowInterChunkMesh(chunk))
                     {
-                        // 非同期な更新要求を登録。
+                        // 非同期な更新要求を追加。
+                        chunk.InterMesh.Completed = false;
                         chunkMeshUpdateManager.EnqueueChunk(chunk);
                     }
                     else
                     {
-                        // PendingMesh の更新を次回の試行とする。
+                        // InterMesh の更新を次回の試行とする。
                         chunk.Updating = false;
                     }
                 }
-                else if (chunk.PendingMesh.Loaded)
+                else if (chunk.InterMesh.Completed)
                 {
-                    // PendingMesh がロード完了ならば ActiveMesh を更新。
+                    // InterMesh が更新完了ならば Mesh を更新。
 
-                    // 古い ActiveMesh をプールへ戻す。
-                    if (chunk.ActiveMesh != null)
-                        ReturnActiveMesh(chunk.ActiveMesh);
+                    if (!BorrowChunkMesh(chunk)) continue;
 
-                    // PendingMesh を新しい ActiveMesh として設定する。
-                    chunk.ActiveMesh = chunk.PendingMesh;
-                    chunk.PendingMesh = null;
+                    // VertexBuffer/IndexBuffer への反映。
+                    UpdateChunkMeshBuffer(chunk);
 
-                    // VertexBuffer/IndexBuffer への反映
-                    BuildActiveMeshBuffers(chunk.ActiveMesh);
-
-                    // 全ての InterChunkMeshPart をプールへ戻す。
-                    ReturnInterChunkMeshParts(chunk.ActiveMesh);
+                    // InterMesh をプールへ戻す。
+                    ReturnInterChunkMesh(chunk.InterMesh);
+                    chunk.InterMesh = null;
 
                     // 更新終了としてマークする。
                     chunk.Dirty = false;
@@ -346,6 +364,11 @@ namespace Willcraftia.Xna.Blocks.Models
             // 更新処理を実行。
             chunkMeshUpdateManager.Update();
         }
+
+        static readonly BlendState colorWriteDisable = new BlendState
+        {
+            ColorWriteChannels = ColorWriteChannels.None
+        };
 
         public void Draw(View view, Projection projection)
         {
@@ -374,10 +397,10 @@ namespace Willcraftia.Xna.Blocks.Models
                     chunk.Drawing = true;
                 }
                 
-                var activeMesh = chunk.ActiveMesh;
-                if (activeMesh == null)
+                var mesh = chunk.Mesh;
+                if (mesh == null)
                 {
-                    // まだ ActiveMesh の構築が完了していないならばスキップ。
+                    // 一度も構築処理が行われていないならばスキップ。
                     chunk.Drawing = false;
                     continue;
                 }
@@ -390,10 +413,10 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                if (activeMesh.Opaque.VertexCount != 0)
+                if (mesh.Opaque.VertexCount != 0)
                     opaqueChunks.Add(chunk);
 
-                if (activeMesh.Translucent.VertexCount != 0)
+                if (mesh.Translucent.VertexCount != 0)
                     translucentChunks.Add(chunk);
             }
 
@@ -401,6 +424,24 @@ namespace Willcraftia.Xna.Blocks.Models
             translucentChunks.Sort(chunkDistanceComparer);
 
             var pass = region.ChunkEffect.BackingEffect.CurrentTechnique.Passes[0];
+
+            region.GraphicsDevice.BlendState = colorWriteDisable;
+            region.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+
+            foreach (var chunk in opaqueChunks)
+            {
+                Matrix world;
+                chunk.CreateWorldMatrix(out world);
+
+                region.ChunkEffect.World = world;
+
+                pass.Apply();
+
+                chunk.Mesh.Opaque.UpdateOcclusion();
+            }
+
+            region.GraphicsDevice.BlendState = BlendState.Opaque;
+            region.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (var chunk in opaqueChunks)
             {
@@ -411,7 +452,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 
                 pass.Apply();
 
-                chunk.ActiveMesh.Opaque.Draw();
+                chunk.Mesh.Opaque.Draw();
             }
 
             //foreach (var chunk in translucentChunks)
@@ -447,10 +488,19 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // 非同期呼び出し。
-        public bool ActivateChunk(ref VectorI3 position)
+        public Chunk GetChunk(ref VectorI3 position)
+        {
+            lock (activeChunks)
+            {
+                return activeChunks[position];
+            }
+        }
+
+        // 非同期呼び出し。
+        public Chunk ActivateChunk(ref VectorI3 position)
         {
             var chunk = chunkPool.Borrow();
-            if (chunk == null) return false;
+            if (chunk == null) return null;
 
             Debug.Assert(!chunk.Active);
 
@@ -470,14 +520,13 @@ namespace Willcraftia.Xna.Blocks.Models
                 activeChunks.Add(chunk);
             }
 
-            return true;
+            return chunk;
         }
 
         // 非同期呼び出し。
-        public bool PassivateChunk(ref VectorI3 position)
+        public bool PassivateChunk(Chunk chunk)
         {
-            Chunk chunk;
-            if (!TryGetActiveChunk(ref position, out chunk)) return false;
+            if (chunk == null) throw new ArgumentNullException("chunk");
 
             Debug.Assert(chunk.Active);
 
@@ -494,23 +543,12 @@ namespace Willcraftia.Xna.Blocks.Models
                 activeChunks.Remove(chunk);
             }
 
+            // 永続化。
             chunkStore.AddChunk(chunk);
 
-            chunk.Clear();
+            // プールへ戻す。
+            ReturnChunk(chunk);
 
-            if (chunk.ActiveMesh != null)
-            {
-                chunkMeshPool.Return(chunk.ActiveMesh);
-                chunk.ActiveMesh = null;
-            }
-
-            if (chunk.PendingMesh != null)
-            {
-                chunkMeshPool.Return(chunk.PendingMesh);
-                chunk.PendingMesh = null;
-            }
-
-            chunkPool.Return(chunk);
             return true;
         }
 
