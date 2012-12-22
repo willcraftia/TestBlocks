@@ -37,6 +37,30 @@ namespace Willcraftia.Xna.Framework
             return new Vector3(X, Y, Z);
         }
 
+        #region Operators
+
+        public static VectorI3 operator +(VectorI3 v1, VectorI3 v2)
+        {
+            return new VectorI3
+            {
+                X = v1.X + v2.X,
+                Y = v1.Y + v2.Y,
+                Z = v1.Z + v2.Z
+            };
+        }
+
+        public static VectorI3 operator -(VectorI3 v1, VectorI3 v2)
+        {
+            return new VectorI3
+            {
+                X = v1.X - v2.X,
+                Y = v1.Y - v2.Y,
+                Z = v1.Z - v2.Z
+            };
+        }
+
+        #endregion
+
         #region Equatable
 
         public static bool operator ==(VectorI3 p1, VectorI3 p2)
