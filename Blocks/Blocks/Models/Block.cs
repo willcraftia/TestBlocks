@@ -69,6 +69,12 @@ namespace Willcraftia.Xna.Blocks.Models
             Mesh = BlockMesh.Create(this);
         }
 
+        public bool IsTranslucentTile(Side side)
+        {
+            var tile = GetTile(side);
+            return tile != null && tile.Translucent;
+        }
+
         public Tile GetTile(Side side)
         {
             switch (side)

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Threading;
@@ -39,7 +40,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
-        static readonly VectorI3[] nearbyBlockOffsets =
+        static readonly VectorI3[] nearbyOffsets =
         {
             // Top
             new VectorI3(0, 1, 0),
@@ -60,6 +61,8 @@ namespace Willcraftia.Xna.Blocks.Models
         ChunkManager chunkManager;
 
         VectorI3 chunkSize;
+
+        Vector3 inverseChunkSize;
 
         // TODO
         // プール サイズは、メモリ占有量の観点で決定する。
@@ -82,6 +85,9 @@ namespace Willcraftia.Xna.Blocks.Models
             this.chunkManager = chunkManager;
 
             chunkSize = chunkManager.ChunkSize;
+            inverseChunkSize.X = 1 / (float) chunkSize.X;
+            inverseChunkSize.Y = 1 / (float) chunkSize.Y;
+            inverseChunkSize.Z = 1 / (float) chunkSize.Z;
 
             taskPool = new Pool<Task>(() => { return new Task(this); });
         }
@@ -152,42 +158,106 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void BuildChunkMesh(Chunk chunk)
         {
-            for (int z = 0; z < chunkSize.Z; z++)
-            {
-                for (int y = 0; y < chunkSize.Y; y++)
-                {
-                    for (int x = 0; x < chunkSize.X; x++)
-                    {
-                        var blockIndex = chunk[x, y, z];
-                        if (Block.EmptyIndex == blockIndex)
-                            continue;
+            // 事前にアクティブな隣接 Chunk を探索し、
+            // それらのみをアクティブな隣接 Chunk であるとして処理を進める。
+            //
+            // 当該 ChunkMesh の更新中であっても、Chunk は随時アクティブ化されるため、
+            // ここでスナップショットとして取得しておかないと、
+            // ある時点まではアクティブな隣接 Chunk が見つからないが、
+            // ある時点からアクティブな隣接 Chunk が見つかるという状態が発生し、
+            // 隣接 Block からの面の要否の決定が曖昧となる。
+            var position = chunk.Position;
+            NearbyChunks nearbyChunks;
+            chunkManager.GetNearbyActiveChunks(ref position, out nearbyChunks);
 
-                        var block = region.BlockCatalog[blockIndex];
-                        BuildChunkMesh(chunk, x, y, z, block);
-                    }
-                }
-            }
+            for (int z = 0; z < chunkSize.Z; z++)
+                for (int y = 0; y < chunkSize.Y; y++)
+                    for (int x = 0; x < chunkSize.X; x++)
+                        BuildChunkMesh(chunk, x, y, z, ref nearbyChunks);
         }
 
-        void BuildChunkMesh(Chunk chunk, int x, int y, int z, Block block)
+        void BuildChunkMesh(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks)
         {
-            var chunkMesh = chunk.InterMesh;
+            var blockIndex = chunk[x, y, z];
+
+            // 空ならば頂点は存在しない。
+            if (Block.EmptyIndex == blockIndex) return;
+
+            var block = region.BlockCatalog[blockIndex];
+
+            // MeshPart が必ずしも平面であるとは限らないが、
+            // ここでは平面を仮定して隣接状態を考える。
 
             for (int i = 0; i < 6; i++)
             {
                 var side = (Side) i;
-                if (!ShouldDrawSurface(chunk, x, y, z, block, side)) continue;
-
                 var meshPart = block.Mesh[side];
 
-                if (block.Fluid || IsTranslucentSurface(block, side))
+                // 対象面が存在しない場合はスキップ。
+                if (meshPart == null) continue;
+
+                // 対象面に隣接する Block を探索。
+                var nearbyBlockIndex = GetNearbyBlockIndex(chunk, x, y, z, ref nearbyChunks, side);
+                if (nearbyBlockIndex != Block.EmptyIndex)
                 {
-                    AddMesh(x, y, z, meshPart, chunkMesh.Translucent);
+                    // 隣接 Block との関係から対象面の要否を判定。
+                    var nearbyBlock = region.BlockCatalog[nearbyBlockIndex];
+                    if (!IsVisibleBlock(block, side, nearbyBlock)) continue;
+                }
+
+                if (block.Fluid || block.IsTranslucentTile(side))
+                {
+                    AddMesh(x, y, z, meshPart, chunk.InterMesh.Translucent);
                 }
                 else
                 {
-                    AddMesh(x, y, z, meshPart, chunkMesh.Opaque);
+                    AddMesh(x, y, z, meshPart, chunk.InterMesh.Opaque);
                 }
+            }
+        }
+
+        bool IsVisibleBlock(Block block, Side side, Block nearbyBlock)
+        {
+            // 半透明な連続した流体 Block を並べる際、流体 Block 間の面は不要。
+            // ※流体 Block は常に半透明を仮定して処理。
+            if (nearbyBlock.Fluid && block.Fluid) return false;
+
+            // 対象面が半透明ではないならば、隣接 Block により不可視面となるため不要。
+            if (!block.IsTranslucentTile(side)) return false;
+
+            return true;
+        }
+
+        byte GetNearbyBlockIndex(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks, Side side)
+        {
+            var nearbyBlockPosition = nearbyOffsets[(byte) side];
+            nearbyBlockPosition.X += x;
+            nearbyBlockPosition.Y += y;
+            nearbyBlockPosition.Z += z;
+
+            // 対象面に隣接する Block を探索。
+            if (chunk.Contains(ref nearbyBlockPosition))
+            {
+                // 隣接 Block が対象 Chunk に含まれている場合。
+                return chunk[nearbyBlockPosition.X, nearbyBlockPosition.Y, nearbyBlockPosition.Z];
+            }
+            else
+            {
+                // 隣接 Block が隣接 Chunk に含まれている場合。
+                var nearbyChunk = nearbyChunks[side];
+                
+                // 隣接 Chunk がないならば空。
+                if (nearbyChunk == null) return Block.EmptyIndex;
+
+                // 隣接 Chunk での相対座標を算出。
+                var relativeX = nearbyBlockPosition.X % chunkSize.X;
+                var relativeY = nearbyBlockPosition.Y % chunkSize.Y;
+                var relativeZ = nearbyBlockPosition.Z % chunkSize.Z;
+                if (relativeX < 0) relativeX += chunkSize.X;
+                if (relativeY < 0) relativeY += chunkSize.Y;
+                if (relativeZ < 0) relativeZ += chunkSize.Z;
+
+                return nearbyChunk[relativeX, relativeY, relativeZ];
             }
         }
 
@@ -208,35 +278,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 vertex.Position.Z += 0.5f;
                 destination.AddVertex(ref vertex);
             }
-        }
-
-        bool ShouldDrawSurface(Chunk chunk, int x, int y, int z, Block block, Side side)
-        {
-            if (block.Mesh[side] == null) return false;
-
-            var nearbyBlockPosition = nearbyBlockOffsets[(byte) side];
-            nearbyBlockPosition.X += x;
-            nearbyBlockPosition.Y += y;
-            nearbyBlockPosition.Z += z;
-
-            var nearbyBlockIndex = chunkManager.FindActiveBlockIndex(chunk, ref nearbyBlockPosition);
-            if (Block.EmptyIndex == nearbyBlockIndex)
-                return true;
-
-            var nearbyBlock = region.BlockCatalog[nearbyBlockIndex];
-            if (nearbyBlock.Fluid && block.Fluid)
-                return false;
-
-            if (IsTranslucentSurface(block, side))
-                return true;
-
-            return false;
-        }
-
-        bool IsTranslucentSurface(Block block, Side side)
-        {
-            var tile = block.GetTile(side);
-            return tile != null && tile.Translucent;
         }
     }
 }

@@ -62,6 +62,22 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly Logger logger = new Logger(typeof(ChunkManager).Name);
 
+        static readonly VectorI3[] nearbyOffsets =
+        {
+            // Top
+            new VectorI3(0, 1, 0),
+            // Bottom
+            new VectorI3(0, -1, 0),
+            // Front
+            new VectorI3(0, 0, 1),
+            // Back
+            new VectorI3(0, 0, -1),
+            // Left
+            new VectorI3(-1, 0, 0),
+            // Right
+            new VectorI3(1, 0, 0)
+        };
+
         // TODO
         //
         // 実行で最適と思われる値を調べて決定する。
@@ -551,35 +567,21 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public byte FindActiveBlockIndex(Chunk baseChunk, ref VectorI3 position)
+        public void GetNearbyActiveChunks(ref VectorI3 position, out NearbyChunks nearbyChunks)
         {
-            // position が baseChunk に含まれる場合。
-            if (baseChunk.Contains(ref position))
-                return baseChunk[position.X, position.Y, position.Z];
+            nearbyChunks = new NearbyChunks();
 
-            // position が baseChunk に含まれない場合は、それを含むアクティブな Chunk を探す。
-            var chunkPosition = baseChunk.Position;
-            chunkPosition.X += MathExtension.Floor(position.X * inverseChunkSize.X);
-            chunkPosition.Y += MathExtension.Floor(position.Y * inverseChunkSize.Y);
-            chunkPosition.Z += MathExtension.Floor(position.Z * inverseChunkSize.Z);
-
-            Chunk targetChunk;
-            if (!TryGetActiveChunk(ref chunkPosition, out targetChunk))
-                return Block.EmptyIndex;
-
-            var relativeX = position.X % chunkSize.X;
-            var relativeY = position.Y % chunkSize.Y;
-            var relativeZ = position.Z % chunkSize.Z;
-            if (relativeX < 0) relativeX += chunkSize.X;
-            if (relativeY < 0) relativeY += chunkSize.Y;
-            if (relativeZ < 0) relativeZ += chunkSize.Z;
-
-            lock (targetChunk)
+            lock (activeChunks)
             {
-                // 処理中に非アクティブになっているなら空と判定。
-                if (!targetChunk.Active) return Block.EmptyIndex;
+                for (int i = 0; i < 6; i++)
+                {
+                    var side = (Side) i;
+                    var nearbyPosition = position + nearbyOffsets[i];
 
-                return targetChunk[relativeX, relativeY, relativeZ];
+                    Chunk nearbyChunk;
+                    if (activeChunks.TryGetItem(ref nearbyPosition, out nearbyChunk))
+                        nearbyChunks[side] = nearbyChunk;
+                }
             }
         }
 
