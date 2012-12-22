@@ -132,6 +132,7 @@ namespace Willcraftia.Xna.Blocks.Models
             p.Y = reader.ReadInt32();
             p.Z = reader.ReadInt32();
 
+            // BoundingBox/WorldPosition を同時に更新しなければならない。
             Position = p;
 
             for (int i = 0; i < blockIndices.Length; i++)

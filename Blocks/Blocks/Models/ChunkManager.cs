@@ -113,9 +113,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Pool<InterChunkMesh> interChunkMeshPool;
 
-        Pool<DynamicVertexBuffer> vertexBufferPool;
+        Pool<VertexBuffer> vertexBufferPool;
 
-        Pool<DynamicIndexBuffer> indexBufferPool;
+        Pool<IndexBuffer> indexBufferPool;
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
@@ -161,8 +161,8 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 MaxCapacity = 20
             };
-            vertexBufferPool = new Pool<DynamicVertexBuffer>(CreateVertexBuffer);
-            indexBufferPool = new Pool<DynamicIndexBuffer>(CreateIndexBuffer);
+            vertexBufferPool = new Pool<VertexBuffer>(CreateVertexBuffer);
+            indexBufferPool = new Pool<IndexBuffer>(CreateIndexBuffer);
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
             chunkDistanceComparer = new ChunkDistanceComparer(chunkSize);
 
@@ -193,14 +193,14 @@ namespace Willcraftia.Xna.Blocks.Models
             return new InterChunkMesh();
         }
 
-        DynamicVertexBuffer CreateVertexBuffer()
+        VertexBuffer CreateVertexBuffer()
         {
-            return new DynamicVertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalTexture), defaultVertexCapacity, BufferUsage.WriteOnly);
+            return new VertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalTexture), defaultVertexCapacity, BufferUsage.WriteOnly);
         }
 
-        DynamicIndexBuffer CreateIndexBuffer()
+        IndexBuffer CreateIndexBuffer()
         {
-            return new DynamicIndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
+            return new IndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
         }
 
         void ReturnChunk(Chunk chunk)

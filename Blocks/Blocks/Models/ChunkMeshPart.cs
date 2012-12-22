@@ -12,9 +12,9 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public DynamicVertexBuffer VertexBuffer { get; internal set; }
+        public VertexBuffer VertexBuffer { get; internal set; }
 
-        public DynamicIndexBuffer IndexBuffer { get; internal set; }
+        public IndexBuffer IndexBuffer { get; internal set; }
 
         public int VertexCount
         {
