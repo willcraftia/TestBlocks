@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int DefaultTaskQueueSlotCount = 20;
 
-        static readonly VectorI3[] nearbyPartitionOffsets =
+        static readonly VectorI3[] nearbyOffsets =
         {
             // Top
             new VectorI3(0, 1, 0),
@@ -45,15 +45,21 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         Pool<Partition> partitionPool;
 
+        // 効率のためにキュー構造を採用。
+        // 全件対象の処理が大半であり、リストでは削除のたびに配列コピーが発生して無駄。
+
         // TODO
         //
         // 初期容量。
 
-        PartitionCollection activePartitions = new PartitionCollection();
+        PartitionQueue activePartitions = new PartitionQueue(5000);
 
-        PartitionCollection activatingPartitions = new PartitionCollection();
+        PartitionQueue activatingPartitions = new PartitionQueue(100);
 
-        PartitionCollection passivatingPartitions = new PartitionCollection();
+        PartitionQueue passivatingPartitions = new PartitionQueue(100);
+
+        // activatingPartitions のキュー内配列のサイズの拡大を抑制するための制限。
+        int activationCapacity = 100;
 
         TaskQueue activationTaskQueue = new TaskQueue
         {
@@ -184,83 +190,84 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void CheckPassivationCompleted()
         {
-            int index = 0;
-            while (index < passivatingPartitions.Count)
+            int partitionCount = passivatingPartitions.Count;
+            for (int i = 0; i < partitionCount; i++)
             {
-                var partition = passivatingPartitions[index];
+                var partition = passivatingPartitions.Dequeue();
 
                 if (partition.IsPassivationFailed)
                 {
-                    // 一旦アクティブ リストへ戻し、
-                    // 再度、パッシベート判定を行わせる。
-                    passivatingPartitions.RemoveAt(index);
-                    activePartitions.Add(partition);
+                    // 一旦アクティブ リストへ戻す。
+                    // 次回のパッシベーション試行に委ねる。
+                    activePartitions.Enqueue(partition);
                     continue;
                 }
 
                 if (!partition.IsPassivationCompleted)
                 {
-                    index++;
+                    // 未完のためキューへ戻す。
+                    passivatingPartitions.Enqueue(partition);
                     continue;
                 }
 
-                // Deregister.
-                passivatingPartitions.RemoveAt(index);
-
-                // Return.
+                // パッシベーションに成功したのでプールへ戻す。
                 partitionPool.Return(partition);
             }
         }
 
         void CheckActivationCompleted()
         {
-            int index = 0;
-            while (index < activatingPartitions.Count)
+            int partitionCount = activatingPartitions.Count;
+            for (int i = 0; i < partitionCount; i++)
             {
-                var partition = activatingPartitions[index];
+                var partition = activatingPartitions.Dequeue();
 
                 if (partition.IsActivationFailed)
                 {
-                    // 一旦アクティベーション リストから削除し、
-                    // 再度、アクティベーション判定を行わせる。
-                    activatingPartitions.RemoveAt(index);
+                    // 失敗したのでプールへ戻す。
+                    partitionPool.Return(partition);
+
+                    // 次回のアクティベーション試行に委ねる。
                     continue;
                 }
 
                 if (!partition.IsActivationCompleted)
                 {
-                    index++;
+                    // 未完のためキューへ戻す。
+                    activatingPartitions.Enqueue(partition);
                     continue;
                 }
 
-                // Add this partition into the list of active partitions.
-                activatingPartitions.RemoveAt(index);
-                activePartitions.Add(partition);
+                // アクティベーションに成功したのでアクティブ リストへ追加。
+                activePartitions.Enqueue(partition);
 
-                // Notify that a neighbor is activated.
-                var position = partition.GridPosition;
-                for (int i = 0; i < 6; i++)
-                {
-                    var nearbyPosition = position + nearbyPartitionOffsets[i];
-                    Partition neighbor;
-                    if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
-                        neighbor.OnNeighborActivated(partition);
-                }
+                // アクティブな隣接パーティションへ成功を通知。
+                NotifyNeighborActivated(partition);
+            }
+        }
+
+        void NotifyNeighborActivated(Partition partition)
+        {
+            var position = partition.GridPosition;
+            for (int i = 0; i < nearbyOffsets.Length; i++)
+            {
+                var nearbyPosition = position + nearbyOffsets[i];
+                Partition neighbor;
+                if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                    neighbor.OnNeighborActivated(partition);
             }
         }
 
         void PassivatePartitions()
         {
-            //
-            // try to passivate partitions out of the passivation bounds.
-            //
+            // パッシベーション不要領域 (アクティブ状態維持領域) を算出。
             BoundingBoxI bounds;
             CalculateBounds(ref eyeGridPosition, PassivationRange, out bounds);
 
-            int index = 0;
-            while (index < activePartitions.Count)
+            int partitionCount = activePartitions.Count;
+            for (int i = 0; i < partitionCount; i++)
             {
-                var partition = activePartitions[index];
+                var partition = activePartitions.Dequeue();
 
                 if (!Closing)
                 {
@@ -270,27 +277,23 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                     if (containmentType == ContainmentType.Contains)
                     {
-                        index++;
+                        // パッシベーション不要領域内ならばアクティブ リストへ戻す。
+                        activePartitions.Enqueue(partition);
                         continue;
                     }
                 }
 
-                // Remove this partition from collections of active partitions.
-                activePartitions.Remove(partition);
+                // パッシベーション キューへ追加。
+                passivatingPartitions.Enqueue(partition);
 
-                // Add this partition into the list of partions waiting to be unload.
-                passivatingPartitions.Add(partition);
-
-                // Unload this partition asynchronously.
+                // 非同期パッシベーションを要求。
                 passivationTaskQueue.Enqueue(partition.Passivate);
             }
         }
 
         void ActivatePartitions()
         {
-            //
-            // try to activate partitions in the activation bounds.
-            //
+            // アクティベーション領域を算出。
             BoundingBoxI bounds;
             CalculateBounds(ref eyeGridPosition, ActivationRange, out bounds);
 
@@ -301,29 +304,32 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     for (gridPosition.X = bounds.Min.X; gridPosition.X < bounds.Max.X; gridPosition.X++)
                     {
-                        // This partition is already activated.
+                        // 同時アクティベーション許容数を越えるならばスキップ。
+                        if (activationCapacity <= activatingPartitions.Count) continue;
+
+                        // アクティベーション中あるいはパッシベーション中かどうか。
+                        if (activatingPartitions.Contains(gridPosition) ||
+                            passivatingPartitions.Contains(gridPosition))
+                            continue;
+
+                        // 既にアクティブであるかどうか。
                         if (activePartitions.Contains(gridPosition)) continue;
 
-                        // An activation thread is handling this partition now.
-                        if (activatingPartitions.Contains(gridPosition)) continue;
-
-                        // An passivation thread is handling this partition now.
-                        if (passivatingPartitions.Contains(gridPosition)) continue;
-
-                        // No partition is needed.
+                        // アクティベーション可能であるかどうか。
                         if (!CanActivatePartition(ref gridPosition)) continue;
 
-                        // A new partition.
+                        // プールからパーティション インスタンスを取得。
+                        // プール枯渇ならばアクティベーションは一時取消。
                         var partition = partitionPool.Borrow();
-
-                        // Skip if can borrow no object from the pool.
                         if (partition == null) return;
 
-                        // Initialize this partition.
+                        // パーティションを初期化。
                         InitializePartition(partition, ref gridPosition);
 
-                        // Add.
-                        activatingPartitions.Add(partition);
+                        // アクティベーション キューへ追加。
+                        activatingPartitions.Enqueue(partition);
+
+                        // 非同期アクティベーションを要求。
                         activationTaskQueue.Enqueue(partition.Activate);
                     }
                 }

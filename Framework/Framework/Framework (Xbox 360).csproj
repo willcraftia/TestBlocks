@@ -97,6 +97,7 @@
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Collections\KeyedList.cs" />
+    <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionCollection.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
+    <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="MathExtension.cs" />
     <Compile Include="Noise\Add.cs" />
     <Compile Include="Noise\Billow.cs" />
