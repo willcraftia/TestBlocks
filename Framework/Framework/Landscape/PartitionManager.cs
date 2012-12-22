@@ -25,18 +25,12 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         static readonly VectorI3[] nearbyOffsets =
         {
-            // Top
-            new VectorI3(0, 1, 0),
-            // Bottom
-            new VectorI3(0, -1, 0),
-            // Front
-            new VectorI3(0, 0, 1),
-            // Back
-            new VectorI3(0, 0, -1),
-            // Left
-            new VectorI3(-1, 0, 0),
-            // Right
-            new VectorI3(1, 0, 0)
+            VectorI3.Top,
+            VectorI3.Bottom,
+            VectorI3.Front,
+            VectorI3.Back,
+            VectorI3.Left,
+            VectorI3.Right,
         };
 
         Vector3 partitionSize;
@@ -49,7 +43,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         // 全件対象の処理が大半であり、リストでは削除のたびに配列コピーが発生して無駄。
 
         // TODO
-        //
         // 初期容量。
 
         PartitionQueue activePartitions = new PartitionQueue(5000);
@@ -75,7 +68,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         
         int passivationRange = DefaultPassivationRange;
 
-        VectorI3 eyeGridPosition;
+        VectorI3 eyePosition;
 
         public bool Closing { get; private set; }
 
@@ -134,9 +127,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (Closed) return;
 
-            eyeGridPosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
-            eyeGridPosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
-            eyeGridPosition.Z = MathExtension.Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
+            eyePosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
+            eyePosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
+            eyePosition.Z = MathExtension.Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
 
             if (!Closing)
             {
@@ -183,7 +176,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         protected abstract Partition CreatePartition();
 
-        protected virtual bool CanActivatePartition(ref VectorI3 gridPosition)
+        protected virtual bool CanActivatePartition(ref VectorI3 position)
         {
             return true;
         }
@@ -248,13 +241,27 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void NotifyNeighborActivated(Partition partition)
         {
-            var position = partition.GridPosition;
+            var position = partition.Position;
             for (int i = 0; i < nearbyOffsets.Length; i++)
             {
                 var nearbyPosition = position + nearbyOffsets[i];
                 Partition neighbor;
                 if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
-                    neighbor.OnNeighborActivated(partition);
+                {
+                    var side = (CubeSides) i;
+                    switch (side)
+                    {
+                        case CubeSides.Top: side = CubeSides.Bottom; break;
+                        case CubeSides.Bottom: side = CubeSides.Top; break;
+                        case CubeSides.Front: side = CubeSides.Back; break;
+                        case CubeSides.Back: side = CubeSides.Front; break;
+                        case CubeSides.Left: side = CubeSides.Right; break;
+                        case CubeSides.Right: side = CubeSides.Left; break;
+                        default: throw new InvalidOperationException();
+                    }
+
+                    neighbor.OnNeighborActivated(partition, side);
+                }
             }
         }
 
@@ -262,7 +269,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             // パッシベーション不要領域 (アクティブ状態維持領域) を算出。
             BoundingBoxI bounds;
-            CalculateBounds(ref eyeGridPosition, PassivationRange, out bounds);
+            CalculateBounds(ref eyePosition, PassivationRange, out bounds);
 
             int partitionCount = activePartitions.Count;
             for (int i = 0; i < partitionCount; i++)
@@ -271,7 +278,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    var position = partition.GridPosition;
+                    var position = partition.Position;
                     ContainmentType containmentType;
                     bounds.Contains(ref position, out containmentType);
 
@@ -295,28 +302,28 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             // アクティベーション領域を算出。
             BoundingBoxI bounds;
-            CalculateBounds(ref eyeGridPosition, ActivationRange, out bounds);
+            CalculateBounds(ref eyePosition, ActivationRange, out bounds);
 
-            var gridPosition = new VectorI3();
-            for (gridPosition.Z = bounds.Min.Z; gridPosition.Z < bounds.Max.Z; gridPosition.Z++)
+            var position = new VectorI3();
+            for (position.Z = bounds.Min.Z; position.Z < bounds.Max.Z; position.Z++)
             {
-                for (gridPosition.Y = bounds.Min.Y; gridPosition.Y < bounds.Max.Y; gridPosition.Y++)
+                for (position.Y = bounds.Min.Y; position.Y < bounds.Max.Y; position.Y++)
                 {
-                    for (gridPosition.X = bounds.Min.X; gridPosition.X < bounds.Max.X; gridPosition.X++)
+                    for (position.X = bounds.Min.X; position.X < bounds.Max.X; position.X++)
                     {
                         // 同時アクティベーション許容数を越えるならばスキップ。
                         if (activationCapacity <= activatingPartitions.Count) continue;
 
                         // アクティベーション中あるいはパッシベーション中かどうか。
-                        if (activatingPartitions.Contains(gridPosition) ||
-                            passivatingPartitions.Contains(gridPosition))
+                        if (activatingPartitions.Contains(position) ||
+                            passivatingPartitions.Contains(position))
                             continue;
 
                         // 既にアクティブであるかどうか。
-                        if (activePartitions.Contains(gridPosition)) continue;
+                        if (activePartitions.Contains(position)) continue;
 
                         // アクティベーション可能であるかどうか。
-                        if (!CanActivatePartition(ref gridPosition)) continue;
+                        if (!CanActivatePartition(ref position)) continue;
 
                         // プールからパーティション インスタンスを取得。
                         // プール枯渇ならばアクティベーションは一時取消。
@@ -324,7 +331,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                         if (partition == null) return;
 
                         // パーティションを初期化。
-                        InitializePartition(partition, ref gridPosition);
+                        InitializePartition(partition, ref position);
 
                         // アクティベーション キューへ追加。
                         activatingPartitions.Enqueue(partition);
@@ -336,9 +343,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
-        void InitializePartition(Partition partition, ref VectorI3 gridPosition)
+        void InitializePartition(Partition partition, ref VectorI3 position)
         {
-            partition.GridPosition = gridPosition;
+            partition.Position = position;
             partition.Initialize();
         }
 

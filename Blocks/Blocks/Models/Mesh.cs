@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 
@@ -27,23 +28,23 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public MeshPart Right { get; set; }
 
-        public MeshPart this[Side side]
+        public MeshPart this[CubeSides side]
         {
             get
             {
                 switch (side)
                 {
-                    case Side.Top:
+                    case CubeSides.Top:
                         return Top;
-                    case Side.Bottom:
+                    case CubeSides.Bottom:
                         return Bottom;
-                    case Side.Front:
+                    case CubeSides.Front:
                         return Front;
-                    case Side.Back:
+                    case CubeSides.Back:
                         return Back;
-                    case Side.Left:
+                    case CubeSides.Left:
                         return Left;
-                    case Side.Right:
+                    case CubeSides.Right:
                         return Right;
                     default:
                         throw new InvalidOperationException();
@@ -53,22 +54,22 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 switch (side)
                 {
-                    case Side.Top:
+                    case CubeSides.Top:
                         Top = value;
                         break;
-                    case Side.Bottom:
+                    case CubeSides.Bottom:
                         Bottom = value;
                         break;
-                    case Side.Front:
+                    case CubeSides.Front:
                         Front = value;
                         break;
-                    case Side.Back:
+                    case CubeSides.Back:
                         Back = value;
                         break;
-                    case Side.Left:
+                    case CubeSides.Left:
                         Left = value;
                         break;
-                    case Side.Right:
+                    case CubeSides.Right:
                         Right = value;
                         break;
                     default:

@@ -64,18 +64,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly VectorI3[] nearbyOffsets =
         {
-            // Top
-            new VectorI3(0, 1, 0),
-            // Bottom
-            new VectorI3(0, -1, 0),
-            // Front
-            new VectorI3(0, 0, 1),
-            // Back
-            new VectorI3(0, 0, -1),
-            // Left
-            new VectorI3(-1, 0, 0),
-            // Right
-            new VectorI3(1, 0, 0)
+            VectorI3.Top,
+            VectorI3.Bottom,
+            VectorI3.Front,
+            VectorI3.Back,
+            VectorI3.Left,
+            VectorI3.Right,
         };
 
         // TODO
@@ -412,7 +406,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                     chunk.Drawing = true;
                 }
-                
+
                 var mesh = chunk.Mesh;
                 if (mesh == null)
                 {
@@ -519,11 +513,12 @@ namespace Willcraftia.Xna.Blocks.Models
                     procedure.Generate(chunk);
             }
 
+            chunk.Dirty = true;
+            chunk.Active = true;
+
             // Register
             lock (activeChunks)
             {
-                chunk.Dirty = true;
-                chunk.Active = true;
                 activeChunks.Add(chunk);
             }
 
@@ -575,7 +570,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 for (int i = 0; i < 6; i++)
                 {
-                    var side = (Side) i;
+                    var side = (CubeSides) i;
                     var nearbyPosition = position + nearbyOffsets[i];
 
                     Chunk nearbyChunk;

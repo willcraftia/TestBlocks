@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
@@ -20,18 +21,18 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Chunk Right;
 
-        public Chunk this[Side side]
+        public Chunk this[CubeSides side]
         {
             get
             {
                 switch (side)
                 {
-                    case Side.Top: return Top;
-                    case Side.Bottom: return Bottom;
-                    case Side.Front: return Front;
-                    case Side.Back: return Back;
-                    case Side.Left: return Left;
-                    case Side.Right: return Right;
+                    case CubeSides.Top: return Top;
+                    case CubeSides.Bottom: return Bottom;
+                    case CubeSides.Front: return Front;
+                    case CubeSides.Back: return Back;
+                    case CubeSides.Left: return Left;
+                    case CubeSides.Right: return Right;
                     default: throw new InvalidOperationException();
                 }
             }
@@ -39,12 +40,12 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 switch (side)
                 {
-                    case Side.Top: Top = value; break;
-                    case Side.Bottom: Bottom = value; break;
-                    case Side.Front: Front = value; break;
-                    case Side.Back: Back = value; break;
-                    case Side.Left: Left = value; break;
-                    case Side.Right: Right = value; break;
+                    case CubeSides.Top: Top = value; break;
+                    case CubeSides.Bottom: Bottom = value; break;
+                    case CubeSides.Front: Front = value; break;
+                    case CubeSides.Back: Back = value; break;
+                    case CubeSides.Left: Left = value; break;
+                    case CubeSides.Right: Right = value; break;
                     default: throw new InvalidOperationException();
                 }
             }

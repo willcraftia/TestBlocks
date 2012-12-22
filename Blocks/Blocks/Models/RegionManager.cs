@@ -96,19 +96,19 @@ namespace Willcraftia.Xna.Blocks.Models
             return region;
         }
 
-        public bool RegionExists(ref VectorI3 gridPosition)
+        public bool RegionExists(ref VectorI3 position)
         {
             Region region;
-            return TryGetRegion(ref gridPosition, out region);
+            return TryGetRegion(ref position, out region);
         }
 
-        public bool TryGetRegion(ref VectorI3 gridPosition, out Region region)
+        public bool TryGetRegion(ref VectorI3 position, out Region region)
         {
             lock (regions)
             {
                 foreach (var r in regions)
                 {
-                    if (r.ContainsGridPosition(ref gridPosition))
+                    if (r.ContainsPosition(ref position))
                     {
                         region = r;
                         return true;

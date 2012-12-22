@@ -104,6 +104,7 @@
     <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="BoundingBoxI.cs" />
+    <Compile Include="CubeSides.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="PerspectiveFov.cs" />

@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 
@@ -69,53 +70,53 @@ namespace Willcraftia.Xna.Blocks.Models
             Mesh = BlockMesh.Create(this);
         }
 
-        public bool IsTranslucentTile(Side side)
+        public bool IsTranslucentTile(CubeSides side)
         {
             var tile = GetTile(side);
             return tile != null && tile.Translucent;
         }
 
-        public Tile GetTile(Side side)
+        public Tile GetTile(CubeSides side)
         {
             switch (side)
             {
-                case Side.Top:
+                case CubeSides.Top:
                     return TopTile;
-                case Side.Bottom:
+                case CubeSides.Bottom:
                     return BottomTile;
-                case Side.Front:
+                case CubeSides.Front:
                     return FrontTile;
-                case Side.Back:
+                case CubeSides.Back:
                     return BackTile;
-                case Side.Left:
+                case CubeSides.Left:
                     return LeftTile;
-                case Side.Right:
+                case CubeSides.Right:
                     return RightTile;
                 default:
                     throw new InvalidOperationException();
             }
         }
 
-        public void SetTile(Side side, Tile tile)
+        public void SetTile(CubeSides side, Tile tile)
         {
             switch (side)
             {
-                case Side.Top:
+                case CubeSides.Top:
                     TopTile = tile;
                     break;
-                case Side.Bottom:
+                case CubeSides.Bottom:
                     BottomTile = tile;
                     break;
-                case Side.Front:
+                case CubeSides.Front:
                     FrontTile = tile;
                     break;
-                case Side.Back:
+                case CubeSides.Back:
                     BackTile = tile;
                     break;
-                case Side.Left:
+                case CubeSides.Left:
                     LeftTile = tile;
                     break;
-                case Side.Right:
+                case CubeSides.Right:
                     RightTile = tile;
                     break;
                 default:

@@ -42,18 +42,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly VectorI3[] nearbyOffsets =
         {
-            // Top
-            new VectorI3(0, 1, 0),
-            // Bottom
-            new VectorI3(0, -1, 0),
-            // Front
-            new VectorI3(0, 0, 1),
-            // Back
-            new VectorI3(0, 0, -1),
-            // Left
-            new VectorI3(-1, 0, 0),
-            // Right
-            new VectorI3(1, 0, 0)
+            VectorI3.Top,
+            VectorI3.Bottom,
+            VectorI3.Front,
+            VectorI3.Back,
+            VectorI3.Left,
+            VectorI3.Right,
         };
 
         Region region;
@@ -61,8 +55,6 @@ namespace Willcraftia.Xna.Blocks.Models
         ChunkManager chunkManager;
 
         VectorI3 chunkSize;
-
-        Vector3 inverseChunkSize;
 
         // TODO
         // プール サイズは、メモリ占有量の観点で決定する。
@@ -72,7 +64,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         List<Chunk> updatingChunks = new List<Chunk>();
 
-        List<Task> activeTasks = new List<Task>();
+        // 全件を対象に削除判定を行うため、リストではなくキューで管理。
+        Queue<Task> activeTasks = new Queue<Task>();
 
         TaskQueue taskQueue = new TaskQueue();
 
@@ -85,9 +78,6 @@ namespace Willcraftia.Xna.Blocks.Models
             this.chunkManager = chunkManager;
 
             chunkSize = chunkManager.ChunkSize;
-            inverseChunkSize.X = 1 / (float) chunkSize.X;
-            inverseChunkSize.Y = 1 / (float) chunkSize.Y;
-            inverseChunkSize.Z = 1 / (float) chunkSize.Z;
 
             taskPool = new Pool<Task>(() => { return new Task(this); });
         }
@@ -109,7 +99,7 @@ namespace Willcraftia.Xna.Blocks.Models
             task.Chunk = chunk;
             task.IsCompleted = false;
             taskQueue.Enqueue(task.Execute);
-            activeTasks.Add(task);
+            activeTasks.Enqueue(task);
         }
 
         public void Update()
@@ -122,18 +112,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void CheckCompletedTasks()
         {
-            int index = 0;
-            while (index < activeTasks.Count)
+            int activeTaskCount = activeTasks.Count;
+            for (int i = 0; i < activeTaskCount; i++)
             {
-                var task = activeTasks[index];
+                var task = activeTasks.Dequeue();
                 if (!task.IsCompleted)
                 {
-                    index++;
+                    // リストへ戻す。
+                    activeTasks.Enqueue(task);
                     continue;
                 }
-
-                // Task の登録を解除
-                activeTasks.RemoveAt(index);
 
                 var chunk = task.Chunk;
 
@@ -158,6 +146,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void BuildChunkMesh(Chunk chunk)
         {
+            // TODO
+            // 以下の方法ではダメ。
+            //
             // 事前にアクティブな隣接 Chunk を探索し、
             // それらのみをアクティブな隣接 Chunk であるとして処理を進める。
             //
@@ -190,7 +181,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             for (int i = 0; i < 6; i++)
             {
-                var side = (Side) i;
+                var side = (CubeSides) i;
                 var meshPart = block.Mesh[side];
 
                 // 対象面が存在しない場合はスキップ。
@@ -202,7 +193,13 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     // 隣接 Block との関係から対象面の要否を判定。
                     var nearbyBlock = region.BlockCatalog[nearbyBlockIndex];
-                    if (!IsVisibleBlock(block, side, nearbyBlock)) continue;
+
+                    // 半透明な連続した流体 Block を並べる際、流体 Block 間の面は不要。
+                    // ※流体 Block は常に半透明を仮定して処理。
+                    if (nearbyBlock.Fluid && block.Fluid) continue;
+
+                    // 対象面が半透明ではないならば、隣接 Block により不可視面となるため不要。
+                    if (!block.IsTranslucentTile(side)) continue;
                 }
 
                 if (block.Fluid || block.IsTranslucentTile(side))
@@ -216,19 +213,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        bool IsVisibleBlock(Block block, Side side, Block nearbyBlock)
-        {
-            // 半透明な連続した流体 Block を並べる際、流体 Block 間の面は不要。
-            // ※流体 Block は常に半透明を仮定して処理。
-            if (nearbyBlock.Fluid && block.Fluid) return false;
-
-            // 対象面が半透明ではないならば、隣接 Block により不可視面となるため不要。
-            if (!block.IsTranslucentTile(side)) return false;
-
-            return true;
-        }
-
-        byte GetNearbyBlockIndex(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks, Side side)
+        byte GetNearbyBlockIndex(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks, CubeSides side)
         {
             var nearbyBlockPosition = nearbyOffsets[(byte) side];
             nearbyBlockPosition.X += x;

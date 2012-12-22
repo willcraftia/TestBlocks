@@ -19,6 +19,36 @@ namespace Willcraftia.Xna.Framework
             get { return new VectorI3(1, 1, 1); }
         }
 
+        public static VectorI3 Top
+        {
+            get { return new VectorI3(0, 1, 0); }
+        }
+
+        public static VectorI3 Bottom
+        {
+            get { return new VectorI3(0, -1, 0); }
+        }
+
+        public static VectorI3 Front
+        {
+            get { return new VectorI3(0, 0, 1); }
+        }
+
+        public static VectorI3 Back
+        {
+            get { return new VectorI3(0, 0, -1); }
+        }
+
+        public static VectorI3 Left
+        {
+            get { return new VectorI3(-1, 0, 0); }
+        }
+
+        public static VectorI3 Right
+        {
+            get { return new VectorI3(1, 0, 0); }
+        }
+
         public int X;
 
         public int Y;

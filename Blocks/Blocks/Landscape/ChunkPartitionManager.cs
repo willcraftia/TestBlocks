@@ -28,11 +28,11 @@ namespace Willcraftia.Xna.Blocks.Landscape
             return new ChunkPartition(regionManager);
         }
 
-        protected override bool CanActivatePartition(ref VectorI3 gridPosition)
+        protected override bool CanActivatePartition(ref VectorI3 position)
         {
-            if (!regionManager.RegionExists(ref gridPosition)) return false;
+            if (!regionManager.RegionExists(ref position)) return false;
 
-            return base.CanActivatePartition(ref gridPosition);
+            return base.CanActivatePartition(ref position);
         }
     }
 }

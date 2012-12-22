@@ -129,6 +129,7 @@
     <Compile Include="Content\IAssetManagerAware.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="Content\WebAssetManager.cs" />
+    <Compile Include="CubeSides.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />

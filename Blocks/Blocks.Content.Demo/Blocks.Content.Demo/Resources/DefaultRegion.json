@@ -7,9 +7,9 @@
       "Z": 0
     },
     "Max": {
-      "X": 16,
-      "Y": 16,
-      "Z": 16
+      "X": 2,
+      "Y": 3,
+      "Z": 1
     }
   },
   "TileCatalog": "DefaultTileCatalog.json",

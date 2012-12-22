@@ -39,7 +39,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
 
         protected override bool ActivateOverride()
         {
-            var position = GridPosition;
+            var position = Position;
 
             if (!regionManager.TryGetRegion(ref position, out region))
                 throw new InvalidOperationException("Region not found: " + position);
@@ -62,13 +62,11 @@ namespace Willcraftia.Xna.Blocks.Landscape
             return base.PassivateOverride();
         }
 
-        public override void OnNeighborActivated(Partition neighbor)
+        public override void OnNeighborActivated(Partition neighbor, Framework.CubeSides side)
         {
-            Debug.Assert(chunk != null);
-
             chunk.Dirty = true;
 
-            base.OnNeighborActivated(neighbor);
+            base.OnNeighborActivated(neighbor, side);
         }
     }
 }

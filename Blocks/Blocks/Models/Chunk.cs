@@ -66,7 +66,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (y < 0 || size.Y < y) throw new ArgumentOutOfRangeException("y");
                 if (z < 0 || size.Z < z) throw new ArgumentOutOfRangeException("z");
 
-                var index = (x * size.X * size.Y) + (y * size.X) + z;
+                var index = x + y * size.X + z * size.X * size.Y;
                 return blockIndices[index];
             }
             set
@@ -75,15 +75,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (y < 0 || size.Y < y) throw new ArgumentOutOfRangeException("y");
                 if (z < 0 || size.Z < z) throw new ArgumentOutOfRangeException("z");
 
-                var index = (x * size.X * size.Y) + (y * size.X) + z;
+                var index = x + y * size.X + z * size.X * size.Y;
                 blockIndices[index] = value;
             }
-        }
-
-        public byte this[int index]
-        {
-            get { return blockIndices[index]; }
-            set { blockIndices[index] = value; }
         }
 
         public int Count

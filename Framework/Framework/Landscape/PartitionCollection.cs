@@ -16,7 +16,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         protected override VectorI3 GetKeyForItem(Partition item)
         {
-            return item.GridPosition;
+            return item.Position;
         }
     }
 }

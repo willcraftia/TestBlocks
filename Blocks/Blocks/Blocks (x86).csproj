@@ -120,7 +120,6 @@
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
-    <Compile Include="Side.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Ionic.Zip.CF, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">

@@ -96,12 +96,12 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkManager.Draw(view, projection);
         }
 
-        public bool ContainsGridPosition(ref VectorI3 gridPosition)
+        public bool ContainsPosition(ref VectorI3 position)
         {
             // BoundingBoxI.Contains では Max 境界も含めてしまうため、
             // それを用いずに判定する。
-            if (gridPosition.X < bounds.Min.X || gridPosition.Y < bounds.Min.Y || gridPosition.Z < bounds.Min.Z ||
-                bounds.Max.X <= gridPosition.X || bounds.Max.Y <= gridPosition.Y || bounds.Max.Z <= gridPosition.Z)
+            if (position.X < bounds.Min.X || position.Y < bounds.Min.Y || position.Z < bounds.Min.Z ||
+                bounds.Max.X <= position.X || bounds.Max.Y <= position.Y || bounds.Max.Z <= position.Z)
                 return false;
 
             return true;

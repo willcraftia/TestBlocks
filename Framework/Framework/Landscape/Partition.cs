@@ -19,8 +19,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
 
-        // A position in the partition space.
-        public VectorI3 GridPosition { get; internal set; }
+        // パーティション空間座標。
+        public VectorI3 Position { get; internal set; }
 
         public bool IsActivationCompleted { get; private set; }
 
@@ -85,7 +85,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             asyncCallEvent.Set();
         }
 
-        public virtual void OnNeighborActivated(Partition neighbor) { }
+        public virtual void OnNeighborActivated(Partition neighbor, CubeSides side) { }
 
         protected virtual void InitializeOverride() { }
 

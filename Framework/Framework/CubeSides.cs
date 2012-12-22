@@ -4,9 +4,9 @@ using System;
 
 #endregion
 
-namespace Willcraftia.Xna.Blocks
+namespace Willcraftia.Xna.Framework
 {
-    public enum Side : byte
+    public enum CubeSides : byte
     {
         Top = 0,
         Bottom,

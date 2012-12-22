@@ -153,7 +153,6 @@
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
-    <Compile Include="Side.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework.IO.Compression\Framework.IO.Compression\Framework.IO.Compression %28Xbox 360%29.csproj">
