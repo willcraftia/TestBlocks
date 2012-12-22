@@ -51,11 +51,7 @@ namespace Willcraftia.Xna.Framework.Collections
         public T Borrow()
         {
             while (0 < MaxCapacity && MaxCapacity < TotalObjectCount && 0 < objects.Count)
-            {
-                var obj = objects.Dequeue();
-                var disposable = obj as IDisposable;
-                if (disposable != null) disposable.Dispose();
-            }
+                DisposeObject(objects.Dequeue());
 
             if (0 < objects.Count)
                 return objects.Dequeue();
@@ -65,17 +61,19 @@ namespace Willcraftia.Xna.Framework.Collections
 
         public void Return(T obj)
         {
-            if (TotalObjectCount <= MaxCapacity)
+            if (MaxCapacity == 0 || TotalObjectCount <= MaxCapacity)
+            {
                 objects.Enqueue(obj);
+            }
+            else
+            {
+                DisposeObject(obj);
+            }
         }
 
         public void Clear()
         {
-            foreach (var obj in objects)
-            {
-                var disposable = obj as IDisposable;
-                if (disposable != null) disposable.Dispose();
-            }
+            foreach (var obj in objects) DisposeObject(obj);
 
             objects.Clear();
         }
@@ -87,6 +85,14 @@ namespace Willcraftia.Xna.Framework.Collections
 
             TotalObjectCount++;
             return createFunction();
+        }
+
+        void DisposeObject(T obj)
+        {
+            var disposable = obj as IDisposable;
+            if (disposable != null) disposable.Dispose();
+
+            TotalObjectCount--;
         }
     }
 }
