@@ -488,15 +488,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // 非同期呼び出し。
-        public Chunk GetChunk(ref VectorI3 position)
-        {
-            lock (activeChunks)
-            {
-                return activeChunks[position];
-            }
-        }
-
-        // 非同期呼び出し。
         public Chunk ActivateChunk(ref VectorI3 position)
         {
             var chunk = chunkPool.Borrow();
