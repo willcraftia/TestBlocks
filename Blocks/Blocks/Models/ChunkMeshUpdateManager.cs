@@ -248,7 +248,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void AddMesh(int x, int y, int z, MeshPart source, InterChunkMeshPart destination)
         {
-            destination.AddIndices(source.Indices);
+            foreach (var index in source.Indices)
+                destination.AddIndex(index);
 
             var vertices = source.Vertices;
             for (int i = 0; i < vertices.Length; i++)

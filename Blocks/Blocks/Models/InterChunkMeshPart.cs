@@ -100,11 +100,11 @@ namespace Willcraftia.Xna.Blocks.Models
             indexBuffer.SetData(indices, 0, indexCount);
         }
 
-        public void AddIndices(ushort[] indices)
+        public void AddIndex(ushort index)
         {
             if (indexCount == indices.Length) EnsureIndexCapacity(indexCount + indices.Length);
 
-            foreach (var index in indices) AddIndex(index);
+            indices[indexCount++] = (ushort) (vertexCount + index);
         }
 
         public void AddVertex(ref VertexPositionNormalTexture vertex)
@@ -118,11 +118,6 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             vertexCount = 0;
             indexCount = 0;
-        }
-
-        void AddIndex(ushort index)
-        {
-            indices[indexCount++] = (ushort) (vertexCount + index);
         }
 
         // TODO
