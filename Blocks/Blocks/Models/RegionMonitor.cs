@@ -1,4 +1,6 @@
-﻿#region Using
+﻿#if DEBUG
+
+#region Using
 
 using System;
 
@@ -45,6 +47,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public int OccludedOpaqueChunkCount { get; private set; }
 
+        public int TotalChunkVertexCount { get; private set; }
+
+        public int TotalChunkIndexCount { get; private set; }
+
+        // ゲームを通しての最大を記録する。
+        public int MaxChunkVertexCount { get; private set; }
+
+        // ゲームを通しての最大を記録する。
+        public int MaxChunkIndexCount { get; private set; }
+
         public void Clear()
         {
             TotalChunkCount = 0;
@@ -58,11 +70,27 @@ namespace Willcraftia.Xna.Blocks.Models
             VisibleOpaqueChunkCount = 0;
             VisibleTranslucentChunkCount = 0;
             OccludedOpaqueChunkCount = 0;
+            TotalChunkVertexCount = 0;
+            TotalChunkIndexCount = 0;
         }
 
         public void IncrementOccludedOpaqueChunkCount()
         {
             OccludedOpaqueChunkCount++;
         }
+
+        public void AddChunkVertexCount(int vertexCount)
+        {
+            TotalChunkVertexCount += vertexCount;
+            MaxChunkVertexCount = Math.Max(MaxChunkVertexCount, vertexCount);
+        }
+
+        public void AddChunkIndexCount(int indexCount)
+        {
+            TotalChunkIndexCount += indexCount;
+            MaxChunkIndexCount = Math.Max(MaxChunkIndexCount, indexCount);
+        }
     }
 }
+
+#endif

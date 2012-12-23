@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Landscape;
 using Willcraftia.Xna.Blocks.Models;
 
@@ -62,7 +63,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
             return base.PassivateOverride();
         }
 
-        public override void OnNeighborActivated(Partition neighbor, Framework.CubeSides side)
+        public override void OnNeighborActivated(Partition neighbor, CubeSides side)
         {
             chunk.Dirty = true;
 

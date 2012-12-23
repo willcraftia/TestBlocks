@@ -499,6 +499,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 pass.Apply();
 
                 chunk.Mesh.Opaque.Draw();
+
+                DebugRegionMonitorAddChunkVertexCount(chunk.Mesh.Opaque);
             }
 
             //foreach (var chunk in translucentChunks)
@@ -516,6 +518,13 @@ namespace Willcraftia.Xna.Blocks.Models
                 chunk.Drawing = false;
 
             workingChunks.Clear();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugRegionMonitorAddChunkVertexCount(ChunkMeshPart meshPart)
+        {
+            region.Monitor.AddChunkVertexCount(meshPart.VertexCount);
+            region.Monitor.AddChunkIndexCount(meshPart.IndexCount);
         }
 
         [Conditional("DEBUG")]

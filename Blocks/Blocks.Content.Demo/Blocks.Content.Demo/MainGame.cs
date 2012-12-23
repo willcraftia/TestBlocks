@@ -339,7 +339,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(graphics.PreferredBackBufferWidth).Append('x');
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
 
-            sb.Append("Far plane distance: ");
+            sb.Append("FarPlane: ");
             sb.AppendNumber(farPlaneDistance).AppendLine();
             
             sb.Append("Partition: ");
@@ -356,7 +356,15 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             
             sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(region.Monitor.ActiveVertexBufferCount).Append("/");
             sb.AppendNumber(region.Monitor.TotalVertexBufferCount).AppendLine();
-            
+
+            sb.Append("ChunkVertex: ");
+            sb.Append("Max(").AppendNumber(region.Monitor.MaxChunkVertexCount).Append(") ");
+            sb.Append("Total(").AppendNumber(region.Monitor.TotalChunkVertexCount).Append(")").AppendLine();
+
+            sb.Append("ChunkIndex: ");
+            sb.Append("Max(").AppendNumber(region.Monitor.MaxChunkIndexCount).Append(") ");
+            sb.Append("Total(").AppendNumber(region.Monitor.TotalChunkIndexCount).Append(")").AppendLine();
+
             sb.Append("VisibleChunk: ");
             sb.Append("O(").AppendNumber(region.Monitor.VisibleOpaqueChunkCount).Append(") ");
             sb.Append("T(").AppendNumber(region.Monitor.VisibleTranslucentChunkCount).Append(")").AppendLine();
@@ -364,7 +372,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("OccludedChunk: ");
             sb.Append("O(").AppendNumber(region.Monitor.OccludedOpaqueChunkCount).Append(") ").AppendLine();
             
-            sb.Append("Move velocity: ");
+            sb.Append("MoveVelocity: ");
             sb.AppendNumber(viewInput.MoveVelocity).AppendLine();
             
             sb.Append("Eye: ");
