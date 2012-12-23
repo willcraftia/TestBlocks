@@ -310,6 +310,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
+            DebugUpdateRegionMonitor();
+
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
             {
@@ -377,6 +379,20 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkMeshUpdateManager.Update();
         }
 
+        [Conditional("DEBUG")]
+        void DebugUpdateRegionMonitor()
+        {
+            var m = region.Monitor;
+            m.TotalChunkCount = chunkPool.TotalObjectCount;
+            m.ActiveChunkCount = activeChunks.Count;
+            m.TotalChunkMeshCount = chunkMeshPool.TotalObjectCount;
+            m.PassiveChunkMeshCount = chunkMeshPool.Count;
+            m.TotalInterChunkMeshCount = interChunkMeshPool.TotalObjectCount;
+            m.PassiveInterChunkMeshCount = interChunkMeshPool.Count;
+            m.TotalVertexBufferCount = vertexBufferPool.TotalObjectCount;
+            m.PassiveVertexBufferCount = vertexBufferPool.Count;
+        }
+
         static readonly BlendState colorWriteDisable = new BlendState
         {
             ColorWriteChannels = ColorWriteChannels.None
@@ -439,26 +455,32 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var pass = region.ChunkEffect.BackingEffect.CurrentTechnique.Passes[0];
 
-            //region.GraphicsDevice.BlendState = colorWriteDisable;
-            //region.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            region.GraphicsDevice.BlendState = colorWriteDisable;
+            region.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
-            //foreach (var chunk in opaqueChunks)
-            //{
-            //    Matrix world;
-            //    chunk.CreateWorldMatrix(out world);
+            foreach (var chunk in opaqueChunks)
+            {
+                Matrix world;
+                chunk.CreateWorldMatrix(out world);
 
-            //    region.ChunkEffect.World = world;
+                region.ChunkEffect.World = world;
 
-            //    pass.Apply();
+                pass.Apply();
 
-            //    chunk.Mesh.Opaque.UpdateOcclusion();
-            //}
+                chunk.Mesh.Opaque.UpdateOcclusion();
+            }
 
             region.GraphicsDevice.BlendState = BlendState.Opaque;
             region.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (var chunk in opaqueChunks)
             {
+                if (chunk.Mesh.Opaque.Occluded)
+                {
+                    DebugIncrementRegionMonitorOccludedChunkCount();
+                    continue;
+                }
+
                 Matrix world;
                 chunk.CreateWorldMatrix(out world);
 
@@ -472,7 +494,9 @@ namespace Willcraftia.Xna.Blocks.Models
             //foreach (var chunk in translucentChunks)
             //    DrawChunkMeshPart(chunk.ActiveMesh.Translucent);
 
-            DrawChunkBoundingBoxes(view, projection);
+            DebugDrawChunkBoundingBoxes(view, projection);
+
+            DebugUpdateRegionMonitorVisibleChunkCounts();
 
             opaqueChunks.Clear();
             translucentChunks.Clear();
@@ -485,7 +509,21 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         [Conditional("DEBUG")]
-        void DrawChunkBoundingBoxes(View view, Projection projection)
+        void DebugIncrementRegionMonitorOccludedChunkCount()
+        {
+            region.Monitor.IncrementOccludedOpaqueChunkCount();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUpdateRegionMonitorVisibleChunkCounts()
+        {
+            var m = region.Monitor;
+            m.VisibleOpaqueChunkCount = opaqueChunks.Count;
+            m.VisibleTranslucentChunkCount = translucentChunks.Count;
+        }
+
+        [Conditional("DEBUG")]
+        void DebugDrawChunkBoundingBoxes(View view, Projection projection)
         {
             if (!region.ChunkBoundingBoxVisible) return;
 

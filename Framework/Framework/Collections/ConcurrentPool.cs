@@ -10,8 +10,6 @@ namespace Willcraftia.Xna.Framework.Collections
 {
     public sealed class ConcurrentPool<T> where T : class
     {
-        public const int DefaultInitialCapacity = 0;
-
         // 0 means the infinite capacity.
         public const int DefaultMaxCapacity = 0;
 
@@ -29,7 +27,6 @@ namespace Willcraftia.Xna.Framework.Collections
                 }
             }
         }
-
         public int InitialCapacity { get; private set; }
 
         public int MaxCapacity { get; set; }
@@ -37,23 +34,20 @@ namespace Willcraftia.Xna.Framework.Collections
         public int TotalObjectCount { get; private set; }
 
         public ConcurrentPool(Func<T> createFunction)
-            : this(createFunction, DefaultInitialCapacity)
         {
+            this.createFunction = createFunction;
+            MaxCapacity = DefaultMaxCapacity;
         }
 
-        public ConcurrentPool(Func<T> createFunction, int initialCapacity)
+        public void Prepare(int initialCapacity)
         {
-            if (initialCapacity < 0)
+            if (initialCapacity < 0 || (MaxCapacity != 0 && MaxCapacity < initialCapacity))
                 throw new ArgumentOutOfRangeException("initialCapacity");
 
-            this.createFunction = createFunction;
             InitialCapacity = initialCapacity;
-            MaxCapacity = DefaultMaxCapacity;
 
             for (int i = 0; i < initialCapacity; i++)
-            {
                 objects.Enqueue(CreateObject());
-            }
         }
 
         public T Borrow()

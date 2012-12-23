@@ -71,6 +71,11 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public bool Occluded
+        {
+            get { return occluded; }
+        }
+
         public ChunkMeshPart(GraphicsDevice graphicsDevice)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");

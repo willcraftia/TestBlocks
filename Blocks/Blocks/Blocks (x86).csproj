@@ -87,6 +87,7 @@
     <Compile Include="Models\NearbyChunks.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
+    <Compile Include="Models\RegionMonitor.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />

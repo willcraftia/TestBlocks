@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -47,6 +48,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool ChunkBoundingBoxVisible { get; set; }
 
+#if DEBUG
+
+        public RegionMonitor Monitor { get; private set; }
+
+#endif
+
         public void Initialize(GraphicsDevice graphicsDevice, AssetManager assetManager, IChunkStore chunkStore)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -60,11 +67,27 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // todo
             ChunkBoundingBoxVisible = true;
+
+            DebugInitialize();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugInitialize()
+        {
+            if (Monitor == null) Monitor = new RegionMonitor();
         }
 
         public void Update()
         {
+            DebugUpdate();
+
             chunkManager.Update();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUpdate()
+        {
+            Monitor.Clear();
         }
 
         public void Draw(View view, Projection projection)

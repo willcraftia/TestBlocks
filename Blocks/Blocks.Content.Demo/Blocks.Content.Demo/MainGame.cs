@@ -49,6 +49,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         Vector4 backgroundColor = Color.CornflowerBlue.ToVector4();
 
+        Region region;
+
 #if DEBUG
 
         string helpMessage =
@@ -193,7 +195,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Region
 
-            regionManager.LoadRegion("title:Resources/DefaultRegion.json");
+            region = regionManager.LoadRegion("title:Resources/DefaultRegion.json");
 
             //================================================================
             // Debug
@@ -329,16 +331,35 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("Screen: ");
             sb.AppendNumber(graphics.PreferredBackBufferWidth).Append('x');
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
+
             sb.Append("Far plane distance: ");
             sb.AppendNumber(farPlaneDistance).AppendLine();
-            sb.AppendLine();
-            sb.Append("Partitions: ");
+            
+            sb.Append("Partition: ");
             sb.Append("A(").AppendNumber(partitionManager.ActivePartitionCount).Append(") ");
             sb.Append("W(").AppendNumber(partitionManager.ActivatingPartitionCount).Append(") ");
-            sb.Append("P(").AppendNumber(partitionManager.PassivatingPartitionCount).Append(")");
-            sb.AppendLine();
+            sb.Append("P(").AppendNumber(partitionManager.PassivatingPartitionCount).Append(")").AppendLine();
+            
+            sb.Append("Chunk: ").AppendNumber(region.Monitor.ActiveChunkCount).Append("/");
+            sb.AppendNumber(region.Monitor.TotalChunkCount).Append(" ");
+            sb.Append("Mesh: ").AppendNumber(region.Monitor.ActiveChunkMeshCount).Append("/");
+            sb.AppendNumber(region.Monitor.TotalChunkMeshCount).Append(" ");
+            sb.Append("InterMesh: ").AppendNumber(region.Monitor.ActiveInterChunkMeshCount).Append("/");
+            sb.AppendNumber(region.Monitor.TotalInterChunkMeshCount).AppendLine();
+            
+            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(region.Monitor.ActiveVertexBufferCount).Append("/");
+            sb.AppendNumber(region.Monitor.TotalVertexBufferCount).AppendLine();
+            
+            sb.Append("VisibleChunk: ");
+            sb.Append("O(").AppendNumber(region.Monitor.VisibleOpaqueChunkCount).Append(") ");
+            sb.Append("T(").AppendNumber(region.Monitor.VisibleTranslucentChunkCount).Append(")").AppendLine();
+            
+            sb.Append("OccludedChunk: ");
+            sb.Append("O(").AppendNumber(region.Monitor.OccludedOpaqueChunkCount).Append(") ").AppendLine();
+            
             sb.Append("Move velocity: ");
             sb.AppendNumber(viewInput.MoveVelocity).AppendLine();
+            
             sb.Append("Eye: ");
             sb.Append("P(");
             sb.AppendNumber(view.Position.X).Append(", ");
