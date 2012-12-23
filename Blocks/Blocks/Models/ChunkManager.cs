@@ -227,11 +227,13 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 vertexBufferPool.Return(meshPart.VertexBuffer);
                 meshPart.VertexBuffer = null;
+                meshPart.VertexCount = 0;
             }
             if (meshPart.IndexBuffer != null)
             {
                 indexBufferPool.Return(meshPart.IndexBuffer);
                 meshPart.IndexBuffer = null;
+                meshPart.IndexCount = 0;
             }
         }
 
@@ -298,7 +300,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (0 < source.VertexCount && 0 < source.IndexCount)
             {
                 BorrowBuffer(destination);
-                source.Populate(destination.VertexBuffer, destination.IndexBuffer);
+                source.Populate(destination);
             }
             else
             {
@@ -423,6 +425,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
+                if (chunk.Position.Y == 2) continue;
+
                 if (mesh.Opaque.VertexCount != 0)
                     opaqueChunks.Add(chunk);
 
@@ -435,20 +439,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var pass = region.ChunkEffect.BackingEffect.CurrentTechnique.Passes[0];
 
-            region.GraphicsDevice.BlendState = colorWriteDisable;
-            region.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            //region.GraphicsDevice.BlendState = colorWriteDisable;
+            //region.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
-            foreach (var chunk in opaqueChunks)
-            {
-                Matrix world;
-                chunk.CreateWorldMatrix(out world);
+            //foreach (var chunk in opaqueChunks)
+            //{
+            //    Matrix world;
+            //    chunk.CreateWorldMatrix(out world);
 
-                region.ChunkEffect.World = world;
+            //    region.ChunkEffect.World = world;
 
-                pass.Apply();
+            //    pass.Apply();
 
-                chunk.Mesh.Opaque.UpdateOcclusion();
-            }
+            //    chunk.Mesh.Opaque.UpdateOcclusion();
+            //}
 
             region.GraphicsDevice.BlendState = BlendState.Opaque;
             region.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -491,6 +495,8 @@ namespace Willcraftia.Xna.Blocks.Models
             foreach (var chunk in workingChunks)
             {
                 if (!chunk.Drawing) continue;
+
+                if (chunk.Position.Y == 2) continue;
 
                 var box = chunk.BoundingBox;
                 boundingBoxDrawer.Draw(ref box, debugEffect);

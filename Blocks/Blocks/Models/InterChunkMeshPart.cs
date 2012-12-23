@@ -91,13 +91,12 @@ namespace Willcraftia.Xna.Blocks.Models
             indices = new ushort[defaultIndexCapacity];
         }
 
-        public void Populate(VertexBuffer vertexBuffer, IndexBuffer indexBuffer)
+        public void Populate(ChunkMeshPart destination)
         {
-            if (vertexBuffer == null) throw new ArgumentNullException("vertexBuffer");
-            if (indexBuffer == null) throw new ArgumentNullException("indexBuffer");
+            if (destination == null) throw new ArgumentNullException("destination");
 
-            vertexBuffer.SetData(vertices, 0, vertexCount);
-            indexBuffer.SetData(indices, 0, indexCount);
+            destination.SetVertices(vertices, vertexCount);
+            destination.SetIndices(indices, indexCount);
         }
 
         public void AddIndex(ushort index)

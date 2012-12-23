@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             public Chunk Chunk { get; set; }
 
-            public bool IsCompleted { get; set; }
+            public bool Completed { get; set; }
 
             public Task(ChunkMeshUpdateManager chunkMeshUpdateManager)
             {
@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 chunkMeshUpdateManager.UpdateChunk(Chunk);
 
-                IsCompleted = true;
+                Completed = true;
             }
         }
 
@@ -62,6 +62,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         // TODO 初期容量
 
+        // TODO: HashSet にしたい。
         List<Chunk> updatingChunks = new List<Chunk>();
 
         // 全件を対象に削除判定を行うため、リストではなくキューで管理。
@@ -97,7 +98,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // Task を準備して登録。
             task.Chunk = chunk;
-            task.IsCompleted = false;
+            task.Completed = false;
             taskQueue.Enqueue(task.Execute);
             activeTasks.Enqueue(task);
         }
@@ -116,7 +117,7 @@ namespace Willcraftia.Xna.Blocks.Models
             for (int i = 0; i < activeTaskCount; i++)
             {
                 var task = activeTasks.Dequeue();
-                if (!task.IsCompleted)
+                if (!task.Completed)
                 {
                     // リストへ戻す。
                     activeTasks.Enqueue(task);
@@ -215,7 +216,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         byte GetNearbyBlockIndex(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks, CubeSides side)
         {
-            var nearbyBlockPosition = nearbyOffsets[(byte) side];
+            var nearbyBlockPosition = nearbyOffsets[(int) side];
             nearbyBlockPosition.X += x;
             nearbyBlockPosition.Y += y;
             nearbyBlockPosition.Z += z;

@@ -10,61 +10,129 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkMeshPart
     {
-        public GraphicsDevice GraphicsDevice { get; private set; }
+        GraphicsDevice graphicsDevice;
 
-        public VertexBuffer VertexBuffer { get; internal set; }
+        VertexBuffer vertexBuffer;
 
-        public IndexBuffer IndexBuffer { get; internal set; }
+        IndexBuffer indexBuffer;
 
-        public int VertexCount
-        {
-            get
-            {
-                return VertexBuffer != null ? VertexBuffer.VertexCount : 0;
-            }
-        }
+        int vertexCount;
 
-        public int IndexCount
-        {
-            get
-            {
-                return IndexBuffer != null ? IndexBuffer.IndexCount : 0;
-            }
-        }
+        int indexCount;
 
-        public bool Occluded { get; private set; }
+        int primitiveCount;
+
+        bool occluded;
 
         OcclusionQuery occlusionQuery;
 
         bool occlusionQueryActive;
 
+        public VertexBuffer VertexBuffer
+        {
+            get { return vertexBuffer; }
+            set
+            {
+                vertexBuffer = value;
+                VertexCount = 0;
+            }
+        }
+
+        public IndexBuffer IndexBuffer
+        {
+            get { return indexBuffer; }
+            set
+            {
+                indexBuffer = value;
+                IndexCount = 0;
+            }
+        }
+
+        public int VertexCount
+        {
+            get { return vertexCount; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                vertexCount = value;
+            }
+        }
+
+        public int IndexCount
+        {
+            get { return indexCount; }
+            internal set
+            {
+                if (value < 0 || ushort.MaxValue < value) throw new ArgumentOutOfRangeException("value");
+
+                indexCount = value;
+                primitiveCount = indexCount / 3;
+            }
+        }
+
         public ChunkMeshPart(GraphicsDevice graphicsDevice)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
-            GraphicsDevice = graphicsDevice;
+            this.graphicsDevice = graphicsDevice;
 
             occlusionQuery = new OcclusionQuery(graphicsDevice);
         }
 
+        public void SetVertices(VertexPositionNormalTexture[] vertices, int vertexCount)
+        {
+            if (vertices == null) throw new ArgumentNullException("vertices");
+            if (vertexCount < 0 || vertices.Length < vertexCount) throw new ArgumentOutOfRangeException("vertexCount");
+            if (VertexBuffer == null) throw new InvalidOperationException("VertexBuffer is null.");
+
+            if (vertexCount != 0 && vertices.Length != 0)
+            {
+                VertexBuffer.SetData(vertices, 0, vertexCount);
+                this.vertexCount = vertexCount;
+            }
+            else
+            {
+                this.vertexCount = 0;
+            }
+        }
+
+        public void SetIndices(ushort[] indices, int indexCount)
+        {
+            if (indices == null) throw new ArgumentNullException("indices");
+            if (indexCount < 0 || indices.Length < indexCount) throw new ArgumentOutOfRangeException("vertexCount");
+            if (IndexBuffer == null) throw new InvalidOperationException("IndexBuffer is null.");
+
+            if (indexCount != 0 && indices.Length != 0)
+            {
+                IndexBuffer.SetData(indices, 0, indexCount);
+                IndexCount = indexCount;
+            }
+            else
+            {
+                IndexCount = 0;
+            }
+        }
+
         public void UpdateOcclusion()
         {
-            if (VertexBuffer == null || IndexBuffer == null) return;
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
 
-            Occluded = false;
+            occluded = false;
 
             if (occlusionQueryActive)
             {
                 if (!occlusionQuery.IsComplete) return;
 
-                Occluded = (occlusionQuery.PixelCount == 0);
+                occluded = (occlusionQuery.PixelCount == 0);
             }
 
             occlusionQuery.Begin();
 
-            GraphicsDevice.SetVertexBuffer(VertexBuffer);
-            GraphicsDevice.Indices = IndexBuffer;
-            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VertexBuffer.VertexCount, 0, IndexBuffer.IndexCount / 3);
+            graphicsDevice.SetVertexBuffer(vertexBuffer);
+            graphicsDevice.Indices = indexBuffer;
+            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
 
             occlusionQuery.End();
             occlusionQueryActive = true;
@@ -72,12 +140,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw()
         {
-            if (VertexBuffer == null || IndexBuffer == null) return;
-            if (Occluded) return;
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
+            if (occluded) return;
 
-            GraphicsDevice.SetVertexBuffer(VertexBuffer);
-            GraphicsDevice.Indices = IndexBuffer;
-            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VertexBuffer.VertexCount, 0, IndexBuffer.IndexCount / 3);
+            graphicsDevice.SetVertexBuffer(vertexBuffer);
+            graphicsDevice.Indices = indexBuffer;
+            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
         }
     }
 }

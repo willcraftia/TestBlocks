@@ -2,7 +2,6 @@
 
 using System;
 using System.IO;
-using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 

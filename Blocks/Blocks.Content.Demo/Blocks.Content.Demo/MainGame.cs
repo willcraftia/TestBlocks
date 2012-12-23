@@ -109,8 +109,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             viewInput.MoveVelocity = moveVelocity;
             viewInput.DashFactor = dashFactor;
 
-            //view.Position = new Vector3(0, 16 * 16, 0);
-            view.Position = new Vector3(0, 16 * 4, 0);
+            view.Position = new Vector3(0, 16 * 16, 0);
+            //view.Position = new Vector3(0, 16 * 3, 0);
             view.Yaw(MathHelper.Pi);
             view.Update();
 
