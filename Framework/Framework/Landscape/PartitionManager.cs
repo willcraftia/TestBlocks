@@ -112,6 +112,21 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
+        public int ActivePartitionCount
+        {
+            get { return activePartitions.Count; }
+        }
+
+        public int ActivatingPartitionCount
+        {
+            get { return activatingPartitions.Count; }
+        }
+
+        public int PassivatingPartitionCount
+        {
+            get { return passivatingPartitions.Count; }
+        }
+
         public PartitionManager(Vector3 partitionSize)
         {
             this.partitionSize = partitionSize;

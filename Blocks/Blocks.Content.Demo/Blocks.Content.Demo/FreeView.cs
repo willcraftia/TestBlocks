@@ -16,6 +16,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         Matrix inverseMatrix;
 
+        Vector3 forward = Vector3.Backward;
+
         /// <summary>
         /// The orientation of the camera.
         /// X = pitch, Y = yaw, Z = roll.
@@ -35,6 +37,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 position = value;
                 MatrixDirty = true;
             }
+        }
+
+        public Vector3 Forward
+        {
+            get { return forward; }
         }
 
         public void Move(float distance)
@@ -95,6 +102,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         {
             Matrix rotation;
             Matrix.CreateFromYawPitchRoll(orientation.Y, orientation.X, orientation.Z, out rotation);
+
+            forward = rotation.Forward;
 
             var target = position + rotation.Forward;
             var up = rotation.Up;

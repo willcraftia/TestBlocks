@@ -1,6 +1,8 @@
 #region Using
 
 using System;
+using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -8,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Framework.Serialization.Json;
@@ -23,6 +26,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         static readonly Logger logger = new Logger(typeof(MainGame).Name);
 
         GraphicsDeviceManager graphics;
+
+        KeyboardState lastKeyboardState;
 
         FreeView view = new FreeView();
 
@@ -43,6 +48,38 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         RasterizerState defaultRasterizerState = new RasterizerState();
 
         Vector4 backgroundColor = Color.CornflowerBlue.ToVector4();
+
+#if DEBUG
+
+        string helpMessage =
+            "[F1] Help\r\n" +
+            //"[F2] Node bounding box\r\n" +
+            //"[F3] Wireframe\r\n" +
+            //"[F4] Light\r\n" +
+            //"[F5] Fog\r\n" +
+            //"[F9] Height color\r\n" +
+            //"[F10] Normal\r\n" +
+            //"[F11] White solid\r\n" +
+            //"[F12] Texture\r\n" +
+            "[w][s][a][d][q][z] Movement\r\n" +
+            "[Mouse] Camera orientation\r\n" +
+            "[PageUp][PageDown] Move velocity";
+
+        Vector2 debugHelpMessageFontSize;
+
+        Vector2 debugInformationTextFontSize;
+
+        bool helpVisible = true;
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        SpriteBatch debugSpriteBatch;
+
+        SpriteFont debugFont;
+
+        Texture2D debugFillTexture;
+
+#endif
 
         public MainGame()
         {
@@ -123,9 +160,22 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             defaultRasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
             defaultRasterizerState.FillMode = FillMode.Solid;
 
-#if DEBUG
             //================================================================
-            // DEBUG: FpsCounter
+            // Debug
+
+            DebugInitialize();
+
+            //================================================================
+            // Others
+
+            base.Initialize();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugInitialize()
+        {
+            //================================================================
+            // FpsCounter
 
             var fpsCounter = new FpsCounter(this);
             fpsCounter.Content.RootDirectory = "Content";
@@ -134,12 +184,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             fpsCounter.Enabled = false;
             fpsCounter.Visible = false;
             Components.Add(fpsCounter);
-#endif
-
-            //================================================================
-            // Others
-
-            base.Initialize();
         }
 
         protected override void LoadContent()
@@ -150,6 +194,25 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // Region
 
             regionManager.LoadRegion("title:Resources/DefaultRegion.json");
+
+            //================================================================
+            // Debug
+
+            DebugLoadContent();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugLoadContent()
+        {
+            Content.RootDirectory = "Content";
+
+            debugSpriteBatch = new SpriteBatch(GraphicsDevice);
+            debugFont = Content.Load<SpriteFont>("Fonts/Debug");
+            debugFillTexture = Texture2DHelper.CreateFillTexture(GraphicsDevice);
+            debugHelpMessageFontSize = debugFont.MeasureString(helpMessage);
+
+            BuildInformationMessage();
+            debugInformationTextFontSize = debugFont.MeasureString(stringBuilder);
         }
 
         protected override void UnloadContent()
@@ -205,7 +268,26 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             regionManager.Update();
 
+            //================================================================
+            // Debug
+
+            DebugUpdate(gameTime);
+
+            //================================================================
+            // Keyboard State
+
+            lastKeyboardState = keyboardState;
+
             base.Update(gameTime);
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUpdate(GameTime gameTime)
+        {
+            var keyboardState = Keyboard.GetState();
+
+            if (keyboardState.IsKeyUp(Keys.F1) && lastKeyboardState.IsKeyDown(Keys.F1))
+                helpVisible = !helpVisible;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -217,6 +299,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             if (!partitionManager.Closing && !partitionManager.Closed)
                 regionManager.Draw(view, projection);
+
+            DrawHelp();
 
             base.Draw(gameTime);
         }
@@ -234,6 +318,99 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 FileTraceListenerManager.Clear();
 
             base.Dispose(disposing);
+        }
+
+        [Conditional("DEBUG")]
+        void BuildInformationMessage()
+        {
+            var sb = stringBuilder;
+
+            sb.Length = 0;
+            sb.Append("Screen: ");
+            sb.AppendNumber(graphics.PreferredBackBufferWidth).Append('x');
+            sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
+            sb.Append("Far plane distance: ");
+            sb.AppendNumber(farPlaneDistance).AppendLine();
+            sb.AppendLine();
+            sb.Append("Partitions: ");
+            sb.Append("A(").AppendNumber(partitionManager.ActivePartitionCount).Append(") ");
+            sb.Append("W(").AppendNumber(partitionManager.ActivatingPartitionCount).Append(") ");
+            sb.Append("P(").AppendNumber(partitionManager.PassivatingPartitionCount).Append(")");
+            sb.AppendLine();
+            sb.Append("Move velocity: ");
+            sb.AppendNumber(viewInput.MoveVelocity).AppendLine();
+            sb.Append("Eye: ");
+            sb.Append("P(");
+            sb.AppendNumber(view.Position.X).Append(", ");
+            sb.AppendNumber(view.Position.Y).Append(", ");
+            sb.AppendNumber(view.Position.Z).Append(") ");
+            sb.Append("D(");
+            sb.AppendNumber(view.Forward.X).Append(", ");
+            sb.AppendNumber(view.Forward.Y).Append(", ");
+            sb.AppendNumber(view.Forward.Z).Append(")");
+        }
+
+        [Conditional("DEBUG")]
+        void DrawHelp()
+        {
+            if (!helpVisible) return;
+
+            debugSpriteBatch.Begin();
+
+            var layout = new DebugLayout();
+
+            int informationWidth = 380;
+
+            // calculate the background area for information.
+            layout.ContainerBounds = GraphicsDevice.Viewport.TitleSafeArea;
+            layout.Width = informationWidth + 4;
+            layout.Height = (int) debugInformationTextFontSize.Y + 2;
+            layout.HorizontalMargin = 8;
+            layout.VerticalMargin = 8;
+            layout.HorizontalAlignment = DebugHorizontalAlignment.Left;
+            layout.VerticalAlignment = DebugVerticalAlignment.Top;
+            layout.Arrange();
+            // draw the rectangle.
+            debugSpriteBatch.Draw(debugFillTexture, layout.ArrangedBounds, Color.Black * 0.5f);
+
+            // calculate the text area for help messages.
+            layout.ContainerBounds = layout.ArrangedBounds;
+            layout.Width = informationWidth;
+            layout.Height = (int) debugInformationTextFontSize.Y;
+            layout.HorizontalMargin = 2;
+            layout.VerticalMargin = 0;
+            layout.HorizontalAlignment = DebugHorizontalAlignment.Center;
+            layout.VerticalAlignment = DebugVerticalAlignment.Center;
+            layout.Arrange();
+            // draw the text.
+            BuildInformationMessage();
+            debugSpriteBatch.DrawString(debugFont, stringBuilder, new Vector2(layout.ArrangedBounds.X, layout.ArrangedBounds.Y), Color.Yellow);
+
+            // calculate the background area for help messages.
+            layout.ContainerBounds = GraphicsDevice.Viewport.TitleSafeArea;
+            layout.Width = (int) debugHelpMessageFontSize.X + 4;
+            layout.Height = (int) debugHelpMessageFontSize.Y + 2;
+            layout.HorizontalMargin = 8;
+            layout.VerticalMargin = 8;
+            layout.HorizontalAlignment = DebugHorizontalAlignment.Left;
+            layout.VerticalAlignment = DebugVerticalAlignment.Bottom;
+            layout.Arrange();
+            // draw the rectangle.
+            debugSpriteBatch.Draw(debugFillTexture, layout.ArrangedBounds, Color.Black * 0.5f);
+
+            // calculate the text area for help messages.
+            layout.ContainerBounds = layout.ArrangedBounds;
+            layout.Width = (int) debugHelpMessageFontSize.X;
+            layout.Height = (int) debugHelpMessageFontSize.Y;
+            layout.HorizontalMargin = 2;
+            layout.VerticalMargin = 0;
+            layout.HorizontalAlignment = DebugHorizontalAlignment.Center;
+            layout.VerticalAlignment = DebugVerticalAlignment.Center;
+            layout.Arrange();
+            // draw the text.
+            debugSpriteBatch.DrawString(debugFont, helpMessage, new Vector2(layout.ArrangedBounds.X, layout.ArrangedBounds.Y), Color.Yellow);
+
+            debugSpriteBatch.End();
         }
     }
 }
