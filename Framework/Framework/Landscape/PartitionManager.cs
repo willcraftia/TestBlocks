@@ -23,16 +23,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int DefaultTaskQueueSlotCount = 20;
 
-        static readonly VectorI3[] nearbyOffsets =
-        {
-            VectorI3.Top,
-            VectorI3.Bottom,
-            VectorI3.Front,
-            VectorI3.Back,
-            VectorI3.Left,
-            VectorI3.Right,
-        };
-
         Vector3 partitionSize;
 
         Vector3 inversePartitionSize;
@@ -262,25 +252,16 @@ namespace Willcraftia.Xna.Framework.Landscape
         void NotifyNeighborActivated(Partition partition)
         {
             var position = partition.Position;
-            for (int i = 0; i < nearbyOffsets.Length; i++)
+
+            foreach (var side in CubicSide.Items)
             {
-                var nearbyPosition = position + nearbyOffsets[i];
+                var nearbyPosition = position + side.Direction;
+
                 Partition neighbor;
                 if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
                 {
-                    var side = (CubeSides) i;
-                    switch (side)
-                    {
-                        case CubeSides.Top: side = CubeSides.Bottom; break;
-                        case CubeSides.Bottom: side = CubeSides.Top; break;
-                        case CubeSides.Front: side = CubeSides.Back; break;
-                        case CubeSides.Back: side = CubeSides.Front; break;
-                        case CubeSides.Left: side = CubeSides.Right; break;
-                        case CubeSides.Right: side = CubeSides.Left; break;
-                        default: throw new InvalidOperationException();
-                    }
-
-                    neighbor.OnNeighborActivated(partition, side);
+                    var reverseSide = side.Reverse();
+                    neighbor.OnNeighborActivated(partition, reverseSide);
                 }
             }
         }

@@ -4,6 +4,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Collections;
 
 #endregion
 
@@ -11,87 +12,28 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class BlockMesh
     {
-        public MeshPart Top { get; private set; }
+        public CubicCollection<MeshPart> MeshParts { get; private set; }
 
-        public MeshPart Bottom { get; private set; }
-
-        public MeshPart Front { get; private set; }
-
-        public MeshPart Back { get; private set; }
-
-        public MeshPart Left { get; private set; }
-
-        public MeshPart Right { get; private set; }
-
-        public MeshPart this[CubeSides side]
+        BlockMesh()
         {
-            get
-            {
-                switch (side)
-                {
-                    case CubeSides.Top:
-                        return Top;
-                    case CubeSides.Bottom:
-                        return Bottom;
-                    case CubeSides.Front:
-                        return Front;
-                    case CubeSides.Back:
-                        return Back;
-                    case CubeSides.Left:
-                        return Left;
-                    case CubeSides.Right:
-                        return Right;
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
-            private set
-            {
-                switch (side)
-                {
-                    case CubeSides.Top:
-                        Top = value;
-                        break;
-                    case CubeSides.Bottom:
-                        Bottom = value;
-                        break;
-                    case CubeSides.Front:
-                        Front = value;
-                        break;
-                    case CubeSides.Back:
-                        Back = value;
-                        break;
-                    case CubeSides.Left:
-                        Left = value;
-                        break;
-                    case CubeSides.Right:
-                        Right = value;
-                        break;
-                    default:
-                        throw new InvalidOperationException();
-                }
-            }
+            MeshParts = new CubicCollection<MeshPart>();
         }
-
-        BlockMesh() { }
 
         public static BlockMesh Create(Block block)
         {
             var mesh = new BlockMesh();
 
-            for (int i = 0; i < 6; i++)
+            foreach (var side in CubicSide.Items)
             {
-                var side = (CubeSides) i;
-
-                var prototype = block.MeshPrototype[side];
+                var prototype = block.MeshPrototype.MeshParts[side];
                 if (prototype == null) continue;
 
                 var texCoordOffset = Vector2.Zero;
 
-                var tile = block.GetTile(side);
+                var tile = block.Tiles[side];
                 if (tile != null) tile.GetTexCoordOffset(out texCoordOffset);
 
-                mesh[side] = Create(prototype, ref texCoordOffset);
+                mesh.MeshParts[side] = Create(prototype, ref texCoordOffset);
             }
 
             return mesh;

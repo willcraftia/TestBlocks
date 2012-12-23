@@ -2,6 +2,7 @@
 
 using System;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 
@@ -29,17 +30,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Mesh MeshPrototype { get; set; }
 
-        public Tile TopTile { get; set; }
-        
-        public Tile BottomTile { get; set; }
-        
-        public Tile FrontTile { get; set; }
-        
-        public Tile BackTile { get; set; }
-        
-        public Tile LeftTile { get; set; }
-        
-        public Tile RightTile { get; set; }
+        public CubicCollection<Tile> Tiles { get; private set; }
 
         public bool Fluid { get; set; }
 
@@ -63,6 +54,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public Block()
         {
             Index = EmptyIndex;
+            Tiles = new CubicCollection<Tile>();
         }
 
         public void BuildMesh()
@@ -70,58 +62,10 @@ namespace Willcraftia.Xna.Blocks.Models
             Mesh = BlockMesh.Create(this);
         }
 
-        public bool IsTranslucentTile(CubeSides side)
+        public bool IsTranslucentTile(CubicSide side)
         {
-            var tile = GetTile(side);
+            var tile = Tiles[side];
             return tile != null && tile.Translucent;
-        }
-
-        public Tile GetTile(CubeSides side)
-        {
-            switch (side)
-            {
-                case CubeSides.Top:
-                    return TopTile;
-                case CubeSides.Bottom:
-                    return BottomTile;
-                case CubeSides.Front:
-                    return FrontTile;
-                case CubeSides.Back:
-                    return BackTile;
-                case CubeSides.Left:
-                    return LeftTile;
-                case CubeSides.Right:
-                    return RightTile;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
-
-        public void SetTile(CubeSides side, Tile tile)
-        {
-            switch (side)
-            {
-                case CubeSides.Top:
-                    TopTile = tile;
-                    break;
-                case CubeSides.Bottom:
-                    BottomTile = tile;
-                    break;
-                case CubeSides.Front:
-                    FrontTile = tile;
-                    break;
-                case CubeSides.Back:
-                    BackTile = tile;
-                    break;
-                case CubeSides.Left:
-                    LeftTile = tile;
-                    break;
-                case CubeSides.Right:
-                    RightTile = tile;
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
         }
 
         #region ToString

@@ -2,6 +2,7 @@
 
 using System;
 using System.Xml.Serialization;
+using Willcraftia.Xna.Framework;
 
 #endregion
 

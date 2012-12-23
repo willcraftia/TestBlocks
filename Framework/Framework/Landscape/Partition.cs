@@ -93,7 +93,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             asyncCallEvent.Set();
         }
 
-        public virtual void OnNeighborActivated(Partition neighbor, CubeSides side) { }
+        public virtual void OnNeighborActivated(Partition neighbor, CubicSide side) { }
 
         protected virtual void InitializeOverride() { }
 

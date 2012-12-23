@@ -647,10 +647,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             lock (activeChunks)
             {
-                for (int i = 0; i < 6; i++)
+                foreach (var side in CubicSide.Items)
                 {
-                    var side = (CubeSides) i;
-                    var nearbyPosition = position + nearbyOffsets[i];
+                    var nearbyPosition = position + side.Direction;
 
                     Chunk nearbyChunk;
                     if (activeChunks.TryGetItem(ref nearbyPosition, out nearbyChunk))

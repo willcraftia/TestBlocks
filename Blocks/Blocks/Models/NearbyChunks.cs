@@ -21,33 +21,33 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Chunk Right;
 
-        public Chunk this[CubeSides side]
+        public Chunk this[CubicSide side]
         {
             get
             {
-                switch (side)
+                switch (side.Index)
                 {
-                    case CubeSides.Top: return Top;
-                    case CubeSides.Bottom: return Bottom;
-                    case CubeSides.Front: return Front;
-                    case CubeSides.Back: return Back;
-                    case CubeSides.Left: return Left;
-                    case CubeSides.Right: return Right;
-                    default: throw new InvalidOperationException();
+                    case CubicSide.TopIndex: return Top;
+                    case CubicSide.BottomIndex: return Bottom;
+                    case CubicSide.FrontIndex: return Front;
+                    case CubicSide.BackIndex: return Back;
+                    case CubicSide.LeftIndex: return Left;
+                    case CubicSide.RightIndex: return Right;
                 }
+                throw new InvalidOperationException();
             }
             set
             {
-                switch (side)
+                switch (side.Index)
                 {
-                    case CubeSides.Top: Top = value; break;
-                    case CubeSides.Bottom: Bottom = value; break;
-                    case CubeSides.Front: Front = value; break;
-                    case CubeSides.Back: Back = value; break;
-                    case CubeSides.Left: Left = value; break;
-                    case CubeSides.Right: Right = value; break;
-                    default: throw new InvalidOperationException();
+                    case CubicSide.TopIndex: Top = value; return;
+                    case CubicSide.BottomIndex: Bottom = value; return;
+                    case CubicSide.FrontIndex: Front = value; return;
+                    case CubicSide.BackIndex: Back = value; return;
+                    case CubicSide.LeftIndex: Left = value; return;
+                    case CubicSide.RightIndex: Right = value; return;
                 }
+                throw new InvalidOperationException();
             }
         }
     }

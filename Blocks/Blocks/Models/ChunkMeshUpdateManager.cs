@@ -40,16 +40,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
-        static readonly VectorI3[] nearbyOffsets =
-        {
-            VectorI3.Top,
-            VectorI3.Bottom,
-            VectorI3.Front,
-            VectorI3.Back,
-            VectorI3.Left,
-            VectorI3.Right,
-        };
-
         Region region;
 
         ChunkManager chunkManager;
@@ -180,10 +170,9 @@ namespace Willcraftia.Xna.Blocks.Models
             // MeshPart が必ずしも平面であるとは限らないが、
             // ここでは平面を仮定して隣接状態を考える。
 
-            for (int i = 0; i < 6; i++)
+            foreach (var side in CubicSide.Items)
             {
-                var side = (CubeSides) i;
-                var meshPart = block.Mesh[side];
+                var meshPart = block.Mesh.MeshParts[side];
 
                 // 対象面が存在しない場合はスキップ。
                 if (meshPart == null) continue;
@@ -214,9 +203,9 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        byte GetNearbyBlockIndex(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks, CubeSides side)
+        byte GetNearbyBlockIndex(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks, CubicSide side)
         {
-            var nearbyBlockPosition = nearbyOffsets[(int) side];
+            var nearbyBlockPosition = side.Direction;
             nearbyBlockPosition.X += x;
             nearbyBlockPosition.Y += y;
             nearbyBlockPosition.Z += z;

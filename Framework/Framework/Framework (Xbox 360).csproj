@@ -96,6 +96,7 @@
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
+    <Compile Include="Collections\CubicCollection.cs" />
     <Compile Include="Collections\KeyedList.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Collections\ListBase.cs" />
@@ -129,7 +130,7 @@
     <Compile Include="Content\IAssetManagerAware.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="Content\WebAssetManager.cs" />
-    <Compile Include="CubeSides.cs" />
+    <Compile Include="CubicSide.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />

@@ -89,6 +89,7 @@
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
+    <Compile Include="Collections\CubicCollection.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentInfoManager.cs" />
@@ -104,7 +105,7 @@
     <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="BoundingBoxI.cs" />
-    <Compile Include="CubeSides.cs" />
+    <Compile Include="CubicSide.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="PerspectiveFov.cs" />

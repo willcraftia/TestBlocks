@@ -63,7 +63,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
             return base.PassivateOverride();
         }
 
-        public override void OnNeighborActivated(Partition neighbor, CubeSides side)
+        public override void OnNeighborActivated(Partition neighbor, CubicSide side)
         {
             chunk.Dirty = true;
 
