@@ -10,6 +10,18 @@ namespace Willcraftia.Xna.Framework
 {
     public sealed class CubicSide
     {
+        [Flags]
+        public enum Flags
+        {
+            None = 0x0,
+            Top = 0x1,
+            Bottom = 0x2,
+            Front = 0x4,
+            Back = 0x8,
+            Left = 0x10,
+            Right = 0x20
+        }
+
         public const int Count = 6;
 
         public const int TopIndex = 0;
@@ -88,6 +100,21 @@ namespace Willcraftia.Xna.Framework
                 case BackIndex: return CubicSide.Front;
                 case LeftIndex: return CubicSide.Right;
                 case RightIndex: return CubicSide.Left;
+            }
+
+            throw new InvalidOperationException();
+        }
+
+        public Flags ToFlags()
+        {
+            switch (Index)
+            {
+                case TopIndex: return Flags.Top;
+                case BottomIndex: return Flags.Bottom;
+                case FrontIndex: return Flags.Front;
+                case BackIndex: return Flags.Back;
+                case LeftIndex: return Flags.Left;
+                case RightIndex: return Flags.Right;
             }
 
             throw new InvalidOperationException();

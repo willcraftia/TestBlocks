@@ -213,6 +213,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                     continue;
                 }
 
+                // アクティブな隣接パーティションへ非アクティブ化を通知。
+                NotifyNeighborActivated(partition);
+
                 // パッシベーションに成功したのでプールへ戻す。
                 partitionPool.Return(partition);
             }
@@ -244,8 +247,25 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティベーションに成功したのでアクティブ リストへ追加。
                 activePartitions.Enqueue(partition);
 
-                // アクティブな隣接パーティションへ成功を通知。
+                // アクティブな隣接パーティションへアクティブ化を通知。
                 NotifyNeighborActivated(partition);
+            }
+        }
+
+        void NortifyNeighborPassivated(Partition partition)
+        {
+            var position = partition.Position;
+
+            foreach (var side in CubicSide.Items)
+            {
+                var nearbyPosition = position + side.Direction;
+
+                Partition neighbor;
+                if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                {
+                    var reverseSide = side.Reverse();
+                    neighbor.OnNeighborPassivated(partition, reverseSide);
+                }
             }
         }
 

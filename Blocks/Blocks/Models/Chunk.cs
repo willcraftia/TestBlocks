@@ -84,6 +84,8 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return blockIndices.Length; }
         }
 
+        public CubicSide.Flags ActiveNeighbors { get; set; }
+
         public bool Dirty { get; set; }
 
         public ChunkMesh Mesh { get; set; }

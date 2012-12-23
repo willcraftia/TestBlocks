@@ -95,6 +95,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public virtual void OnNeighborActivated(Partition neighbor, CubicSide side) { }
 
+        public virtual void OnNeighborPassivated(Partition neighbor, CubicSide side) { }
+
         protected virtual void InitializeOverride() { }
 
         protected virtual bool ActivateOverride() { return true; }
