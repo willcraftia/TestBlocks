@@ -55,8 +55,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         string helpMessage =
             "[F1] Help\r\n" +
-            //"[F2] Node bounding box\r\n" +
-            //"[F3] Wireframe\r\n" +
+            "[F2] Chunk bounding box\r\n" +
+            "[F3] Wireframe\r\n" +
             //"[F4] Light\r\n" +
             //"[F5] Fog\r\n" +
             //"[F9] Height color\r\n" +
@@ -288,8 +288,15 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         {
             var keyboardState = Keyboard.GetState();
 
+            // F1
             if (keyboardState.IsKeyUp(Keys.F1) && lastKeyboardState.IsKeyDown(Keys.F1))
                 helpVisible = !helpVisible;
+            // F2
+            if (keyboardState.IsKeyUp(Keys.F2) && lastKeyboardState.IsKeyDown(Keys.F2))
+                ChunkManager.ChunkBoundingBoxVisible = !ChunkManager.ChunkBoundingBoxVisible;
+            // F3
+            if (keyboardState.IsKeyUp(Keys.F3) && lastKeyboardState.IsKeyDown(Keys.F3))
+                ChunkManager.Wireframe = !ChunkManager.Wireframe;
         }
 
         protected override void Draw(GameTime gameTime)

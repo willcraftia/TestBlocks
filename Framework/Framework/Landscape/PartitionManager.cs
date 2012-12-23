@@ -17,9 +17,9 @@ namespace Willcraftia.Xna.Framework.Landscape
     //
     public abstract class PartitionManager : IDisposable
     {
-        public const int DefaultActivationRange = 12;
+        public const int DefaultActivationRange = 10;
 
-        public const int DefaultPassivationRange = 14;
+        public const int DefaultPassivationRange = 12;
 
         public const int DefaultTaskQueueSlotCount = 20;
 

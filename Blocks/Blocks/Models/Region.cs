@@ -46,8 +46,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkEffect ChunkEffect { get; set; }
 
-        public bool ChunkBoundingBoxVisible { get; set; }
-
 #if DEBUG
 
         public RegionMonitor Monitor { get; private set; }
@@ -64,9 +62,6 @@ namespace Willcraftia.Xna.Blocks.Models
             AssetManager = assetManager;
 
             chunkManager = new ChunkManager(this, chunkStore, RegionManager.ChunkSize);
-
-            // todo
-            ChunkBoundingBoxVisible = true;
 
             DebugInitialize();
         }

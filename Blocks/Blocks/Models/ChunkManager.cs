@@ -60,6 +60,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+#if DEBUG
+
+        public static bool ChunkBoundingBoxVisible { get; set; }
+
+        public static bool Wireframe { get; set; }
+
+#endif
+
         static readonly Logger logger = new Logger(typeof(ChunkManager).Name);
 
         static readonly VectorI3[] nearbyOffsets =
@@ -400,6 +408,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw(View view, Projection projection)
         {
+            DebugSetEffectTechnique();
+
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
             {
@@ -509,6 +519,22 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         [Conditional("DEBUG")]
+        void DebugSetEffectTechnique()
+        {
+            var chunkEffect = region.ChunkEffect;
+            var realEffect = chunkEffect.BackingEffect;
+
+            if (Wireframe)
+            {
+                realEffect.CurrentTechnique = chunkEffect.WireframeTequnique;
+            }
+            else
+            {
+                realEffect.CurrentTechnique = chunkEffect.DefaultTequnique;
+            }
+        }
+
+        [Conditional("DEBUG")]
         void DebugIncrementRegionMonitorOccludedChunkCount()
         {
             region.Monitor.IncrementOccludedOpaqueChunkCount();
@@ -525,7 +551,7 @@ namespace Willcraftia.Xna.Blocks.Models
         [Conditional("DEBUG")]
         void DebugDrawChunkBoundingBoxes(View view, Projection projection)
         {
-            if (!region.ChunkBoundingBoxVisible) return;
+            if (!ChunkBoundingBoxVisible) return;
 
             debugEffect.View = view.Matrix;
             debugEffect.Projection = projection.Matrix;
