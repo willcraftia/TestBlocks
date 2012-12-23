@@ -57,6 +57,8 @@ namespace Willcraftia.Xna.Blocks.Models
         // ゲームを通しての最大を記録する。
         public int MaxChunkIndexCount { get; private set; }
 
+        public int UpdatingChunkCount { get; internal set; }
+
         public void Clear()
         {
             TotalChunkCount = 0;
@@ -72,6 +74,7 @@ namespace Willcraftia.Xna.Blocks.Models
             OccludedOpaqueChunkCount = 0;
             TotalChunkVertexCount = 0;
             TotalChunkIndexCount = 0;
+            UpdatingChunkCount = 0;
         }
 
         public void IncrementOccludedOpaqueChunkCount()

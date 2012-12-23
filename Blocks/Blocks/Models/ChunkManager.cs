@@ -340,9 +340,15 @@ namespace Willcraftia.Xna.Blocks.Models
                     chunk.Updating = true;
                 }
 
+                // 現在の隣接チャンクのアクティブ状態が前回のメッシュ更新時のアクティブ状態と異なるならば、
+                // 新たにアクティブ化された隣接チャンクを考慮してメッシュを更新するために、
+                // 強制的にチャンクを Dirty とする。
+                if (chunk.ActiveNeighbors != chunk.NeighborsReferencedOnUpdate)
+                    chunk.Dirty = true;
+
                 if (!chunk.Dirty)
                 {
-                    // Dirty ではない Chunk は更新しない。
+                    // Dirty ではないチャンクは更新しない。
                     chunk.Updating = false;
                     continue;
                 }

@@ -357,6 +357,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(region.Monitor.ActiveVertexBufferCount).Append("/");
             sb.AppendNumber(region.Monitor.TotalVertexBufferCount).AppendLine();
 
+            sb.Append("UpdatingChunk: ").AppendNumber(region.Monitor.UpdatingChunkCount).AppendLine();
+
             sb.Append("ChunkVertex: ");
             sb.Append("Max(").AppendNumber(region.Monitor.MaxChunkVertexCount).Append(") ");
             sb.Append("Total(").AppendNumber(region.Monitor.TotalChunkVertexCount).Append(")").AppendLine();

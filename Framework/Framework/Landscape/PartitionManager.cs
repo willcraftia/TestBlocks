@@ -280,6 +280,10 @@ namespace Willcraftia.Xna.Framework.Landscape
                 Partition neighbor;
                 if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
                 {
+                    // 既にアクティブであるパーティションを通知。
+                    partition.OnNeighborActivated(neighbor, side);
+
+                    // 既にアクティブであるパーティションへ通知。
                     var reverseSide = side.Reverse();
                     neighbor.OnNeighborActivated(partition, reverseSide);
                 }

@@ -95,10 +95,18 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
+            DebugUpdateRegionMonitor();
+
             // Update the task queue.
             taskQueue.Update();
 
             CheckCompletedTasks();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUpdateRegionMonitor()
+        {
+            region.Monitor.UpdatingChunkCount = updatingChunks.Count;
         }
 
         void CheckCompletedTasks()
@@ -137,21 +145,22 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void BuildChunkMesh(Chunk chunk)
         {
-            // TODO
-            // 以下の方法ではダメ。
-            //
-            // 事前にアクティブな隣接 Chunk を探索し、
-            // それらのみをアクティブな隣接 Chunk であるとして処理を進める。
-            //
-            // 当該 ChunkMesh の更新中であっても、Chunk は随時アクティブ化されるため、
-            // ここでスナップショットとして取得しておかないと、
-            // ある時点まではアクティブな隣接 Chunk が見つからないが、
-            // ある時点からアクティブな隣接 Chunk が見つかるという状態が発生し、
-            // 隣接 Block からの面の要否の決定が曖昧となる。
             var position = chunk.Position;
+            
+            // この更新で利用する隣接チャンクを探索。
             NearbyChunks nearbyChunks;
             chunkManager.GetNearbyActiveChunks(ref position, out nearbyChunks);
 
+            // この更新で利用する隣接チャンクを記録。
+            var flags = CubicSide.Flags.None;
+            foreach (var side in CubicSide.Items)
+            {
+                if (nearbyChunks[side] != null)
+                    flags |= side.ToFlags();
+            }
+            chunk.AddNeightborsReferencedOnUpdate(flags);
+
+            // メッシュを更新。
             for (int z = 0; z < chunkSize.Z; z++)
                 for (int y = 0; y < chunkSize.Y; y++)
                     for (int x = 0; x < chunkSize.X; x++)

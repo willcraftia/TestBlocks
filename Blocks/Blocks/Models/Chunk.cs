@@ -21,6 +21,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         byte[] blockIndices;
 
+        object activeNeighborsLock = new object();
+
+        object neighborsReferencedOnUpdateLock = new object();
+
         public VectorI3 Size
         {
             get { return size; }
@@ -84,7 +88,9 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return blockIndices.Length; }
         }
 
-        public CubicSide.Flags ActiveNeighbors { get; set; }
+        public CubicSide.Flags ActiveNeighbors { get; private set; }
+
+        public CubicSide.Flags NeighborsReferencedOnUpdate { get; private set; }
 
         public bool Dirty { get; set; }
 
@@ -103,6 +109,36 @@ namespace Willcraftia.Xna.Blocks.Models
             this.size = size;
 
             blockIndices = new byte[size.X * size.Y * size.Z];
+        }
+
+        public void OnNeighborActivated(CubicSide side)
+        {
+            lock (activeNeighborsLock)
+            {
+                var flag = side.ToFlags();
+
+                if ((ActiveNeighbors & flag) == CubicSide.Flags.None)
+                    ActiveNeighbors ^= flag;
+            }
+        }
+
+        public void OnNeighborPassivated(CubicSide side)
+        {
+            lock (activeNeighborsLock)
+            {
+                var flag = side.ToFlags();
+
+                if ((ActiveNeighbors & flag) == flag)
+                    ActiveNeighbors ^= flag;
+            }
+        }
+
+        public void AddNeightborsReferencedOnUpdate(CubicSide.Flags flags)
+        {
+            lock (neighborsReferencedOnUpdateLock)
+            {
+                NeighborsReferencedOnUpdate |= flags;
+            }
         }
 
         public void CreateWorldMatrix(out Matrix result)
