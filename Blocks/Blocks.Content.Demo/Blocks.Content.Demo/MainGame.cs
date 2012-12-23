@@ -131,8 +131,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             fpsCounter.Content.RootDirectory = "Content";
             fpsCounter.HorizontalAlignment = DebugHorizontalAlignment.Right;
             fpsCounter.SampleSpan = TimeSpan.FromSeconds(2);
-            //fpsCounter.Enabled = false;
-            //fpsCounter.Visible = false;
+            fpsCounter.Enabled = false;
+            fpsCounter.Visible = false;
             Components.Add(fpsCounter);
 #endif
 

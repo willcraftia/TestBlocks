@@ -64,7 +64,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
 
         public override void OnNeighborActivated(Partition neighbor, Framework.CubeSides side)
         {
-            chunk.Dirty = true;
+            //chunk.Dirty = true;
 
             base.OnNeighborActivated(neighbor, side);
         }

@@ -30,7 +30,15 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public bool IsPassivationFailed { get; private set; }
 
-        protected Partition() { }
+        internal Action ActivateAction { get; private set; }
+
+        internal Action PassivateAction { get; private set; }
+
+        protected Partition()
+        {
+            ActivateAction = new Action(Activate);
+            PassivateAction = new Action(Passivate);
+        }
 
         // 同期呼び出し。
         // Initialize() 呼び出しの前に、Size、GridPosition は設定済み。

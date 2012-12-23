@@ -12,15 +12,17 @@ namespace Willcraftia.Xna.Blocks.Landscape
     public sealed class ChunkPartitionManager : PartitionManager
     {
         // TODO
-        public const int InitialPoolCapacity = 0;
+        public const int InitialPoolCapacity = 1000;
 
         RegionManager regionManager;
 
         public ChunkPartitionManager(RegionManager regionManager)
-            : base(RegionManager.ChunkSize.ToVector3(), InitialPoolCapacity)
+            : base(RegionManager.ChunkSize.ToVector3())
         {
             if (regionManager == null) throw new ArgumentNullException("regionManager");
             this.regionManager = regionManager;
+
+            PrepareInitialPartitions(InitialPoolCapacity);
         }
 
         protected override Partition CreatePartition()

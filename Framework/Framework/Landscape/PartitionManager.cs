@@ -112,7 +112,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
-        public PartitionManager(Vector3 partitionSize, int initialPoolCapacity)
+        public PartitionManager(Vector3 partitionSize)
         {
             this.partitionSize = partitionSize;
 
@@ -120,7 +120,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             inversePartitionSize.Y = 1 / partitionSize.Y;
             inversePartitionSize.Z = 1 / partitionSize.Z;
 
-            partitionPool = new Pool<Partition>(CreatePartition, initialPoolCapacity);
+            partitionPool = new Pool<Partition>(CreatePartition);
+        }
+
+        protected void PrepareInitialPartitions(int initialCapacity)
+        {
+            partitionPool.Prepare(initialCapacity);
         }
 
         public void Update(ref Vector3 eyeWorldPosition)
@@ -294,7 +299,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 passivatingPartitions.Enqueue(partition);
 
                 // 非同期パッシベーションを要求。
-                passivationTaskQueue.Enqueue(partition.Passivate);
+                passivationTaskQueue.Enqueue(partition.PassivateAction);
             }
         }
 
@@ -337,7 +342,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                         activatingPartitions.Enqueue(partition);
 
                         // 非同期アクティベーションを要求。
-                        activationTaskQueue.Enqueue(partition.Activate);
+                        activationTaskQueue.Enqueue(partition.ActivateAction);
                     }
                 }
             }
