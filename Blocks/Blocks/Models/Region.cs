@@ -100,8 +100,9 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.LightDiffuseColor = Vector3.One;
             ChunkEffect.LightSpecularColor = Vector3.Zero;
             ChunkEffect.FogEnabled = true;
-            ChunkEffect.FogStart = 100;
-            ChunkEffect.FogEnd = 200;
+            // TODO
+            ChunkEffect.FogStart = Math.Max(50, (projection as PerspectiveFov).FarPlaneDistance - 50);
+            ChunkEffect.FogEnd = (projection as PerspectiveFov).FarPlaneDistance;
             ChunkEffect.FogColor = Color.CornflowerBlue.ToVector3();
             ChunkEffect.TileMap = TileCatalog.TileMap;
             ChunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
