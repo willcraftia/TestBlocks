@@ -63,7 +63,7 @@ namespace Willcraftia.Xna.Framework
             Direction = direction;
         }
 
-        public static CubicSide Parse(int index)
+        public static CubicSide ToCubicSide(int index)
         {
             switch (index)
             {
