@@ -144,6 +144,8 @@
     <Compile Include="Diagnostics\LogEvent.cs" />
     <Compile Include="Diagnostics\Logger.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
+    <Compile Include="Diagnostics\TimeRuler.cs" />
+    <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\Texture2DHelper.cs" />

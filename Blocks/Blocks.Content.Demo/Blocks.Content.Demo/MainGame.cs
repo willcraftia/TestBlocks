@@ -53,6 +53,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
 #if DEBUG
 
+        TimeRuler timeRuler;
+
+        TimeRulerMarker updateMarker;
+
+        TimeRulerMarker drawMarker;
+
         string helpMessage =
             "[F1] Help\r\n" +
             "[F2] Chunk bounding box\r\n" +
@@ -183,9 +189,27 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             fpsCounter.Content.RootDirectory = "Content";
             fpsCounter.HorizontalAlignment = DebugHorizontalAlignment.Right;
             fpsCounter.SampleSpan = TimeSpan.FromSeconds(2);
-            fpsCounter.Enabled = false;
-            fpsCounter.Visible = false;
+            //fpsCounter.Enabled = false;
+            //fpsCounter.Visible = false;
             Components.Add(fpsCounter);
+
+            //================================================================
+            // TimeRuler
+
+            timeRuler = new TimeRuler(this);
+            //timeRuler.Enabled = false;
+            //timeRuler.Visible = false;
+            Components.Add(timeRuler);
+
+            updateMarker = timeRuler.CreateMarker();
+            updateMarker.Name = "Draw";
+            updateMarker.BarIndex = 0;
+            updateMarker.Color = Color.Cyan;
+
+            drawMarker = timeRuler.CreateMarker();
+            drawMarker.Name = "Draw";
+            drawMarker.BarIndex = 1;
+            drawMarker.Color = Color.Yellow;
         }
 
         protected override void LoadContent()
@@ -213,17 +237,39 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             debugFillTexture = Texture2DHelper.CreateFillTexture(GraphicsDevice);
             debugHelpMessageFontSize = debugFont.MeasureString(helpMessage);
 
-            BuildInformationMessage();
+            DebugBuildInfoMessage();
             debugInformationTextFontSize = debugFont.MeasureString(stringBuilder);
         }
 
         protected override void UnloadContent()
         {
+            //================================================================
+            // Debug
+
+            DebugUnloadContent();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUnloadContent()
+        {
+            timeRuler.ReleaseMarker(updateMarker);
+            timeRuler.ReleaseMarker(drawMarker);
+
+            debugSpriteBatch.Dispose();
+            debugFillTexture.Dispose();
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (!IsActive) return;
+
+            //================================================================
+            // TimeRuler (DEBUG)
+
+            DebugBeginUpdate();
+
+            //================================================================
+            // Keyboard State
 
             var keyboardState = Keyboard.GetState();
 
@@ -273,7 +319,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Debug
 
-            DebugUpdate(gameTime);
+            DebugUpdate(gameTime, ref keyboardState);
 
             //================================================================
             // Keyboard State
@@ -281,13 +327,29 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             lastKeyboardState = keyboardState;
 
             base.Update(gameTime);
+
+            //================================================================
+            // TimeRuler (DEBUG)
+
+            DebugEndUpdate();
         }
 
         [Conditional("DEBUG")]
-        void DebugUpdate(GameTime gameTime)
+        void DebugBeginUpdate()
         {
-            var keyboardState = Keyboard.GetState();
+            timeRuler.StartFrame();
+            updateMarker.Begin();
+        }
 
+        [Conditional("DEBUG")]
+        void DebugEndUpdate()
+        {
+            updateMarker.End();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUpdate(GameTime gameTime, ref KeyboardState keyboardState)
+        {
             // F1
             if (keyboardState.IsKeyUp(Keys.F1) && lastKeyboardState.IsKeyDown(Keys.F1))
                 helpVisible = !helpVisible;
@@ -301,6 +363,14 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         protected override void Draw(GameTime gameTime)
         {
+            //================================================================
+            // TimeRuler (DEBUG)
+
+            DebugBeginDraw();
+
+            //================================================================
+            // RegionManager
+
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, backgroundColor, 1, 0);
             GraphicsDevice.RasterizerState = defaultRasterizerState;
             GraphicsDevice.BlendState = BlendState.Opaque;
@@ -308,9 +378,29 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             regionManager.Draw(view, projection);
 
-            DrawHelp();
+            //================================================================
+            // Help HUD (DEBUG)
+
+            DebugDrawHelp();
+
+            //================================================================
+            // TimeRuler (DEBUG)
+
+            DebugEndDraw();
 
             base.Draw(gameTime);
+        }
+
+        [Conditional("DEBUG")]
+        void DebugBeginDraw()
+        {
+            drawMarker.Begin();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugEndDraw()
+        {
+            drawMarker.End();
         }
 
         protected override void OnExiting(object sender, EventArgs args)
@@ -329,7 +419,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         }
 
         [Conditional("DEBUG")]
-        void BuildInformationMessage()
+        void DebugBuildInfoMessage()
         {
             var sb = stringBuilder;
 
@@ -388,7 +478,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         }
 
         [Conditional("DEBUG")]
-        void DrawHelp()
+        void DebugDrawHelp()
         {
             if (!helpVisible) return;
 
@@ -420,7 +510,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             layout.VerticalAlignment = DebugVerticalAlignment.Center;
             layout.Arrange();
             // draw the text.
-            BuildInformationMessage();
+            DebugBuildInfoMessage();
             debugSpriteBatch.DrawString(debugFont, stringBuilder, new Vector2(layout.ArrangedBounds.X, layout.ArrangedBounds.Y), Color.Yellow);
 
             // calculate the background area for help messages.
