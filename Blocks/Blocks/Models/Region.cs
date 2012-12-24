@@ -66,23 +66,11 @@ namespace Willcraftia.Xna.Blocks.Models
             DebugInitialize();
         }
 
-        [Conditional("DEBUG")]
-        void DebugInitialize()
-        {
-            if (Monitor == null) Monitor = new RegionMonitor();
-        }
-
         public void Update()
         {
             DebugUpdate();
 
             chunkManager.Update();
-        }
-
-        [Conditional("DEBUG")]
-        void DebugUpdate()
-        {
-            Monitor.Clear();
         }
 
         public void Draw(View view, Projection projection)
@@ -136,6 +124,18 @@ namespace Willcraftia.Xna.Blocks.Models
         public bool PassivateChunk(Chunk chunk)
         {
             return chunkManager.PassivateChunk(chunk);
+        }
+
+        [Conditional("DEBUG")]
+        void DebugInitialize()
+        {
+            if (Monitor == null) Monitor = new RegionMonitor();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUpdate()
+        {
+            Monitor.Clear();
         }
 
         #region ToString
