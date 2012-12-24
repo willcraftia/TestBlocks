@@ -107,6 +107,7 @@
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="CubicSide.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
+    <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="PerspectiveFov.cs" />
     <Compile Include="ProjectionBase.cs" />

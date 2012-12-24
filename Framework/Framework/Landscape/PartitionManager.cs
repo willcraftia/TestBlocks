@@ -25,6 +25,10 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int DefaultTaskQueueSlotCount = 20;
 
+        public const int DefaultActivationCapacity = 100;
+
+        public const int DefaultPassivationCapacity = 100;
+
         Vector3 partitionSize;
 
         Vector3 inversePartitionSize;
@@ -39,12 +43,13 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         PartitionQueue activePartitions = new PartitionQueue(5000);
 
-        PartitionQueue activatingPartitions = new PartitionQueue(100);
+        PartitionQueue activatingPartitions = new PartitionQueue(DefaultActivationCapacity);
 
-        PartitionQueue passivatingPartitions = new PartitionQueue(100);
+        PartitionQueue passivatingPartitions = new PartitionQueue(DefaultPassivationCapacity);
 
-        // activatingPartitions のキュー内配列のサイズの拡大を抑制するための制限。
-        int activationCapacity = 100;
+        int activationCapacity = DefaultActivationCapacity;
+
+        int passivationCapacity = DefaultPassivationCapacity;
 
         TaskQueue activationTaskQueue = new TaskQueue
         {
@@ -89,7 +94,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             get { return activationRange; }
             set
             {
-                if (passivationRange < value) throw new ArgumentOutOfRangeException("passivationRange < value");
+                if (passivationRange < value) throw new ArgumentOutOfRangeException("value");
                 activationRange = value;
             }
         }
@@ -99,25 +104,37 @@ namespace Willcraftia.Xna.Framework.Landscape
             get { return passivationRange; }
             set
             {
-                if (value < activationRange) throw new ArgumentOutOfRangeException("value < activationRange");
+                if (value < activationRange) throw new ArgumentOutOfRangeException("value");
                 passivationRange = value;
             }
         }
 
-        public int ActivePartitionCount
+        // activatingPartitions のキュー内配列のサイズの拡大を抑制するための制限。
+        public int ActivationCapacity
         {
-            get { return activePartitions.Count; }
+            get { return activationCapacity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+                activationCapacity = value;
+            }
         }
 
-        public int ActivatingPartitionCount
+        public int PassivationCapacity
         {
-            get { return activatingPartitions.Count; }
+            get { return passivationCapacity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+                passivationCapacity = value;
+            }
         }
 
-        public int PassivatingPartitionCount
-        {
-            get { return passivatingPartitions.Count; }
-        }
+#if DEBUG
+
+        public PartitionManagerMonitor Monitor { get; private set;}
+
+#endif
 
         public PartitionManager(Vector3 partitionSize)
         {
@@ -128,6 +145,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             inversePartitionSize.Z = 1 / partitionSize.Z;
 
             partitionPool = new Pool<Partition>(CreatePartition);
+
+            DebugInitialize();
         }
 
         protected void PrepareInitialPartitions(int initialCapacity)
@@ -138,6 +157,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         public void Update(ref Vector3 eyeWorldPosition)
         {
             if (Closed) return;
+
+            DebugUpdateMonitor();
 
             eyePosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
             eyePosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
@@ -300,6 +321,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             int partitionCount = activePartitions.Count;
             for (int i = 0; i < partitionCount; i++)
             {
+                // 同時非アクティブ化許容数を越えるならば、以降の非アクティブ化を全てスキップ。
+                if (0 < passivationCapacity && passivationCapacity <= passivatingPartitions.Count)
+                    return;
+
                 var partition = activePartitions.Dequeue();
 
                 if (!Closing)
@@ -333,8 +358,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     for (position.X = bounds.Min.X; position.X < bounds.Max.X; position.X++)
                     {
-                        // 同時アクティブ化許容数を越えるならばスキップ。
-                        if (activationCapacity <= activatingPartitions.Count) continue;
+                        // 同時アクティブ化許容数を越えるならば、以降のアクティブ化を全てスキップ。
+                        if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
+                            return;
 
                         // アクティブ化中あるいは非アクティブ化中かどうか。
                         if (activatingPartitions.Contains(position) ||
@@ -385,6 +411,20 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         protected virtual void DisposeOverride(bool disposing) { }
+
+        [Conditional("DEBUG")]
+        void DebugInitialize()
+        {
+            Monitor = new PartitionManagerMonitor();
+        }
+
+        [Conditional("DEBUG")]
+        void DebugUpdateMonitor()
+        {
+            Monitor.ActivePartitionCount = activePartitions.Count;
+            Monitor.ActivatingPartitionCount = activatingPartitions.Count;
+            Monitor.PassivatingPartitionCount = passivatingPartitions.Count;
+        }
 
         #region IDisposable
 

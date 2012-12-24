@@ -343,9 +343,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(farPlaneDistance).AppendLine();
             
             sb.Append("Partition: ");
-            sb.Append("A(").AppendNumber(partitionManager.ActivePartitionCount).Append(") ");
-            sb.Append("W(").AppendNumber(partitionManager.ActivatingPartitionCount).Append(") ");
-            sb.Append("P(").AppendNumber(partitionManager.PassivatingPartitionCount).Append(")").AppendLine();
+            sb.Append("A(").AppendNumber(partitionManager.Monitor.ActivePartitionCount).Append(") ");
+            sb.Append("W(").AppendNumber(partitionManager.Monitor.ActivatingPartitionCount).Append(") ");
+            sb.Append("P(").AppendNumber(partitionManager.Monitor.PassivatingPartitionCount).Append(")").AppendLine();
             
             sb.Append("Chunk: ").AppendNumber(region.Monitor.ActiveChunkCount).Append("/");
             sb.AppendNumber(region.Monitor.TotalChunkCount).Append(" ");
