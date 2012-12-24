@@ -70,14 +70,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly Logger logger = new Logger(typeof(ChunkManager).Name);
 
-        static readonly VectorI3[] nearbyOffsets =
+        static readonly BlendState colorWriteDisable = new BlendState
         {
-            VectorI3.Top,
-            VectorI3.Bottom,
-            VectorI3.Front,
-            VectorI3.Back,
-            VectorI3.Left,
-            VectorI3.Right,
+            ColorWriteChannels = ColorWriteChannels.None
         };
 
         // TODO
@@ -139,6 +134,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         BoundingBoxDrawer boundingBoxDrawer;
 
+        bool closing;
+
+        bool closed;
+
 #endif
 
         public VectorI3 ChunkSize
@@ -175,6 +174,21 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
+            if (closed) return;
+
+            if (closing)
+            {
+                lock (activeChunks)
+                {
+                    if (activeChunks.Count == 0)
+                    {
+                        closing = false;
+                        closed = true;
+                        return;
+                    }
+                }
+            }
+
             DebugUpdateRegionMonitor();
 
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
@@ -208,15 +222,21 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (chunk.InterMesh == null)
                 {
                     // 中間メッシュ未設定ならば設定を試行。
-                    if (BorrowInterChunkMesh(chunk))
+
+                    if (closing)
                     {
-                        // 非同期な更新要求を追加。
+                        // クローズが開始したならば新規の更新要求は破棄。
+                        chunk.ExitUpdate();
+                    }
+                    else if (BorrowInterChunkMesh(chunk))
+                    {
+                        // 中間メッシュが枯渇していなければ非同期な更新要求を追加。
                         chunk.InterMesh.Completed = false;
                         chunkMeshUpdateManager.EnqueueChunk(chunk);
                     }
                     else
                     {
-                        // 中間メッシュ更新を次回の試行とする。
+                        // 中間メッシュが枯渇しているため更新を次回の試行に委ねる。
                         chunk.ExitUpdate();
                     }
                 }
@@ -245,11 +265,6 @@ namespace Willcraftia.Xna.Blocks.Models
             // 更新処理を実行。
             chunkMeshUpdateManager.Update();
         }
-
-        static readonly BlendState colorWriteDisable = new BlendState
-        {
-            ColorWriteChannels = ColorWriteChannels.None
-        };
 
         public void Draw(View view, Projection projection)
         {
@@ -427,6 +442,13 @@ namespace Willcraftia.Xna.Blocks.Models
             ReturnChunk(chunk);
 
             return true;
+        }
+
+        public void Close()
+        {
+            if (closing || closed) return;
+
+            closing = true;
         }
 
         public bool TryGetActiveChunk(ref VectorI3 position, out Chunk chunk)

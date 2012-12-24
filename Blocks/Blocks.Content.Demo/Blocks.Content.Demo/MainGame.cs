@@ -306,8 +306,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            if (!partitionManager.Closing && !partitionManager.Closed)
-                regionManager.Draw(view, projection);
+            regionManager.Draw(view, projection);
 
             DrawHelp();
 

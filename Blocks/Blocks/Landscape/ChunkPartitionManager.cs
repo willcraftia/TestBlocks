@@ -36,5 +36,12 @@ namespace Willcraftia.Xna.Blocks.Landscape
 
             return base.CanActivatePartition(ref position);
         }
+
+        protected override void OnClosing()
+        {
+            regionManager.Close();
+
+            base.OnClosing();
+        }
     }
 }

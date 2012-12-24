@@ -196,6 +196,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     Closing = false;
                     Closed = true;
+                    OnClosed();
                 }
             }
         }
@@ -205,7 +206,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (Closing || Closed) return;
 
             Closing = true;
+            OnClosing();
         }
+
+        protected virtual void OnClosing() { }
+
+        protected virtual void OnClosed() { }
 
         protected abstract Partition CreatePartition();
 

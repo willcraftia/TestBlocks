@@ -126,6 +126,14 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunkManager.PassivateChunk(chunk);
         }
 
+        public void Close()
+        {
+            // チャンク マネージャにクローズ処理を要求。
+            // チャンク マネージャは即座に更新を終えるのではなく、
+            // 更新のために占有しているチャンクの解放を全て待ってから更新を終える。
+            chunkManager.Close();
+        }
+
         [Conditional("DEBUG")]
         void DebugInitialize()
         {
