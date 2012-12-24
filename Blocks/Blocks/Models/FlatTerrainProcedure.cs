@@ -85,7 +85,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         break;
                 }
             }
-            else
+            else if (h < Height)
             {
                 // Below the horizon.
                 switch (biomeElement)
