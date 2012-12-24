@@ -58,9 +58,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void Generate(Chunk chunk, int x, int y, int z, BiomeElement biomeElement)
         {
+            var position = chunk.Position;
+            var h = position.Y * chunk.Size.Y + y;
+
             byte index = Block.EmptyIndex;
 
-            if (Height == y)
+            if (Height == h)
             {
                 // Horizon.
                 switch (biomeElement)
