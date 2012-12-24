@@ -200,23 +200,21 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var partition = passivatingPartitions.Dequeue();
 
-                Debug.Assert(!partition.Active);
-
-                if (partition.IsPassivationFailed)
+                if (!partition.PassivationCompleted)
                 {
-                    // 一旦アクティブ リストへ戻し、次回の非アクティブ化に委ねる。
-                    partition.Active = true;
-                    activePartitions.Enqueue(partition);
-                    continue;
-                }
-
-                if (!partition.IsPassivationCompleted)
-                {
-                    // 未完のためキューへ戻す。
+                    // 未完ならばキューへ戻す。
                     passivatingPartitions.Enqueue(partition);
                     continue;
                 }
 
+                if (partition.PassivationCanceled)
+                {
+                    // 取り消されていたならばアクティブ リストへ戻し、次回の非アクティブ化に委ねる。
+                    partition.PassivationCompleted = false;
+                    activePartitions.Enqueue(partition);
+                    continue;
+                }
+                
                 // アクティブな隣接パーティションへ非アクティブ化を通知。
                 NortifyNeighborPassivated(partition);
 
@@ -232,29 +230,25 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var partition = activatingPartitions.Dequeue();
 
-                Debug.Assert(!partition.Active);
-
-                if (partition.IsActivationFailed)
+                if (!partition.ActivationCompleted)
                 {
-                    // 失敗したのでプールへ戻す。
-                    partitionPool.Return(partition);
-
-                    // 次回のアクティブ化に委ねる。
-                    continue;
-                }
-
-                if (!partition.IsActivationCompleted)
-                {
-                    // 未完のためキューへ戻す。
+                    // 未完ならばキューへ戻す。
                     activatingPartitions.Enqueue(partition);
                     continue;
                 }
 
+                if (partition.ActivationCanceled)
+                {
+                    // 取り消されていたならばプールへ戻す。
+                    partition.ActivationCompleted = false;
+                    partitionPool.Return(partition);
+                    continue;
+                }
+
                 // アクティブ化に成功したのでアクティブ リストへ追加。
-                partition.Active = true;
                 activePartitions.Enqueue(partition);
 
-                // アクティブな隣接パーティションへアクティブ化を通知。
+                // アクティブな隣接パーティションへ通知。
                 NotifyNeighborActivated(partition);
             }
         }
@@ -299,7 +293,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void PassivatePartitions()
         {
-            // 非アクティブ化不要領域 (アクティブ状態維持領域) を算出。
+            // アクティブ状態維持領域を算出。
             BoundingBoxI bounds;
             CalculateBounds(ref eyePosition, PassivationRange, out bounds);
 
@@ -310,20 +304,13 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    var position = partition.Position;
-                    ContainmentType containmentType;
-                    bounds.Contains(ref position, out containmentType);
-
-                    if (containmentType == ContainmentType.Contains)
+                    if (partition.IsInBounds(ref bounds))
                     {
-                        // 非アクティブ化不要領域内ならばアクティブ リストへ戻す。
+                        // アクティブ状態維持領域内ならばアクティブ リストへ戻す。
                         activePartitions.Enqueue(partition);
                         continue;
                     }
                 }
-
-                // アクティブ リストから完全に除外したため、ここで非アクティブとしてマーク。
-                partition.Active = false;
 
                 // 非アクティブ化キューへ追加。
                 passivatingPartitions.Enqueue(partition);
@@ -360,13 +347,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                         // アクティブ化可能であるかどうか。
                         if (!CanActivatePartition(ref position)) continue;
 
-                        // プールからパーティション インスタンスを取得。
-                        // プール枯渇ならばアクティブ化は一時取消。
+                        // プールからパーティションを取得。
+                        // プール枯渇ならば以降のアクティブ化を全てスキップ。
                         var partition = partitionPool.Borrow();
                         if (partition == null) return;
 
                         // パーティションを初期化。
-                        InitializePartition(partition, ref position);
+                        partition.Initialize(ref position);
 
                         // アクティブ化キューへ追加。
                         activatingPartitions.Enqueue(partition);
@@ -376,12 +363,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                     }
                 }
             }
-        }
-
-        void InitializePartition(Partition partition, ref VectorI3 position)
-        {
-            partition.Position = position;
-            partition.Initialize();
         }
 
         void CalculateBounds(ref VectorI3 center, int range, out BoundingBoxI result)
