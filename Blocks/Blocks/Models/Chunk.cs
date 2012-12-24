@@ -27,6 +27,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         volatile bool drawing;
 
+        volatile bool passivating;
+
         volatile CubicSide.Flags activeNeighbors;
 
         volatile CubicSide.Flags neighborsReferencedOnUpdate;
@@ -168,6 +170,7 @@ namespace Willcraftia.Xna.Blocks.Models
             lock (activeLock)
             {
                 if (!active) return false;
+                if (passivating) return false;
 
                 updating = true;
                 return true;
@@ -184,6 +187,7 @@ namespace Willcraftia.Xna.Blocks.Models
             lock (activeLock)
             {
                 if (!active) return false;
+                if (passivating) return false;
 
                 drawing = true;
                 return true;
@@ -202,13 +206,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (!active) return false;
                 if (updating || drawing) return false;
 
+                passivating = true;
                 return true;
             }
         }
 
         public void ExitPassivate()
         {
-            active = false;
+            passivating = false;
         }
 
         public void OnNeighborActivated(CubicSide side)
