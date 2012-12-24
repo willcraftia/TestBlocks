@@ -162,7 +162,6 @@
     <Compile Include="IO\WebResource.cs" />
     <Compile Include="IO\WebResourceLoader.cs" />
     <Compile Include="Landscape\Partition.cs" />
-    <Compile Include="Landscape\PartitionCollection.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="MathExtension.cs" />
