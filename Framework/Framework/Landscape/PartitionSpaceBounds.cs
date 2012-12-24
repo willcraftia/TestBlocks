@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace Willcraftia.Xna.Framework.Landscape
 {
-    public struct PartitionSpaceBounds
+    internal struct PartitionSpaceBounds
     {
         public VectorI3 Center;
 

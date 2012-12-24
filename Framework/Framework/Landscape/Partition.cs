@@ -107,25 +107,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             PassivateAction = new Action(Passivate);
         }
 
-        public bool IsInBounds(ref PartitionSpaceBounds volume)
+        internal bool IsInBounds(ref PartitionSpaceBounds volume)
         {
             bool result;
             volume.Contains(ref position, out result);
             return result;
-        }
-
-        /// <summary>
-        /// 指定の領域にパーティションが含まれるかどうかを示す値を取得します。
-        /// </summary>
-        /// <param name="bounds">領域。</param>
-        /// <returns>
-        /// true (指定の領域にパーティションが含まれる場合)、false (それ以外の場合)。
-        /// </returns>
-        public bool IsInBounds(ref BoundingBoxI bounds)
-        {
-            ContainmentType containmentType;
-            bounds.Contains(ref position, out containmentType);
-            return containmentType == ContainmentType.Contains;
         }
 
         /// <summary>
