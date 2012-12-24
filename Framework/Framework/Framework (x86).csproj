@@ -109,6 +109,7 @@
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
+    <Compile Include="Landscape\PartitionSpaceBounds.cs" />
     <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="PerspectiveFov.cs" />

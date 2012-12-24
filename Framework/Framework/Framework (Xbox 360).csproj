@@ -167,6 +167,7 @@
     <Compile Include="Landscape\PartitionManager.cs" />
     <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
+    <Compile Include="Landscape\PartitionSpaceBounds.cs" />
     <Compile Include="MathExtension.cs" />
     <Compile Include="Noise\Add.cs" />
     <Compile Include="Noise\Billow.cs" />

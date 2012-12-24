@@ -25,6 +25,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
     {
         static readonly Logger logger = new Logger(typeof(MainGame).Name);
 
+        const int partitionMinActiveRange = 10;
+
+        const int partitionMaxActiveRange = 12;
+
         GraphicsDeviceManager graphics;
 
         KeyboardState lastKeyboardState;
@@ -142,7 +146,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // ChunkPartitionManager
 
             partitionManager = new ChunkPartitionManager(regionManager);
-            //partitionManager.TaskQueueSlotCount = 20;
+            partitionManager.Initialize(partitionMinActiveRange, partitionMaxActiveRange);
 
             //================================================================
             // Camera Settings

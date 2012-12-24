@@ -62,6 +62,31 @@ namespace Willcraftia.Xna.Framework
             Z = z;
         }
 
+        public static void Distance(ref VectorI3 v1, ref VectorI3 v2, out float result)
+        {
+            int distanceSquared;
+            DistanceSquared(ref v1, ref v2, out distanceSquared);
+            result = (float) Math.Sqrt(distanceSquared);
+        }
+
+        public static void DistanceSquared(ref VectorI3 v1, ref VectorI3 v2, out int result)
+        {
+            var x = v2.X - v1.X;
+            var y = v2.Y - v1.Y;
+            var z = v2.Z - v1.Z;
+            result = x * x + y * y + z * z;
+        }
+
+        public float Length()
+        {
+            return (float) Math.Sqrt(LengthSquared());
+        }
+
+        public int LengthSquared()
+        {
+            return X * X + Y * Y + Z * Z;
+        }
+
         public Vector3 ToVector3()
         {
             return new Vector3(X, Y, Z);

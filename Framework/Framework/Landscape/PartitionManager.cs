@@ -19,10 +19,6 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     public abstract class PartitionManager : IDisposable
     {
-        public const int DefaultActivationRange = 8;
-
-        public const int DefaultPassivationRange = 10;
-
         public const int DefaultTaskQueueSlotCount = 20;
 
         public const int DefaultActivationCapacity = 100;
@@ -61,9 +57,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             SlotCount = DefaultTaskQueueSlotCount
         };
 
-        int activationRange = DefaultActivationRange;
-        
-        int passivationRange = DefaultPassivationRange;
+        PartitionSpaceBounds maxActiveBounds;
+
+        VectorI3[] minActivePointOffsets;
 
         VectorI3 eyePosition;
 
@@ -87,26 +83,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             get { return partitionPool.MaxCapacity; }
             set { partitionPool.MaxCapacity = value; }
-        }
-
-        public int ActivationRange
-        {
-            get { return activationRange; }
-            set
-            {
-                if (passivationRange < value) throw new ArgumentOutOfRangeException("value");
-                activationRange = value;
-            }
-        }
-
-        public int PassivationRange
-        {
-            get { return passivationRange; }
-            set
-            {
-                if (value < activationRange) throw new ArgumentOutOfRangeException("value");
-                passivationRange = value;
-            }
         }
 
         // activatingPartitions のキュー内配列のサイズの拡大を抑制するための制限。
@@ -149,9 +125,16 @@ namespace Willcraftia.Xna.Framework.Landscape
             DebugInitialize();
         }
 
-        protected void PrepareInitialPartitions(int initialCapacity)
+        public void Initialize(int minActiveRange, int maxActiveRange)
         {
-            partitionPool.Prepare(initialCapacity);
+            if (minActiveRange < 0) throw new ArgumentOutOfRangeException("minActiveRange");
+            if (maxActiveRange < 0 || maxActiveRange <= minActiveRange)
+                throw new ArgumentOutOfRangeException("maxActiveRange");
+
+            maxActiveBounds = new PartitionSpaceBounds { Radius = maxActiveRange };
+
+            var dummyBounds = new PartitionSpaceBounds { Radius = minActiveRange };
+            minActivePointOffsets = dummyBounds.GetPoints();
         }
 
         public void Update(ref Vector3 eyeWorldPosition)
@@ -163,6 +146,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             eyePosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
             eyePosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
             eyePosition.Z = MathExtension.Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
+
+            // アクティブ領域を現在の視点位置を中心に設定。
+            maxActiveBounds.Center = eyePosition;
 
             if (!Closing)
             {
@@ -207,6 +193,11 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             Closing = true;
             OnClosing();
+        }
+
+        protected void PrepareInitialPartitions(int initialCapacity)
+        {
+            partitionPool.Prepare(initialCapacity);
         }
 
         protected virtual void OnClosing() { }
@@ -320,10 +311,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void PassivatePartitions()
         {
-            // アクティブ状態維持領域を算出。
-            BoundingBoxI bounds;
-            CalculateBounds(ref eyePosition, PassivationRange, out bounds);
-
             int partitionCount = activePartitions.Count;
             for (int i = 0; i < partitionCount; i++)
             {
@@ -335,7 +322,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (partition.IsInBounds(ref bounds))
+                    if (partition.IsInBounds(ref maxActiveBounds))
                     {
                         // アクティブ状態維持領域内ならばアクティブ リストへ戻す。
                         activePartitions.Enqueue(partition);
@@ -353,67 +340,39 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void ActivatePartitions()
         {
-            // アクティブ化領域を算出。
-            BoundingBoxI bounds;
-            CalculateBounds(ref eyePosition, ActivationRange, out bounds);
-
-            var position = new VectorI3();
-            for (position.Z = bounds.Min.Z; position.Z < bounds.Max.Z; position.Z++)
+            for (int i = 0; i < minActivePointOffsets.Length; i++)
             {
-                for (position.Y = bounds.Min.Y; position.Y < bounds.Max.Y; position.Y++)
-                {
-                    for (position.X = bounds.Min.X; position.X < bounds.Max.X; position.X++)
-                    {
-                        // 同時アクティブ化許容数を越えるならば、以降のアクティブ化を全てスキップ。
-                        if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
-                            return;
+                var position = eyePosition + minActivePointOffsets[i];
 
-                        // アクティブ化中あるいは非アクティブ化中かどうか。
-                        if (activatingPartitions.Contains(position) ||
-                            passivatingPartitions.Contains(position))
-                            continue;
+                // 同時アクティブ化許容数を越えるならば、以降のアクティブ化を全てスキップ。
+                if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
+                    return;
 
-                        // 既にアクティブであるかどうか。
-                        if (activePartitions.Contains(position)) continue;
+                // アクティブ化中あるいは非アクティブ化中かどうか。
+                if (activatingPartitions.Contains(position) ||
+                    passivatingPartitions.Contains(position))
+                    continue;
 
-                        // アクティブ化可能であるかどうか。
-                        if (!CanActivatePartition(ref position)) continue;
+                // 既にアクティブであるかどうか。
+                if (activePartitions.Contains(position)) continue;
 
-                        // プールからパーティションを取得。
-                        // プール枯渇ならば以降のアクティブ化を全てスキップ。
-                        var partition = partitionPool.Borrow();
-                        if (partition == null) return;
+                // アクティブ化可能であるかどうか。
+                if (!CanActivatePartition(ref position)) continue;
 
-                        // パーティションを初期化。
-                        partition.Initialize(ref position);
+                // プールからパーティションを取得。
+                // プール枯渇ならば以降のアクティブ化を全てスキップ。
+                var partition = partitionPool.Borrow();
+                if (partition == null) return;
 
-                        // アクティブ化キューへ追加。
-                        activatingPartitions.Enqueue(partition);
+                // パーティションを初期化。
+                partition.Initialize(ref position);
 
-                        // 非同期処理を要求。
-                        activationTaskQueue.Enqueue(partition.ActivateAction);
-                    }
-                }
+                // アクティブ化キューへ追加。
+                activatingPartitions.Enqueue(partition);
+
+                // 非同期処理を要求。
+                activationTaskQueue.Enqueue(partition.ActivateAction);
             }
-        }
-
-        void CalculateBounds(ref VectorI3 center, int range, out BoundingBoxI result)
-        {
-            result = new BoundingBoxI
-            {
-                Min = new VectorI3
-                {
-                    X = center.X - range,
-                    Y = center.Y - range,
-                    Z = center.Z - range
-                },
-                Max = new VectorI3
-                {
-                    X = center.X + range,
-                    Y = center.Y + range,
-                    Z = center.Z + range
-                }
-            };
         }
 
         protected virtual void DisposeOverride(bool disposing) { }

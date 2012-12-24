@@ -107,6 +107,13 @@ namespace Willcraftia.Xna.Framework.Landscape
             PassivateAction = new Action(Passivate);
         }
 
+        public bool IsInBounds(ref PartitionSpaceBounds volume)
+        {
+            bool result;
+            volume.Contains(ref position, out result);
+            return result;
+        }
+
         /// <summary>
         /// 指定の領域にパーティションが含まれるかどうかを示す値を取得します。
         /// </summary>
