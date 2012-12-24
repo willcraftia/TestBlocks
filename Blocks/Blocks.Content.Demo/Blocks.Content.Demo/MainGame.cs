@@ -398,13 +398,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         [Conditional("DEBUG")]
         void DebugBeginDraw()
         {
-            drawMarker.Begin();
+            if (IsActive) drawMarker.Begin();
         }
 
         [Conditional("DEBUG")]
         void DebugEndDraw()
         {
-            drawMarker.End();
+            if (IsActive) drawMarker.End();
         }
 
         protected override void OnExiting(object sender, EventArgs args)
