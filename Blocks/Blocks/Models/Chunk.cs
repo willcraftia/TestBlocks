@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 
@@ -167,13 +168,19 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool EnterUpdate()
         {
-            lock (activeLock)
+            if (!Monitor.TryEnter(activeLock)) return false;
+
+            try
             {
                 if (!active) return false;
                 if (passivating) return false;
 
                 updating = true;
                 return true;
+            }
+            finally
+            {
+                Monitor.Exit(activeLock);
             }
         }
 
@@ -184,13 +191,19 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool EnterDraw()
         {
-            lock (activeLock)
+            if (!Monitor.TryEnter(activeLock)) return false;
+
+            try
             {
                 if (!active) return false;
                 if (passivating) return false;
 
                 drawing = true;
                 return true;
+            }
+            finally
+            {
+                Monitor.Exit(activeLock);
             }
         }
 
@@ -201,13 +214,19 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool EnterPassivate()
         {
-            lock (activeLock)
+            if (!Monitor.TryEnter(activeLock)) return false;
+
+            try
             {
                 if (!active) return false;
                 if (updating || drawing) return false;
 
                 passivating = true;
                 return true;
+            }
+            finally
+            {
+                Monitor.Exit(activeLock);
             }
         }
 

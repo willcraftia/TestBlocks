@@ -2,38 +2,38 @@
 	<Name>Default Block Catalog</Name>
 	<Entries>
 		<Entry>
-			<Index>1</Index>
+			<Index>0</Index>
 			<Uri>DefaultBlock.json</Uri>
 		</Entry>
 		<Entry>
-			<Index>2</Index>
+			<Index>1</Index>
 			<Uri>DirtBlock.json</Uri>
 		</Entry>
 		<Entry>
-			<Index>3</Index>
+			<Index>2</Index>
 			<Uri>GrassBlock.json</Uri>
 		</Entry>
 		<Entry>
-			<Index>4</Index>
+			<Index>3</Index>
 			<Uri>MantleBlock.json</Uri>
 		</Entry>
 		<Entry>
-			<Index>5</Index>
+			<Index>4</Index>
 			<Uri>SandBlock.json</Uri>
 		</Entry>
 		<Entry>
-			<Index>6</Index>
+			<Index>5</Index>
 			<Uri>SnowBlock.json</Uri>
 		</Entry>
 		<Entry>
-			<Index>7</Index>
+			<Index>6</Index>
 			<Uri>StoneBlock.json</Uri>
 		</Entry>
 	</Entries>
-	<Dirt>2</Dirt>
-	<Grass>3</Grass>
-	<Mantle>4</Mantle>
-	<Sand>5</Sand>
-	<Snow>6</Snow>
-	<Stone>7</Stone>
+	<Dirt>1</Dirt>
+	<Grass>2</Grass>
+	<Mantle>3</Mantle>
+	<Sand>4</Sand>
+	<Snow>5</Snow>
+	<Stone>6</Stone>
 </BlockCatalog>

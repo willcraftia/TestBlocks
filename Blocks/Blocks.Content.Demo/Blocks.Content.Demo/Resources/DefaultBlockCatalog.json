@@ -2,38 +2,38 @@
   "Name": "Default Block Catalog",
   "Entries": [
     {
-      "Index": 1,
+      "Index": 0,
       "Uri": "DefaultBlock.json"
     },
     {
-      "Index": 2,
+      "Index": 1,
       "Uri": "DirtBlock.json"
     },
     {
-      "Index": 3,
+      "Index": 2,
       "Uri": "GrassBlock.json"
     },
     {
-      "Index": 4,
+      "Index": 3,
       "Uri": "MantleBlock.json"
     },
     {
-      "Index": 5,
+      "Index": 4,
       "Uri": "SandBlock.json"
     },
     {
-      "Index": 6,
+      "Index": 5,
       "Uri": "SnowBlock.json"
     },
     {
-      "Index": 7,
+      "Index": 6,
       "Uri": "StoneBlock.json"
     }
   ],
-  "Dirt": 2,
-  "Grass": 3,
-  "Mantle": 4,
-  "Sand": 5,
-  "Snow": 6,
-  "Stone": 7
+  "Dirt": 1,
+  "Grass": 2,
+  "Mantle": 3,
+  "Sand": 4,
+  "Snow": 5,
+  "Stone": 6
 }

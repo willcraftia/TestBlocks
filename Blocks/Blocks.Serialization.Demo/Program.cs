@@ -418,20 +418,20 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Block Catalog",
                     Entries = new IndexedUriDefinition[]
                     {
-                        new IndexedUriDefinition { Index = 1, Uri = "DefaultBlock.json" },
-                        new IndexedUriDefinition { Index = 2, Uri = "DirtBlock.json" },
-                        new IndexedUriDefinition { Index = 3, Uri = "GrassBlock.json" },
-                        new IndexedUriDefinition { Index = 4, Uri = "MantleBlock.json" },
-                        new IndexedUriDefinition { Index = 5, Uri = "SandBlock.json" },
-                        new IndexedUriDefinition { Index = 6, Uri = "SnowBlock.json" },
-                        new IndexedUriDefinition { Index = 7, Uri = "StoneBlock.json" }
+                        new IndexedUriDefinition { Index = 0, Uri = "DefaultBlock.json" },
+                        new IndexedUriDefinition { Index = 1, Uri = "DirtBlock.json" },
+                        new IndexedUriDefinition { Index = 2, Uri = "GrassBlock.json" },
+                        new IndexedUriDefinition { Index = 3, Uri = "MantleBlock.json" },
+                        new IndexedUriDefinition { Index = 4, Uri = "SandBlock.json" },
+                        new IndexedUriDefinition { Index = 5, Uri = "SnowBlock.json" },
+                        new IndexedUriDefinition { Index = 6, Uri = "StoneBlock.json" }
                     },
-                    Dirt = 2,
-                    Grass = 3,
-                    Mantle = 4,
-                    Sand = 5,
-                    Snow = 6,
-                    Stone = 7
+                    Dirt = 1,
+                    Grass = 2,
+                    Mantle = 3,
+                    Sand = 4,
+                    Snow = 5,
+                    Stone = 6
                 };
                 var jsonResource = SerializeToJson<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
                 var xmlResource = SerializeToXml<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);

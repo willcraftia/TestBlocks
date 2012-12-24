@@ -203,7 +203,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             foreach (var chunk in workingChunks)
             {
-                // チャンクが更新処理に入れるかどうか。
                 if (!chunk.EnterUpdate()) continue;
 
                 // 現在の隣接チャンクのアクティブ状態が前回のメッシュ更新時のアクティブ状態と異なるならば、
@@ -214,7 +213,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (!chunk.MeshDirty)
                 {
-                    // Dirty ではないチャンクは更新しない。
                     chunk.ExitUpdate();
                     continue;
                 }
@@ -230,7 +228,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     }
                     else if (BorrowInterChunkMesh(chunk))
                     {
-                        // 中間メッシュが枯渇していなければ非同期な更新要求を追加。
                         chunk.InterMesh.Completed = false;
                         chunkMeshUpdateManager.EnqueueChunk(chunk);
                     }
@@ -247,14 +244,11 @@ namespace Willcraftia.Xna.Blocks.Models
                     // メッシュ枯渇ならば次回の試行とする。
                     if (!BorrowChunkMesh(chunk)) continue;
 
-                    // VertexBuffer/IndexBuffer への反映。
                     UpdateChunkMeshBuffer(chunk);
 
-                    // 中間メッシュをプールへ戻す。
                     ReturnInterChunkMesh(chunk.InterMesh);
                     chunk.InterMesh = null;
 
-                    // 更新終了としてマークする。
                     chunk.MeshDirty = false;
                     chunk.ExitUpdate();
                 }
@@ -262,7 +256,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             workingChunks.Clear();
 
-            // 更新処理を実行。
             chunkMeshUpdateManager.Update();
         }
 
@@ -290,14 +283,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
             foreach (var chunk in workingChunks)
             {
-                // チャンクが描画処理に入れるかどうか。
                 if (!chunk.EnterDraw()) continue;
 
                 var mesh = chunk.Mesh;
                 if (mesh == null || !chunk.IsInFrustum(frustum))
                 {
-                    // メッシュの無いチャンクは不可視。
-                    // カリングされたチャンクは不可視。
                     chunk.ExitDraw();
                     continue;
                 }
@@ -400,11 +390,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             Debug.Assert(!chunk.Active);
 
-            // 永続化されているチャンクの取得を試行。
             if (!chunkStore.GetChunk(ref position, chunk))
             {
-                // 永続化されていないならば自動生成。
-
                 chunk.Position = position;
 
                 foreach (var procedure in region.ChunkProcesures)
@@ -413,7 +400,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunk.OnActivated();
 
-            // アクティブ リストへ追加。
             lock (activeChunks) activeChunks.Add(chunk);
 
             return chunk;
@@ -426,10 +412,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             Debug.Assert(chunk.Active);
 
-            // 非アクティブ化処理にチャンクが入れるかどうか。
             if (!chunk.EnterPassivate()) return false;
 
-            // アクティブ リストから削除。
             lock (activeChunks) activeChunks.Remove(chunk);
 
             // 定義に変更があるならば永続化領域を更新。
@@ -438,7 +422,6 @@ namespace Willcraftia.Xna.Blocks.Models
             chunk.OnPassivated();
             chunk.ExitPassivate();
 
-            // チャンクをプールへ戻す。
             ReturnChunk(chunk);
 
             return true;
