@@ -19,6 +19,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
 
+        volatile bool active;
+
         // パーティション空間座標。
         public VectorI3 Position { get; internal set; }
 
@@ -29,6 +31,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         public bool IsPassivationCompleted { get; private set; }
 
         public bool IsPassivationFailed { get; private set; }
+
+        public bool Active
+        {
+            get { return active; }
+            set { active = value; }
+        }
 
         internal Action ActivateAction { get; private set; }
 

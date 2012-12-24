@@ -21,9 +21,19 @@ namespace Willcraftia.Xna.Blocks.Models
 
         byte[] blockIndices;
 
-        object activeNeighborsLock = new object();
+        volatile bool active;
 
-        object neighborsReferencedOnUpdateLock = new object();
+        volatile bool updating;
+
+        volatile bool drawing;
+
+        volatile CubicSide.Flags activeNeighbors;
+
+        volatile CubicSide.Flags neighborsReferencedOnUpdate;
+
+        object activeLock = new object();
+
+        object activeNeighborsLock = new object();
 
         public VectorI3 Size
         {
@@ -88,9 +98,16 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return blockIndices.Length; }
         }
 
-        public CubicSide.Flags ActiveNeighbors { get; private set; }
+        public CubicSide.Flags ActiveNeighbors
+        {
+            get { return activeNeighbors; }
+        }
 
-        public CubicSide.Flags NeighborsReferencedOnUpdate { get; private set; }
+        public CubicSide.Flags NeighborsReferencedOnUpdate
+        {
+            get { return neighborsReferencedOnUpdate; }
+            set { neighborsReferencedOnUpdate = value; }
+        }
 
         public bool Dirty { get; set; }
 
@@ -98,11 +115,26 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public InterChunkMesh InterMesh { get; set; }
 
-        public bool Active { get; set; }
+        public bool Active
+        {
+            get { return active; }
+        }
 
-        public bool Updating { get; set; }
+        // Updating と Drawing は個別にフラグを持つ必要がある。
+        // 例えば、Updating = true 中に Drawing = true となった場合、
+        // 描画の終了では Drawing = false としたいだけであり、
+        // Updating には関与したくない。
+        // 逆に、更新中は Drawing には関与したくない。
 
-        public bool Drawing { get; set; }
+        public bool Updating
+        {
+            get { return updating; }
+        }
+
+        public bool Drawing
+        {
+            get { return drawing; }
+        }
 
         public Chunk(VectorI3 size)
         {
@@ -111,14 +143,74 @@ namespace Willcraftia.Xna.Blocks.Models
             blockIndices = new byte[size.X * size.Y * size.Z];
         }
 
+        public void OnActivated()
+        {
+            lock (activeLock) active = true;
+
+            Dirty = true;
+        }
+
+        public void OnPassivated()
+        {
+            lock (activeLock) active = false;
+        }
+
+        public bool EnterUpdate()
+        {
+            lock (activeLock)
+            {
+                if (!active) return false;
+
+                updating = true;
+                return true;
+            }
+        }
+
+        public void ExitUpdate()
+        {
+            updating = false;
+        }
+
+        public bool EnterDraw()
+        {
+            lock (activeLock)
+            {
+                if (!active) return false;
+
+                drawing = true;
+                return true;
+            }
+        }
+
+        public void ExitDraw()
+        {
+            drawing = false;
+        }
+
+        public bool EnterPassivate()
+        {
+            lock (activeLock)
+            {
+                if (!active) return false;
+                if (updating || drawing) return false;
+
+                return true;
+            }
+        }
+
+        public void ExitPassivate()
+        {
+            active = false;
+        }
+
         public void OnNeighborActivated(CubicSide side)
         {
             lock (activeNeighborsLock)
             {
                 var flag = side.ToFlags();
 
-                if ((ActiveNeighbors & flag) == CubicSide.Flags.None)
-                    ActiveNeighbors ^= flag;
+                if ((activeNeighbors & flag) == CubicSide.Flags.None)
+                    activeNeighbors ^= flag;
             }
         }
 
@@ -128,16 +220,8 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var flag = side.ToFlags();
 
-                if ((ActiveNeighbors & flag) == flag)
-                    ActiveNeighbors ^= flag;
-            }
-        }
-
-        public void AddNeightborsReferencedOnUpdate(CubicSide.Flags flags)
-        {
-            lock (neighborsReferencedOnUpdateLock)
-            {
-                NeighborsReferencedOnUpdate |= flags;
+                if ((activeNeighbors & flag) == flag)
+                    activeNeighbors ^= flag;
             }
         }
 
@@ -191,6 +275,10 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Clear()
         {
             Array.Clear(blockIndices, 0, blockIndices.Length);
+            
+            activeNeighbors = CubicSide.Flags.None;
+            neighborsReferencedOnUpdate = CubicSide.Flags.None;
+
             Dirty = true;
         }
 
@@ -199,6 +287,14 @@ namespace Willcraftia.Xna.Blocks.Models
             return 0 <= blockPosition.X && blockPosition.X < size.X &&
                 0 <= blockPosition.Y && blockPosition.Y < size.Y &&
                 0 <= blockPosition.Z && blockPosition.Z < size.Z;
+        }
+
+        public bool IsInFrustum(BoundingFrustum frustum)
+        {
+            ContainmentType containmentType;
+            frustum.Contains(ref boundingBox, out containmentType);
+
+            return containmentType != ContainmentType.Disjoint;
         }
     }
 }

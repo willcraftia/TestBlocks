@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
@@ -199,9 +200,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var partition = passivatingPartitions.Dequeue();
 
+                Debug.Assert(!partition.Active);
+
                 if (partition.IsPassivationFailed)
                 {
                     // 一旦アクティブ リストへ戻し、次回の非アクティブ化に委ねる。
+                    partition.Active = true;
                     activePartitions.Enqueue(partition);
                     continue;
                 }
@@ -214,7 +218,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // アクティブな隣接パーティションへ非アクティブ化を通知。
-                NotifyNeighborActivated(partition);
+                NortifyNeighborPassivated(partition);
 
                 // 非アクティブ化成功したのでプールへ戻す。
                 partitionPool.Return(partition);
@@ -227,6 +231,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             for (int i = 0; i < partitionCount; i++)
             {
                 var partition = activatingPartitions.Dequeue();
+
+                Debug.Assert(!partition.Active);
 
                 if (partition.IsActivationFailed)
                 {
@@ -244,7 +250,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                     continue;
                 }
 
-                // アクティブ化成功したのでアクティブ リストへ追加。
+                // アクティブ化に成功したのでアクティブ リストへ追加。
+                partition.Active = true;
                 activePartitions.Enqueue(partition);
 
                 // アクティブな隣接パーティションへアクティブ化を通知。
@@ -280,10 +287,10 @@ namespace Willcraftia.Xna.Framework.Landscape
                 Partition neighbor;
                 if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
                 {
-                    // 既にアクティブであるパーティションを通知。
+                    // partition へアクティブな隣接パーティションを通知。
                     partition.OnNeighborActivated(neighbor, side);
 
-                    // 既にアクティブであるパーティションへ通知。
+                    // アクティブな隣接パーティションへ partition を通知。
                     var reverseSide = side.Reverse();
                     neighbor.OnNeighborActivated(partition, reverseSide);
                 }
@@ -314,6 +321,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                         continue;
                     }
                 }
+
+                // アクティブ リストから完全に除外したため、ここで非アクティブとしてマーク。
+                partition.Active = false;
 
                 // 非アクティブ化キューへ追加。
                 passivatingPartitions.Enqueue(partition);

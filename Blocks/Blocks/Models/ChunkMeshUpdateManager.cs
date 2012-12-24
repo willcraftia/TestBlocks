@@ -158,7 +158,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (nearbyChunks[side] != null)
                     flags |= side.ToFlags();
             }
-            chunk.AddNeightborsReferencedOnUpdate(flags);
+            chunk.NeighborsReferencedOnUpdate = flags;
 
             // メッシュを更新。
             for (int z = 0; z < chunkSize.Z; z++)

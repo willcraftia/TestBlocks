@@ -67,8 +67,6 @@ namespace Willcraftia.Xna.Blocks.Landscape
         {
             chunk.OnNeighborActivated(side);
 
-            //chunk.Dirty = true;
-
             base.OnNeighborActivated(neighbor, side);
         }
 
