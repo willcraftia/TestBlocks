@@ -90,6 +90,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 var index = x + y * size.X + z * size.X * size.Y;
                 blockIndices[index] = value;
+
+                MeshDirty = true;
+                DefinitionDirty = true;
             }
         }
 
@@ -109,7 +112,12 @@ namespace Willcraftia.Xna.Blocks.Models
             set { neighborsReferencedOnUpdate = value; }
         }
 
-        public bool Dirty { get; set; }
+        // 外部からブロックを設定した場合などに true とする。
+        // true の場合は非アクティブ化でキャッシュを更新。
+        // false の場合はキャッシュの更新が不要である。
+        public bool DefinitionDirty { get; set; }
+
+        public bool MeshDirty { get; set; }
 
         public ChunkMesh Mesh { get; set; }
 
@@ -147,7 +155,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             lock (activeLock) active = true;
 
-            Dirty = true;
+            MeshDirty = true;
         }
 
         public void OnPassivated()
@@ -259,7 +267,7 @@ namespace Willcraftia.Xna.Blocks.Models
             for (int i = 0; i < blockIndices.Length; i++)
                 blockIndices[i] = reader.ReadByte();
 
-            Dirty = true;
+            MeshDirty = true;
         }
 
         public void Write(BinaryWriter writer)
@@ -279,7 +287,8 @@ namespace Willcraftia.Xna.Blocks.Models
             activeNeighbors = CubicSide.Flags.None;
             neighborsReferencedOnUpdate = CubicSide.Flags.None;
 
-            Dirty = true;
+            MeshDirty = true;
+            DefinitionDirty = false;
         }
 
         public bool Contains(ref VectorI3 blockPosition)

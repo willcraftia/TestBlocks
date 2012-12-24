@@ -138,7 +138,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(chunk.Active);
             Debug.Assert(chunk.Updating);
-            Debug.Assert(chunk.Dirty);
+            Debug.Assert(chunk.MeshDirty);
 
             BuildChunkMesh(chunk);
         }

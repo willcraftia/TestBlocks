@@ -196,9 +196,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 新たにアクティブ化された隣接チャンクを考慮してメッシュを更新するために、
                 // 強制的にチャンクを Dirty とする。
                 if (chunk.ActiveNeighbors != chunk.NeighborsReferencedOnUpdate)
-                    chunk.Dirty = true;
+                    chunk.MeshDirty = true;
 
-                if (!chunk.Dirty)
+                if (!chunk.MeshDirty)
                 {
                     // Dirty ではないチャンクは更新しない。
                     chunk.ExitUpdate();
@@ -235,7 +235,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     chunk.InterMesh = null;
 
                     // 更新終了としてマークする。
-                    chunk.Dirty = false;
+                    chunk.MeshDirty = false;
                     chunk.ExitUpdate();
                 }
             }
@@ -417,8 +417,8 @@ namespace Willcraftia.Xna.Blocks.Models
             // アクティブ リストから削除。
             lock (activeChunks) activeChunks.Remove(chunk);
 
-            // 永続化。
-            chunkStore.AddChunk(chunk);
+            // 定義に変更があるならば永続化領域を更新。
+            if (chunk.DefinitionDirty) chunkStore.AddChunk(chunk);
 
             chunk.OnPassivated();
             chunk.ExitPassivate();
