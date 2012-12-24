@@ -84,7 +84,10 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.EyePosition = eyePosition;
             ChunkEffect.ViewProjection = viewProjection;
             ChunkEffect.AmbientLightColor = Vector3.One;
-            ChunkEffect.LightDirection = Vector3.Down;
+            // TODO
+            var lightDirection = new Vector3(1, -1, -1);
+            lightDirection.Normalize();
+            ChunkEffect.LightDirection = lightDirection;
             ChunkEffect.LightDiffuseColor = Vector3.One;
             ChunkEffect.LightSpecularColor = Vector3.Zero;
             ChunkEffect.FogEnabled = true;
