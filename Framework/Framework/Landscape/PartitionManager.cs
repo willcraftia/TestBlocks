@@ -25,6 +25,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int DefaultPassivationCapacity = 100;
 
+        public const int DefaultPassivationSearchCapacity = 200;
+
         Vector3 partitionSize;
 
         Vector3 inversePartitionSize;
@@ -46,6 +48,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         int activationCapacity = DefaultActivationCapacity;
 
         int passivationCapacity = DefaultPassivationCapacity;
+
+        int passivationSearchCapacity = DefaultPassivationSearchCapacity;
 
         TaskQueue activationTaskQueue = new TaskQueue
         {
@@ -178,7 +182,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 PassivatePartitions();
 
                 // 全ての非アクティブ化が完了していればクローズ完了。
-                if (passivatingPartitions.Count == 0)
+                if (passivatingPartitions.Count == 0 && activePartitions.Count == 0)
                 {
                     Closing = false;
                     Closed = true;
@@ -311,8 +315,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void PassivatePartitions()
         {
-            int partitionCount = activePartitions.Count;
-            for (int i = 0; i < partitionCount; i++)
+            int count = Math.Min(activePartitions.Count, passivationSearchCapacity);
+            for (int i = 0; i < count; i++)
             {
                 // 同時非アクティブ化許容数を越えるならば、以降の非アクティブ化を全てスキップ。
                 if (0 < passivationCapacity && passivationCapacity <= passivatingPartitions.Count)
