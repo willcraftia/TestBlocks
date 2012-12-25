@@ -465,16 +465,15 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             nearbyChunks = new NearbyChunks();
 
-            lock (activeChunks)
+            foreach (var side in CubicSide.Items)
             {
-                foreach (var side in CubicSide.Items)
-                {
-                    var nearbyPosition = position + side.Direction;
+                var nearbyPosition = position + side.Direction;
 
-                    Chunk nearbyChunk;
-                    if (activeChunks.TryGetItem(ref nearbyPosition, out nearbyChunk))
-                        nearbyChunks[side] = nearbyChunk;
-                }
+                Chunk nearbyChunk;
+                lock (activeChunks)
+                    activeChunks.TryGetItem(ref nearbyPosition, out nearbyChunk);
+
+                nearbyChunks[side] = nearbyChunk;
             }
         }
 
