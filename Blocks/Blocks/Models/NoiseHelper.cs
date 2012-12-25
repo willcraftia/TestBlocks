@@ -35,10 +35,18 @@ namespace Willcraftia.Xna.Blocks.Models
             typeRegistory.SetTypeDefinitionName(typeof(SinFractal));
             typeRegistory.SetTypeDefinitionName(typeof(SumFractal));
 
+            // Other fractal functions.
+            typeRegistory.SetTypeDefinitionName(typeof(Billow));
+
             // Controllers.
             typeRegistory.SetTypeDefinitionName(typeof(Add));
+            typeRegistory.SetTypeDefinitionName(typeof(Cache));
+            typeRegistory.SetTypeDefinitionName(typeof(Gradient));
+            typeRegistory.SetTypeDefinitionName(typeof(Scalar));
             typeRegistory.SetTypeDefinitionName(typeof(ScaleBias));
+            typeRegistory.SetTypeDefinitionName(typeof(ScaleDomain));
             typeRegistory.SetTypeDefinitionName(typeof(Select));
+            typeRegistory.SetTypeDefinitionName(typeof(TranslateDomain));
         }
     }
 }

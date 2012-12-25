@@ -112,6 +112,11 @@
     <Compile Include="Landscape\PartitionSpaceBounds.cs" />
     <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
+    <Compile Include="Noise\Cache.cs" />
+    <Compile Include="Noise\Gradient.cs" />
+    <Compile Include="Noise\Scalar.cs" />
+    <Compile Include="Noise\ScaleDomain.cs" />
+    <Compile Include="Noise\TranslateDomain.cs" />
     <Compile Include="PerspectiveFov.cs" />
     <Compile Include="ProjectionBase.cs" />
     <Compile Include="ViewBase.cs" />
