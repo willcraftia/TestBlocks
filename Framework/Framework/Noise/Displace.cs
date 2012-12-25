@@ -10,18 +10,18 @@ namespace Willcraftia.Xna.Framework.Noise
     {
         public INoiseSource Source { get; set; }
 
-        public INoiseSource SourceX { get; set; }
+        public INoiseSource DisplaceX { get; set; }
 
-        public INoiseSource SourceY { get; set; }
+        public INoiseSource DisplaceY { get; set; }
         
-        public INoiseSource SourceZ { get; set; }
+        public INoiseSource DisplaceZ { get; set; }
 
         // I/F
         public float Sample(float x, float y, float z)
         {
-            var nx = x + SourceX.Sample(x, y, z);
-            var ny = y + SourceY.Sample(x, y, z);
-            var nz = z + SourceZ.Sample(x, y, z);
+            var nx = x + DisplaceX.Sample(x, y, z);
+            var ny = y + DisplaceY.Sample(x, y, z);
+            var nz = z + DisplaceZ.Sample(x, y, z);
 
             return Source.Sample(nx, ny, nz);
         }

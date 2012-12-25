@@ -17,9 +17,9 @@ namespace Willcraftia.Xna.Framework.Noise
 
         INoiseSource controller;
 
-        INoiseSource source0;
+        INoiseSource lowerSource;
 
-        INoiseSource source1;
+        INoiseSource upperSource;
 
         float edgeFalloff = DefaultEdgeFalloff;
 
@@ -27,80 +27,106 @@ namespace Willcraftia.Xna.Framework.Noise
 
         float upperBound = DefaultUpperBound;
 
+        float halfSize = (DefaultUpperBound - DefaultLowerBound) * 0.5f;
+
+        bool edgeFalloffEnabled;
+
         public INoiseSource Controller
         {
             get { return controller; }
             set { controller = value; }
         }
 
-        public INoiseSource Source0
+        public INoiseSource LowerSource
         {
-            get { return source0; }
-            set { source0 = value; }
+            get { return lowerSource; }
+            set { lowerSource = value; }
         }
 
-        public INoiseSource Source1
+        public INoiseSource UpperSource
         {
-            get { return source1; }
-            set { source1 = value; }
+            get { return upperSource; }
+            set { upperSource = value; }
         }
 
         public float EdgeFalloff
         {
             get { return edgeFalloff; }
-            set { edgeFalloff = value; }
+            set
+            {
+                edgeFalloff = value;
+                UpdateEdgeFalloffEnabled();
+            }
         }
 
         public float LowerBound
         {
             get { return lowerBound; }
-            set { lowerBound = value; }
+            set
+            {
+                lowerBound = value;
+                UpdateHalfSize();
+            }
         }
 
         public float UpperBound
         {
             get { return upperBound; }
-            set { upperBound = value; }
+            set
+            {
+                upperBound = value;
+                UpdateHalfSize();
+            }
         }
 
         // I/F
         public float Sample(float x, float y, float z)
         {
             var control = controller.Sample(x, y, z);
-            var halfSize = (upperBound - lowerBound) * 0.5f;
-            var ef = (halfSize < edgeFalloff) ? halfSize : edgeFalloff;
 
-            if (0 < ef)
+            if (edgeFalloffEnabled)
             {
                 if (control < lowerBound - edgeFalloff)
-                    return source0.Sample(x, y, z);
+                    return lowerSource.Sample(x, y, z);
                 
                 if (control < lowerBound + edgeFalloff)
                 {
                     var lowerCurve = lowerBound - edgeFalloff;
                     var upperCurve = lowerBound + edgeFalloff;
                     var amount = SCurve3.Function((control - lowerCurve) / (upperCurve - lowerCurve));
-                    return MathHelper.Lerp(source0.Sample(x, y, z), source1.Sample(x, y, z), amount);
+                    return MathHelper.Lerp(lowerSource.Sample(x, y, z), upperSource.Sample(x, y, z), amount);
                 }
 
                 if (control < upperBound - edgeFalloff)
-                    return source1.Sample(x, y, z);
+                    return upperSource.Sample(x, y, z);
 
                 if (control < upperBound + edgeFalloff)
                 {
                     var lowerCurve = upperBound - edgeFalloff;
                     var upperCurve = upperBound + edgeFalloff;
                     var amount = SCurve3.Function((control - lowerCurve) / (upperCurve - lowerCurve));
-                    return MathHelper.Lerp(source1.Sample(x, y, z), source0.Sample(x, y, z), amount);
+                    return MathHelper.Lerp(upperSource.Sample(x, y, z), lowerSource.Sample(x, y, z), amount);
                 }
 
-                return source0.Sample(x, y, z);
+                return lowerSource.Sample(x, y, z);
             }
 
             if (control < lowerBound || upperBound < control)
-                return source0.Sample(x, y, z);
+                return lowerSource.Sample(x, y, z);
 
-            return source1.Sample(x, y, z);
+            return upperSource.Sample(x, y, z);
+        }
+
+        void UpdateHalfSize()
+        {
+            halfSize = (upperBound - lowerBound) * 0.5f;
+            UpdateEdgeFalloffEnabled();
+        }
+
+        void UpdateEdgeFalloffEnabled()
+        {
+            var ef = (halfSize < edgeFalloff) ? halfSize : edgeFalloff;
+            edgeFalloffEnabled = (0 < ef);
         }
     }
 }
