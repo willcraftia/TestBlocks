@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Blocks.Models
             typeRegistory.SetTypeDefinitionName(typeof(ScaleBias));
             typeRegistory.SetTypeDefinitionName(typeof(ScaleDomain));
             typeRegistory.SetTypeDefinitionName(typeof(Select));
-            typeRegistory.SetTypeDefinitionName(typeof(TranslateDomain));
+            typeRegistory.SetTypeDefinitionName(typeof(Displace));
         }
     }
 }

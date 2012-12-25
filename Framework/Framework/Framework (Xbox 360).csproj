@@ -178,6 +178,7 @@
     <Compile Include="Noise\CrackleVoronoi.cs" />
     <Compile Include="Noise\Difference10Voronoi.cs" />
     <Compile Include="Noise\Difference21Voronoi.cs" />
+    <Compile Include="Noise\Displace.cs" />
     <Compile Include="Noise\Gradient.cs" />
     <Compile Include="Noise\Heterofractal.cs" />
     <Compile Include="Noise\HybridMultifractal.cs" />
@@ -210,7 +211,6 @@
     <Compile Include="Noise\SinFractal.cs" />
     <Compile Include="Noise\SquaredMetric.cs" />
     <Compile Include="Noise\SumFractal.cs" />
-    <Compile Include="Noise\TranslateDomain.cs" />
     <Compile Include="Noise\Turbulence.cs" />
     <Compile Include="Noise\Voronoi.cs" />
     <Compile Include="PerspectiveFov.cs" />

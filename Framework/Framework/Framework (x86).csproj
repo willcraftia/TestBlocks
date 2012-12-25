@@ -116,7 +116,7 @@
     <Compile Include="Noise\Gradient.cs" />
     <Compile Include="Noise\Const.cs" />
     <Compile Include="Noise\ScaleDomain.cs" />
-    <Compile Include="Noise\TranslateDomain.cs" />
+    <Compile Include="Noise\Displace.cs" />
     <Compile Include="PerspectiveFov.cs" />
     <Compile Include="ProjectionBase.cs" />
     <Compile Include="ViewBase.cs" />

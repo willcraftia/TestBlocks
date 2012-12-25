@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public sealed class TranslateDomain : INoiseSource
+    public sealed class Displace : INoiseSource
     {
         public INoiseSource Source { get; set; }
 
