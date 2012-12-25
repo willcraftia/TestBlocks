@@ -96,6 +96,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkCollection activeChunks = new ChunkCollection();
 
+        Queue<Chunk> updatingChunks = new Queue<Chunk>();
+
+        int updateCapacity = 1000;
+
+        int updateOffset = 0;
+
         List<Chunk> workingChunks = new List<Chunk>();
 
         // チャンク数はパーティション数に等しい。
@@ -194,15 +200,32 @@ namespace Willcraftia.Xna.Blocks.Models
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
             {
-                // 複製ループに入る前に十分な容量を保証。
-                workingChunks.Capacity = activeChunks.Count;
+                int index = updateOffset;
+                bool cycled = false;
+                while (updatingChunks.Count < updateCapacity)
+                {
+                    if (activeChunks.Count <= index)
+                    {
+                        index = 0;
+                        cycled = true;
+                    }
 
-                for (int i = 0; i < activeChunks.Count; i++)
-                    workingChunks.Add(activeChunks[i]);
+                    if (cycled && updateOffset <= index) break;
+
+                    var chunk = activeChunks[index++];
+                    updatingChunks.Enqueue(chunk);
+                }
+
+                updateOffset = index;
             }
 
-            foreach (var chunk in workingChunks)
+            Debug.Assert(updatingChunks.Count <= updateCapacity);
+
+            int count = updatingChunks.Count;
+            for (int i = 0; i < count; i++)
             {
+                var chunk = updatingChunks.Dequeue();
+
                 if (!chunk.EnterUpdate()) continue;
 
                 // 現在の隣接チャンクのアクティブ状態が前回のメッシュ更新時のアクティブ状態と異なるならば、
@@ -254,7 +277,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            workingChunks.Clear();
+            Debug.Assert(updatingChunks.Count == 0);
 
             chunkMeshUpdateManager.Update();
         }
@@ -432,14 +455,6 @@ namespace Willcraftia.Xna.Blocks.Models
             if (closing || closed) return;
 
             closing = true;
-        }
-
-        public bool TryGetActiveChunk(ref VectorI3 position, out Chunk chunk)
-        {
-            lock (activeChunks)
-            {
-                return activeChunks.TryGetItem(ref position, out chunk);
-            }
         }
 
         public void GetNearbyActiveChunks(ref VectorI3 position, out NearbyChunks nearbyChunks)
