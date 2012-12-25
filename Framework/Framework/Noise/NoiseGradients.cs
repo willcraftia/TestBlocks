@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public static class Gradients
+    public static class NoiseGradients
     {
         public static float Calculate(int hash, float x, float y, float z)
         {

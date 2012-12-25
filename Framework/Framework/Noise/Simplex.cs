@@ -146,7 +146,7 @@ namespace Willcraftia.Xna.Framework.Noise
             else
             {
                 t0 *= t0;
-                n0 = t0 * t0 * Gradients.Calculate(
+                n0 = t0 * t0 * NoiseGradients.Calculate(
                     permutation[ii + permutation[jj + permutation[kk]]], x0, y0, z0);
             }
 
@@ -155,7 +155,7 @@ namespace Willcraftia.Xna.Framework.Noise
             else
             {
                 t1 *= t1;
-                n1 = t1 * t1 * Gradients.Calculate(
+                n1 = t1 * t1 * NoiseGradients.Calculate(
                     permutation[ii + i1 + permutation[jj + j1 + permutation[kk + k1]]], x1, y1, z1);
             }
 
@@ -164,7 +164,7 @@ namespace Willcraftia.Xna.Framework.Noise
             else
             {
                 t2 *= t2;
-                n2 = t2 * t2 * Gradients.Calculate(
+                n2 = t2 * t2 * NoiseGradients.Calculate(
                     permutation[ii + i2 + permutation[jj + j2 + permutation[kk + k2]]], x2, y2, z2);
             }
 
@@ -173,7 +173,7 @@ namespace Willcraftia.Xna.Framework.Noise
             else
             {
                 t3 *= t3;
-                n3 = t3 * t3 * Gradients.Calculate(
+                n3 = t3 * t3 * NoiseGradients.Calculate(
                     permutation[ii + 1 + permutation[jj + 1 + permutation[kk + 1]]], x3, y3, z3);
             }
 

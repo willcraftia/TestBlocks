@@ -94,14 +94,14 @@ namespace Willcraftia.Xna.Framework.Noise
             var bb = permutation[b + 1] + cz;
 
             // Gradients of the 8 cube corners.
-            var g0 = Gradients.Calculate(permutation[aa], rx, ry, rz);
-            var g1 = Gradients.Calculate(permutation[ba], rx - 1, ry, rz);
-            var g2 = Gradients.Calculate(permutation[ab], rx, ry - 1, rz);
-            var g3 = Gradients.Calculate(permutation[bb], rx - 1, ry - 1, rz);
-            var g4 = Gradients.Calculate(permutation[aa + 1], rx, ry, rz - 1);
-            var g5 = Gradients.Calculate(permutation[ba + 1], rx - 1, ry, rz - 1);
-            var g6 = Gradients.Calculate(permutation[ab + 1], rx, ry - 1, rz - 1);
-            var g7 = Gradients.Calculate(permutation[bb + 1], rx - 1, ry - 1, rz - 1);
+            var g0 = NoiseGradients.Calculate(permutation[aa], rx, ry, rz);
+            var g1 = NoiseGradients.Calculate(permutation[ba], rx - 1, ry, rz);
+            var g2 = NoiseGradients.Calculate(permutation[ab], rx, ry - 1, rz);
+            var g3 = NoiseGradients.Calculate(permutation[bb], rx - 1, ry - 1, rz);
+            var g4 = NoiseGradients.Calculate(permutation[aa + 1], rx, ry, rz - 1);
+            var g5 = NoiseGradients.Calculate(permutation[ba + 1], rx - 1, ry, rz - 1);
+            var g6 = NoiseGradients.Calculate(permutation[ab + 1], rx, ry - 1, rz - 1);
+            var g7 = NoiseGradients.Calculate(permutation[bb + 1], rx - 1, ry - 1, rz - 1);
 
             // Lerp.
             var l0 = MathHelper.Lerp(g0, g1, u);

@@ -176,7 +176,6 @@
     <Compile Include="Noise\CrackleVoronoi.cs" />
     <Compile Include="Noise\Difference10Voronoi.cs" />
     <Compile Include="Noise\Difference21Voronoi.cs" />
-    <Compile Include="Noise\Gradients.cs" />
     <Compile Include="Noise\Heterofractal.cs" />
     <Compile Include="Noise\HybridMultifractal.cs" />
     <Compile Include="Noise\IFadeCurve.cs" />
@@ -192,6 +191,7 @@
     <Compile Include="Noise\NoFadeCurve.cs" />
     <Compile Include="Noise\NoiseArray2.cs" />
     <Compile Include="Noise\NoiseArrayF2Extension.cs" />
+    <Compile Include="Noise\NoiseGradients.cs" />
     <Compile Include="Noise\NoiseMapBuilder.cs" />
     <Compile Include="Noise\Perlin.cs" />
     <Compile Include="Noise\PerlinFractal.cs" />

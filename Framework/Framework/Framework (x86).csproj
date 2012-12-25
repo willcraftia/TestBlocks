@@ -190,7 +190,7 @@
     <Compile Include="Noise\Musgrave.cs" />
     <Compile Include="Noise\NoiseArray2.cs" />
     <Compile Include="Noise\NoiseArrayF2Extension.cs" />
-    <Compile Include="Noise\Gradients.cs" />
+    <Compile Include="Noise\NoiseGradients.cs" />
     <Compile Include="Noise\NoiseMapBuilder.cs" />
     <Compile Include="Noise\Perlin.cs" />
     <Compile Include="Noise\PerlinFractal.cs" />
