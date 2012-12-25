@@ -579,20 +579,155 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             //================================================================
             // NoiseTerrainProcedure (ComponentBundleDefinition)
 
+            // see: http://accidentalnoise.sourceforge.net/minecraftworlds.html
+
             Console.WriteLine("NoiseTerrainProcedure (ComponentBundleDefinition)");
             {
+                // const zero
+                var constZero = new Const { Value = 0 };
+
+                // ground_gradient
+                var groundGradient = new Gradient { X1 = 0, X2 = 0, Y1 = 0, Y2 = 1 };
+
+                // lowland_shape_fractal (no use lowland_autocorrect)
+                var lowlandShapeFractal = new Billow
+                {
+                    OctaveCount = 2,
+                    Frequency = 0.25f,
+                    Source = new ClassicPerlin { Seed = 300 }
+                };
+                // lowland_scale
+                var lowlandScale = new ScaleBias
+                {
+                    Scale = 0.125f,
+                    Bias = -0.45f,
+                    Source = lowlandShapeFractal
+                };
+                // lowland_y_scale
+                var lowlandYScale = new ScalePoint
+                {
+                    ScaleY = 0,
+                    Source = lowlandScale
+                };
+                // lowland_terrain
+                var lowlandTerrain = new Displace
+                {
+                    DisplaceX = constZero,
+                    DisplaceY = lowlandYScale,
+                    DisplaceZ = constZero,
+                    Source = groundGradient
+                };
+
+                // highland_shape_fractal (no use highland_autocorrect)
+                var highlandShapeFractal = new SumFractal
+                {
+                    OctaveCount = 4,
+                    Frequency = 2,
+                    Source = new ClassicPerlin { Seed = 300 }
+                };
+                // highland_scale
+                var highlandScale = new ScaleBias
+                {
+                    Scale = 0.25f,
+                    Bias = 0,
+                    Source = highlandShapeFractal
+                };
+                // highland_y_scale
+                var highlandYScale = new ScalePoint
+                {
+                    ScaleY = 0,
+                    Source = highlandScale
+                };
+                // highland_terrain
+                var highlandTerrain = new Displace
+                {
+                    DisplaceX = constZero,
+                    DisplaceY = highlandYScale,
+                    DisplaceZ = constZero,
+                    Source = groundGradient
+                };
+
+                // mountain_shape_fractal (no use mountain_autocorrect)
+                var mountainShapeFractal = new RidgedMultifractal
+                {
+                    OctaveCount = 8,
+                    Frequency = 1,
+                    Source = new ClassicPerlin { Seed = 300 }
+                };
+                // mountain_scale
+                var mountainScale = new ScaleBias
+                {
+                    Scale = 0.45f,
+                    Bias = 0.15f,
+                    Source = mountainShapeFractal
+                };
+                // mountain_y_scale
+                var mountainYScale = new ScalePoint
+                {
+                    ScaleY = 0.25f,
+                    Source = mountainScale
+                };
+                // mountain_terrain
+                var mountainTerrain = new Displace
+                {
+                    DisplaceX = constZero,
+                    DisplaceY = mountainYScale,
+                    DisplaceZ = constZero,
+                    Source = groundGradient
+                };
+
+                // terrain_type_fractal (no use terrain_autocorrect)
+                var terrainTypeFractal = new SumFractal
+                {
+                    OctaveCount = 3,
+                    Frequency = 0.125f,
+                    Source = new ClassicPerlin { Seed = 300 }
+                };
+                // terrain_type_y_scale
+                var terrainTypeYScale = new ScalePoint
+                {
+                    ScaleY = 0,
+                    Source = terrainTypeFractal
+                };
+                // terrain_type_cache
+                var terrainTypeCache = new Cache { Source = terrainTypeYScale };
+                // highland_mountain_select
+                var highlandMountainSelect = new Select
+                {
+                    LowerBound = 0.55f - 0.2f,
+                    UpperBound = 0.55f + 0.2f,
+                    LowerSource = highlandTerrain,
+                    UpperSource = mountainTerrain,
+                    Controller = terrainTypeCache
+                };
+                // highland_lowland_select
+                var hightlandLowlandSelect = new Select
+                {
+                    LowerBound = 0.25f - 0.15f,
+                    UpperBound = 0.25f + 0.15f,
+                    LowerSource = lowlandTerrain,
+                    UpperSource = highlandMountainSelect,
+                    Controller = terrainTypeCache
+                };
+                // highland_lowland_select_cache
+                var hightlandLowlandSelectCache = new Cache { Source = hightlandLowlandSelect };
+
+                // ground_select
+                var groundSelect = new Select
+                {
+                    LowerBound = 0.5f,
+                    UpperBound = 10,
+                    LowerSource = new Const { Value = 0 },
+                    UpperSource = new Const { Value = 1 },
+                    Controller = hightlandLowlandSelectCache
+                };
+
+                var value = groundSelect.Sample(0.1f, 0.1f, 0.1f);
+
                 var procedure = new NoiseTerrainProcedure
                 {
                     Name = "Default Noise Terrain Procedure",
-                    HeightNoise = new ScaleBias
-                    {
-                        Scale = 128,
-                        Bias = 128,
-                        Source = new SumFractal
-                        {
-                            Source = new ClassicPerlin { Seed = 300 }
-                        }
-                    }
+                    Noise = groundSelect
                 };
 
                 var componentInfoManager = new ComponentInfoManager(ChunkProcedureLoader.ComponentTypeRegistory);
