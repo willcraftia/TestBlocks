@@ -16,6 +16,6 @@
 	<BlockCatalog>DefaultBlockCatalog.json</BlockCatalog>
 	<BiomeManager>DefaultBiomeManager.json</BiomeManager>
 	<ChunkProcedures>
-		<Procedure>DefaultFlatTerrainProcedure.json</Procedure>
+		<Procedure>DefaultNoiseTerrainProcedure.json</Procedure>
 	</ChunkProcedures>
 </Region>

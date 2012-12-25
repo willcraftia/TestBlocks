@@ -574,6 +574,43 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
+            #region FlatTerrainProcedure (ComponentBundleDefinition)
+
+            //================================================================
+            // NoiseTerrainProcedure (ComponentBundleDefinition)
+
+            Console.WriteLine("NoiseTerrainProcedure (ComponentBundleDefinition)");
+            {
+                var procedure = new NoiseTerrainProcedure
+                {
+                    Name = "Default Noise Terrain Procedure",
+                    HeightNoise = new ScaleBias
+                    {
+                        Scale = 128,
+                        Bias = 128,
+                        Source = new SumFractal
+                        {
+                            Source = new ClassicPerlin { Seed = 300 }
+                        }
+                    }
+                };
+
+                var componentInfoManager = new ComponentInfoManager(ChunkProcedureLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+                builder.Add("Target", procedure);
+
+                ComponentBundleDefinition bundle;
+                builder.BuildDefinition(out bundle);
+
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultNoiseTerrainProcedure", bundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultNoiseTerrainProcedure", bundle);
+                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
             #region RegionDefinition
 
             //================================================================
@@ -594,7 +631,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     BiomeManager = "DefaultBiomeManager.json",
                     ChunkProcedures = new string[]
                     {
-                        "DefaultFlatTerrainProcedure.json"
+                        "DefaultNoiseTerrainProcedure.json"
                     }
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);

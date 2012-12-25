@@ -80,9 +80,9 @@ namespace Willcraftia.Xna.Blocks.Models
         // TODO
         //
         // 実行で最適と思われる値を調べて決定する。
-        const ushort defaultVertexCapacity = 10000;
+        const ushort defaultVertexCapacity = 20000;
 
-        const ushort defaultIndexCapacity = 10000;
+        const ushort defaultIndexCapacity = 20000;
 
         Region region;
 

@@ -89,6 +89,7 @@
     <Compile Include="Models\RandomBiomeManager.cs" />
     <Compile Include="Models\RegionMonitor.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
+    <Compile Include="Models\NoiseTerrainProcedure.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />

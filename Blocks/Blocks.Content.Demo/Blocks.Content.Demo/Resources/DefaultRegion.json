@@ -17,6 +17,6 @@
   "BiomeManager": "DefaultBiomeManager.json",
   "ChunkBundle": null,
   "ChunkProcedures": [
-    "DefaultFlatTerrainProcedure.json"
+    "DefaultNoiseTerrainProcedure.json"
   ]
 }

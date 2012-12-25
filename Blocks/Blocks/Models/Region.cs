@@ -46,6 +46,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkEffect ChunkEffect { get; set; }
 
+        public VectorI3 ChunkSize
+        {
+            get { return RegionManager.ChunkSize; }
+        }
+
 #if DEBUG
 
         public RegionMonitor Monitor { get; private set; }

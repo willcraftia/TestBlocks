@@ -31,7 +31,9 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
             // 利用可能な実体の型を全て登録しておく。
+            NoiseHelper.SetTypeDefinitionNames(ComponentTypeRegistory);
             ComponentTypeRegistory.SetTypeDefinitionName(typeof(FlatTerrainProcedure));
+            ComponentTypeRegistory.SetTypeDefinitionName(typeof(NoiseTerrainProcedure));
         }
 
         public ChunkProcedureLoader()

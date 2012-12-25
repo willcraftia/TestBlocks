@@ -137,9 +137,9 @@ namespace Willcraftia.Xna.Blocks.Content
             for (int i = 0; i < chunkProcedureUris.Length; i++)
             {
                 var procedure = Load<IChunkProcedure>(baseResource, chunkProcedureUris[i]);
-                
-                // TODO: コンテキストを設定し、コンテキスト経由で Region を得るように変更。
+
                 procedure.Region = region;
+                procedure.Initialize();
 
                 list.Add(procedure);
             }

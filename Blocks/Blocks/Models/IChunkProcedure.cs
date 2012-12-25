@@ -11,6 +11,8 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         Region Region { get; set; }
 
+        void Initialize();
+
         void Generate(Chunk chunk);
     }
 }

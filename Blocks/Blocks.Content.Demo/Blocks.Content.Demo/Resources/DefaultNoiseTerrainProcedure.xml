@@ -1,0 +1,33 @@
+﻿<Bundle>
+	<Components>
+		<Component Name="Target" Type="NoiseTerrainProcedure">
+			<Properties>
+				<Property Name="Name" Value="Default Noise Terrain Procedure" />
+				<Property Name="HeightNoise" Value="Target_HeightNoise" />
+			</Properties>
+		</Component>
+		<Component Name="Target_HeightNoise" Type="ScaleBias">
+			<Properties>
+				<Property Name="Source" Value="Target_HeightNoise_Source" />
+				<Property Name="Bias" Value="128" />
+				<Property Name="Scale" Value="128" />
+			</Properties>
+		</Component>
+		<Component Name="Target_HeightNoise_Source" Type="SumFractal">
+			<Properties>
+				<Property Name="Source" Value="Target_HeightNoise_Source_Source" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="6" />
+			</Properties>
+		</Component>
+		<Component Name="Target_HeightNoise_Source_Source" Type="ClassicPerlin">
+			<Properties>
+				<Property Name="Seed" Value="300" />
+				<Property Name="FadeCurve" Value="Target_HeightNoise_Source_Source_FadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="Target_HeightNoise_Source_Source_FadeCurve" Type="SCurve3" />
+	</Components>
+</Bundle>
