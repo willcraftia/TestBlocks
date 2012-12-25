@@ -42,11 +42,11 @@ namespace Willcraftia.Xna.Blocks.Models
             typeRegistory.SetTypeDefinitionName(typeof(Add));
             typeRegistory.SetTypeDefinitionName(typeof(Cache));
             typeRegistory.SetTypeDefinitionName(typeof(Const));
+            typeRegistory.SetTypeDefinitionName(typeof(Displace));
             typeRegistory.SetTypeDefinitionName(typeof(Gradient));
             typeRegistory.SetTypeDefinitionName(typeof(ScaleBias));
-            typeRegistory.SetTypeDefinitionName(typeof(ScaleDomain));
+            typeRegistory.SetTypeDefinitionName(typeof(ScalePoint));
             typeRegistory.SetTypeDefinitionName(typeof(Select));
-            typeRegistory.SetTypeDefinitionName(typeof(Displace));
         }
     }
 }

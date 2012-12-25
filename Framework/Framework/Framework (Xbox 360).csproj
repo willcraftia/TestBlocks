@@ -202,7 +202,7 @@
     <Compile Include="Noise\RealMetric.cs" />
     <Compile Include="Noise\RidgedMultifractal.cs" />
     <Compile Include="Noise\ScaleBias.cs" />
-    <Compile Include="Noise\ScaleDomain.cs" />
+    <Compile Include="Noise\ScalePoint.cs" />
     <Compile Include="Noise\SCurve3.cs" />
     <Compile Include="Noise\SCurve5.cs" />
     <Compile Include="Noise\Select.cs" />
