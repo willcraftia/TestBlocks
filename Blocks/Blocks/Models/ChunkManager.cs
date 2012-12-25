@@ -68,6 +68,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
 #endif
 
+        public const int DefaultUpdateCapacity = 1000;
+
         static readonly Logger logger = new Logger(typeof(ChunkManager).Name);
 
         static readonly BlendState colorWriteDisable = new BlendState
@@ -98,8 +100,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Queue<Chunk> updatingChunks = new Queue<Chunk>();
 
-        int updateCapacity = 1000;
+        // 更新の最大試行数。
+        int updateCapacity = DefaultUpdateCapacity;
 
+        // 更新の開始インデックス。
         int updateOffset = 0;
 
         List<Chunk> workingChunks = new List<Chunk>();

@@ -19,6 +19,8 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     public abstract class PartitionManager : IDisposable
     {
+        public const int InitialActivePartitionCapacity = 5000;
+
         public const int DefaultTaskQueueSlotCount = 20;
 
         public const int DefaultActivationCapacity = 100;
@@ -26,6 +28,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         public const int DefaultPassivationCapacity = 100;
 
         public const int DefaultPassivationSearchCapacity = 200;
+
+        public const int DefaultActivationSearchCapacity = 1000;
 
         Vector3 partitionSize;
 
@@ -39,17 +43,26 @@ namespace Willcraftia.Xna.Framework.Landscape
         // TODO
         // 初期容量。
 
-        PartitionQueue activePartitions = new PartitionQueue(5000);
+        PartitionQueue activePartitions = new PartitionQueue(InitialActivePartitionCapacity);
 
         PartitionQueue activatingPartitions = new PartitionQueue(DefaultActivationCapacity);
 
         PartitionQueue passivatingPartitions = new PartitionQueue(DefaultPassivationCapacity);
 
+        // 同時アクティブ化許容量。
         int activationCapacity = DefaultActivationCapacity;
 
+        // 同時非アクティブ化許容量。
         int passivationCapacity = DefaultPassivationCapacity;
 
+        // 非アクティブ化可能パーティション検索の最大試行数。
         int passivationSearchCapacity = DefaultPassivationSearchCapacity;
+
+        // アクティブ化可能パーティション検索の最大試行数。
+        int activationSearchCapacity = DefaultActivationSearchCapacity;
+
+        // アクティブ化可能パーティション検索の開始インデックス。
+        int activationSearchOffset = 0;
 
         TaskQueue activationTaskQueue = new TaskQueue
         {
@@ -61,8 +74,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             SlotCount = DefaultTaskQueueSlotCount
         };
 
+        // 最大アクティブ化領域。
         PartitionSpaceBounds maxActiveBounds;
 
+        // 最小アクティブ化領域に含まれる座標の配列。
         VectorI3[] minActivePointOffsets;
 
         VectorI3 eyePosition;
@@ -344,9 +359,20 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void ActivatePartitions()
         {
-            for (int i = 0; i < minActivePointOffsets.Length; i++)
+            int index = activationSearchOffset;
+            bool cycled = false;
+            int count = 0;
+            while (count < activationSearchCapacity)
             {
-                var position = eyePosition + minActivePointOffsets[i];
+                if (minActivePointOffsets.Length <= index)
+                {
+                    index = 0;
+                    cycled = true;
+                }
+
+                if (cycled && activationSearchOffset <= index) break;
+
+                var position = eyePosition + minActivePointOffsets[index++];
 
                 // 同時アクティブ化許容数を越えるならば、以降のアクティブ化を全てスキップ。
                 if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
@@ -376,7 +402,11 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // 非同期処理を要求。
                 activationTaskQueue.Enqueue(partition.ActivateAction);
+
+                count++;
             }
+
+            activationSearchOffset = index;
         }
 
         protected virtual void DisposeOverride(bool disposing) { }
