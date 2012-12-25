@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public sealed class Scalar : INoiseSource
+    public sealed class Const : INoiseSource
     {
         public float Value { get; set; }
 

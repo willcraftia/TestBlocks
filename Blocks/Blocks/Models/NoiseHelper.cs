@@ -41,8 +41,8 @@ namespace Willcraftia.Xna.Blocks.Models
             // Controllers.
             typeRegistory.SetTypeDefinitionName(typeof(Add));
             typeRegistory.SetTypeDefinitionName(typeof(Cache));
+            typeRegistory.SetTypeDefinitionName(typeof(Const));
             typeRegistory.SetTypeDefinitionName(typeof(Gradient));
-            typeRegistory.SetTypeDefinitionName(typeof(Scalar));
             typeRegistory.SetTypeDefinitionName(typeof(ScaleBias));
             typeRegistory.SetTypeDefinitionName(typeof(ScaleDomain));
             typeRegistory.SetTypeDefinitionName(typeof(Select));
