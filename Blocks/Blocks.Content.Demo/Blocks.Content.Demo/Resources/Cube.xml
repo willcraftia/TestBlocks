@@ -167,7 +167,7 @@
 				</Normal>
 				<TextureCoordinate>
 					<X>0</X>
-					<Y>0</Y>
+					<Y>1</Y>
 				</TextureCoordinate>
 			</Vertex>
 			<Vertex>
@@ -182,7 +182,7 @@
 					<Z>1</Z>
 				</Normal>
 				<TextureCoordinate>
-					<X>0</X>
+					<X>1</X>
 					<Y>1</Y>
 				</TextureCoordinate>
 			</Vertex>
@@ -199,7 +199,7 @@
 				</Normal>
 				<TextureCoordinate>
 					<X>1</X>
-					<Y>1</Y>
+					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
 			<Vertex>
@@ -214,7 +214,7 @@
 					<Z>1</Z>
 				</Normal>
 				<TextureCoordinate>
-					<X>1</X>
+					<X>0</X>
 					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
@@ -242,7 +242,7 @@
 					<Z>-1</Z>
 				</Normal>
 				<TextureCoordinate>
-					<X>0</X>
+					<X>1</X>
 					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
@@ -259,7 +259,7 @@
 				</Normal>
 				<TextureCoordinate>
 					<X>0</X>
-					<Y>1</Y>
+					<Y>0</Y>
 				</TextureCoordinate>
 			</Vertex>
 			<Vertex>
@@ -274,7 +274,7 @@
 					<Z>-1</Z>
 				</Normal>
 				<TextureCoordinate>
-					<X>1</X>
+					<X>0</X>
 					<Y>1</Y>
 				</TextureCoordinate>
 			</Vertex>
@@ -291,7 +291,7 @@
 				</Normal>
 				<TextureCoordinate>
 					<X>1</X>
-					<Y>0</Y>
+					<Y>1</Y>
 				</TextureCoordinate>
 			</Vertex>
 		</Vertices>

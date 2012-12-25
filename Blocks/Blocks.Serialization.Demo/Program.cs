@@ -723,6 +723,18 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             CreateMeshPartDefinition(ref normals[4], out mesh.Left);
             CreateMeshPartDefinition(ref normals[5], out mesh.Right);
 
+            // Front と Back のみ UV 座標を調整。
+
+            mesh.Front.Vertices[0].TextureCoordinate = new Vector2(0, 1);
+            mesh.Front.Vertices[1].TextureCoordinate = new Vector2(1, 1);
+            mesh.Front.Vertices[2].TextureCoordinate = new Vector2(1, 0);
+            mesh.Front.Vertices[3].TextureCoordinate = new Vector2(0, 0);
+
+            mesh.Back.Vertices[0].TextureCoordinate = new Vector2(1, 0);
+            mesh.Back.Vertices[1].TextureCoordinate = new Vector2(0, 0);
+            mesh.Back.Vertices[2].TextureCoordinate = new Vector2(0, 1);
+            mesh.Back.Vertices[3].TextureCoordinate = new Vector2(1, 1);
+
             return mesh;
         }
 

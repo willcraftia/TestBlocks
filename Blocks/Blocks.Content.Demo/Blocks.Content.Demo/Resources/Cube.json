@@ -69,22 +69,22 @@
       {
         "Position": "0.5, -0.5, 0.5",
         "Normal": "0, 0, 1",
-        "TextureCoordinate": "0, 0"
+        "TextureCoordinate": "0, 1"
       },
       {
         "Position": "-0.5, -0.5, 0.5",
         "Normal": "0, 0, 1",
-        "TextureCoordinate": "0, 1"
+        "TextureCoordinate": "1, 1"
       },
       {
         "Position": "-0.5, 0.5, 0.5",
         "Normal": "0, 0, 1",
-        "TextureCoordinate": "1, 1"
+        "TextureCoordinate": "1, 0"
       },
       {
         "Position": "0.5, 0.5, 0.5",
         "Normal": "0, 0, 1",
-        "TextureCoordinate": "1, 0"
+        "TextureCoordinate": "0, 0"
       }
     ],
     "Indices": [
@@ -101,22 +101,22 @@
       {
         "Position": "0.5, 0.5, -0.5",
         "Normal": "0, 0, -1",
-        "TextureCoordinate": "0, 0"
+        "TextureCoordinate": "1, 0"
       },
       {
         "Position": "-0.5, 0.5, -0.5",
         "Normal": "0, 0, -1",
-        "TextureCoordinate": "0, 1"
+        "TextureCoordinate": "0, 0"
       },
       {
         "Position": "-0.5, -0.5, -0.5",
         "Normal": "0, 0, -1",
-        "TextureCoordinate": "1, 1"
+        "TextureCoordinate": "0, 1"
       },
       {
         "Position": "0.5, -0.5, -0.5",
         "Normal": "0, 0, -1",
-        "TextureCoordinate": "1, 0"
+        "TextureCoordinate": "1, 1"
       }
     ],
     "Indices": [
