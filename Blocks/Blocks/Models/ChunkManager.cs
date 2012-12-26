@@ -326,6 +326,10 @@ namespace Willcraftia.Xna.Blocks.Models
                     translucentChunks.Add(chunk);
             }
 
+            // 現在の視点位置で比較オブジェクトを初期化。
+            chunkDistanceComparer.EyePosition = eyePosition;
+
+            // 視点に近い順にチャンクをソート。
             opaqueChunks.Sort(chunkDistanceComparer);
             translucentChunks.Sort(chunkDistanceComparer);
 
