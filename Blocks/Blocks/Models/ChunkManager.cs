@@ -98,10 +98,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 inverseChunkSize;
 
-        // TODO
-        // 初期容量の調整。
-        //
-
         ChunkCollection activeChunks = new ChunkCollection(InitialActiveChunkCapacity);
 
         Queue<Chunk> updatingChunks = new Queue<Chunk>(UpdateCapacity);
