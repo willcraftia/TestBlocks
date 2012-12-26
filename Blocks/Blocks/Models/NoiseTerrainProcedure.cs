@@ -38,7 +38,9 @@ namespace Willcraftia.Xna.Blocks.Models
             inverseChunkSize.Z = 1 / (float) chunkSize.Z;
         }
 
-        const int scale = 256;
+        const int scale = 64;
+
+        const int heightOffset = 256;
 
         const float inverseScale = 1 / (float) scale;
 
@@ -76,7 +78,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
 
                     var terrain = biome.TerrainNoise.Sample(noiseX, 0, noiseZ);
-                    int height = (int) (terrain * scale) + scale;
+                    int height = (int) (terrain * scale) + heightOffset;
 
                     for (int y = chunkSize.Y - 1; 0 <= y; y--)
                     {
