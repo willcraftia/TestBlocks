@@ -88,7 +88,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(INoiseSource), new NoiseLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
-            region.Initialize(graphicsDevice, assetManager, new StorageChunkStore(resource));
+            region.Initialize(graphicsDevice, assetManager);
 
             lock (regions)
             {

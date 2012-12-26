@@ -71,7 +71,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 TileCatalog = Load<TileCatalog>(resource, definition.TileCatalog),
                 BlockCatalog = Load<BlockCatalog>(resource, definition.BlockCatalog),
                 BiomeManager = Load<IBiomeManager>(resource, definition.BiomeManager),
-                ChunkBundleResource = Load(resource, definition.ChunkBundle)
+                ChunkBundleResource = Load(resource, definition.ChunkBundle),
+                ChunkStore = CreateChunkStore(definition.ChunkStore, resource)
             };
             region.ChunkProcesures = ToChunkProcedures(resource, definition.ChunkProcedures, region);
 
@@ -94,10 +95,30 @@ namespace Willcraftia.Xna.Blocks.Content
                 BlockCatalog = ToUri(resource, region.BlockCatalog),
                 BiomeManager = ToUri(resource, region.BiomeManager),
                 ChunkBundle = ToUri(resource, region.ChunkBundleResource),
-                ChunkProcedures = ToUri(resource, region.ChunkProcesures)
+                ChunkProcedures = ToUri(resource, region.ChunkProcesures),
+                ChunkStore = ToChunkStoreType(region.ChunkStore)
             };
 
             serializer.Serialize(resource, definition);
+        }
+
+        IChunkStore CreateChunkStore(ChunkStoreTypes chunkStoreType, IResource resource)
+        {
+            switch (chunkStoreType)
+            {
+                case ChunkStoreTypes.Storage:
+                    return new StorageChunkStore(resource);
+                default:
+                    return NullChunkStore.Instance;
+            }
+        }
+
+        ChunkStoreTypes ToChunkStoreType(IChunkStore chunkStore)
+        {
+            if (chunkStore is StorageChunkStore)
+                return ChunkStoreTypes.Storage;
+
+            return ChunkStoreTypes.None;
         }
 
         IResource Load(IResource baseResource, string uri)

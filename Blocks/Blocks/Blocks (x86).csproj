@@ -75,6 +75,7 @@
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
+    <Compile Include="Serialization\ChunkStoreTypes.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
     <Compile Include="Models\GlobalSceneSettings.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Models\InterChunkMeshPart.cs" />
     <Compile Include="Models\NearbyChunks.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
+    <Compile Include="Models\NullChunkStore.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
     <Compile Include="Models\RegionMonitor.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />

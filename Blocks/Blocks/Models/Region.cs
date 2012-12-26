@@ -46,6 +46,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkEffect ChunkEffect { get; set; }
 
+        public IChunkStore ChunkStore { get; set; }
+
         public VectorI3 ChunkSize
         {
             get { return RegionManager.ChunkSize; }
@@ -57,16 +59,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
 #endif
 
-        public void Initialize(GraphicsDevice graphicsDevice, AssetManager assetManager, IChunkStore chunkStore)
+        public void Initialize(GraphicsDevice graphicsDevice, AssetManager assetManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (assetManager == null) throw new ArgumentNullException("assetManager");
-            if (chunkStore == null) throw new ArgumentNullException("chunkStore");
 
             GraphicsDevice = graphicsDevice;
             AssetManager = assetManager;
 
-            chunkManager = new ChunkManager(this, chunkStore, RegionManager.ChunkSize);
+            chunkManager = new ChunkManager(this, ChunkStore, RegionManager.ChunkSize);
 
             DebugInitialize();
         }

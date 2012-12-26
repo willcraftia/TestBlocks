@@ -833,7 +833,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ChunkProcedures = new string[]
                     {
                         "DefaultTerrainProcedure.json"
-                    }
+                    },
+                    ChunkStore = ChunkStoreTypes.None
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlResource = SerializeToXml<RegionDefinition>("DefaultRegion", region);

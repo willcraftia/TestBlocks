@@ -18,5 +18,6 @@
   "ChunkBundle": null,
   "ChunkProcedures": [
     "DefaultTerrainProcedure.json"
-  ]
+  ],
+  "ChunkStore": 1
 }
