@@ -114,6 +114,9 @@
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
+    <Compile Include="Landscape\ActivePartitionQueue.cs" />
+    <Compile Include="Landscape\PartitionBundle.cs" />
+    <Compile Include="Landscape\PartitionBundleManager.cs" />
     <Compile Include="Landscape\PartitionSpaceBounds.cs" />
     <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />

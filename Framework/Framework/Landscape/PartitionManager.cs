@@ -43,7 +43,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         // TODO
         // 初期容量。
 
-        PartitionQueue activePartitions = new PartitionQueue(InitialActivePartitionCapacity);
+        ActivePartitionQueue activePartitions = new ActivePartitionQueue(16, InitialActivePartitionCapacity);
 
         PartitionQueue activatingPartitions = new PartitionQueue(DefaultActivationCapacity);
 
@@ -299,7 +299,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var nearbyPosition = position + side.Direction;
 
                 Partition neighbor;
-                if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                if (activePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
                 {
                     var reverseSide = side.Reverse();
                     neighbor.OnNeighborPassivated(partition, reverseSide);
@@ -316,7 +316,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var nearbyPosition = position + side.Direction;
 
                 Partition neighbor;
-                if (activePartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                if (activePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
                 {
                     // partition へアクティブな隣接パーティションを通知。
                     partition.OnNeighborActivated(neighbor, side);
@@ -384,7 +384,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     continue;
 
                 // 既にアクティブであるかどうか。
-                if (activePartitions.Contains(position)) continue;
+                if (activePartitions.Contains(ref position)) continue;
 
                 // アクティブ化可能であるかどうか。
                 if (!CanActivatePartition(ref position)) continue;
@@ -478,6 +478,15 @@ namespace Willcraftia.Xna.Framework.Landscape
             while (0 < partitions.Count)
             {
                 var partition = partitions.Borrow();
+                partition.Dispose();
+            }
+        }
+
+        void DisposePartitions(ActivePartitionQueue partitions)
+        {
+            while (0 < partitions.Count)
+            {
+                var partition = partitions.Dequeue();
                 partition.Dispose();
             }
         }
