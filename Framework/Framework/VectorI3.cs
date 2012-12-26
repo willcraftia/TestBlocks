@@ -16,7 +16,7 @@ namespace Willcraftia.Xna.Framework
 
         public static VectorI3 One
         {
-            get { return new VectorI3(1, 1, 1); }
+            get { return new VectorI3(1); }
         }
 
         public static VectorI3 Top
@@ -54,6 +54,13 @@ namespace Willcraftia.Xna.Framework
         public int Y;
 
         public int Z;
+
+        public VectorI3(int value)
+        {
+            X = value;
+            Y = value;
+            Z = value;
+        }
 
         public VectorI3(int x, int y, int z)
         {
