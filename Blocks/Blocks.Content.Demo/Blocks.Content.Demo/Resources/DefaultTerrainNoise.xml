@@ -36,9 +36,9 @@
 				<Property Name="OctaveCount" Value="6" />
 			</Properties>
 		</Component>
-		<Component Name="Target_Controller_Source_Source_Source" Type="ClassicPerlin">
+		<Component Name="Target_Controller_Source_Source_Source" Type="Perlin">
 			<Properties>
-				<Property Name="Name" Value="Terrain Type Noise" />
+				<Property Name="Name" Value="Terrain Type Perlin" />
 				<Property Name="Seed" Value="400" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>
@@ -71,9 +71,9 @@
 				<Property Name="OctaveCount" Value="2" />
 			</Properties>
 		</Component>
-		<Component Name="Target_LowerSource_Source_Source_Source" Type="ClassicPerlin">
+		<Component Name="Target_LowerSource_Source_Source_Source" Type="Perlin">
 			<Properties>
-				<Property Name="Name" Value="Lowland Noise" />
+				<Property Name="Name" Value="Lowland Perlin" />
 				<Property Name="Seed" Value="100" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>
@@ -108,9 +108,9 @@
 				<Property Name="OctaveCount" Value="4" />
 			</Properties>
 		</Component>
-		<Component Name="Target_UpperSource_LowerSource_Source_Source" Type="ClassicPerlin">
+		<Component Name="Target_UpperSource_LowerSource_Source_Source" Type="Perlin">
 			<Properties>
-				<Property Name="Name" Value="Highland Noise" />
+				<Property Name="Name" Value="Highland Perlin" />
 				<Property Name="Seed" Value="200" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>
@@ -144,9 +144,9 @@
 				<Property Name="OctaveCount" Value="6" />
 			</Properties>
 		</Component>
-		<Component Name="Target_UpperSource_UpperSource_Source_Source_Source" Type="ClassicPerlin">
+		<Component Name="Target_UpperSource_UpperSource_Source_Source_Source" Type="Perlin">
 			<Properties>
-				<Property Name="Name" Value="Mountain Noise" />
+				<Property Name="Name" Value="Mountain Perlin" />
 				<Property Name="Seed" Value="300" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>

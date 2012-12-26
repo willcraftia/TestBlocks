@@ -44,7 +44,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         const float inverseScale = 1 / (float) scale;
 
-        const int xzScale = 32;
+        const int xzScale = 64;
 
         const float inverseXzScale = 1 / (float) xzScale;
 

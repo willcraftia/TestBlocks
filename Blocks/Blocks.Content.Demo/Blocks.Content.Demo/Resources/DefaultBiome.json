@@ -56,7 +56,7 @@
       "Properties": [
         {
           "Name": "Name",
-          "Value": null
+          "Value": "Temperature ScaleBias"
         },
         {
           "Name": "Source",
@@ -78,7 +78,7 @@
       "Properties": [
         {
           "Name": "Name",
-          "Value": null
+          "Value": "Temperature Fractal"
         },
         {
           "Name": "Source",
@@ -104,11 +104,11 @@
     },
     {
       "Name": "Target_TemperatureNoise_Source_Source",
-      "Type": "ClassicPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": null
+          "Value": "Temperature Perlin"
         },
         {
           "Name": "Seed",
@@ -131,7 +131,7 @@
       "Properties": [
         {
           "Name": "Name",
-          "Value": null
+          "Value": "Humidity ScaleBias"
         },
         {
           "Name": "Source",
@@ -153,7 +153,7 @@
       "Properties": [
         {
           "Name": "Name",
-          "Value": null
+          "Value": "Humidity Fractal"
         },
         {
           "Name": "Source",
@@ -179,11 +179,11 @@
     },
     {
       "Name": "Target_HumidityNoise_Source_Source",
-      "Type": "ClassicPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": null
+          "Value": "Humidity Perlin"
         },
         {
           "Name": "Seed",

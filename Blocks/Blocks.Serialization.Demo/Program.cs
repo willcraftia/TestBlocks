@@ -513,9 +513,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         {
                             Name = "Lowland Fractal",
                             OctaveCount = 2,
-                            Source = new ClassicPerlin
+                            Source = new Perlin
                             {
-                                Name = "Lowland Noise",
+                                Name = "Lowland Perlin",
                                 Seed = 100
                             }
                         }
@@ -531,9 +531,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         Name = "Highland Fractal",
                         OctaveCount = 4,
                         Frequency = 2,
-                        Source = new ClassicPerlin
+                        Source = new Perlin
                         {
-                            Name = "Highland Noise",
+                            Name = "Highland Perlin",
                             Seed = 200
                         }
                     }
@@ -551,9 +551,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         Source = new RidgedMultifractal
                         {
                             Name = "Mountain Fractal",
-                            Source = new ClassicPerlin
+                            Source = new Perlin
                             {
-                                Name = "Mountain Noise",
+                                Name = "Mountain Perlin",
                                 Seed = 300
                             }
                         }
@@ -572,9 +572,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Name = "Terrain Type Fractal",
                             Frequency = 0.5f,
                             Lacunarity = 0.25f,
-                            Source = new ClassicPerlin
+                            Source = new Perlin
                             {
-                                Name = "Terrain Type Noise",
+                                Name = "Terrain Type Perlin",
                                 Seed = 400
                             }
                         }
@@ -648,20 +648,32 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Biome",
                     HumidityNoise = new ScaleBias
                     {
+                        Name = "Humidity ScaleBias",
                         Scale = 0.5f,
                         Bias = 0.5f,
                         Source = new SumFractal
                         {
-                            Source = new ClassicPerlin { Seed = 100 }
+                            Name = "Humidity Fractal",
+                            Source = new Perlin
+                            {
+                                Name = "Humidity Perlin",
+                                Seed = 100
+                            }
                         }
                     },
                     TemperatureNoise = new ScaleBias
                     {
+                        Name = "Temperature ScaleBias",
                         Scale = 0.5f,
                         Bias = 0.5f,
                         Source = new SumFractal
                         {
-                            Source = new ClassicPerlin { Seed = 200 }
+                            Name = "Temperature Fractal",
+                            Source = new Perlin
+                            {
+                                Name = "Temperature Perlin",
+                                Seed = 200
+                            }
                         }
                     },
                     DensityNoise = new MockNoise(),

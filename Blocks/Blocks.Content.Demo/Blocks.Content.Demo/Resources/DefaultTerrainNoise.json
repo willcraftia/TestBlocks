@@ -106,11 +106,11 @@
     },
     {
       "Name": "Target_Controller_Source_Source_Source",
-      "Type": "ClassicPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Terrain Type Noise"
+          "Value": "Terrain Type Perlin"
         },
         {
           "Name": "Seed",
@@ -207,11 +207,11 @@
     },
     {
       "Name": "Target_LowerSource_Source_Source_Source",
-      "Type": "ClassicPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Lowland Noise"
+          "Value": "Lowland Perlin"
         },
         {
           "Name": "Seed",
@@ -315,11 +315,11 @@
     },
     {
       "Name": "Target_UpperSource_LowerSource_Source_Source",
-      "Type": "ClassicPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Highland Noise"
+          "Value": "Highland Perlin"
         },
         {
           "Name": "Seed",
@@ -419,11 +419,11 @@
     },
     {
       "Name": "Target_UpperSource_UpperSource_Source_Source_Source",
-      "Type": "ClassicPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Mountain Noise"
+          "Value": "Mountain Perlin"
         },
         {
           "Name": "Seed",
