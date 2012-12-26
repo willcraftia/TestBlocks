@@ -10,6 +10,11 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkCollection : KeyedList<VectorI3, Chunk>
     {
+        public ChunkCollection(int capacity)
+            : base(capacity)
+        {
+        }
+
         public bool TryGetItem(ref VectorI3 key, out Chunk item)
         {
             return Dictionary.TryGetValue(key, out item);

@@ -68,7 +68,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
 #endif
 
-        public const int DefaultUpdateCapacity = 1000;
+        // TODO
+        //
+        // 実行で最適と思われる値を調べて決定するが、
+        // 最終的には定義ファイルのようなもので定義を変更できるようにする。
+        //
+
+        public const ushort VertexCapacity = 8000;
+
+        public const ushort IndexCapacity = 11000;
+
+        // 更新の最大試行数。
+        public const int UpdateCapacity = 1000;
+
+        public const int InitialActiveChunkCapacity = 3000;
 
         static readonly Logger logger = new Logger(typeof(ChunkManager).Name);
 
@@ -76,13 +89,6 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             ColorWriteChannels = ColorWriteChannels.None
         };
-
-        // TODO
-        //
-        // 実行で最適と思われる値を調べて決定する。
-        const ushort defaultVertexCapacity = 20000;
-
-        const ushort defaultIndexCapacity = 20000;
 
         Region region;
 
@@ -96,17 +102,14 @@ namespace Willcraftia.Xna.Blocks.Models
         // 初期容量の調整。
         //
 
-        ChunkCollection activeChunks = new ChunkCollection();
+        ChunkCollection activeChunks = new ChunkCollection(InitialActiveChunkCapacity);
 
-        Queue<Chunk> updatingChunks = new Queue<Chunk>();
-
-        // 更新の最大試行数。
-        int updateCapacity = DefaultUpdateCapacity;
+        Queue<Chunk> updatingChunks = new Queue<Chunk>(UpdateCapacity);
 
         // 更新の開始インデックス。
         int updateOffset = 0;
 
-        List<Chunk> workingChunks = new List<Chunk>();
+        List<Chunk> workingChunks = new List<Chunk>(InitialActiveChunkCapacity);
 
         // チャンク数はパーティション数に等しい。
         // このため、ここでは最大チャンク数を決定できない。
@@ -206,7 +209,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 int index = updateOffset;
                 bool cycled = false;
-                while (updatingChunks.Count < updateCapacity)
+                while (updatingChunks.Count < UpdateCapacity)
                 {
                     if (activeChunks.Count <= index)
                     {
@@ -223,7 +226,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 updateOffset = index;
             }
 
-            Debug.Assert(updatingChunks.Count <= updateCapacity);
+            Debug.Assert(updatingChunks.Count <= UpdateCapacity);
 
             int count = updatingChunks.Count;
             for (int i = 0; i < count; i++)
@@ -488,12 +491,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         VertexBuffer CreateVertexBuffer()
         {
-            return new VertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalTexture), defaultVertexCapacity, BufferUsage.WriteOnly);
+            return new VertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalTexture), VertexCapacity, BufferUsage.WriteOnly);
         }
 
         IndexBuffer CreateIndexBuffer()
         {
-            return new IndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, defaultIndexCapacity, BufferUsage.WriteOnly);
+            return new IndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, IndexCapacity, BufferUsage.WriteOnly);
         }
 
         void ReturnChunk(Chunk chunk)
