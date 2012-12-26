@@ -7,6 +7,7 @@ using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework.Noise;
 using Willcraftia.Xna.Framework.Serialization;
 using Willcraftia.Xna.Blocks.Content;
 using Willcraftia.Xna.Blocks.Serialization;
@@ -80,10 +81,11 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(resourceManager, graphicsDevice));
             assetManager.RegisterLoader(typeof(Block), new BlockLoader(resourceManager));
             assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(IBiome), new BiomeLoader());
+            assetManager.RegisterLoader(typeof(IBiome), new BiomeLoader(resourceManager));
             assetManager.RegisterLoader(typeof(IBiomeManager), new BiomeManagerLoader(resourceManager));
             assetManager.RegisterLoader(typeof(BiomeCatalog), new BiomeCatalogLoader(resourceManager));
             assetManager.RegisterLoader(typeof(IChunkProcedure), new ChunkProcedureLoader());
+            assetManager.RegisterLoader(typeof(INoiseSource), new NoiseLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
             region.Initialize(graphicsDevice, assetManager, new StorageChunkStore(resource));

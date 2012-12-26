@@ -28,12 +28,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public INoiseSource Noise { get; set; }
-
-        public NoiseTerrainProcedure()
-        {
-        }
-
         // I/F
         public void Initialize()
         {
@@ -47,45 +41,86 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void Generate(Chunk chunk)
         {
+            var position = chunk.Position;
             var biome = Region.BiomeManager.GetBiome(chunk);
 
             for (int x = 0; x < chunkSize.X; x++)
             {
+                var absoluteX = chunk.CalculateBlockPositionX(x);
+                var noiseX = absoluteX * inverseChunkSize.X;
+
                 for (int z = 0; z < chunkSize.Z; z++)
                 {
-                    var biomeElement = GetBiomeElement(chunk, biome, x, z);
+                    var absoluteZ = chunk.CalculateBlockPositionZ(z);
+                    var noiseZ = absoluteZ * inverseChunkSize.Z;
+                    var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
 
-                    for (int y = 0; y < chunkSize.Y; y++)
-                        Generate(chunk, x, y, z, biomeElement);
+                    int firstY = -1;
+                    for (int y = chunkSize.Y - 1; 0 <= y; y--)
+                    {
+                        var absoluteY = chunk.CalculateBlockPositionY(y);
+                        var noiseY = absoluteY * inverseChunkSize.Y;
+
+                        var terrain = biome.TerrainNoise.Sample(noiseX, noiseY, noiseZ);
+
+                        byte blockIndex = Block.EmptyIndex;
+                        if (terrain != 0)
+                        {
+                            if (firstY == -1) firstY = y;
+
+                            // TODO ひとまずの回避でしかない。
+                            if (firstY == y && y != chunkSize.Y - 1)
+                            {
+                                blockIndex = GetBlockIndexAtHorizon(biomeElement);
+                            }
+                            else
+                            {
+                                blockIndex = GetBlockIndexBelowHorizon(biomeElement);
+                            }
+                        }
+
+                        chunk[x, y, z] = blockIndex;
+                    }
                 }
             }
         }
 
-        void Generate(Chunk chunk, int x, int y, int z, BiomeElement biomeElement)
+        byte GetBlockIndexAtHorizon(BiomeElement biomeElement)
         {
-            var position = chunk.Position;
+            switch (biomeElement)
+            {
+                case BiomeElement.Desert:
+                    return Region.BlockCatalog.SandIndex;
+                case BiomeElement.Forest:
+                    return Region.BlockCatalog.DirtIndex;
+                case BiomeElement.Mountains:
+                    return Region.BlockCatalog.StoneIndex;
+                case BiomeElement.Plains:
+                    return Region.BlockCatalog.GrassIndex;
+                case BiomeElement.Snow:
+                    return Region.BlockCatalog.SnowIndex;
+            }
 
-            var absoluteX = chunk.CalculateBlockPositionX(x);
-            var absoluteY = chunk.CalculateBlockPositionY(y);
-            var absoluteZ = chunk.CalculateBlockPositionZ(z);
-            
-            var noiseX = absoluteX * inverseChunkSize.X;
-            var noiseY = absoluteY * inverseChunkSize.Y;
-            var noiseZ = absoluteZ * inverseChunkSize.Z;
-
-            var value = Noise.Sample(noiseX, noiseY, noiseZ);
-
-            byte index = Block.EmptyIndex;
-            if (value != 0) index = Region.BlockCatalog.Grass.Index;
-
-            chunk[x, y, z] = index;
+            throw new InvalidOperationException();
         }
 
-        BiomeElement GetBiomeElement(Chunk chunk, IBiome biome, int x, int z)
+        byte GetBlockIndexBelowHorizon(BiomeElement biomeElement)
         {
-            var absoluteX = chunk.CalculateBlockPositionX(x);
-            var absoluteZ = chunk.CalculateBlockPositionZ(z);
-            return biome.GetBiomeElement(absoluteX, absoluteZ);
+            switch (biomeElement)
+            {
+                case BiomeElement.Desert:
+                    return Region.BlockCatalog.SandIndex;
+                case BiomeElement.Forest:
+                    return Region.BlockCatalog.DirtIndex;
+                case BiomeElement.Mountains:
+                    return Region.BlockCatalog.StoneIndex;
+                case BiomeElement.Plains:
+                    return Region.BlockCatalog.DirtIndex;
+                case BiomeElement.Snow:
+                    return Region.BlockCatalog.SnowIndex;
+            }
+
+            throw new InvalidOperationException();
         }
 
         #region ToString

@@ -4,6 +4,7 @@ using System;
 using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework.Noise;
 using Willcraftia.Xna.Blocks.Component;
 using Willcraftia.Xna.Blocks.Models;
 using Willcraftia.Xna.Blocks.Serialization;
@@ -12,7 +13,7 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Content
 {
-    public sealed class BiomeManagerLoader : IAssetLoader, IAssetManagerAware
+    public sealed class NoiseLoader : IAssetLoader, IAssetManagerAware
     {
         public const string ComponentName = "Target";
 
@@ -40,20 +41,19 @@ namespace Willcraftia.Xna.Blocks.Content
             }
         }
 
-        static BiomeManagerLoader()
+        static NoiseLoader()
         {
             ComponentTypeRegistory = new ComponentTypeRegistory();
-            // 利用可能な実体の型を全て登録しておく。
-            ComponentTypeRegistory.SetTypeDefinitionName(typeof(SingleBiomeManager));
+            NoiseHelper.SetTypeDefinitionNames(ComponentTypeRegistory);
         }
 
-        public BiomeManagerLoader(ResourceManager resourceManager)
+        public NoiseLoader(ResourceManager resourceManager)
         {
             assetPropertyHandler.ResourceManager = resourceManager;
 
             componentFactory = new ComponentFactory(componentInfoManager);
             componentFactory.PropertyHandlers.Add(assetPropertyHandler);
-            
+
             componentBundleBuilder = new ComponentBundleBuilder(componentInfoManager);
         }
 
@@ -64,23 +64,23 @@ namespace Willcraftia.Xna.Blocks.Content
             assetPropertyHandler.BaseResource = resource;
             componentFactory.Build(ref definition);
 
-            var biomeManager = componentFactory[ComponentName] as IBiomeManager;
-
+            var noiseSource = componentFactory[ComponentName] as INoiseSource;
+            
             componentFactory.Clear();
             assetPropertyHandler.BaseResource = null;
 
-            return biomeManager;
+            return noiseSource;
         }
 
         public void Save(IResource resource, object asset)
         {
-            var biomeManager = asset as IBiomeManager;
+            var noiseSource = asset as INoiseSource;
 
             // TODO
             //
             // アセット参照のプロパティをどうするのか？
 
-            componentBundleBuilder.Add(ComponentName, biomeManager);
+            componentBundleBuilder.Add(ComponentName, noiseSource);
 
             ComponentBundleDefinition definition;
             componentBundleBuilder.BuildDefinition(out definition);

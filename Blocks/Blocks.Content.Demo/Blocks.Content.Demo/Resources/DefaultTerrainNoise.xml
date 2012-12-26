@@ -1,0 +1,182 @@
+﻿<Bundle>
+	<Components>
+		<Component Name="Target" Type="Select">
+			<Properties>
+				<Property Name="Controller" Value="Target_Controller" />
+				<Property Name="LowerSource" Value="Target_LowerSource" />
+				<Property Name="UpperSource" Value="Target_UpperSource" />
+				<Property Name="EdgeFalloff" Value="0" />
+				<Property Name="LowerBound" Value="0.25" />
+				<Property Name="UpperBound" Value="1000" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller" Type="Displace">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_Source" />
+				<Property Name="DisplaceX" Value="Target_Controller_DisplaceX" />
+				<Property Name="DisplaceY" Value="Target_Controller_DisplaceY" />
+				<Property Name="DisplaceZ" Value="Target_Controller_DisplaceZ" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_Source" Type="GradientDensity">
+			<Properties>
+				<Property Name="MinY" Value="0" />
+				<Property Name="MaxY" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceX" Type="Const">
+			<Properties>
+				<Property Name="Value" Value="0" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY" Type="Select">
+			<Properties>
+				<Property Name="Controller" Value="Target_Controller_DisplaceY_Controller" />
+				<Property Name="LowerSource" Value="Target_Controller_DisplaceY_LowerSource" />
+				<Property Name="UpperSource" Value="Target_Controller_DisplaceY_UpperSource" />
+				<Property Name="EdgeFalloff" Value="0.125" />
+				<Property Name="LowerBound" Value="0" />
+				<Property Name="UpperBound" Value="1000" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_Controller" Type="Cache">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_Controller_Source" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_Controller_Source" Type="ScalePoint">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_Controller_Source_Source" />
+				<Property Name="ScaleX" Value="1" />
+				<Property Name="ScaleY" Value="0" />
+				<Property Name="ScaleZ" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_Controller_Source_Source" Type="SumFractal">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_Controller_Source_Source_Source" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="0.5" />
+				<Property Name="Lacunarity" Value="0.25" />
+				<Property Name="OctaveCount" Value="6" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_Controller_Source_Source_Source" Type="ClassicPerlin">
+			<Properties>
+				<Property Name="Seed" Value="400" />
+				<Property Name="FadeCurve" Value="Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve" Type="SCurve3" />
+		<Component Name="Target_Controller_DisplaceY_LowerSource" Type="ScalePoint">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_LowerSource_Source" />
+				<Property Name="ScaleX" Value="1" />
+				<Property Name="ScaleY" Value="0" />
+				<Property Name="ScaleZ" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_LowerSource_Source" Type="ScaleBias">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_LowerSource_Source_Source" />
+				<Property Name="Bias" Value="-0.75" />
+				<Property Name="Scale" Value="0.125" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_LowerSource_Source_Source" Type="Billow">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_LowerSource_Source_Source_Source" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="Persistence" Value="0.5" />
+				<Property Name="OctaveCount" Value="2" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_LowerSource_Source_Source_Source" Type="ClassicPerlin">
+			<Properties>
+				<Property Name="Seed" Value="100" />
+				<Property Name="FadeCurve" Value="Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource" Type="Select">
+			<Properties>
+				<Property Name="Controller" Value="Target_Controller_DisplaceY_Controller" />
+				<Property Name="LowerSource" Value="Target_Controller_DisplaceY_UpperSource_LowerSource" />
+				<Property Name="UpperSource" Value="Target_Controller_DisplaceY_UpperSource_UpperSource" />
+				<Property Name="EdgeFalloff" Value="0.125" />
+				<Property Name="LowerBound" Value="0" />
+				<Property Name="UpperBound" Value="1000" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource_LowerSource" Type="ScalePoint">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_UpperSource_LowerSource_Source" />
+				<Property Name="ScaleX" Value="1" />
+				<Property Name="ScaleY" Value="0" />
+				<Property Name="ScaleZ" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource_LowerSource_Source" Type="SumFractal">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_UpperSource_LowerSource_Source_Source" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="2" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="4" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource_LowerSource_Source_Source" Type="ClassicPerlin">
+			<Properties>
+				<Property Name="Seed" Value="200" />
+				<Property Name="FadeCurve" Value="Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource_UpperSource" Type="ScalePoint">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_UpperSource_UpperSource_Source" />
+				<Property Name="ScaleX" Value="1" />
+				<Property Name="ScaleY" Value="0" />
+				<Property Name="ScaleZ" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource_UpperSource_Source" Type="ScaleBias">
+			<Properties>
+				<Property Name="Source" Value="Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source" />
+				<Property Name="Bias" Value="0.25" />
+				<Property Name="Scale" Value="0.5" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source" Type="RidgedMultifractal">
+			<Properties>
+				<Property Name="Offset" Value="1" />
+				<Property Name="Gain" Value="2" />
+				<Property Name="Source" Value="Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source_Source" />
+				<Property Name="Hurst" Value="1" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="6" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source_Source" Type="ClassicPerlin">
+			<Properties>
+				<Property Name="Seed" Value="300" />
+				<Property Name="FadeCurve" Value="Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="Target_Controller_DisplaceZ" Type="Const">
+			<Properties>
+				<Property Name="Value" Value="0" />
+			</Properties>
+		</Component>
+		<Component Name="Target_LowerSource" Type="Const">
+			<Properties>
+				<Property Name="Value" Value="0" />
+			</Properties>
+		</Component>
+		<Component Name="Target_UpperSource" Type="Const">
+			<Properties>
+				<Property Name="Value" Value="1" />
+			</Properties>
+		</Component>
+	</Components>
+</Bundle>

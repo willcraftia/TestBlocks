@@ -71,6 +71,7 @@
     <None Include="Resources\DefaultRegion.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\DefaultTerrainNoise.json" />
     <None Include="Resources\DefaultTile.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -89,6 +90,7 @@
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
     <Content Include="Resources\DefaultNoiseTerrainProcedure.xml" />
+    <Content Include="Resources\DefaultTerrainNoise.xml" />
     <None Include="Resources\DirtBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

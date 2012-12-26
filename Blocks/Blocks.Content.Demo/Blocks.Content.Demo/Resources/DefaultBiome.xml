@@ -2,6 +2,7 @@
 	<Components>
 		<Component Name="Target" Type="DefaultBiome">
 			<Properties>
+				<Property Name="TerrainNoise" Value="title:Resources/DefaultTerrainNoise.json" />
 				<Property Name="Name" Value="Default Biome" />
 				<Property Name="TemperatureNoise" Value="Target_TemperatureNoise" />
 				<Property Name="HumidityNoise" Value="Target_HumidityNoise" />
@@ -31,7 +32,7 @@
 		</Component>
 		<Component Name="Target_TemperatureNoise_Source_Source" Type="ClassicPerlin">
 			<Properties>
-				<Property Name="Seed" Value="301" />
+				<Property Name="Seed" Value="200" />
 				<Property Name="FadeCurve" Value="Target_TemperatureNoise_Source_Source_FadeCurve" />
 			</Properties>
 		</Component>
@@ -54,7 +55,7 @@
 		</Component>
 		<Component Name="Target_HumidityNoise_Source_Source" Type="ClassicPerlin">
 			<Properties>
-				<Property Name="Seed" Value="300" />
+				<Property Name="Seed" Value="100" />
 				<Property Name="FadeCurve" Value="Target_TemperatureNoise_Source_Source_FadeCurve" />
 			</Properties>
 		</Component>

@@ -5,6 +5,10 @@
       "Type": "DefaultBiome",
       "Properties": [
         {
+          "Name": "TerrainNoise",
+          "Value": "title:Resources/DefaultTerrainNoise.json"
+        },
+        {
           "Name": "Name",
           "Value": "Default Biome"
         },
@@ -92,7 +96,7 @@
       "Properties": [
         {
           "Name": "Seed",
-          "Value": "301"
+          "Value": "200"
         },
         {
           "Name": "FadeCurve",
@@ -155,7 +159,7 @@
       "Properties": [
         {
           "Name": "Seed",
-          "Value": "300"
+          "Value": "100"
         },
         {
           "Name": "FadeCurve",

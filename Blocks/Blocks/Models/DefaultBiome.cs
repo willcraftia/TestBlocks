@@ -70,12 +70,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         const float inverseSizeX = 1 / (float) BiomeBounds.SizeX;
 
+        const float inverseSizeY = 1 / (float) BiomeBounds.SizeY;
+
         const float inverseSizeZ = 1 / (float) BiomeBounds.SizeZ;
 
         //====================================================================
         //
         // Persistent Properties
         //
+
+        // I/F
+        public INoiseSource TerrainNoise { get; set; }
 
         public string Name { get; set; }
 
@@ -150,6 +155,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (TemperatureNoise == null) throw new InvalidOperationException("TemperatureNoise is null.");
             if (HumidityNoise == null) throw new InvalidOperationException("HumidityNoise is null.");
+            if (TerrainNoise == null) throw new InvalidOperationException("TerrainNoise is null.");
         }
 
         // I/F

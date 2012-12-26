@@ -26,13 +26,31 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
         {
             public byte Index { get; set; }
 
+            public INoiseSource TerrainNoise
+            {
+                get { throw new NotSupportedException(); }
+                set { throw new NotSupportedException(); }
+            }
+
             public IResource Resource { get; set; }
 
-            public float GetTemperature(int x, int z) { throw new NotImplementedException(); }
+            public float GetTemperature(int x, int z) { throw new NotSupportedException(); }
 
-            public float GetHumidity(int x, int z) { throw new NotImplementedException(); }
+            public float GetHumidity(int x, int z) { throw new NotSupportedException(); }
 
-            public BiomeElement GetBiomeElement(int x, int z) { throw new NotImplementedException(); }
+            public BiomeElement GetBiomeElement(int x, int z) { throw new NotSupportedException(); }
+        }
+
+        #endregion
+
+        #region MockNoise
+
+        class MockNoise : INoiseSource
+        {
+            public float Sample(float x, float y, float z)
+            {
+                throw new NotSupportedException();
+            }
         }
 
         #endregion
@@ -442,6 +460,138 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
+
+            #region TerrainNoise (INoiseSource) (ComponentBundleDefinition)
+
+            //================================================================
+            // TerrainNoise (INoiseSource) (ComponentBundleDefinition)
+
+            Console.WriteLine("TerrainNoise (INoiseSource) (ComponentBundleDefinition)");
+            {
+                // lowlandShape
+                var lowlandShape = new ScalePoint
+                {
+                    ScaleY = 0,
+                    Source = new ScaleBias
+                    {
+                        Scale = 0.125f,
+                        Bias = -0.75f,
+                        Source = new Billow
+                        {
+                            OctaveCount = 2,
+                            Source = new ClassicPerlin { Seed = 100 }
+                        }
+                    }
+                };
+                // highlandShape
+                var highlandShape = new ScalePoint
+                {
+                    ScaleY = 0,
+                    Source = new SumFractal
+                    {
+                        OctaveCount = 4,
+                        Frequency = 2,
+                        Source = new ClassicPerlin { Seed = 200 }
+                    }
+                };
+                // mountainShape
+                var mountainShape = new ScalePoint
+                {
+                    ScaleY = 0,
+                    Source = new ScaleBias
+                    {
+                        Scale = 0.5f,
+                        Bias = 0.25f,
+                        Source = new RidgedMultifractal
+                        {
+                            Source = new ClassicPerlin { Seed = 300 }
+                        }
+                    }
+                };
+                // terrainType
+                var terrainType = new Cache
+                {
+                    Source = new ScalePoint
+                    {
+                        ScaleY = 0,
+                        Source = new SumFractal
+                        {
+                            Frequency = 0.5f,
+                            Lacunarity = 0.25f,
+                            Source = new ClassicPerlin { Seed = 400 }
+                        }
+                    }
+                };
+                // highlandMountainSelect
+                var highlandMountainSelect = new Select
+                {
+                    LowerSource = highlandShape,
+                    LowerBound = 0,
+                    UpperSource = mountainShape,
+                    UpperBound = 1000,
+                    Controller = terrainType,
+                    EdgeFalloff = 0.125f
+                };
+                // terrainSelect
+                var terrainSelect = new Select
+                {
+                    LowerSource = lowlandShape,
+                    LowerBound = 0,
+                    UpperSource = highlandMountainSelect,
+                    UpperBound = 1000,
+                    Controller = terrainType,
+                    EdgeFalloff = 0.125f
+                };
+                // density
+                var density = new GradientDensity();
+                // terrain
+                var terrain = new Select
+                {
+                    LowerSource = new Const { Value = 0 },
+                    LowerBound = 0.25f,
+                    UpperSource = new Const { Value = 1 },
+                    UpperBound = 1000,
+                    Controller = new Displace
+                    {
+                        DisplaceX = new Const { Value = 0 },
+                        DisplaceY = terrainSelect,
+                        DisplaceZ = new Const { Value = 0 },
+                        Source = density
+                    }
+                };
+
+                //int zeroCount = 0;
+                //int oneCount = 0;
+                //int otherCount = 0;
+                //for (int z = 0; z < 100; z++)
+                //    for (int y = 0; y < 100; y++)
+                //        for (int x = 0; x < 100; x++)
+                //        {
+                //            var fx = x / 100f;
+                //            var fy = y / 100f;
+                //            var fz = z / 100f;
+                //            var value = terrain.Sample(fx, fy, fz);
+                //            if (value == 0) zeroCount++;
+                //            else if (value == 1) oneCount++;
+                //            else otherCount++;
+                //        }
+
+                var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+                builder.Add("Target", terrain);
+
+                ComponentBundleDefinition biomeBundle;
+                builder.BuildDefinition(out biomeBundle);
+
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultTerrainNoise", biomeBundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultTerrainNoise", biomeBundle);
+                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
             #region DefaultBiome (ComponentBundleDefinition)
 
             //================================================================
@@ -458,7 +608,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         Bias = 0.5f,
                         Source = new SumFractal
                         {
-                            Source = new ClassicPerlin { Seed = 300 }
+                            Source = new ClassicPerlin { Seed = 100 }
                         }
                     },
                     TemperatureNoise = new ScaleBias
@@ -467,14 +617,16 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         Bias = 0.5f,
                         Source = new SumFractal
                         {
-                            Source = new ClassicPerlin { Seed = 301 }
+                            Source = new ClassicPerlin { Seed = 200 }
                         }
-                    }
+                    },
+                    TerrainNoise = new MockNoise()
                 };
 
                 var componentInfoManager = new ComponentInfoManager(BiomeLoader.ComponentTypeRegistory);
                 var builder = new ComponentBundleBuilder(componentInfoManager);
                 builder.Add("Target", biome);
+                builder.AddExternalReference(biome.TerrainNoise, "title:Resources/DefaultTerrainNoise.json");
 
                 ComponentBundleDefinition biomeBundle;
                 builder.BuildDefinition(out biomeBundle);
@@ -574,160 +726,16 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region FlatTerrainProcedure (ComponentBundleDefinition)
+            #region NoiseTerrainProcedure (ComponentBundleDefinition)
 
             //================================================================
             // NoiseTerrainProcedure (ComponentBundleDefinition)
 
-            // see: http://accidentalnoise.sourceforge.net/minecraftworlds.html
-
             Console.WriteLine("NoiseTerrainProcedure (ComponentBundleDefinition)");
             {
-                // const zero
-                var constZero = new Const { Value = 0 };
-
-                // ground_gradient
-                var groundGradient = new Gradient { X1 = 0, X2 = 0, Y1 = 0, Y2 = 1 };
-
-                // lowland_shape_fractal (no use lowland_autocorrect)
-                var lowlandShapeFractal = new Billow
-                {
-                    OctaveCount = 2,
-                    Frequency = 0.25f,
-                    Source = new ClassicPerlin { Seed = 300 }
-                };
-                // lowland_scale
-                var lowlandScale = new ScaleBias
-                {
-                    Scale = 0.125f,
-                    Bias = -0.45f,
-                    Source = lowlandShapeFractal
-                };
-                // lowland_y_scale
-                var lowlandYScale = new ScalePoint
-                {
-                    ScaleY = 0,
-                    Source = lowlandScale
-                };
-                // lowland_terrain
-                var lowlandTerrain = new Displace
-                {
-                    DisplaceX = constZero,
-                    DisplaceY = lowlandYScale,
-                    DisplaceZ = constZero,
-                    Source = groundGradient
-                };
-
-                // highland_shape_fractal (no use highland_autocorrect)
-                var highlandShapeFractal = new SumFractal
-                {
-                    OctaveCount = 4,
-                    Frequency = 2,
-                    Source = new ClassicPerlin { Seed = 300 }
-                };
-                // highland_scale
-                var highlandScale = new ScaleBias
-                {
-                    Scale = 0.25f,
-                    Bias = 0,
-                    Source = highlandShapeFractal
-                };
-                // highland_y_scale
-                var highlandYScale = new ScalePoint
-                {
-                    ScaleY = 0,
-                    Source = highlandScale
-                };
-                // highland_terrain
-                var highlandTerrain = new Displace
-                {
-                    DisplaceX = constZero,
-                    DisplaceY = highlandYScale,
-                    DisplaceZ = constZero,
-                    Source = groundGradient
-                };
-
-                // mountain_shape_fractal (no use mountain_autocorrect)
-                var mountainShapeFractal = new RidgedMultifractal
-                {
-                    OctaveCount = 8,
-                    Frequency = 1,
-                    Source = new ClassicPerlin { Seed = 300 }
-                };
-                // mountain_scale
-                var mountainScale = new ScaleBias
-                {
-                    Scale = 0.45f,
-                    Bias = 0.15f,
-                    Source = mountainShapeFractal
-                };
-                // mountain_y_scale
-                var mountainYScale = new ScalePoint
-                {
-                    ScaleY = 0.25f,
-                    Source = mountainScale
-                };
-                // mountain_terrain
-                var mountainTerrain = new Displace
-                {
-                    DisplaceX = constZero,
-                    DisplaceY = mountainYScale,
-                    DisplaceZ = constZero,
-                    Source = groundGradient
-                };
-
-                // terrain_type_fractal (no use terrain_autocorrect)
-                var terrainTypeFractal = new SumFractal
-                {
-                    OctaveCount = 3,
-                    Frequency = 0.125f,
-                    Source = new ClassicPerlin { Seed = 300 }
-                };
-                // terrain_type_y_scale
-                var terrainTypeYScale = new ScalePoint
-                {
-                    ScaleY = 0,
-                    Source = terrainTypeFractal
-                };
-                // terrain_type_cache
-                var terrainTypeCache = new Cache { Source = terrainTypeYScale };
-                // highland_mountain_select
-                var highlandMountainSelect = new Select
-                {
-                    LowerBound = 0.55f - 0.2f,
-                    UpperBound = 0.55f + 0.2f,
-                    LowerSource = highlandTerrain,
-                    UpperSource = mountainTerrain,
-                    Controller = terrainTypeCache
-                };
-                // highland_lowland_select
-                var hightlandLowlandSelect = new Select
-                {
-                    LowerBound = 0.25f - 0.15f,
-                    UpperBound = 0.25f + 0.15f,
-                    LowerSource = lowlandTerrain,
-                    UpperSource = highlandMountainSelect,
-                    Controller = terrainTypeCache
-                };
-                // highland_lowland_select_cache
-                var hightlandLowlandSelectCache = new Cache { Source = hightlandLowlandSelect };
-
-                // ground_select
-                var groundSelect = new Select
-                {
-                    LowerBound = 0.5f,
-                    UpperBound = 10,
-                    LowerSource = new Const { Value = 0 },
-                    UpperSource = new Const { Value = 1 },
-                    Controller = hightlandLowlandSelectCache
-                };
-
-                var value = groundSelect.Sample(0.1f, 0.1f, 0.1f);
-
                 var procedure = new NoiseTerrainProcedure
                 {
                     Name = "Default Noise Terrain Procedure",
-                    Noise = groundSelect
                 };
 
                 var componentInfoManager = new ComponentInfoManager(ChunkProcedureLoader.ComponentTypeRegistory);

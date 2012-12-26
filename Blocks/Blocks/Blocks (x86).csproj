@@ -68,6 +68,7 @@
     <Compile Include="Content\ChunkProcedureLoader.cs" />
     <Compile Include="Content\Image2DLoader.cs" />
     <Compile Include="Content\MeshLoader.cs" />
+    <Compile Include="Content\NoiseLoader.cs" />
     <Compile Include="Content\RegionLoader.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
     <Compile Include="Models\BiomeElement.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Models\RegionMonitor.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\NoiseTerrainProcedure.cs" />
+    <Compile Include="Models\GradientDensity.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
