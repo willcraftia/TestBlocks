@@ -120,7 +120,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void UpdateOcclusion()
+        public void UpdateOcclusion(ChunkEffect effect, ref Matrix world)
         {
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
                 return;
@@ -135,6 +135,9 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             occlusionQuery.Begin();
+
+            effect.World = world;
+            effect.Apply();
 
             graphicsDevice.SetVertexBuffer(vertexBuffer);
             graphicsDevice.Indices = indexBuffer;

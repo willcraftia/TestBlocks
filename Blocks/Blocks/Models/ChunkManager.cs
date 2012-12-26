@@ -346,11 +346,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 Matrix world;
                 chunk.CreateWorldMatrix(out world);
 
-                region.ChunkEffect.World = world;
-
-                region.ChunkEffect.Apply();
-
-                chunk.Mesh.Opaque.UpdateOcclusion();
+                chunk.Mesh.Opaque.UpdateOcclusion(region.ChunkEffect, ref world);
             }
 
             //================================================================
