@@ -44,6 +44,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         const float inverseScale = 1 / (float) scale;
 
+        const int xzScale = 32;
+
+        const float inverseXzScale = 1 / (float) xzScale;
+
         // I/F
         public void Generate(Chunk chunk)
         {
@@ -69,12 +73,14 @@ namespace Willcraftia.Xna.Blocks.Models
             for (int x = 0; x < chunkSize.X; x++)
             {
                 var absoluteX = chunk.CalculateBlockPositionX(x);
-                var noiseX = absoluteX * inverseChunkSize.X;
+                //var noiseX = absoluteX * inverseChunkSize.X;
+                var noiseX = absoluteX * inverseXzScale;
 
                 for (int z = 0; z < chunkSize.Z; z++)
                 {
                     var absoluteZ = chunk.CalculateBlockPositionZ(z);
-                    var noiseZ = absoluteZ * inverseChunkSize.Z;
+                    //var noiseZ = absoluteZ * inverseChunkSize.Z;
+                    var noiseZ = absoluteZ * inverseXzScale;
                     var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
 
                     var terrain = biome.TerrainNoise.Sample(noiseX, 0, noiseZ);
@@ -83,7 +89,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     for (int y = chunkSize.Y - 1; 0 <= y; y--)
                     {
                         var absoluteY = chunk.CalculateBlockPositionY(y);
-                        var noiseY = absoluteY * inverseScale;
+                        //var noiseY = absoluteY * inverseScale;
 
                         byte blockIndex = Block.EmptyIndex;
 
