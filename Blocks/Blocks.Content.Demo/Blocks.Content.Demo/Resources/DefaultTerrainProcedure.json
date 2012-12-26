@@ -2,7 +2,7 @@
   "Components": [
     {
       "Name": "Target",
-      "Type": "NoiseTerrainProcedure",
+      "Type": "DefaultTerrainProcedure",
       "Properties": [
         {
           "Name": "Name",

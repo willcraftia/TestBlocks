@@ -12,7 +12,7 @@ using Willcraftia.Xna.Framework.Noise;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class NoiseTerrainProcedure : IChunkProcedure
+    public sealed class DefaultTerrainProcedure : IChunkProcedure
     {
         VectorI3 chunkSize;
 

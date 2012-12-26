@@ -784,14 +784,14 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region NoiseTerrainProcedure (ComponentBundleDefinition)
+            #region DefaultTerrainProcedure (ComponentBundleDefinition)
 
             //================================================================
-            // NoiseTerrainProcedure (ComponentBundleDefinition)
+            // DefaultTerrainProcedure (ComponentBundleDefinition)
 
-            Console.WriteLine("NoiseTerrainProcedure (ComponentBundleDefinition)");
+            Console.WriteLine("DefaultTerrainProcedure (ComponentBundleDefinition)");
             {
-                var procedure = new NoiseTerrainProcedure
+                var procedure = new DefaultTerrainProcedure
                 {
                     Name = "Default Noise Terrain Procedure",
                 };
@@ -803,8 +803,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 ComponentBundleDefinition bundle;
                 builder.BuildDefinition(out bundle);
 
-                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultNoiseTerrainProcedure", bundle);
-                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultNoiseTerrainProcedure", bundle);
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultTerrainProcedure", bundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultTerrainProcedure", bundle);
                 var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
             }
@@ -824,15 +824,15 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Region",
                     Bounds = new BoundingBoxI
                     {
-                        Min = VectorI3.Zero,
-                        Max = new VectorI3(16, 16, 16)
+                        Min = new VectorI3(-32, 0, -32),
+                        Max = new VectorI3(32, 16, 32)
                     },
                     TileCatalog = "DefaultTileCatalog.json",
                     BlockCatalog = "DefaultBlockCatalog.json",
                     BiomeManager = "DefaultBiomeManager.json",
                     ChunkProcedures = new string[]
                     {
-                        "DefaultNoiseTerrainProcedure.json"
+                        "DefaultTerrainProcedure.json"
                     }
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);

@@ -1,6 +1,6 @@
 ﻿<Bundle>
 	<Components>
-		<Component Name="Target" Type="NoiseTerrainProcedure">
+		<Component Name="Target" Type="DefaultTerrainProcedure">
 			<Properties>
 				<Property Name="Name" Value="Default Noise Terrain Procedure" />
 			</Properties>

@@ -2,20 +2,20 @@
 	<Name>Default Region</Name>
 	<Bounds>
 		<Min>
-			<X>0</X>
+			<X>-32</X>
 			<Y>0</Y>
-			<Z>0</Z>
+			<Z>-32</Z>
 		</Min>
 		<Max>
-			<X>16</X>
+			<X>32</X>
 			<Y>16</Y>
-			<Z>16</Z>
+			<Z>32</Z>
 		</Max>
 	</Bounds>
 	<TileCatalog>DefaultTileCatalog.json</TileCatalog>
 	<BlockCatalog>DefaultBlockCatalog.json</BlockCatalog>
 	<BiomeManager>DefaultBiomeManager.json</BiomeManager>
 	<ChunkProcedures>
-		<Procedure>DefaultNoiseTerrainProcedure.json</Procedure>
+		<Procedure>DefaultTerrainProcedure.json</Procedure>
 	</ChunkProcedures>
 </Region>

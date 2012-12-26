@@ -123,6 +123,7 @@
     <Compile Include="Models\ChunkMeshPart.cs" />
     <Compile Include="Models\ChunkMeshUpdateManager.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
+    <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\DefinedBiomeManager.cs" />
     <Compile Include="Models\FlatTerrainProcedure.cs" />
     <Compile Include="Models\GradientDensity.cs" />
@@ -137,7 +138,6 @@
     <Compile Include="Models\MeshPart.cs" />
     <Compile Include="Models\NearbyChunks.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
-    <Compile Include="Models\NoiseTerrainProcedure.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\RegionManager.cs" />

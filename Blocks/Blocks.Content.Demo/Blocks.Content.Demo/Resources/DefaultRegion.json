@@ -2,14 +2,14 @@
   "Name": "Default Region",
   "Bounds": {
     "Min": {
-      "X": 0,
+      "X": -32,
       "Y": 0,
-      "Z": 0
+      "Z": -32
     },
     "Max": {
-      "X": 16,
+      "X": 32,
       "Y": 16,
-      "Z": 16
+      "Z": 32
     }
   },
   "TileCatalog": "DefaultTileCatalog.json",
@@ -17,6 +17,6 @@
   "BiomeManager": "DefaultBiomeManager.json",
   "ChunkBundle": null,
   "ChunkProcedures": [
-    "DefaultNoiseTerrainProcedure.json"
+    "DefaultTerrainProcedure.json"
   ]
 }
