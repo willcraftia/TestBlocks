@@ -34,6 +34,7 @@ namespace Willcraftia.Xna.Framework.Component
 
             PropertyHandlers = new List<IPropertyHandler>();
             PropertyHandlers.Add(DefaultPropertyHandler.Instance);
+            PropertyHandlers.Add(XnaTypePropertyHandler.Instance);
             PropertyHandlers.Add(new ComponentPropertyHandler(this));
         }
 

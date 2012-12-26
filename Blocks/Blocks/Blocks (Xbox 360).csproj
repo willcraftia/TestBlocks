@@ -126,6 +126,7 @@
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\DefinedBiomeManager.cs" />
     <Compile Include="Models\FlatTerrainProcedure.cs" />
+    <Compile Include="Models\GlobalSceneSettings.cs" />
     <Compile Include="Models\GradientDensity.cs" />
     <Compile Include="Models\IBiome.cs" />
     <Compile Include="Models\IBiomeManager.cs" />

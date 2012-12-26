@@ -17,11 +17,18 @@ namespace Willcraftia.Xna.Framework.Component
 
         Dictionary<object, string> externalReferenceMap;
 
+        public List<IPropertyStringfier> PropertyStringfiers { get; private set; }
+
         public ComponentBundleBuilder(ComponentInfoManager componentInfoManager)
         {
             if (componentInfoManager == null) throw new ArgumentNullException("componentInfoManager");
 
             this.componentInfoManager = componentInfoManager;
+
+            PropertyStringfiers = new List<IPropertyStringfier>();
+            PropertyStringfiers.Add(DefaultPropertyStringfier.Instance);
+            PropertyStringfiers.Add(XnaTypePropertyStringfier.Instance);
+            PropertyStringfiers.Add(new ComponentPropertyStringfier(this));
         }
 
         public void Add(string name, object component)
@@ -47,6 +54,21 @@ namespace Willcraftia.Xna.Framework.Component
         public bool Contains(string name)
         {
             return nameComponentMap.ContainsKey(name);
+        }
+
+        public bool Contains(object component)
+        {
+            return nameComponentMap.ContainsValue(component);
+        }
+
+        public bool ContainsExternalReference(string uri)
+        {
+            return externalReferenceMap != null && externalReferenceMap.ContainsValue(uri);
+        }
+
+        public bool ContainsExternalReference(object component)
+        {
+            return externalReferenceMap != null && externalReferenceMap.ContainsKey(component);
         }
 
         public void Remove(string name)
@@ -75,6 +97,12 @@ namespace Willcraftia.Xna.Framework.Component
             }
 
             throw new ArgumentException("Component not found.");
+        }
+
+        public string GetExternalReferenceName(object component)
+        {
+            if (externalReferenceMap == null) throw new KeyNotFoundException("External reference not found.");
+            return externalReferenceMap[component];
         }
 
         public void BuildDefinition(out ComponentBundleDefinition definition)
@@ -109,26 +137,11 @@ namespace Willcraftia.Xna.Framework.Component
                     var propertyValue = property.GetValue(component, null);
 
                     string stringValue = null;
-                    if (propertyType == typeof(string))
+
+                    foreach (var stringfier in PropertyStringfiers)
                     {
-                        stringValue = propertyValue as string;
-                    }
-                    else if (propertyType.IsEnum)
-                    {
-                        stringValue = Convert.ToString(propertyValue);
-                    }
-                    else if (typeof(IConvertible).IsAssignableFrom(propertyType))
-                    {
-                        var convertible = propertyValue as IConvertible;
-                        stringValue = convertible.ToString();
-                    }
-                    else if (components.Contains(propertyValue))
-                    {
-                        stringValue = GetName(propertyValue);
-                    }
-                    else if (externalReferenceMap != null && externalReferenceMap.ContainsKey(propertyValue))
-                    {
-                        stringValue = externalReferenceMap[propertyValue];
+                        if (stringfier.ConvertToString(component, property, propertyValue, out stringValue))
+                            break;
                     }
 
                     definition.Components[i].Properties[j] = new PropertyDefinition
@@ -160,20 +173,16 @@ namespace Willcraftia.Xna.Framework.Component
                 var propertyName = property.Name;
                 var propertyValue = property.GetValue(component, null);
 
-                if (propertyType == typeof(string))
-                    continue;
-
-                if (propertyType.IsEnum)
-                    continue;
-
-                if (typeof(IConvertible).IsAssignableFrom(propertyType))
-                    continue;
-
-                if (components.Contains(propertyValue))
-                    continue;
-
-                if (externalReferenceMap != null && externalReferenceMap.ContainsKey(propertyValue))
-                    continue;
+                bool handled = false;
+                foreach (var stringfier in PropertyStringfiers)
+                {
+                    if (stringfier.CanConvertToString(component, property, propertyValue))
+                    {
+                        handled = true;
+                        break;
+                    }
+                }
+                if (handled) continue;
 
                 var ownerComponentName = GetName(component);
                 var componentName = ownerComponentName + "_" + propertyName;

@@ -95,7 +95,7 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.LightDirection = lightDirection;
             ChunkEffect.LightDiffuseColor = Vector3.One;
             ChunkEffect.LightSpecularColor = Vector3.Zero;
-            ChunkEffect.FogEnabled = true;
+            ChunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
             // TODO
             ChunkEffect.FogStart = Math.Max(50, (projection as PerspectiveFov).FarPlaneDistance - 50);
             ChunkEffect.FogEnd = (projection as PerspectiveFov).FarPlaneDistance;

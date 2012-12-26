@@ -67,12 +67,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             "[F1] Help\r\n" +
             "[F2] Chunk bounding box\r\n" +
             "[F3] Wireframe\r\n" +
-            //"[F4] Light\r\n" +
-            //"[F5] Fog\r\n" +
-            //"[F9] Height color\r\n" +
-            //"[F10] Normal\r\n" +
-            //"[F11] White solid\r\n" +
-            //"[F12] Texture\r\n" +
+            "[F4] Fog\r\n" +
             "[w][s][a][d][q][z] Movement\r\n" +
             "[Mouse] Camera orientation\r\n" +
             "[PageUp][PageDown] Move velocity";
@@ -365,6 +360,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // F3
             if (keyboardState.IsKeyUp(Keys.F3) && lastKeyboardState.IsKeyDown(Keys.F3))
                 ChunkManager.Wireframe = !ChunkManager.Wireframe;
+            // F4
+            if (keyboardState.IsKeyUp(Keys.F4) && lastKeyboardState.IsKeyDown(Keys.F4))
+                GlobalSceneSettings.FogEnabled = !GlobalSceneSettings.FogEnabled;
         }
 
         protected override void Draw(GameTime gameTime)

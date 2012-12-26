@@ -93,6 +93,11 @@
     <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentInfoManager.cs" />
+    <Compile Include="Component\ComponentPropertyStringfier.cs" />
+    <Compile Include="Component\DefaultPropertyStringfier.cs" />
+    <Compile Include="Component\IPropertyStringfier.cs" />
+    <Compile Include="Component\XnaTypePropertyHandler.cs" />
+    <Compile Include="Component\XnaTypePropertyStringfier.cs" />
     <Compile Include="Content\AssetHolder.cs" />
     <Compile Include="Content\AssetHolderCollection.cs" />
     <Compile Include="Content\AssetManager.cs" />
