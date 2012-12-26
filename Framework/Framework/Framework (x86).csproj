@@ -129,7 +129,7 @@
     <Compile Include="Component\ITypeHandler.cs" />
     <Compile Include="Component\DefaultPropertyHandler.cs" />
     <Compile Include="Component\TypeHandler.cs" />
-    <Compile Include="Component\IInitializingComponent.cs" />
+    <Compile Include="IInitializingObject.cs" />
     <Compile Include="Component\ComponentFactory.cs" />
     <Compile Include="Component\ComponentBundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />

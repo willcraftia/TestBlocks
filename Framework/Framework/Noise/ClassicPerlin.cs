@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Noise
     /// <summary>
     /// The class generates Perlin noise.
     /// </summary>
-    public sealed class ClassicPerlin : INoiseSource
+    public sealed class ClassicPerlin : INoiseSource, IInitializingObject
     {
         const int wrapIndex = 256;
 
@@ -41,14 +41,6 @@ namespace Willcraftia.Xna.Framework.Noise
             set { seed = value; }
         }
 
-        public void Reseed()
-        {
-            random = new Random(seed);
-            InitializeLookupTables();
-
-            initialized = true;
-        }
-
         /// <summary>
         /// Gets/sets a curve function that fades the defference between
         /// the coordinates of the input value and
@@ -63,6 +55,12 @@ namespace Willcraftia.Xna.Framework.Noise
         {
             get { return fadeCurve; }
             set { fadeCurve = value ?? defaultFadeCurve; }
+        }
+
+        // I/F
+        public void Initialize()
+        {
+            Reseed();
         }
 
         // I/F
@@ -139,6 +137,14 @@ namespace Willcraftia.Xna.Framework.Noise
             d = MathHelper.Lerp(a, b, sy);
 
             return MathHelper.Lerp(c, d, sz);
+        }
+
+        public void Reseed()
+        {
+            random = new Random(seed);
+            InitializeLookupTables();
+
+            initialized = true;
         }
 
         float GenerateGradientValue()

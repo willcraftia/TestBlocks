@@ -1,13 +1,14 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Component;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class RandomBiomeManager : CatalogedBiomeManager, IInitializingComponent
+    public sealed class RandomBiomeManager : CatalogedBiomeManager, IInitializingObject
     {
         int seed = Environment.TickCount;
 

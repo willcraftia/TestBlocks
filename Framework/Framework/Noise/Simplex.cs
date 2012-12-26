@@ -12,7 +12,7 @@ namespace Willcraftia.Xna.Framework.Noise
     /// http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
     /// http://staffwww.itn.liu.se/~stegu/aqsis/aqsis-newnoise/
     /// </summary>
-    public sealed class Simplex : INoiseSource
+    public sealed class Simplex : INoiseSource, IInitializingObject
     {
         const int wrapIndex = 256;
 
@@ -34,12 +34,10 @@ namespace Willcraftia.Xna.Framework.Noise
             set { seed = value; }
         }
 
-        public void Reseed()
+        // I/F
+        public void Initialize()
         {
-            random = new Random(seed);
-            InitializePermutationTables();
-
-            initialized = true;
+            Reseed();
         }
 
         // I/F
@@ -182,6 +180,14 @@ namespace Willcraftia.Xna.Framework.Noise
             // Add contributions from each corner to get the final noise value.
             // The result is scaled to stay just inside [-1,1]
             return 32.0f * (n0 + n1 + n2 + n3);
+        }
+
+        public void Reseed()
+        {
+            random = new Random(seed);
+            InitializePermutationTables();
+
+            initialized = true;
         }
 
         void InitializePermutationTables()

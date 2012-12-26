@@ -10,7 +10,7 @@ using Willcraftia.Xna.Framework.Noise;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class DefaultBiome : IBiome, IInitializingComponent
+    public sealed class DefaultBiome : IBiome, IInitializingObject
     {
         #region Range
 

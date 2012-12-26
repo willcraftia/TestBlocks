@@ -112,7 +112,6 @@
     <Compile Include="Component\ComponentPropertyHandler.cs" />
     <Compile Include="Component\ComponentTypeRegistory.cs" />
     <Compile Include="Component\DefaultPropertyHandler.cs" />
-    <Compile Include="Component\IInitializingComponent.cs" />
     <Compile Include="Component\IPropertyHandler.cs" />
     <Compile Include="Component\ITypeHandler.cs" />
     <Compile Include="Component\PropertyDefinition.cs" />
@@ -150,6 +149,7 @@
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\Texture2DHelper.cs" />
     <Compile Include="Graphics\WritableVertexBuffer.cs" />
+    <Compile Include="IInitializingObject.cs" />
     <Compile Include="IO\ContentResource.cs" />
     <Compile Include="IO\ContentResourceLoader.cs" />
     <Compile Include="IO\FileResource.cs" />

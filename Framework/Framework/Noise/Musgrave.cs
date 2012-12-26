@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Noise
 {
-    public abstract class Musgrave : INoiseSource
+    public abstract class Musgrave : INoiseSource, IInitializingObject
     {
         public const int MaxOctaveCount = 30;
 
@@ -80,6 +80,14 @@ namespace Willcraftia.Xna.Framework.Noise
         }
 
         // I/F
+        public void Initialize()
+        {
+            InitializeSpectralWeights();
+            InitializeOverride();
+            initialized = true;
+        }
+
+        // I/F
         public float Sample(float x, float y, float z)
         {
             if (!initialized) Initialize();
@@ -89,11 +97,7 @@ namespace Willcraftia.Xna.Framework.Noise
 
         protected abstract float GetValueOverride(float x, float y, float z);
 
-        protected virtual void Initialize()
-        {
-            InitializeSpectralWeights();
-            initialized = true;
-        }
+        protected virtual void InitializeOverride() { }
 
         protected void InitializeSpectralWeights()
         {

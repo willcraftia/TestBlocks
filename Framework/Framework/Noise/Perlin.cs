@@ -13,7 +13,7 @@ namespace Willcraftia.Xna.Framework.Noise
     ///
     /// http://mrl.nyu.edu/~perlin/noise/
     /// </summary>
-    public sealed class Perlin : INoiseSource
+    public sealed class Perlin : INoiseSource, IInitializingObject
     {
         const int wrapIndex = 256;
 
@@ -39,14 +39,6 @@ namespace Willcraftia.Xna.Framework.Noise
             set { seed = value; }
         }
 
-        public void Reseed()
-        {
-            random = new Random(seed);
-            InitializePermutationTables();
-
-            initialized = true;
-        }
-
         /// <summary>
         /// Gets/sets a curve function that fades the defference between
         /// the coordinates of the input value and
@@ -61,6 +53,12 @@ namespace Willcraftia.Xna.Framework.Noise
         {
             get { return fadeCurve; }
             set { fadeCurve = value ?? defaultFadeCurve; }
+        }
+
+        // I/F
+        public void Initialize()
+        {
+            Reseed();
         }
 
         // I/F
@@ -113,6 +111,14 @@ namespace Willcraftia.Xna.Framework.Noise
             var l4 = MathHelper.Lerp(l0, l1, v);
             var l5 = MathHelper.Lerp(l2, l3, v);
             return MathHelper.Lerp(l4, l5, w);
+        }
+
+        public void Reseed()
+        {
+            random = new Random(seed);
+            InitializePermutationTables();
+
+            initialized = true;
         }
 
         void InitializePermutationTables()

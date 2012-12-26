@@ -81,7 +81,7 @@ namespace Willcraftia.Xna.Framework.Component
                 var name = definition.Components[i].Name;
                 var component = nameComponentMap[name];
 
-                var initializable = component as IInitializingComponent;
+                var initializable = component as IInitializingObject;
                 if (initializable != null) initializable.Initialize();
             }
         }
