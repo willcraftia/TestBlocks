@@ -2,6 +2,7 @@
 	<Components>
 		<Component Name="Target" Type="Select">
 			<Properties>
+				<Property Name="Name" Value="Final Terrain Select" />
 				<Property Name="Controller" Value="Target_Controller" />
 				<Property Name="LowerSource" Value="Target_LowerSource" />
 				<Property Name="UpperSource" Value="Target_UpperSource" />
@@ -12,11 +13,13 @@
 		</Component>
 		<Component Name="Target_Controller" Type="Cache">
 			<Properties>
+				<Property Name="Name" Value="Terrain Type Cache" />
 				<Property Name="Source" Value="Target_Controller_Source" />
 			</Properties>
 		</Component>
 		<Component Name="Target_Controller_Source" Type="ScalePoint">
 			<Properties>
+				<Property Name="Name" Value="Terrain Type ScalePoint" />
 				<Property Name="Source" Value="Target_Controller_Source_Source" />
 				<Property Name="ScaleX" Value="1" />
 				<Property Name="ScaleY" Value="0" />
@@ -25,6 +28,7 @@
 		</Component>
 		<Component Name="Target_Controller_Source_Source" Type="SumFractal">
 			<Properties>
+				<Property Name="Name" Value="Terrain Type Fractal" />
 				<Property Name="Source" Value="Target_Controller_Source_Source_Source" />
 				<Property Name="Hurst" Value="0.9" />
 				<Property Name="Frequency" Value="0.5" />
@@ -34,6 +38,7 @@
 		</Component>
 		<Component Name="Target_Controller_Source_Source_Source" Type="ClassicPerlin">
 			<Properties>
+				<Property Name="Name" Value="Terrain Type Noise" />
 				<Property Name="Seed" Value="400" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>
@@ -41,6 +46,7 @@
 		<Component Name="Target_Controller_Source_Source_Source_FadeCurve" Type="SCurve3" />
 		<Component Name="Target_LowerSource" Type="ScalePoint">
 			<Properties>
+				<Property Name="Name" Value="Lowland Shape" />
 				<Property Name="Source" Value="Target_LowerSource_Source" />
 				<Property Name="ScaleX" Value="1" />
 				<Property Name="ScaleY" Value="0" />
@@ -49,6 +55,7 @@
 		</Component>
 		<Component Name="Target_LowerSource_Source" Type="ScaleBias">
 			<Properties>
+				<Property Name="Name" Value="Lowland ScaleBias" />
 				<Property Name="Source" Value="Target_LowerSource_Source_Source" />
 				<Property Name="Bias" Value="-0.75" />
 				<Property Name="Scale" Value="0.125" />
@@ -56,6 +63,7 @@
 		</Component>
 		<Component Name="Target_LowerSource_Source_Source" Type="Billow">
 			<Properties>
+				<Property Name="Name" Value="Lowland Fractal" />
 				<Property Name="Source" Value="Target_LowerSource_Source_Source_Source" />
 				<Property Name="Frequency" Value="1" />
 				<Property Name="Lacunarity" Value="2" />
@@ -65,12 +73,14 @@
 		</Component>
 		<Component Name="Target_LowerSource_Source_Source_Source" Type="ClassicPerlin">
 			<Properties>
+				<Property Name="Name" Value="Lowland Noise" />
 				<Property Name="Seed" Value="100" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>
 		</Component>
 		<Component Name="Target_UpperSource" Type="Select">
 			<Properties>
+				<Property Name="Name" Value="Highland or Mountain Select" />
 				<Property Name="Controller" Value="Target_Controller" />
 				<Property Name="LowerSource" Value="Target_UpperSource_LowerSource" />
 				<Property Name="UpperSource" Value="Target_UpperSource_UpperSource" />
@@ -81,6 +91,7 @@
 		</Component>
 		<Component Name="Target_UpperSource_LowerSource" Type="ScalePoint">
 			<Properties>
+				<Property Name="Name" Value="Highland Shape" />
 				<Property Name="Source" Value="Target_UpperSource_LowerSource_Source" />
 				<Property Name="ScaleX" Value="1" />
 				<Property Name="ScaleY" Value="0" />
@@ -89,6 +100,7 @@
 		</Component>
 		<Component Name="Target_UpperSource_LowerSource_Source" Type="SumFractal">
 			<Properties>
+				<Property Name="Name" Value="Highland Fractal" />
 				<Property Name="Source" Value="Target_UpperSource_LowerSource_Source_Source" />
 				<Property Name="Hurst" Value="0.9" />
 				<Property Name="Frequency" Value="2" />
@@ -98,12 +110,14 @@
 		</Component>
 		<Component Name="Target_UpperSource_LowerSource_Source_Source" Type="ClassicPerlin">
 			<Properties>
+				<Property Name="Name" Value="Highland Noise" />
 				<Property Name="Seed" Value="200" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>
 		</Component>
 		<Component Name="Target_UpperSource_UpperSource" Type="ScalePoint">
 			<Properties>
+				<Property Name="Name" Value="Mountain Shape" />
 				<Property Name="Source" Value="Target_UpperSource_UpperSource_Source" />
 				<Property Name="ScaleX" Value="1" />
 				<Property Name="ScaleY" Value="0" />
@@ -112,6 +126,7 @@
 		</Component>
 		<Component Name="Target_UpperSource_UpperSource_Source" Type="ScaleBias">
 			<Properties>
+				<Property Name="Name" Value="Mountain ScaleBias" />
 				<Property Name="Source" Value="Target_UpperSource_UpperSource_Source_Source" />
 				<Property Name="Bias" Value="0.25" />
 				<Property Name="Scale" Value="0.5" />
@@ -121,6 +136,7 @@
 			<Properties>
 				<Property Name="Offset" Value="1" />
 				<Property Name="Gain" Value="2" />
+				<Property Name="Name" Value="Mountain Fractal" />
 				<Property Name="Source" Value="Target_UpperSource_UpperSource_Source_Source_Source" />
 				<Property Name="Hurst" Value="1" />
 				<Property Name="Frequency" Value="1" />
@@ -130,6 +146,7 @@
 		</Component>
 		<Component Name="Target_UpperSource_UpperSource_Source_Source_Source" Type="ClassicPerlin">
 			<Properties>
+				<Property Name="Name" Value="Mountain Noise" />
 				<Property Name="Seed" Value="300" />
 				<Property Name="FadeCurve" Value="Target_Controller_Source_Source_Source_FadeCurve" />
 			</Properties>

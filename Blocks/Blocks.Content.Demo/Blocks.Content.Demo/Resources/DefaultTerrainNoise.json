@@ -5,6 +5,10 @@
       "Type": "Select",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": "Final Terrain Select"
+        },
+        {
           "Name": "Controller",
           "Value": "Target_Controller"
         },
@@ -35,6 +39,10 @@
       "Type": "Cache",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": "Terrain Type Cache"
+        },
+        {
           "Name": "Source",
           "Value": "Target_Controller_Source"
         }
@@ -44,6 +52,10 @@
       "Name": "Target_Controller_Source",
       "Type": "ScalePoint",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type ScalePoint"
+        },
         {
           "Name": "Source",
           "Value": "Target_Controller_Source_Source"
@@ -66,6 +78,10 @@
       "Name": "Target_Controller_Source_Source",
       "Type": "SumFractal",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type Fractal"
+        },
         {
           "Name": "Source",
           "Value": "Target_Controller_Source_Source_Source"
@@ -93,6 +109,10 @@
       "Type": "ClassicPerlin",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": "Terrain Type Noise"
+        },
+        {
           "Name": "Seed",
           "Value": "400"
         },
@@ -111,6 +131,10 @@
       "Name": "Target_LowerSource",
       "Type": "ScalePoint",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Lowland Shape"
+        },
         {
           "Name": "Source",
           "Value": "Target_LowerSource_Source"
@@ -134,6 +158,10 @@
       "Type": "ScaleBias",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": "Lowland ScaleBias"
+        },
+        {
           "Name": "Source",
           "Value": "Target_LowerSource_Source_Source"
         },
@@ -151,6 +179,10 @@
       "Name": "Target_LowerSource_Source_Source",
       "Type": "Billow",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Lowland Fractal"
+        },
         {
           "Name": "Source",
           "Value": "Target_LowerSource_Source_Source_Source"
@@ -178,6 +210,10 @@
       "Type": "ClassicPerlin",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": "Lowland Noise"
+        },
+        {
           "Name": "Seed",
           "Value": "100"
         },
@@ -191,6 +227,10 @@
       "Name": "Target_UpperSource",
       "Type": "Select",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland or Mountain Select"
+        },
         {
           "Name": "Controller",
           "Value": "Target_Controller"
@@ -222,6 +262,10 @@
       "Type": "ScalePoint",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": "Highland Shape"
+        },
+        {
           "Name": "Source",
           "Value": "Target_UpperSource_LowerSource_Source"
         },
@@ -243,6 +287,10 @@
       "Name": "Target_UpperSource_LowerSource_Source",
       "Type": "SumFractal",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland Fractal"
+        },
         {
           "Name": "Source",
           "Value": "Target_UpperSource_LowerSource_Source_Source"
@@ -270,6 +318,10 @@
       "Type": "ClassicPerlin",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": "Highland Noise"
+        },
+        {
           "Name": "Seed",
           "Value": "200"
         },
@@ -283,6 +335,10 @@
       "Name": "Target_UpperSource_UpperSource",
       "Type": "ScalePoint",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain Shape"
+        },
         {
           "Name": "Source",
           "Value": "Target_UpperSource_UpperSource_Source"
@@ -305,6 +361,10 @@
       "Name": "Target_UpperSource_UpperSource_Source",
       "Type": "ScaleBias",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain ScaleBias"
+        },
         {
           "Name": "Source",
           "Value": "Target_UpperSource_UpperSource_Source_Source"
@@ -332,6 +392,10 @@
           "Value": "2"
         },
         {
+          "Name": "Name",
+          "Value": "Mountain Fractal"
+        },
+        {
           "Name": "Source",
           "Value": "Target_UpperSource_UpperSource_Source_Source_Source"
         },
@@ -357,6 +421,10 @@
       "Name": "Target_UpperSource_UpperSource_Source_Source_Source",
       "Type": "ClassicPerlin",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain Noise"
+        },
         {
           "Name": "Seed",
           "Value": "300"

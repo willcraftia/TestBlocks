@@ -12,6 +12,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         INoiseSource source1;
 
+        public string Name { get; set; }
+
         public INoiseSource Source0
         {
             get { return source0; }
@@ -29,5 +31,14 @@ namespace Willcraftia.Xna.Framework.Noise
         {
             return source0.Sample(x, y, z) + source1.Sample(x, y, z);
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

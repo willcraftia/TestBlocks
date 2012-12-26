@@ -17,6 +17,7 @@
 		</Component>
 		<Component Name="Target_TemperatureNoise" Type="ScaleBias">
 			<Properties>
+				<Property Name="Name" />
 				<Property Name="Source" Value="Target_TemperatureNoise_Source" />
 				<Property Name="Bias" Value="0.5" />
 				<Property Name="Scale" Value="0.5" />
@@ -24,6 +25,7 @@
 		</Component>
 		<Component Name="Target_TemperatureNoise_Source" Type="SumFractal">
 			<Properties>
+				<Property Name="Name" />
 				<Property Name="Source" Value="Target_TemperatureNoise_Source_Source" />
 				<Property Name="Hurst" Value="0.9" />
 				<Property Name="Frequency" Value="1" />
@@ -33,6 +35,7 @@
 		</Component>
 		<Component Name="Target_TemperatureNoise_Source_Source" Type="ClassicPerlin">
 			<Properties>
+				<Property Name="Name" />
 				<Property Name="Seed" Value="200" />
 				<Property Name="FadeCurve" Value="Target_TemperatureNoise_Source_Source_FadeCurve" />
 			</Properties>
@@ -40,6 +43,7 @@
 		<Component Name="Target_TemperatureNoise_Source_Source_FadeCurve" Type="SCurve3" />
 		<Component Name="Target_HumidityNoise" Type="ScaleBias">
 			<Properties>
+				<Property Name="Name" />
 				<Property Name="Source" Value="Target_HumidityNoise_Source" />
 				<Property Name="Bias" Value="0.5" />
 				<Property Name="Scale" Value="0.5" />
@@ -47,6 +51,7 @@
 		</Component>
 		<Component Name="Target_HumidityNoise_Source" Type="SumFractal">
 			<Properties>
+				<Property Name="Name" />
 				<Property Name="Source" Value="Target_HumidityNoise_Source_Source" />
 				<Property Name="Hurst" Value="0.9" />
 				<Property Name="Frequency" Value="1" />
@@ -56,6 +61,7 @@
 		</Component>
 		<Component Name="Target_HumidityNoise_Source_Source" Type="ClassicPerlin">
 			<Properties>
+				<Property Name="Name" />
 				<Property Name="Seed" Value="100" />
 				<Property Name="FadeCurve" Value="Target_TemperatureNoise_Source_Source_FadeCurve" />
 			</Properties>

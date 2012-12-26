@@ -18,6 +18,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         float cacheValue;
 
+        public string Name { get; set; }
+
         public INoiseSource Source { get; set; }
 
         // I/F
@@ -34,5 +36,14 @@ namespace Willcraftia.Xna.Framework.Noise
 
             return cacheValue;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

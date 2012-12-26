@@ -55,6 +55,10 @@
       "Type": "ScaleBias",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": null
+        },
+        {
           "Name": "Source",
           "Value": "Target_TemperatureNoise_Source"
         },
@@ -72,6 +76,10 @@
       "Name": "Target_TemperatureNoise_Source",
       "Type": "SumFractal",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": null
+        },
         {
           "Name": "Source",
           "Value": "Target_TemperatureNoise_Source_Source"
@@ -99,6 +107,10 @@
       "Type": "ClassicPerlin",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": null
+        },
+        {
           "Name": "Seed",
           "Value": "200"
         },
@@ -118,6 +130,10 @@
       "Type": "ScaleBias",
       "Properties": [
         {
+          "Name": "Name",
+          "Value": null
+        },
+        {
           "Name": "Source",
           "Value": "Target_HumidityNoise_Source"
         },
@@ -135,6 +151,10 @@
       "Name": "Target_HumidityNoise_Source",
       "Type": "SumFractal",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": null
+        },
         {
           "Name": "Source",
           "Value": "Target_HumidityNoise_Source_Source"
@@ -161,6 +181,10 @@
       "Name": "Target_HumidityNoise_Source_Source",
       "Type": "ClassicPerlin",
       "Properties": [
+        {
+          "Name": "Name",
+          "Value": null
+        },
         {
           "Name": "Seed",
           "Value": "100"

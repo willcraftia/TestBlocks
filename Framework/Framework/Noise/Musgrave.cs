@@ -30,6 +30,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool initialized;
 
+        public string Name { get; set; }
+
         public INoiseSource Source { get; set; }
 
         /// <summary>
@@ -102,5 +104,14 @@ namespace Willcraftia.Xna.Framework.Noise
                 f *= lacunarity;
             }
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

@@ -14,6 +14,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         float scaleZ = 1;
 
+        public string Name { get; set; }
+
         public INoiseSource Source { get; set; }
 
         public float ScaleX
@@ -39,5 +41,14 @@ namespace Willcraftia.Xna.Framework.Noise
         {
             return Source.Sample(x * scaleX, y * scaleY, z * scaleZ);
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

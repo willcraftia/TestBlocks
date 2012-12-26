@@ -31,6 +31,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool edgeFalloffEnabled;
 
+        public string Name { get; set; }
+
         public INoiseSource Controller
         {
             get { return controller; }
@@ -128,5 +130,14 @@ namespace Willcraftia.Xna.Framework.Noise
             var ef = (halfSize < edgeFalloff) ? halfSize : edgeFalloff;
             edgeFalloffEnabled = (0 < ef);
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

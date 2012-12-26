@@ -30,6 +30,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int roughness = DefaultRoughness;
 
+        public string Name { get; set; }
+
         public INoiseSource Source
         {
             get { return source; }
@@ -122,5 +124,14 @@ namespace Willcraftia.Xna.Framework.Noise
 
             return source.Sample(dx, dy, dz);
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

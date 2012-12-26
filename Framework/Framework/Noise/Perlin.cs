@@ -31,6 +31,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool initialized;
 
+        public string Name { get; set; }
+
         public int Seed
         {
             get { return seed; }
@@ -135,5 +137,14 @@ namespace Willcraftia.Xna.Framework.Noise
                 permutation[wrapIndex + i] = permutation[i];
             }
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

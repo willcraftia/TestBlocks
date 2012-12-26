@@ -33,6 +33,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         bool initialized;
 
+        public string Name { get; set; }
+
         public int Seed
         {
             get { return seed; }
@@ -175,5 +177,14 @@ namespace Willcraftia.Xna.Framework.Noise
                 gradients[index] = gradients[i];
             }
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

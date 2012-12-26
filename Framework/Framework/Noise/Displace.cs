@@ -8,6 +8,8 @@ namespace Willcraftia.Xna.Framework.Noise
 {
     public sealed class Displace : INoiseSource
     {
+        public string Name { get; set; }
+
         public INoiseSource Source { get; set; }
 
         public INoiseSource DisplaceX { get; set; }
@@ -25,5 +27,14 @@ namespace Willcraftia.Xna.Framework.Noise
 
             return Source.Sample(nx, ny, nz);
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

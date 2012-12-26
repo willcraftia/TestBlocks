@@ -18,6 +18,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         int octaveCount = 6;
 
+        public string Name { get; set; }
+
         public INoiseSource Source
         {
             get { return source; }
@@ -75,5 +77,14 @@ namespace Willcraftia.Xna.Framework.Noise
 
             return value;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

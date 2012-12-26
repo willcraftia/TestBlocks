@@ -66,6 +66,8 @@ namespace Willcraftia.Xna.Framework.Noise
 
         IMetric metric = defaultMetric;
 
+        public string Name { get; set; }
+
         public int Seed
         {
             get { return seed; }
@@ -224,5 +226,14 @@ namespace Willcraftia.Xna.Framework.Noise
             // 0x7fffffff = 2147483647 (decimal) = 1111111111111111111111111111111 (bit).
             return (n * (n * n * 60493 + 19990303) + 1376312589) & 0x7fffffff;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

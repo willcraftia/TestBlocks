@@ -8,6 +8,8 @@ namespace Willcraftia.Xna.Framework.Noise
 {
     public sealed class Const : INoiseSource
     {
+        public string Name { get; set; }
+
         public float Value { get; set; }
 
         // I/F
@@ -15,5 +17,14 @@ namespace Willcraftia.Xna.Framework.Noise
         {
             return Value;
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Name:" + (Name ?? string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

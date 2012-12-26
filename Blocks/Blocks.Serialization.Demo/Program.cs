@@ -502,60 +502,88 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // lowlandShape
                 var lowlandShape = new ScalePoint
                 {
+                    Name = "Lowland Shape",
                     ScaleY = 0,
                     Source = new ScaleBias
                     {
+                        Name = "Lowland ScaleBias",
                         Scale = 0.125f,
                         Bias = -0.75f,
                         Source = new Billow
                         {
+                            Name = "Lowland Fractal",
                             OctaveCount = 2,
-                            Source = new ClassicPerlin { Seed = 100 }
+                            Source = new ClassicPerlin
+                            {
+                                Name = "Lowland Noise",
+                                Seed = 100
+                            }
                         }
                     }
                 };
                 // highlandShape
                 var highlandShape = new ScalePoint
                 {
+                    Name = "Highland Shape",
                     ScaleY = 0,
                     Source = new SumFractal
                     {
+                        Name = "Highland Fractal",
                         OctaveCount = 4,
                         Frequency = 2,
-                        Source = new ClassicPerlin { Seed = 200 }
+                        Source = new ClassicPerlin
+                        {
+                            Name = "Highland Noise",
+                            Seed = 200
+                        }
                     }
                 };
                 // mountainShape
                 var mountainShape = new ScalePoint
                 {
+                    Name = "Mountain Shape",
                     ScaleY = 0,
                     Source = new ScaleBias
                     {
+                        Name = "Mountain ScaleBias",
                         Scale = 0.5f,
                         Bias = 0.25f,
                         Source = new RidgedMultifractal
                         {
-                            Source = new ClassicPerlin { Seed = 300 }
+                            Name = "Mountain Fractal",
+                            Source = new ClassicPerlin
+                            {
+                                Name = "Mountain Noise",
+                                Seed = 300
+                            }
                         }
                     }
                 };
                 // terrainType
                 var terrainType = new Cache
                 {
+                    Name = "Terrain Type Cache",
                     Source = new ScalePoint
                     {
+                        Name = "Terrain Type ScalePoint",
                         ScaleY = 0,
                         Source = new SumFractal
                         {
+                            Name = "Terrain Type Fractal",
                             Frequency = 0.5f,
                             Lacunarity = 0.25f,
-                            Source = new ClassicPerlin { Seed = 400 }
+                            Source = new ClassicPerlin
+                            {
+                                Name = "Terrain Type Noise",
+                                Seed = 400
+                            }
                         }
                     }
                 };
                 // highlandMountainSelect
                 var highlandMountainSelect = new Select
                 {
+                    Name = "Highland or Mountain Select",
                     LowerSource = highlandShape,
                     LowerBound = 0,
                     UpperSource = mountainShape,
@@ -566,6 +594,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // terrain
                 var terrain = new Select
                 {
+                    Name = "Final Terrain Select",
                     LowerSource = lowlandShape,
                     LowerBound = 0,
                     UpperSource = highlandMountainSelect,
