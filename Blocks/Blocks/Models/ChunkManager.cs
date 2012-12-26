@@ -333,15 +333,13 @@ namespace Willcraftia.Xna.Blocks.Models
             opaqueChunks.Sort(chunkDistanceComparer);
             translucentChunks.Sort(chunkDistanceComparer);
 
-            var pass = region.ChunkEffect.BackingEffect.CurrentTechnique.Passes[0];
-
             //================================================================
             //
             // OcclusionQuery
             //
 
             region.GraphicsDevice.BlendState = colorWriteDisable;
-            region.GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            region.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             foreach (var chunk in opaqueChunks)
             {
@@ -350,7 +348,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 region.ChunkEffect.World = world;
 
-                pass.Apply();
+                region.ChunkEffect.Apply();
 
                 chunk.Mesh.Opaque.UpdateOcclusion();
             }
@@ -377,11 +375,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 Matrix world;
                 chunk.CreateWorldMatrix(out world);
 
-                region.ChunkEffect.World = world;
-                
-                pass.Apply();
-
-                chunk.Mesh.Opaque.Draw();
+                chunk.Mesh.Opaque.Draw(region.ChunkEffect, ref world);
 
                 DebugRegionMonitorAddChunkVertexCount(chunk.Mesh.Opaque);
             }
@@ -645,15 +639,14 @@ namespace Willcraftia.Xna.Blocks.Models
         void DebugSetEffectTechnique()
         {
             var chunkEffect = region.ChunkEffect;
-            var realEffect = chunkEffect.BackingEffect;
 
             if (Wireframe)
             {
-                realEffect.CurrentTechnique = chunkEffect.WireframeTequnique;
+                chunkEffect.EnableWireframeTechnique();
             }
             else
             {
-                realEffect.CurrentTechnique = chunkEffect.DefaultTequnique;
+                chunkEffect.EnableDefaultTechnique();
             }
         }
 

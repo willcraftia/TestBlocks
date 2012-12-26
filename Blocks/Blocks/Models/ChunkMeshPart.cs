@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Diagnostics;
 
@@ -143,11 +144,14 @@ namespace Willcraftia.Xna.Blocks.Models
             occlusionQueryActive = true;
         }
 
-        public void Draw()
+        public void Draw(ChunkEffect effect, ref Matrix world)
         {
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
                 return;
             if (occluded) return;
+
+            effect.World = world;
+            effect.Apply();
 
             graphicsDevice.SetVertexBuffer(vertexBuffer);
             graphicsDevice.Indices = indexBuffer;

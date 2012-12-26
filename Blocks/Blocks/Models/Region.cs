@@ -105,9 +105,6 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
             ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
 
-            //ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.DefaultTequnique;
-            ChunkEffect.BackingEffect.CurrentTechnique = ChunkEffect.WireframeTequnique;
-
             chunkManager.Draw(view, projection);
         }
 

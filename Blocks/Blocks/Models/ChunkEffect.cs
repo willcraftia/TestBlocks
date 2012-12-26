@@ -10,6 +10,14 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkEffect
     {
+        //====================================================================
+        // Real Effect
+
+        Effect backingEffect;
+
+        //====================================================================
+        // EffectParameter
+
         EffectParameter world;
 
         EffectParameter viewProjection;
@@ -40,7 +48,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectParameter specularMap;
 
-        public Effect BackingEffect { get; private set; }
+        //====================================================================
+        // EffectTechnique
+
+        EffectTechnique defaultTechnique;
+
+        EffectTechnique wireframeTechnique;
+
+        //====================================================================
+        // Cached pass
+
+        EffectPass currentPass;
 
         public Matrix World
         {
@@ -132,47 +150,66 @@ namespace Willcraftia.Xna.Blocks.Models
             set { specularMap.SetValue(value); }
         }
 
-        public EffectTechnique DefaultTequnique { get; private set; }
-
-        public EffectTechnique WireframeTequnique { get; private set; }
+        public EffectTechnique CurrentTechnique
+        {
+            get { return backingEffect.CurrentTechnique; }
+            set { backingEffect.CurrentTechnique = value; }
+        }
 
         public ChunkEffect(Effect backingEffect)
         {
             if (backingEffect == null) throw new ArgumentNullException("backingEffect");
 
-            BackingEffect = backingEffect;
+            this.backingEffect = backingEffect;
 
             CacheEffectParameters();
-            CacheEffectTequniques();
+            CacheEffectTechniques();
+        }
+
+        public void Apply()
+        {
+            currentPass.Apply();
+        }
+
+        public void EnableDefaultTechnique()
+        {
+            backingEffect.CurrentTechnique = defaultTechnique;
+            currentPass = defaultTechnique.Passes[0];
+        }
+
+        public void EnableWireframeTechnique()
+        {
+            backingEffect.CurrentTechnique = wireframeTechnique;
+            currentPass = wireframeTechnique.Passes[0];
         }
 
         void CacheEffectParameters()
         {
-            world = BackingEffect.Parameters["World"];
-            viewProjection = BackingEffect.Parameters["ViewProjection"];
+            world = backingEffect.Parameters["World"];
+            viewProjection = backingEffect.Parameters["ViewProjection"];
 
-            eyePosition = BackingEffect.Parameters["EyePosition"];
+            eyePosition = backingEffect.Parameters["EyePosition"];
 
-            ambientLightColor = BackingEffect.Parameters["AmbientLightColor"];
-            lightDirection = BackingEffect.Parameters["LightDirection"];
-            lightDiffuseColor = BackingEffect.Parameters["LightDiffuseColor"];
-            lightSpecularColor = BackingEffect.Parameters["LightSpecularColor"];
+            ambientLightColor = backingEffect.Parameters["AmbientLightColor"];
+            lightDirection = backingEffect.Parameters["LightDirection"];
+            lightDiffuseColor = backingEffect.Parameters["LightDiffuseColor"];
+            lightSpecularColor = backingEffect.Parameters["LightSpecularColor"];
 
-            fogEnabled = BackingEffect.Parameters["FogEnabled"];
-            fogStart = BackingEffect.Parameters["FogStart"];
-            fogEnd = BackingEffect.Parameters["FogEnd"];
-            fogColor = BackingEffect.Parameters["FogColor"];
+            fogEnabled = backingEffect.Parameters["FogEnabled"];
+            fogStart = backingEffect.Parameters["FogStart"];
+            fogEnd = backingEffect.Parameters["FogEnd"];
+            fogColor = backingEffect.Parameters["FogColor"];
 
-            tileMap = BackingEffect.Parameters["TileMap"];
-            diffuseMap = BackingEffect.Parameters["DiffuseMap"];
-            emissiveMap = BackingEffect.Parameters["EmissiveMap"];
-            specularMap = BackingEffect.Parameters["SpecularMap"];
+            tileMap = backingEffect.Parameters["TileMap"];
+            diffuseMap = backingEffect.Parameters["DiffuseMap"];
+            emissiveMap = backingEffect.Parameters["EmissiveMap"];
+            specularMap = backingEffect.Parameters["SpecularMap"];
         }
 
-        void CacheEffectTequniques()
+        void CacheEffectTechniques()
         {
-            DefaultTequnique = BackingEffect.Techniques["Default"];
-            WireframeTequnique = BackingEffect.Techniques["Wireframe"];
+            defaultTechnique = backingEffect.Techniques["Default"];
+            wireframeTechnique = backingEffect.Techniques["Wireframe"];
         }
     }
 }
