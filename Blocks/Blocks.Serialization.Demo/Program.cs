@@ -26,6 +26,12 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
         {
             public byte Index { get; set; }
 
+            public INoiseSource DensityNoise
+            {
+                get { throw new NotSupportedException(); }
+                set { throw new NotSupportedException(); }
+            }
+
             public INoiseSource TerrainNoise
             {
                 get { throw new NotSupportedException(); }
@@ -460,6 +466,31 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
+            #region DensityNoise (INoiseSource) (ComponentBundleDefinition)
+
+            //================================================================
+            // TerrainNoise (INoiseSource) (ComponentBundleDefinition)
+
+            Console.WriteLine("DensityNoise (INoiseSource) (ComponentBundleDefinition)");
+            {
+                // density
+                var density = new GradientDensity();
+
+                var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+                builder.Add("Target", density);
+
+                ComponentBundleDefinition biomeBundle;
+                builder.BuildDefinition(out biomeBundle);
+
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultDensityNoise", biomeBundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultDensityNoise", biomeBundle);
+                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
 
             #region TerrainNoise (INoiseSource) (ComponentBundleDefinition)
 
@@ -532,8 +563,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Controller = terrainType,
                     EdgeFalloff = 0.125f
                 };
-                // terrainSelect
-                var terrainSelect = new Select
+                // terrain
+                var terrain = new Select
                 {
                     LowerSource = lowlandShape,
                     LowerBound = 0,
@@ -542,39 +573,23 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Controller = terrainType,
                     EdgeFalloff = 0.125f
                 };
-                // density
-                var density = new GradientDensity();
-                // terrain
-                var terrain = new Select
-                {
-                    LowerSource = new Const { Value = 0 },
-                    LowerBound = 0.25f,
-                    UpperSource = new Const { Value = 1 },
-                    UpperBound = 1000,
-                    Controller = new Displace
-                    {
-                        DisplaceX = new Const { Value = 0 },
-                        DisplaceY = terrainSelect,
-                        DisplaceZ = new Const { Value = 0 },
-                        Source = density
-                    }
-                };
-
-                //int zeroCount = 0;
-                //int oneCount = 0;
-                //int otherCount = 0;
-                //for (int z = 0; z < 100; z++)
-                //    for (int y = 0; y < 100; y++)
-                //        for (int x = 0; x < 100; x++)
-                //        {
-                //            var fx = x / 100f;
-                //            var fy = y / 100f;
-                //            var fz = z / 100f;
-                //            var value = terrain.Sample(fx, fy, fz);
-                //            if (value == 0) zeroCount++;
-                //            else if (value == 1) oneCount++;
-                //            else otherCount++;
-                //        }
+                //// density
+                //var density = new GradientDensity();
+                //// terrain
+                //var terrain = new Select
+                //{
+                //    LowerSource = new Const { Value = 0 },
+                //    LowerBound = 0.25f,
+                //    UpperSource = new Const { Value = 1 },
+                //    UpperBound = 1000,
+                //    Controller = new Displace
+                //    {
+                //        DisplaceX = new Const { Value = 0 },
+                //        DisplaceY = terrainSelect,
+                //        DisplaceZ = new Const { Value = 0 },
+                //        Source = density
+                //    }
+                //};
 
                 var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
                 var builder = new ComponentBundleBuilder(componentInfoManager);
@@ -620,12 +635,14 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Source = new ClassicPerlin { Seed = 200 }
                         }
                     },
+                    DensityNoise = new MockNoise(),
                     TerrainNoise = new MockNoise()
                 };
 
                 var componentInfoManager = new ComponentInfoManager(BiomeLoader.ComponentTypeRegistory);
                 var builder = new ComponentBundleBuilder(componentInfoManager);
                 builder.Add("Target", biome);
+                builder.AddExternalReference(biome.DensityNoise, "title:Resources/DefaultDensityNoise.json");
                 builder.AddExternalReference(biome.TerrainNoise, "title:Resources/DefaultTerrainNoise.json");
 
                 ComponentBundleDefinition biomeBundle;

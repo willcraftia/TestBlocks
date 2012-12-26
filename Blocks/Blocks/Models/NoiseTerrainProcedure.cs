@@ -38,11 +38,31 @@ namespace Willcraftia.Xna.Blocks.Models
             inverseChunkSize.Z = 1 / (float) chunkSize.Z;
         }
 
+        const int scale = 256;
+
+        const float inverseScale = 1 / (float) scale;
+
         // I/F
         public void Generate(Chunk chunk)
         {
             var position = chunk.Position;
             var biome = Region.BiomeManager.GetBiome(chunk);
+
+            // TODO!!!!!
+            //var density = new Select
+            //{
+            //    LowerSource = new Const { Value = 0 },
+            //    LowerBound = 0f,
+            //    UpperSource = new Const { Value = 1 },
+            //    UpperBound = 1000,
+            //    Controller = new Displace
+            //    {
+            //        DisplaceX = new Const { Value = 0 },
+            //        DisplaceY = biome.TerrainNoise,
+            //        DisplaceZ = new Const { Value = 0 },
+            //        Source = biome.DensityNoise
+            //    }
+            //};
 
             for (int x = 0; x < chunkSize.X; x++)
             {
@@ -55,29 +75,37 @@ namespace Willcraftia.Xna.Blocks.Models
                     var noiseZ = absoluteZ * inverseChunkSize.Z;
                     var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
 
-                    int firstY = -1;
+                    var terrain = biome.TerrainNoise.Sample(noiseX, 0, noiseZ);
+                    int height = (int) (terrain * scale) + scale;
+
                     for (int y = chunkSize.Y - 1; 0 <= y; y--)
                     {
                         var absoluteY = chunk.CalculateBlockPositionY(y);
-                        var noiseY = absoluteY * inverseChunkSize.Y;
-
-                        var terrain = biome.TerrainNoise.Sample(noiseX, noiseY, noiseZ);
+                        var noiseY = absoluteY * inverseScale;
 
                         byte blockIndex = Block.EmptyIndex;
-                        if (terrain != 0)
-                        {
-                            if (firstY == -1) firstY = y;
 
-                            // TODO ひとまずの回避でしかない。
-                            if (firstY == y && y != chunkSize.Y - 1)
-                            {
-                                blockIndex = GetBlockIndexAtHorizon(biomeElement);
-                            }
-                            else
-                            {
-                                blockIndex = GetBlockIndexBelowHorizon(biomeElement);
-                            }
+                        if (height == absoluteY)
+                        {
+                            blockIndex = GetBlockIndexAtTop(biomeElement);
                         }
+                        else if (absoluteY < height)
+                        {
+                            blockIndex = GetBlockIndexBelowTop(biomeElement);
+                        }
+
+                        //var d = density.Sample(noiseX, noiseY, noiseZ);
+                        //if (0 < d)
+                        //{
+                        //    if (height == absoluteY)
+                        //    {
+                        //        blockIndex = GetBlockIndexAtTop(biomeElement);
+                        //    }
+                        //    else if (absoluteY < height)
+                        //    {
+                        //        blockIndex = GetBlockIndexBelowTop(biomeElement);
+                        //    }
+                        //}
 
                         chunk[x, y, z] = blockIndex;
                     }
@@ -85,7 +113,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        byte GetBlockIndexAtHorizon(BiomeElement biomeElement)
+        byte GetBlockIndexAtTop(BiomeElement biomeElement)
         {
             switch (biomeElement)
             {
@@ -104,7 +132,7 @@ namespace Willcraftia.Xna.Blocks.Models
             throw new InvalidOperationException();
         }
 
-        byte GetBlockIndexBelowHorizon(BiomeElement biomeElement)
+        byte GetBlockIndexBelowTop(BiomeElement biomeElement)
         {
             switch (biomeElement)
             {

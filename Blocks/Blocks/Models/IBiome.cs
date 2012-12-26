@@ -12,6 +12,8 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         byte Index { get; set; }
 
+        INoiseSource DensityNoise { get; set; }
+
         INoiseSource TerrainNoise { get; set; }
 
         float GetTemperature(int x, int z);

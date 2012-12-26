@@ -18,82 +18,6 @@
         },
         {
           "Name": "EdgeFalloff",
-          "Value": "0"
-        },
-        {
-          "Name": "LowerBound",
-          "Value": "0.25"
-        },
-        {
-          "Name": "UpperBound",
-          "Value": "1000"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller",
-      "Type": "Displace",
-      "Properties": [
-        {
-          "Name": "Source",
-          "Value": "Target_Controller_Source"
-        },
-        {
-          "Name": "DisplaceX",
-          "Value": "Target_Controller_DisplaceX"
-        },
-        {
-          "Name": "DisplaceY",
-          "Value": "Target_Controller_DisplaceY"
-        },
-        {
-          "Name": "DisplaceZ",
-          "Value": "Target_Controller_DisplaceZ"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_Source",
-      "Type": "GradientDensity",
-      "Properties": [
-        {
-          "Name": "MinY",
-          "Value": "0"
-        },
-        {
-          "Name": "MaxY",
-          "Value": "1"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_DisplaceX",
-      "Type": "Const",
-      "Properties": [
-        {
-          "Name": "Value",
-          "Value": "0"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_DisplaceY",
-      "Type": "Select",
-      "Properties": [
-        {
-          "Name": "Controller",
-          "Value": "Target_Controller_DisplaceY_Controller"
-        },
-        {
-          "Name": "LowerSource",
-          "Value": "Target_Controller_DisplaceY_LowerSource"
-        },
-        {
-          "Name": "UpperSource",
-          "Value": "Target_Controller_DisplaceY_UpperSource"
-        },
-        {
-          "Name": "EdgeFalloff",
           "Value": "0.125"
         },
         {
@@ -107,22 +31,22 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_Controller",
+      "Name": "Target_Controller",
       "Type": "Cache",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_Controller_Source"
+          "Value": "Target_Controller_Source"
         }
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_Controller_Source",
+      "Name": "Target_Controller_Source",
       "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_Controller_Source_Source"
+          "Value": "Target_Controller_Source_Source"
         },
         {
           "Name": "ScaleX",
@@ -139,12 +63,12 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_Controller_Source_Source",
+      "Name": "Target_Controller_Source_Source",
       "Type": "SumFractal",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_Controller_Source_Source_Source"
+          "Value": "Target_Controller_Source_Source_Source"
         },
         {
           "Name": "Hurst",
@@ -165,7 +89,7 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_Controller_Source_Source_Source",
+      "Name": "Target_Controller_Source_Source_Source",
       "Type": "ClassicPerlin",
       "Properties": [
         {
@@ -174,22 +98,22 @@
         },
         {
           "Name": "FadeCurve",
-          "Value": "Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve"
+          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
         }
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve",
+      "Name": "Target_Controller_Source_Source_Source_FadeCurve",
       "Type": "SCurve3",
       "Properties": null
     },
     {
-      "Name": "Target_Controller_DisplaceY_LowerSource",
+      "Name": "Target_LowerSource",
       "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_LowerSource_Source"
+          "Value": "Target_LowerSource_Source"
         },
         {
           "Name": "ScaleX",
@@ -206,12 +130,12 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_LowerSource_Source",
+      "Name": "Target_LowerSource_Source",
       "Type": "ScaleBias",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_LowerSource_Source_Source"
+          "Value": "Target_LowerSource_Source_Source"
         },
         {
           "Name": "Bias",
@@ -224,12 +148,12 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_LowerSource_Source_Source",
+      "Name": "Target_LowerSource_Source_Source",
       "Type": "Billow",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_LowerSource_Source_Source_Source"
+          "Value": "Target_LowerSource_Source_Source_Source"
         },
         {
           "Name": "Frequency",
@@ -250,7 +174,7 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_LowerSource_Source_Source_Source",
+      "Name": "Target_LowerSource_Source_Source_Source",
       "Type": "ClassicPerlin",
       "Properties": [
         {
@@ -259,25 +183,25 @@
         },
         {
           "Name": "FadeCurve",
-          "Value": "Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve"
+          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
         }
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource",
+      "Name": "Target_UpperSource",
       "Type": "Select",
       "Properties": [
         {
           "Name": "Controller",
-          "Value": "Target_Controller_DisplaceY_Controller"
+          "Value": "Target_Controller"
         },
         {
           "Name": "LowerSource",
-          "Value": "Target_Controller_DisplaceY_UpperSource_LowerSource"
+          "Value": "Target_UpperSource_LowerSource"
         },
         {
           "Name": "UpperSource",
-          "Value": "Target_Controller_DisplaceY_UpperSource_UpperSource"
+          "Value": "Target_UpperSource_UpperSource"
         },
         {
           "Name": "EdgeFalloff",
@@ -294,12 +218,12 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource_LowerSource",
+      "Name": "Target_UpperSource_LowerSource",
       "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_UpperSource_LowerSource_Source"
+          "Value": "Target_UpperSource_LowerSource_Source"
         },
         {
           "Name": "ScaleX",
@@ -316,12 +240,12 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource_LowerSource_Source",
+      "Name": "Target_UpperSource_LowerSource_Source",
       "Type": "SumFractal",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_UpperSource_LowerSource_Source_Source"
+          "Value": "Target_UpperSource_LowerSource_Source_Source"
         },
         {
           "Name": "Hurst",
@@ -342,7 +266,7 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource_LowerSource_Source_Source",
+      "Name": "Target_UpperSource_LowerSource_Source_Source",
       "Type": "ClassicPerlin",
       "Properties": [
         {
@@ -351,17 +275,17 @@
         },
         {
           "Name": "FadeCurve",
-          "Value": "Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve"
+          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
         }
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource_UpperSource",
+      "Name": "Target_UpperSource_UpperSource",
       "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_UpperSource_UpperSource_Source"
+          "Value": "Target_UpperSource_UpperSource_Source"
         },
         {
           "Name": "ScaleX",
@@ -378,12 +302,12 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource_UpperSource_Source",
+      "Name": "Target_UpperSource_UpperSource_Source",
       "Type": "ScaleBias",
       "Properties": [
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source"
+          "Value": "Target_UpperSource_UpperSource_Source_Source"
         },
         {
           "Name": "Bias",
@@ -396,7 +320,7 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source",
+      "Name": "Target_UpperSource_UpperSource_Source_Source",
       "Type": "RidgedMultifractal",
       "Properties": [
         {
@@ -409,7 +333,7 @@
         },
         {
           "Name": "Source",
-          "Value": "Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source_Source"
+          "Value": "Target_UpperSource_UpperSource_Source_Source_Source"
         },
         {
           "Name": "Hurst",
@@ -430,7 +354,7 @@
       ]
     },
     {
-      "Name": "Target_Controller_DisplaceY_UpperSource_UpperSource_Source_Source_Source",
+      "Name": "Target_UpperSource_UpperSource_Source_Source_Source",
       "Type": "ClassicPerlin",
       "Properties": [
         {
@@ -439,37 +363,7 @@
         },
         {
           "Name": "FadeCurve",
-          "Value": "Target_Controller_DisplaceY_Controller_Source_Source_Source_FadeCurve"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_DisplaceZ",
-      "Type": "Const",
-      "Properties": [
-        {
-          "Name": "Value",
-          "Value": "0"
-        }
-      ]
-    },
-    {
-      "Name": "Target_LowerSource",
-      "Type": "Const",
-      "Properties": [
-        {
-          "Name": "Value",
-          "Value": "0"
-        }
-      ]
-    },
-    {
-      "Name": "Target_UpperSource",
-      "Type": "Const",
-      "Properties": [
-        {
-          "Name": "Value",
-          "Value": "1"
+          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
         }
       ]
     }

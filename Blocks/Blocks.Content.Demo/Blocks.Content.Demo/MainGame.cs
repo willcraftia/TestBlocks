@@ -161,7 +161,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //view.Position = new Vector3(0, 16 * 18, 0);
             view.Position = new Vector3(0, 16 * 16, 0);
             //view.Position = new Vector3(0, 16 * 3, 0);
-            //view.Position = new Vector3(0, 16 * 1, 0);
+            //view.Position = new Vector3(0, 16 * 2, 0);
             view.Yaw(MathHelper.Pi);
             view.Update();
 

@@ -2,6 +2,7 @@
 	<Components>
 		<Component Name="Target" Type="DefaultBiome">
 			<Properties>
+				<Property Name="DensityNoise" Value="title:Resources/DefaultDensityNoise.json" />
 				<Property Name="TerrainNoise" Value="title:Resources/DefaultTerrainNoise.json" />
 				<Property Name="Name" Value="Default Biome" />
 				<Property Name="TemperatureNoise" Value="Target_TemperatureNoise" />

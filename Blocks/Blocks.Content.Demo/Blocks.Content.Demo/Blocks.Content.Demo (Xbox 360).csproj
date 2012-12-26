@@ -64,6 +64,7 @@
     <None Include="Resources\DefaultBlockCatalog.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\DefaultDensityNoise.json" />
     <None Include="Resources\DefaultFlatTerrainProcedure.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -89,6 +90,7 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="Resources\DefaultDensityNoise.xml" />
     <Content Include="Resources\DefaultNoiseTerrainProcedure.xml" />
     <Content Include="Resources\DefaultTerrainNoise.xml" />
     <None Include="Resources\DirtBlock.xml">

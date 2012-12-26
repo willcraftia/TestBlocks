@@ -1,0 +1,18 @@
+{
+  "Components": [
+    {
+      "Name": "Target",
+      "Type": "GradientDensity",
+      "Properties": [
+        {
+          "Name": "MinY",
+          "Value": "0"
+        },
+        {
+          "Name": "MaxY",
+          "Value": "1"
+        }
+      ]
+    }
+  ]
+}

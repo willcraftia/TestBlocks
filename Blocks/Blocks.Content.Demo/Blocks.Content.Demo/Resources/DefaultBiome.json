@@ -5,6 +5,10 @@
       "Type": "DefaultBiome",
       "Properties": [
         {
+          "Name": "DensityNoise",
+          "Value": "title:Resources/DefaultDensityNoise.json"
+        },
+        {
           "Name": "TerrainNoise",
           "Value": "title:Resources/DefaultTerrainNoise.json"
         },

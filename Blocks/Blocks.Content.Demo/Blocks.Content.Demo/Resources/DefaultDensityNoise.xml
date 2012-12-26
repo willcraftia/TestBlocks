@@ -1,0 +1,10 @@
+﻿<Bundle>
+	<Components>
+		<Component Name="Target" Type="GradientDensity">
+			<Properties>
+				<Property Name="MinY" Value="0" />
+				<Property Name="MaxY" Value="1" />
+			</Properties>
+		</Component>
+	</Components>
+</Bundle>
