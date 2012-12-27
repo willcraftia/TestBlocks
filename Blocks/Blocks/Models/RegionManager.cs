@@ -41,6 +41,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         List<Region> regions = new List<Region>();
 
+        SkySphere skySphere;
+
         public SceneSettings SceneSettings { get; private set; }
 
         public RegionManager(IServiceProvider serviceProvider)
@@ -54,12 +56,18 @@ namespace Willcraftia.Xna.Blocks.Models
 
             globalAssetManager = new AssetManager(serviceProvider);
             globalAssetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
+            globalAssetManager.RegisterLoader(typeof(SkySphere), new SkySphereLoader(graphicsDevice, globalResourceManager));
+            globalAssetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(graphicsDevice));
         }
 
         public void LoadGrobalSettings()
         {
             var sceneSettingsResource = globalResourceManager.Load("title:Resources/SceneSettings.json");
             SceneSettings = globalAssetManager.Load<SceneSettings>(sceneSettingsResource);
+
+            var skySphereResource = globalResourceManager.Load("title:Resources/SkySphere.json");
+            skySphere = globalAssetManager.Load<SkySphere>(skySphereResource);
+            skySphere.SceneSettings = SceneSettings;
         }
 
         //
@@ -145,9 +153,11 @@ namespace Willcraftia.Xna.Blocks.Models
             foreach (var region in regions) region.Update();
         }
 
-        public void Draw(View view, Projection projection)
+        public void Draw(View view, PerspectiveFov projection)
         {
             foreach (var region in regions) region.Draw(view, projection);
+
+            skySphere.Draw(view, projection);
         }
 
         public void Close()

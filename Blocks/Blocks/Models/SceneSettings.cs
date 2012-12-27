@@ -2,12 +2,14 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using Willcraftia.Xna.Framework.Content;
+using Willcraftia.Xna.Framework.IO;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SceneSettings
+    public sealed class SceneSettings : IAsset
     {
         public const float DefaultSecondsPerDay = 10f;
 
@@ -66,6 +68,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 return direction;
             }
         }
+
+        // I/F
+        public IResource Resource { get; set; }
 
         public bool EarthRotationEnabled { get; set; }
 
@@ -176,6 +181,16 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return directionalLightSpecularColor; }
         }
 
+        public bool SunVisible
+        {
+            get { return 0 <= sunDirection.Y; }
+        }
+
+        public bool MoonVisible
+        {
+            get { return 0 <= moonDirection.Y; }
+        }
+
         public void Initialize()
         {
             if (initialized) return;
@@ -250,13 +265,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void UpdateDirectionalLight()
         {
-            if (0 <= sunDirection.Y)
+            if (SunVisible)
             {
                 directionalLightDirection = sunlightDirection;
                 directionalLightDiffuseColor = SunlightDiffuseColor;
                 directionalLightSpecularColor = SunlightSpecularColor;
             }
-            else if (0 <= moonDirection.Y)
+            else if (MoonVisible)
             {
                 directionalLightDirection = moonlightDirection;
                 directionalLightDiffuseColor = MoonlightDiffuseColor;
@@ -282,5 +297,14 @@ namespace Willcraftia.Xna.Blocks.Models
             var right = Vector3.Cross(midnightMoonDirection, Vector3.Up);
             moonRotationAxis = Vector3.Cross(right, midnightMoonDirection);
         }
+
+        #region ToString
+
+        public override string ToString()
+        {
+            return "[Uri:" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + "]";
+        }
+
+        #endregion
     }
 }

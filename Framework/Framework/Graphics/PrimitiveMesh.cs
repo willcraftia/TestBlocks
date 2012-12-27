@@ -15,15 +15,22 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ushort[] indices;
 
-        int primitiveCount;
-
         int currentVertexCount;
 
         int currentIndexCount;
 
-        VertexBuffer vertexBuffer;
-        
-        IndexBuffer indexBuffer;
+        public VertexBuffer VertexBuffer { get; private set; }
+
+        public IndexBuffer IndexBuffer { get; private set; }
+
+        public PrimitiveType PrimitiveType
+        {
+            get { return PrimitiveType.TriangleList; }
+        }
+
+        public int NumVertices { get; private set; }
+
+        public int PrimitiveCount { get; private set; }
 
         protected int CurrentVertex
         {
@@ -36,13 +43,13 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             var graphicsDevice = effect.GraphicsDevice;
 
-            graphicsDevice.SetVertexBuffer(vertexBuffer);
-            graphicsDevice.Indices = indexBuffer;
+            graphicsDevice.SetVertexBuffer(VertexBuffer);
+            graphicsDevice.Indices = IndexBuffer;
 
             foreach (var effectPass in effect.CurrentTechnique.Passes)
             {
                 effectPass.Apply();
-                graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertices.Length, 0, primitiveCount);
+                graphicsDevice.DrawIndexedPrimitives(PrimitiveType, 0, 0, NumVertices, 0, PrimitiveCount);
             }
         }
 
@@ -50,7 +57,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             vertices = new VertexPositionNormal[vertexCount];
             indices = new ushort[indexCount];
-            primitiveCount = indices.Length / 3;
+            NumVertices = vertexCount;
+            PrimitiveCount = indices.Length / 3;
         }
 
         protected void AddVertex(Vector3 position, Vector3 normal)
@@ -67,11 +75,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         protected void Build(GraphicsDevice graphicsDevice)
         {
-            vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormal), vertices.Length, BufferUsage.WriteOnly);
-            vertexBuffer.SetData(vertices);
+            VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormal), vertices.Length, BufferUsage.WriteOnly);
+            VertexBuffer.SetData(vertices);
 
-            indexBuffer = new IndexBuffer(graphicsDevice, typeof(ushort), indices.Length, BufferUsage.WriteOnly);
-            indexBuffer.SetData(indices);
+            IndexBuffer = new IndexBuffer(graphicsDevice, typeof(ushort), indices.Length, BufferUsage.WriteOnly);
+            IndexBuffer.SetData(indices);
         }
 
         #region IDisposable
@@ -93,8 +101,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (disposed) return;
 
-            if (vertexBuffer != null) vertexBuffer.Dispose();
-            if (indexBuffer != null) indexBuffer.Dispose();
+            if (VertexBuffer != null) VertexBuffer.Dispose();
+            if (IndexBuffer != null) IndexBuffer.Dispose();
 
             disposed = true;
         }

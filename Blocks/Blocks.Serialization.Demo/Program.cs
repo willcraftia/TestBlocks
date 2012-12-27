@@ -874,6 +874,26 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
+            #region SkySphereDefinition
+
+            //================================================================
+            // SkySphereDefinition
+
+            Console.WriteLine("SkySphereDefinition");
+            {
+                var skySphere = new SkySphereDefinition
+                {
+                    Texture = "SkySphere.png"
+                };
+                var jsonResource = SerializeToJson<SkySphereDefinition>("SkySphere", skySphere);
+                var xmlResource = SerializeToXml<SkySphereDefinition>("SkySphere", skySphere);
+                var fromJson = DeserializeFromJson<SkySphereDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<SkySphereDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
             #region MeshDefinition
 
             //================================================================
