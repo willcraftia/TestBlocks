@@ -1,9 +1,12 @@
 {
   "EarthRotationEnabled": true,
   "MidnightSunDirection": "0, -1, 1",
+  "MidnightMoonDirection": "0, 1, 1",
   "MiddayAmbientLightColor": "0.6, 0.6, 0.6",
   "MidnightAmbientLightColor": "0.1, 0.1, 0.1",
   "SunlightDiffuseColor": "1, 1, 1",
   "SunlightSpecularColor": "0, 0, 0",
-  "SecondsPerDay": 10.0
+  "MoonlightDiffuseColor": "0.5, 0.5, 0.5",
+  "MoonlightSpecularColor": "0, 0, 0",
+  "SecondsPerDay": 20.0
 }

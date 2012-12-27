@@ -5,6 +5,11 @@
 		<Y>-1</Y>
 		<Z>1</Z>
 	</MidnightSunDirection>
+	<MidnightMoonDirection>
+		<X>0</X>
+		<Y>1</Y>
+		<Z>1</Z>
+	</MidnightMoonDirection>
 	<MiddayAmbientLightColor>
 		<X>0.6</X>
 		<Y>0.6</Y>
@@ -25,5 +30,15 @@
 		<Y>0</Y>
 		<Z>0</Z>
 	</SunlightSpecularColor>
-	<SecondsPerDay>10</SecondsPerDay>
+	<MoonlightDiffuseColor>
+		<X>0.5</X>
+		<Y>0.5</Y>
+		<Z>0.5</Z>
+	</MoonlightDiffuseColor>
+	<MoonlightSpecularColor>
+		<X>0</X>
+		<Y>0</Y>
+		<Z>0</Z>
+	</MoonlightSpecularColor>
+	<SecondsPerDay>20</SecondsPerDay>
 </SceneSettingsDefinition>

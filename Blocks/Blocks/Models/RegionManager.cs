@@ -41,7 +41,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         List<Region> regions = new List<Region>();
 
-        SceneSettings sceneSettings;
+        public SceneSettings SceneSettings { get; private set; }
 
         public RegionManager(IServiceProvider serviceProvider)
         {
@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public void LoadGrobalSettings()
         {
             var sceneSettingsResource = globalResourceManager.Load("title:Resources/SceneSettings.json");
-            sceneSettings = globalAssetManager.Load<SceneSettings>(sceneSettingsResource);
+            SceneSettings = globalAssetManager.Load<SceneSettings>(sceneSettingsResource);
         }
 
         //
@@ -104,7 +104,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(INoiseSource), new NoiseLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
-            region.Initialize(graphicsDevice, sceneSettings, assetManager);
+            region.Initialize(graphicsDevice, SceneSettings, assetManager);
 
             lock (regions)
             {
@@ -140,7 +140,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
-            sceneSettings.Update(gameTime);
+            SceneSettings.Update(gameTime);
 
             foreach (var region in regions) region.Update();
         }

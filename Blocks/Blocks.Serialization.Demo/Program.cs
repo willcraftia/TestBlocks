@@ -856,11 +856,14 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 {
                     EarthRotationEnabled = true,
                     MidnightSunDirection = new Vector3(0, -1, 1),
+                    MidnightMoonDirection = new Vector3(0, 1, 1),
                     MiddayAmbientLightColor = new Vector3(0.6f),
                     MidnightAmbientLightColor = new Vector3(0.1f),
                     SunlightDiffuseColor = Vector3.One,
                     SunlightSpecularColor = Vector3.Zero,
-                    SecondsPerDay = 10f
+                    MoonlightDiffuseColor = new Vector3(0.5f),
+                    MoonlightSpecularColor = Vector3.Zero,
+                    SecondsPerDay = 20f
                 };
                 var jsonResource = SerializeToJson<SceneSettingsDefinition>("SceneSettings", sceneSettings);
                 var xmlResource = SerializeToXml<SceneSettingsDefinition>("SceneSettings", sceneSettings);

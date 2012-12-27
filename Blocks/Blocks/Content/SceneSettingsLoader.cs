@@ -22,10 +22,13 @@ namespace Willcraftia.Xna.Blocks.Content
             {
                 EarthRotationEnabled = definition.EarthRotationEnabled,
                 MidnightSunDirection = definition.MidnightSunDirection,
+                MidnightMoonDirection = definition.MidnightMoonDirection,
                 MiddayAmbientLightColor = definition.MiddayAmbientLightColor,
                 MidnightAmbientLightColor = definition.MidnightAmbientLightColor,
                 SunlightDiffuseColor = definition.SunlightDiffuseColor,
                 SunlightSpecularColor = definition.SunlightSpecularColor,
+                MoonlightDiffuseColor = definition.MoonlightDiffuseColor,
+                MoonlightSpecularColor = definition.MoonlightSpecularColor,
                 SecondsPerDay = definition.SecondsPerDay
             };
             sceneSettings.Initialize();
@@ -41,10 +44,13 @@ namespace Willcraftia.Xna.Blocks.Content
             {
                 EarthRotationEnabled = sceneSettings.EarthRotationEnabled,
                 MidnightSunDirection = sceneSettings.MidnightSunDirection,
+                MidnightMoonDirection = sceneSettings.MidnightMoonDirection,
                 MiddayAmbientLightColor = sceneSettings.MiddayAmbientLightColor,
                 MidnightAmbientLightColor = sceneSettings.MidnightAmbientLightColor,
                 SunlightDiffuseColor = sceneSettings.SunlightDiffuseColor,
                 SunlightSpecularColor = sceneSettings.SunlightSpecularColor,
+                MoonlightDiffuseColor = sceneSettings.MoonlightDiffuseColor,
+                MoonlightSpecularColor = sceneSettings.MoonlightSpecularColor,
                 SecondsPerDay = sceneSettings.SecondsPerDay
             };
 

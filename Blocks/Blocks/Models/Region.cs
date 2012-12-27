@@ -94,9 +94,9 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.EyePosition = eyePosition;
             ChunkEffect.ViewProjection = viewProjection;
             ChunkEffect.AmbientLightColor = SceneSettings.AmbientLightColor;
-            ChunkEffect.LightDirection = SceneSettings.SunlightDirection;
-            ChunkEffect.LightDiffuseColor = SceneSettings.SunlightDiffuseColor;
-            ChunkEffect.LightSpecularColor = SceneSettings.SunlightSpecularColor;
+            ChunkEffect.LightDirection = SceneSettings.DirectionalLightDirection;
+            ChunkEffect.LightDiffuseColor = SceneSettings.DirectionalLightDiffuseColor;
+            ChunkEffect.LightSpecularColor = SceneSettings.DirectionalLightSpecularColor;
             ChunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
             // TODO
             ChunkEffect.FogStart = Math.Max(50, (projection as PerspectiveFov).FarPlaneDistance - 50);
