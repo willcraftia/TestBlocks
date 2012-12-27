@@ -18,5 +18,5 @@
 	<ChunkProcedures>
 		<Procedure>DefaultTerrainProcedure.json</Procedure>
 	</ChunkProcedures>
-	<ChunkStore>Storage</ChunkStore>
+	<ChunkStore>None</ChunkStore>
 </Region>

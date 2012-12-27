@@ -19,5 +19,5 @@
   "ChunkProcedures": [
     "DefaultTerrainProcedure.json"
   ],
-  "ChunkStore": 0
+  "ChunkStore": 1
 }

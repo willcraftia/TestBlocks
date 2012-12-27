@@ -6,7 +6,7 @@
 				<Property Name="Controller" Value="Target_Controller" />
 				<Property Name="LowerSource" Value="Target_LowerSource" />
 				<Property Name="UpperSource" Value="Target_UpperSource" />
-				<Property Name="EdgeFalloff" Value="0.125" />
+				<Property Name="EdgeFalloff" Value="0.8" />
 				<Property Name="LowerBound" Value="0" />
 				<Property Name="UpperBound" Value="1000" />
 			</Properties>
@@ -32,7 +32,7 @@
 				<Property Name="Source" Value="Target_Controller_Source_Source_Source" />
 				<Property Name="Hurst" Value="0.9" />
 				<Property Name="Frequency" Value="0.5" />
-				<Property Name="Lacunarity" Value="0.25" />
+				<Property Name="Lacunarity" Value="0.2" />
 				<Property Name="OctaveCount" Value="6" />
 			</Properties>
 		</Component>
@@ -84,7 +84,7 @@
 				<Property Name="Controller" Value="Target_Controller" />
 				<Property Name="LowerSource" Value="Target_UpperSource_LowerSource" />
 				<Property Name="UpperSource" Value="Target_UpperSource_UpperSource" />
-				<Property Name="EdgeFalloff" Value="0.125" />
+				<Property Name="EdgeFalloff" Value="0.2" />
 				<Property Name="LowerBound" Value="0" />
 				<Property Name="UpperBound" Value="1000" />
 			</Properties>
@@ -141,7 +141,7 @@
 				<Property Name="Hurst" Value="1" />
 				<Property Name="Frequency" Value="1" />
 				<Property Name="Lacunarity" Value="2" />
-				<Property Name="OctaveCount" Value="6" />
+				<Property Name="OctaveCount" Value="2" />
 			</Properties>
 		</Component>
 		<Component Name="Target_UpperSource_UpperSource_Source_Source_Source" Type="Perlin">

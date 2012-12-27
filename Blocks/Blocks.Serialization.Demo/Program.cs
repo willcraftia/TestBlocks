@@ -551,6 +551,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         Source = new RidgedMultifractal
                         {
                             Name = "Mountain Fractal",
+                            OctaveCount = 2,
                             Source = new Perlin
                             {
                                 Name = "Mountain Perlin",
@@ -571,7 +572,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         {
                             Name = "Terrain Type Fractal",
                             Frequency = 0.5f,
-                            Lacunarity = 0.25f,
+                            Lacunarity = 0.2f,
                             Source = new Perlin
                             {
                                 Name = "Terrain Type Perlin",
@@ -589,7 +590,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     UpperSource = mountainShape,
                     UpperBound = 1000,
                     Controller = terrainType,
-                    EdgeFalloff = 0.125f
+                    EdgeFalloff = 0.2f
                 };
                 // terrain
                 var terrain = new Select
@@ -600,25 +601,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     UpperSource = highlandMountainSelect,
                     UpperBound = 1000,
                     Controller = terrainType,
-                    EdgeFalloff = 0.125f
+                    EdgeFalloff = 0.8f
                 };
-                //// density
-                //var density = new GradientDensity();
-                //// terrain
-                //var terrain = new Select
-                //{
-                //    LowerSource = new Const { Value = 0 },
-                //    LowerBound = 0.25f,
-                //    UpperSource = new Const { Value = 1 },
-                //    UpperBound = 1000,
-                //    Controller = new Displace
-                //    {
-                //        DisplaceX = new Const { Value = 0 },
-                //        DisplaceY = terrainSelect,
-                //        DisplaceZ = new Const { Value = 0 },
-                //        Source = density
-                //    }
-                //};
 
                 var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
                 var builder = new ComponentBundleBuilder(componentInfoManager);
@@ -834,7 +818,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     {
                         "DefaultTerrainProcedure.json"
                     },
-                    ChunkStore = ChunkStoreTypes.Storage
+                    ChunkStore = ChunkStoreTypes.None
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlResource = SerializeToXml<RegionDefinition>("DefaultRegion", region);

@@ -22,7 +22,7 @@
         },
         {
           "Name": "EdgeFalloff",
-          "Value": "0.125"
+          "Value": "0.8"
         },
         {
           "Name": "LowerBound",
@@ -96,7 +96,7 @@
         },
         {
           "Name": "Lacunarity",
-          "Value": "0.25"
+          "Value": "0.2"
         },
         {
           "Name": "OctaveCount",
@@ -245,7 +245,7 @@
         },
         {
           "Name": "EdgeFalloff",
-          "Value": "0.125"
+          "Value": "0.2"
         },
         {
           "Name": "LowerBound",
@@ -413,7 +413,7 @@
         },
         {
           "Name": "OctaveCount",
-          "Value": "6"
+          "Value": "2"
         }
       ]
     },
