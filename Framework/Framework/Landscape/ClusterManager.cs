@@ -12,6 +12,8 @@ namespace Willcraftia.Xna.Framework.Landscape
     {
         int extent;
 
+        float inverseExtent;
+
         Pool<Cluster> clusterPool;
 
         Dictionary<VectorI3, Cluster> clusterMap;
@@ -26,6 +28,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (extent < 1) throw new ArgumentOutOfRangeException("extent");
 
             this.extent = extent;
+
+            inverseExtent = 1 / (float) extent;
 
             clusterPool = new Pool<Cluster>(CreateNode);
             clusterMap = new Dictionary<VectorI3, Cluster>(capacity);
@@ -130,10 +134,12 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void CalculateClusterPosition(ref VectorI3 position, out VectorI3 result)
         {
-            result = position;
-            result.X /= extent;
-            result.Y /= extent;
-            result.Z /= extent;
+            result = new VectorI3
+            {
+                X = MathExtension.Floor(position.X * inverseExtent),
+                Y = MathExtension.Floor(position.Y * inverseExtent),
+                Z = MathExtension.Floor(position.Z * inverseExtent)
+            };
         }
 
         void CalculateClusterPosition(Partition partition, out VectorI3 result)
