@@ -20,6 +20,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectParameter worldViewProjection;
 
+        EffectParameter skyColor;
+
         EffectParameter sunDirection;
 
         EffectParameter sunDiffuseColor;
@@ -27,10 +29,6 @@ namespace Willcraftia.Xna.Blocks.Models
         EffectParameter sunThreshold;
 
         EffectParameter sunVisible;
-
-        EffectParameter time;
-
-        EffectParameter texture;
 
         //====================================================================
         // EffectTechnique
@@ -46,6 +44,12 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             get { return worldViewProjection.GetValueMatrix(); }
             set { worldViewProjection.SetValue(value); }
+        }
+
+        public Vector3 SkyColor
+        {
+            get { return skyColor.GetValueVector3(); }
+            set { skyColor.SetValue(value); }
         }
 
         public Vector3 SunDirection
@@ -70,18 +74,6 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             get { return sunVisible.GetValueSingle() != 0; }
             set { sunVisible.SetValue(value ? 1 : 0); }
-        }
-
-        public float Time
-        {
-            get { return time.GetValueSingle(); }
-            set { time.SetValue(value); }
-        }
-
-        public Texture2D Texture
-        {
-            get { return texture.GetValueTexture2D(); }
-            set { texture.SetValue(value); }
         }
 
         public SkySphereEffect(Effect backingEffect)
@@ -109,14 +101,12 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             worldViewProjection = backingEffect.Parameters["WorldViewProjection"];
 
+            skyColor = backingEffect.Parameters["SkyColor"];
+
             sunDirection = backingEffect.Parameters["SunDirection"];
             sunDiffuseColor = backingEffect.Parameters["SunDiffuseColor"];
             sunThreshold = backingEffect.Parameters["SunThreshold"];
             sunVisible = backingEffect.Parameters["SunVisible"];
-
-            time = backingEffect.Parameters["Time"];
-
-            texture = backingEffect.Parameters["Texture"];
         }
 
         void CacheEffectTechniques()

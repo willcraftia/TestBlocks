@@ -8,6 +8,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
 {
     public struct SkySphereDefinition
     {
-        public string Texture;
+        public SkyColorDefinition[] ColorTable;
     }
 }

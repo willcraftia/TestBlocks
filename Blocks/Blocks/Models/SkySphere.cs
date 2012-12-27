@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public IResource Resource { get; set; }
 
-        public Image2D Image { get; set; }
+        public SkyColorTable ColorTable { get; private set; }
 
         public SkySphereEffect Effect { get; set; }
 
@@ -57,6 +57,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.graphicsDevice = graphicsDevice;
 
+            ColorTable = new SkyColorTable();
             sphereMesh = new SphereMesh(graphicsDevice);
         }
 
@@ -66,11 +67,12 @@ namespace Willcraftia.Xna.Blocks.Models
             // 0 が 0 時、1 が 24 時。
             var elapsed = SceneSettings.ElapsedSecondsPerDay / SceneSettings.SecondsPerDay;
 
-            // エフェクトで使用する時間へ変換。
-            // エフェクトのテクスチャは、
-            // 0 が 12 時、1 が 24 時で、0 時から 12 時はそのミラー。
-            Effect.Time = 2 * elapsed - 1;
+            // 空の色。
+            Vector3 skyColor;
+            ColorTable.GetColor(elapsed, out skyColor);
+            Effect.SkyColor = skyColor;
 
+            // 太陽の情報。
             if (SunVisible)
             {
                 Effect.SunDiffuseColor = SceneSettings.SunlightDiffuseColor;

@@ -78,6 +78,8 @@
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\SceneSettings.cs" />
+    <Compile Include="Models\SkyColor.cs" />
+    <Compile Include="Models\SkyColorTable.cs" />
     <Compile Include="Models\SkySphere.cs" />
     <Compile Include="Models\SkySphereEffect.cs" />
     <Compile Include="Serialization\ChunkStoreTypes.cs" />
@@ -131,6 +133,7 @@
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />
+    <Compile Include="Serialization\SkyColorDefinition.cs" />
     <Compile Include="Serialization\SkySphereDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />

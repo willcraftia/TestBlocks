@@ -3,6 +3,8 @@
 //-----------------------------------------------------------------------------
 float4x4 WorldViewProjection;
 
+float3 SkyColor;
+
 // ‹“_‚©‚çŒ©‚½‘¾—z‚Ì•ûŒü
 float3 SunDirection;
 float3 SunDiffuseColor;
@@ -11,19 +13,6 @@ float SunThreshold;
 // 0: ‘¾—z‚ğ•`‰æ‚µ‚È‚¢
 // 1: ‘¾—z‚ğ•`‰æ‚·‚é
 float SunVisible;
-
-float Time;
-
-texture Texture;
-sampler TextureSampler = sampler_state
-{
-    Texture = <Texture>;
-    AddressU = Mirror;
-    AddressV = Clamp;
-    MinFilter = Linear;
-    MagFilter = Linear;
-    MipFilter = Linear;
-};
 
 //=============================================================================
 // Structures
@@ -58,9 +47,7 @@ VSOutput VS(VSInput input)
 //-----------------------------------------------------------------------------
 float4 PS(VSOutput input) : COLOR0
 {
-    float2 texCoord = float2(Time, 1);
-
-    float4 color = tex2D(TextureSampler, texCoord);
+    float4 color = float4(SkyColor, 1);
 
     // –@ü‚ª‚Ç‚Ì’ö“x‘¾—z‚ÌŒü‚«‚Éˆê’v‚µ‚Ä‚¢‚é‚©‚ğZo
     // ‘¾—z‚Ì‹t•ûŒü‚Í 0 ‚Æ‚µ‚Ä”jŠü

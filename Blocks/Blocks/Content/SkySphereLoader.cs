@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
@@ -35,26 +36,47 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (SkySphereDefinition) serializer.Deserialize(resource);
 
-            var skySphere = new SkySphere(graphicsDevice)
+            var skySphere = new SkySphere(graphicsDevice);
+
+            if (!ArrayHelper.IsNullOrEmpty(definition.ColorTable))
             {
-                Image = Load<Image2D>(resource, definition.Texture)
-            };
+                for (int i = 0; i < definition.ColorTable.Length; i++)
+                {
+                    var skyColor = ToSkyColor(ref definition.ColorTable[i]);
+                    skySphere.ColorTable.AddColor(skyColor);
+                }
+            }
 
             var effectResource = resourceManager.Load("content:Effects/SkySphereEffect");
             skySphere.Effect = new SkySphereEffect(AssetManager.Load<Effect>(effectResource));
-            skySphere.Effect.Texture = skySphere.Image.Texture;
 
             return skySphere;
+        }
+
+        SkyColor ToSkyColor(ref SkyColorDefinition definition)
+        {
+            return new SkyColor(definition.Time, definition.Color);
         }
 
         public void Save(IResource resource, object asset)
         {
             var skySphere = asset as SkySphere;
 
-            var definition = new SkySphereDefinition
+            var definition = new SkySphereDefinition();
+
+            if (skySphere.ColorTable.Count != 0)
             {
-                Texture = ToUri(resource, skySphere.Image)
-            };
+                definition.ColorTable = new SkyColorDefinition[skySphere.ColorTable.Count];
+                int index = 0;
+                foreach (var skyColor in skySphere.ColorTable)
+                {
+                    definition.ColorTable[index++] = new SkyColorDefinition
+                    {
+                        Time = skyColor.Time,
+                        Color = skyColor.Color
+                    };
+                }
+            }
 
             serializer.Serialize(resource, definition);
         }

@@ -148,6 +148,8 @@
     <Compile Include="Models\RegionMonitor.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
+    <Compile Include="Models\SkyColor.cs" />
+    <Compile Include="Models\SkyColorTable.cs" />
     <Compile Include="Models\SkySphere.cs" />
     <Compile Include="Models\SkySphereEffect.cs" />
     <Compile Include="Models\StorageChunkStore.cs" />
@@ -164,6 +166,7 @@
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />
+    <Compile Include="Serialization\SkyColorDefinition.cs" />
     <Compile Include="Serialization\SkySphereDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
