@@ -23,13 +23,13 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int InitialActivePartitionCapacity = 5000;
 
-        public const int InitialActiveClusterPartitionCapacity = 30;
+        public const int InitialActiveClusterPartitionCapacity = 50;
 
-        public const int DefaultTaskQueueSlotCount = 20;
+        public const int DefaultTaskQueueSlotCount = 50;
 
         public const int DefaultActivationCapacity = 100;
 
-        public const int DefaultPassivationCapacity = 100;
+        public const int DefaultPassivationCapacity = 1000;
 
         public const int DefaultPassivationSearchCapacity = 200;
 

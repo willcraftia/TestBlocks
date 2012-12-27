@@ -83,6 +83,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const int InitialActiveChunkCapacity = 3000;
 
+        public const int InterChunkMeshCapacity = 100;
+
         static readonly Logger logger = new Logger(typeof(ChunkManager).Name);
 
         static readonly BlendState colorWriteDisable = new BlendState
@@ -171,7 +173,7 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkMeshPool = new ConcurrentPool<ChunkMesh>(CreateChunkMesh);
             interChunkMeshPool = new Pool<InterChunkMesh>(CreateInterChunkMesh)
             {
-                MaxCapacity = 20
+                MaxCapacity = InterChunkMeshCapacity
             };
             vertexBufferPool = new Pool<VertexBuffer>(CreateVertexBuffer);
             indexBufferPool = new Pool<IndexBuffer>(CreateIndexBuffer);
