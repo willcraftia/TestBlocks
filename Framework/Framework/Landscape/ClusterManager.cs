@@ -129,7 +129,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref position, out clusterPosition);
 
-            return clusterMap.TryGetValue(position, out result);
+            return clusterMap.TryGetValue(clusterPosition, out result);
         }
 
         void CalculateClusterPosition(ref VectorI3 position, out VectorI3 result)
