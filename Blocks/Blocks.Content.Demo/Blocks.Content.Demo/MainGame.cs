@@ -51,10 +51,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         RasterizerState defaultRasterizerState = new RasterizerState();
 
-        Vector3 middaySkyColor = Color.CornflowerBlue.ToVector3();
-
-        Vector3 midnightSkyColor = Color.Black.ToVector3();
-
         Region region;
 
 #if DEBUG
@@ -381,10 +377,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // RegionManager
 
-            Vector3 skyColor;
-            regionManager.SceneSettings.CalculateSkyColor(ref middaySkyColor, ref midnightSkyColor, out skyColor);
-
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, new Vector4(skyColor, 1), 1, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1, 0);
             GraphicsDevice.RasterizerState = defaultRasterizerState;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
