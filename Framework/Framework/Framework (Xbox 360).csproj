@@ -168,10 +168,10 @@
     <Compile Include="IO\TitleResourceLoader.cs" />
     <Compile Include="IO\WebResource.cs" />
     <Compile Include="IO\WebResourceLoader.cs" />
-    <Compile Include="Landscape\ActivePartitionQueue.cs" />
+    <Compile Include="Landscape\Cluster.cs" />
+    <Compile Include="Landscape\ClusteredPartitionQueue.cs" />
+    <Compile Include="Landscape\ClusterManager.cs" />
     <Compile Include="Landscape\Partition.cs" />
-    <Compile Include="Landscape\PartitionBundle.cs" />
-    <Compile Include="Landscape\PartitionBundleManager.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
     <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />

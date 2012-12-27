@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Willcraftia.Xna.Framework.Landscape
 {
-    public sealed class PartitionBundle
+    public sealed class Cluster
     {
         public VectorI3 Position;
 
@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             get { return partitionMap.Count; }
         }
 
-        public PartitionBundle(int extent)
+        public Cluster(int extent)
         {
             this.extent = extent;
 

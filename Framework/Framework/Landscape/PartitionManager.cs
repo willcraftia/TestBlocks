@@ -19,7 +19,11 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     public abstract class PartitionManager : IDisposable
     {
+        public const int ClusterExtent = 8;
+
         public const int InitialActivePartitionCapacity = 5000;
+
+        public const int InitialActiveClusterPartitionCapacity = 16;
 
         public const int DefaultTaskQueueSlotCount = 20;
 
@@ -43,7 +47,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         // TODO
         // 初期容量。
 
-        ActivePartitionQueue activePartitions = new ActivePartitionQueue(16, InitialActivePartitionCapacity);
+        ClusteredPartitionQueue activePartitions = new ClusteredPartitionQueue(
+            ClusterExtent,
+            InitialActiveClusterPartitionCapacity,
+            InitialActivePartitionCapacity);
 
         PartitionQueue activatingPartitions = new PartitionQueue(DefaultActivationCapacity);
 
@@ -420,6 +427,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         [Conditional("DEBUG")]
         void DebugUpdateMonitor()
         {
+            Monitor.ActiveClusterCount = activePartitions.ClusterCount;
             Monitor.ActivePartitionCount = activePartitions.Count;
             Monitor.ActivatingPartitionCount = activatingPartitions.Count;
             Monitor.PassivatingPartitionCount = passivatingPartitions.Count;
@@ -482,7 +490,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
-        void DisposePartitions(ActivePartitionQueue partitions)
+        void DisposePartitions(ClusteredPartitionQueue partitions)
         {
             while (0 < partitions.Count)
             {
