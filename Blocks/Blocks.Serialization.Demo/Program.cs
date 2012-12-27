@@ -886,11 +886,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ColorTable = new SkyColorDefinition[]
                     {
                         new SkyColorDefinition { Time = 0, Color = Color.Black.ToVector3() },
-                        new SkyColorDefinition { Time = 0.2f, Color = Color.Black.ToVector3() },
-                        new SkyColorDefinition { Time = 0.3f, Color = Color.CornflowerBlue.ToVector3() },
+                        new SkyColorDefinition { Time = 0.15f, Color = Color.Black.ToVector3() },
+                        new SkyColorDefinition { Time = 0.25f, Color = Color.CornflowerBlue.ToVector3() },
                         new SkyColorDefinition { Time = 0.5f, Color = Color.CornflowerBlue.ToVector3() },
-                        new SkyColorDefinition { Time = 0.7f, Color = Color.CornflowerBlue.ToVector3() },
-                        new SkyColorDefinition { Time = 0.8f, Color = Color.Black.ToVector3() },
+                        new SkyColorDefinition { Time = 0.75f, Color = Color.CornflowerBlue.ToVector3() },
+                        new SkyColorDefinition { Time = 0.84f, Color = Color.Black.ToVector3() },
                         new SkyColorDefinition { Time = 1, Color = Color.Black.ToVector3() },
                     }
                 };

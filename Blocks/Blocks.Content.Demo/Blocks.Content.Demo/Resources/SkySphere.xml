@@ -9,7 +9,7 @@
 			</Color>
 		</SkyColorDefinition>
 		<SkyColorDefinition>
-			<Time>0.2</Time>
+			<Time>0.15</Time>
 			<Color>
 				<X>0</X>
 				<Y>0</Y>
@@ -17,7 +17,7 @@
 			</Color>
 		</SkyColorDefinition>
 		<SkyColorDefinition>
-			<Time>0.3</Time>
+			<Time>0.25</Time>
 			<Color>
 				<X>0.392156869</X>
 				<Y>0.58431375</Y>
@@ -33,7 +33,7 @@
 			</Color>
 		</SkyColorDefinition>
 		<SkyColorDefinition>
-			<Time>0.7</Time>
+			<Time>0.75</Time>
 			<Color>
 				<X>0.392156869</X>
 				<Y>0.58431375</Y>
@@ -41,7 +41,7 @@
 			</Color>
 		</SkyColorDefinition>
 		<SkyColorDefinition>
-			<Time>0.8</Time>
+			<Time>0.84</Time>
 			<Color>
 				<X>0</X>
 				<Y>0</Y>
