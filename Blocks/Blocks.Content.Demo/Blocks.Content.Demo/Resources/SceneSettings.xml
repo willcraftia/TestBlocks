@@ -5,11 +5,16 @@
 		<Y>-1</Y>
 		<Z>1</Z>
 	</MidnightSunDirection>
-	<AmbientLightColor>
+	<MiddayAmbientLightColor>
 		<X>0.6</X>
 		<Y>0.6</Y>
 		<Z>0.6</Z>
-	</AmbientLightColor>
+	</MiddayAmbientLightColor>
+	<MidnightAmbientLightColor>
+		<X>0.1</X>
+		<Y>0.1</Y>
+		<Z>0.1</Z>
+	</MidnightAmbientLightColor>
 	<SunlightDiffuseColor>
 		<X>1</X>
 		<Y>1</Y>
@@ -20,5 +25,5 @@
 		<Y>0</Y>
 		<Z>0</Z>
 	</SunlightSpecularColor>
-	<TimeScale>0.05</TimeScale>
+	<SecondsPerDay>10</SecondsPerDay>
 </SceneSettingsDefinition>

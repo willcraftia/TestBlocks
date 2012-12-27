@@ -13,12 +13,14 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public Vector3 MidnightSunDirection;
 
-        public Vector3 AmbientLightColor;
+        public Vector3 MiddayAmbientLightColor;
+
+        public Vector3 MidnightAmbientLightColor;
 
         public Vector3 SunlightDiffuseColor;
 
         public Vector3 SunlightSpecularColor;
 
-        public float TimeScale;
+        public float SecondsPerDay;
     }
 }

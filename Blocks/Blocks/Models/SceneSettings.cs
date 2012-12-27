@@ -9,19 +9,29 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class SceneSettings
     {
-        public const float DefaultTimeScale = 0.05f;
+        public const float DefaultSecondsPerDay = 10f;
 
         Vector3 midnightSunDirection = DefaultMidnightSunDirection;
 
+        Vector3 middayAmbientLightColor;
+
+        Vector3 midnightAmbientLightColor;
+
         Vector3 sunRotationAxis;
 
-        float timeScale = DefaultTimeScale;
+        float secondsPerDay = DefaultSecondsPerDay;
+
+        float halfDaySeconds;
+
+        float inverseHalfDaySeconds;
 
         bool initialized;
 
         Vector3 sunDirection;
 
         Vector3 sunlightDirection;
+
+        Vector3 ambientLightColor;
 
         public static Vector3 DefaultMidnightSunDirection
         {
@@ -52,24 +62,39 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return sunRotationAxis; }
         }
 
-        public Vector3 AmbientLightColor { get; set; }
+        public Vector3 MiddayAmbientLightColor
+        {
+            get { return middayAmbientLightColor; }
+            set { middayAmbientLightColor = value; }
+        }
+
+        public Vector3 MidnightAmbientLightColor
+        {
+            get { return midnightAmbientLightColor; }
+            set { midnightAmbientLightColor = value; }
+        }
 
         public Vector3 SunlightDiffuseColor { get; set; }
 
         public Vector3 SunlightSpecularColor { get; set; }
 
-        public float TimeScale
+        public float SecondsPerDay
         {
-            get { return timeScale; }
+            get { return secondsPerDay; }
             set
             {
                 if (value <= 0) throw new ArgumentOutOfRangeException("value");
 
-                timeScale = value;
+                secondsPerDay = value;
             }
         }
 
-        public float Time { get; private set; }
+        public float ElapsedSecondsPerDay { get; private set; }
+
+        public Vector3 AmbientLightColor
+        {
+            get { return ambientLightColor; }
+        }
 
         public Vector3 SunDirection
         {
@@ -87,16 +112,31 @@ namespace Willcraftia.Xna.Blocks.Models
 
             InitializeSunRotationAxis();
 
+            halfDaySeconds = secondsPerDay * 0.5f;
+            inverseHalfDaySeconds = 1 / halfDaySeconds;
+
             initialized = true;
         }
 
         public void Update(GameTime gameTime)
         {
-            Time = (float) gameTime.TotalGameTime.TotalSeconds * timeScale;
+            ElapsedSecondsPerDay = (float) gameTime.TotalGameTime.TotalSeconds % secondsPerDay;
 
-            var sunTransform = Matrix.CreateFromAxisAngle(sunRotationAxis, MathHelper.TwoPi * Time);
+            var sunAngle = (ElapsedSecondsPerDay / secondsPerDay) * MathHelper.TwoPi;
+            var sunTransform = Matrix.CreateFromAxisAngle(sunRotationAxis, sunAngle);
             sunDirection = Vector3.Transform(midnightSunDirection, sunTransform);
             sunDirection.Normalize();
+
+            if (ElapsedSecondsPerDay < halfDaySeconds)
+            {
+                var amount = ElapsedSecondsPerDay * inverseHalfDaySeconds;
+                Vector3.Lerp(ref midnightAmbientLightColor, ref middayAmbientLightColor, amount, out ambientLightColor);
+            }
+            else
+            {
+                var amount = (ElapsedSecondsPerDay - halfDaySeconds) * inverseHalfDaySeconds;
+                Vector3.Lerp(ref middayAmbientLightColor, ref midnightAmbientLightColor, amount, out ambientLightColor);
+            }
 
             sunlightDirection = -sunDirection;
         }
