@@ -2,14 +2,11 @@
 // Variables
 //-----------------------------------------------------------------------------
 float4x4 World;
-//float4x4 View;
-//float4x4 Projection;
 float4x4 ViewProjection;
 
 float3 EyePosition;
 
 float3 AmbientLightColor;
-//bool LightEnabled;
 float3 LightDirection;
 float3 LightDiffuseColor;
 float3 LightSpecularColor;

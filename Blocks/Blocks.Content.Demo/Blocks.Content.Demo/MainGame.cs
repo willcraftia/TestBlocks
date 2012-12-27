@@ -25,9 +25,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
     {
         static readonly Logger logger = new Logger(typeof(MainGame).Name);
 
-        const int partitionMinActiveRange = 10;
+        const int partitionMinActiveRange = 13;
 
-        const int partitionMaxActiveRange = 12;
+        const int partitionMaxActiveRange = 15;
 
         GraphicsDeviceManager graphics;
 
@@ -43,7 +43,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         
         float dashFactor = 2;
 
-        float farPlaneDistance = 150;
+        float farPlaneDistance = (partitionMinActiveRange - 1) * 16;
 
         RegionManager regionManager;
 

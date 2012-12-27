@@ -2,14 +2,14 @@
 	<Name>Default Region</Name>
 	<Bounds>
 		<Min>
-			<X>-32</X>
+			<X>-128</X>
 			<Y>0</Y>
-			<Z>-32</Z>
+			<Z>-128</Z>
 		</Min>
 		<Max>
-			<X>32</X>
+			<X>128</X>
 			<Y>16</Y>
-			<Z>32</Z>
+			<Z>128</Z>
 		</Max>
 	</Bounds>
 	<TileCatalog>DefaultTileCatalog.json</TileCatalog>
@@ -18,5 +18,5 @@
 	<ChunkProcedures>
 		<Procedure>DefaultTerrainProcedure.json</Procedure>
 	</ChunkProcedures>
-	<ChunkStore>None</ChunkStore>
+	<ChunkStore>Storage</ChunkStore>
 </Region>

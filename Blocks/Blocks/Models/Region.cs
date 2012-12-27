@@ -109,9 +109,8 @@ namespace Willcraftia.Xna.Blocks.Models
             // Fog
 
             ChunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
-            // TODO
-            ChunkEffect.FogStart = Math.Max(50, projection.FarPlaneDistance - 50);
-            ChunkEffect.FogEnd = projection.FarPlaneDistance;
+            ChunkEffect.FogStart = projection.FarPlaneDistance * 0.6f;
+            ChunkEffect.FogEnd = projection.FarPlaneDistance * 0.9f;
             ChunkEffect.FogColor = SceneSettings.SkyColor;
 
             //----------------------------------------------------------------

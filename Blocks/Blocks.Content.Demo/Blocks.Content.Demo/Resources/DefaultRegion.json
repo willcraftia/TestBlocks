@@ -2,14 +2,14 @@
   "Name": "Default Region",
   "Bounds": {
     "Min": {
-      "X": -32,
+      "X": -128,
       "Y": 0,
-      "Z": -32
+      "Z": -128
     },
     "Max": {
-      "X": 32,
+      "X": 128,
       "Y": 16,
-      "Z": 32
+      "Z": 128
     }
   },
   "TileCatalog": "DefaultTileCatalog.json",
@@ -19,5 +19,5 @@
   "ChunkProcedures": [
     "DefaultTerrainProcedure.json"
   ],
-  "ChunkStore": 1
+  "ChunkStore": 0
 }

@@ -824,8 +824,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Region",
                     Bounds = new BoundingBoxI
                     {
-                        Min = new VectorI3(-32, 0, -32),
-                        Max = new VectorI3(32, 16, 32)
+                        Min = new VectorI3(-128, 0, -128),
+                        Max = new VectorI3(128, 16, 128)
                     },
                     TileCatalog = "DefaultTileCatalog.json",
                     BlockCatalog = "DefaultBlockCatalog.json",
@@ -834,7 +834,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     {
                         "DefaultTerrainProcedure.json"
                     },
-                    ChunkStore = ChunkStoreTypes.None
+                    ChunkStore = ChunkStoreTypes.Storage
                 };
                 var jsonResource = SerializeToJson<RegionDefinition>("DefaultRegion", region);
                 var xmlResource = SerializeToXml<RegionDefinition>("DefaultRegion", region);
