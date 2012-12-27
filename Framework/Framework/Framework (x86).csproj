@@ -114,6 +114,10 @@
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
+    <Compile Include="Graphics\CubeMesh.cs" />
+    <Compile Include="Graphics\PrimitiveMesh.cs" />
+    <Compile Include="Graphics\SphereMesh.cs" />
+    <Compile Include="Graphics\VertexPositionNormal.cs" />
     <Compile Include="Landscape\ClusteredPartitionQueue.cs" />
     <Compile Include="Landscape\Cluster.cs" />
     <Compile Include="Landscape\ClusterManager.cs" />

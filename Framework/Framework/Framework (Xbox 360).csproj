@@ -151,8 +151,12 @@
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
+    <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
+    <Compile Include="Graphics\PrimitiveMesh.cs" />
+    <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Texture2DHelper.cs" />
+    <Compile Include="Graphics\VertexPositionNormal.cs" />
     <Compile Include="Graphics\WritableVertexBuffer.cs" />
     <Compile Include="IInitializingObject.cs" />
     <Compile Include="IO\ContentResource.cs" />
