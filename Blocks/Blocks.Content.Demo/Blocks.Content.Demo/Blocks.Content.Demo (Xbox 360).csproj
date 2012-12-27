@@ -94,7 +94,6 @@
     <Content Include="Resources\DefaultTerrainNoise.xml" />
     <Content Include="Resources\DefaultTerrainProcedure.xml" />
     <Content Include="Resources\SceneSettings.xml" />
-    <Content Include="Resources\SkySphere.xml" />
     <None Include="Resources\DirtBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -126,7 +125,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\SceneSettings.json" />
-    <None Include="Resources\SkySphere.json" />
     <None Include="Resources\SnowBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

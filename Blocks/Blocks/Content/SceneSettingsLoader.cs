@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Blocks.Models;
@@ -31,6 +32,16 @@ namespace Willcraftia.Xna.Blocks.Content
                 MoonlightSpecularColor = definition.MoonlightSpecularColor,
                 SecondsPerDay = definition.SecondsPerDay
             };
+
+            if (!ArrayHelper.IsNullOrEmpty(definition.ColorTable))
+            {
+                for (int i = 0; i < definition.ColorTable.Length; i++)
+                {
+                    var skyColor = ToSkyColor(ref definition.ColorTable[i]);
+                    sceneSettings.ColorTable.AddColor(skyColor);
+                }
+            }
+
             sceneSettings.Initialize();
 
             return sceneSettings;
@@ -54,7 +65,26 @@ namespace Willcraftia.Xna.Blocks.Content
                 SecondsPerDay = sceneSettings.SecondsPerDay
             };
 
+            if (sceneSettings.ColorTable.Count != 0)
+            {
+                definition.ColorTable = new SkyColorDefinition[sceneSettings.ColorTable.Count];
+                int index = 0;
+                foreach (var skyColor in sceneSettings.ColorTable)
+                {
+                    definition.ColorTable[index++] = new SkyColorDefinition
+                    {
+                        Time = skyColor.Time,
+                        Color = skyColor.Color
+                    };
+                }
+            }
+
             serializer.Serialize(resource, definition);
+        }
+
+        SkyColor ToSkyColor(ref SkyColorDefinition definition)
+        {
+            return new SkyColor(definition.Time, definition.Color);
         }
     }
 }

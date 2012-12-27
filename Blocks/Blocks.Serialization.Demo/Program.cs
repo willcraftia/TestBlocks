@@ -863,26 +863,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     SunlightSpecularColor = Vector3.Zero,
                     MoonlightDiffuseColor = new Vector3(0.5f),
                     MoonlightSpecularColor = Vector3.Zero,
-                    SecondsPerDay = 20f
-                };
-                var jsonResource = SerializeToJson<SceneSettingsDefinition>("SceneSettings", sceneSettings);
-                var xmlResource = SerializeToXml<SceneSettingsDefinition>("SceneSettings", sceneSettings);
-                var fromJson = DeserializeFromJson<SceneSettingsDefinition>(jsonResource);
-                var fromXml = DeserializeFromXml<SceneSettingsDefinition>(xmlResource);
-            }
-            Console.WriteLine();
-
-            #endregion
-
-            #region SkySphereDefinition
-
-            //================================================================
-            // SkySphereDefinition
-
-            Console.WriteLine("SkySphereDefinition");
-            {
-                var skySphere = new SkySphereDefinition
-                {
                     ColorTable = new SkyColorDefinition[]
                     {
                         new SkyColorDefinition { Time = 0, Color = Color.Black.ToVector3() },
@@ -892,12 +872,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         new SkyColorDefinition { Time = 0.75f, Color = Color.CornflowerBlue.ToVector3() },
                         new SkyColorDefinition { Time = 0.84f, Color = Color.Black.ToVector3() },
                         new SkyColorDefinition { Time = 1, Color = Color.Black.ToVector3() },
-                    }
+                    },
+                    SecondsPerDay = 20f
                 };
-                var jsonResource = SerializeToJson<SkySphereDefinition>("SkySphere", skySphere);
-                var xmlResource = SerializeToXml<SkySphereDefinition>("SkySphere", skySphere);
-                var fromJson = DeserializeFromJson<SkySphereDefinition>(jsonResource);
-                var fromXml = DeserializeFromXml<SkySphereDefinition>(xmlResource);
+                var jsonResource = SerializeToJson<SceneSettingsDefinition>("SceneSettings", sceneSettings);
+                var xmlResource = SerializeToXml<SceneSettingsDefinition>("SceneSettings", sceneSettings);
+                var fromJson = DeserializeFromJson<SceneSettingsDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<SceneSettingsDefinition>(xmlResource);
             }
             Console.WriteLine();
 

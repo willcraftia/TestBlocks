@@ -8,5 +8,35 @@
   "SunlightSpecularColor": "0, 0, 0",
   "MoonlightDiffuseColor": "0.5, 0.5, 0.5",
   "MoonlightSpecularColor": "0, 0, 0",
+  "ColorTable": [
+    {
+      "Time": 0.0,
+      "Color": "0, 0, 0"
+    },
+    {
+      "Time": 0.15,
+      "Color": "0, 0, 0"
+    },
+    {
+      "Time": 0.25,
+      "Color": "0.392156869, 0.58431375, 0.929411769"
+    },
+    {
+      "Time": 0.5,
+      "Color": "0.392156869, 0.58431375, 0.929411769"
+    },
+    {
+      "Time": 0.75,
+      "Color": "0.392156869, 0.58431375, 0.929411769"
+    },
+    {
+      "Time": 0.84,
+      "Color": "0, 0, 0"
+    },
+    {
+      "Time": 1.0,
+      "Color": "0, 0, 0"
+    }
+  ],
   "SecondsPerDay": 20.0
 }

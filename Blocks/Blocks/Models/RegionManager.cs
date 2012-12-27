@@ -56,7 +56,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             globalAssetManager = new AssetManager(serviceProvider);
             globalAssetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
-            globalAssetManager.RegisterLoader(typeof(SkySphere), new SkySphereLoader(graphicsDevice, globalResourceManager));
             globalAssetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(graphicsDevice));
         }
 
@@ -65,8 +64,9 @@ namespace Willcraftia.Xna.Blocks.Models
             var sceneSettingsResource = globalResourceManager.Load("title:Resources/SceneSettings.json");
             SceneSettings = globalAssetManager.Load<SceneSettings>(sceneSettingsResource);
 
-            var skySphereResource = globalResourceManager.Load("title:Resources/SkySphere.json");
-            skySphere = globalAssetManager.Load<SkySphere>(skySphereResource);
+            skySphere = new SkySphere(graphicsDevice);
+            var effectResource = globalResourceManager.Load("content:Effects/SkySphereEffect");
+            skySphere.Effect = new SkySphereEffect(globalAssetManager.Load<Effect>(effectResource));
             skySphere.SceneSettings = SceneSettings;
         }
 

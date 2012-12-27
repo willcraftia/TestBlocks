@@ -33,8 +33,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public IResource Resource { get; set; }
 
-        public SkyColorTable ColorTable { get; private set; }
-
         public SkySphereEffect Effect { get; set; }
 
         public float SunThreshold
@@ -57,7 +55,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.graphicsDevice = graphicsDevice;
 
-            ColorTable = new SkyColorTable();
             sphereMesh = new SphereMesh(graphicsDevice);
         }
 
@@ -69,7 +66,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 空の色。
             Vector3 skyColor;
-            ColorTable.GetColor(elapsed, out skyColor);
+            SceneSettings.ColorTable.GetColor(elapsed, out skyColor);
             Effect.SkyColor = skyColor;
 
             // 太陽の情報。

@@ -128,6 +128,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Vector3 MoonlightSpecularColor { get; set; }
 
+        public SkyColorTable ColorTable { get; private set; }
+
         public float SecondsPerDay
         {
             get { return secondsPerDay; }
@@ -189,6 +191,11 @@ namespace Willcraftia.Xna.Blocks.Models
         public bool MoonVisible
         {
             get { return 0 <= moonDirection.Y; }
+        }
+
+        public SceneSettings()
+        {
+            ColorTable = new SkyColorTable();
         }
 
         public void Initialize()

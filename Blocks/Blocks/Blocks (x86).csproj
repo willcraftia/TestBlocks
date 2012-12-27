@@ -71,7 +71,6 @@
     <Compile Include="Content\NoiseLoader.cs" />
     <Compile Include="Content\RegionLoader.cs" />
     <Compile Include="Content\SceneSettingsLoader.cs" />
-    <Compile Include="Content\SkySphereLoader.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
     <Compile Include="Models\BiomeElement.cs" />
     <Compile Include="Models\BiomeBounds.cs" />
@@ -134,7 +133,6 @@
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />
     <Compile Include="Serialization\SkyColorDefinition.cs" />
-    <Compile Include="Serialization\SkySphereDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
   </ItemGroup>

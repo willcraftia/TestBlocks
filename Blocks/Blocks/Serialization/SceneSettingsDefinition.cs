@@ -27,6 +27,8 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public Vector3 MoonlightSpecularColor;
 
+        public SkyColorDefinition[] ColorTable;
+
         public float SecondsPerDay;
     }
 }
