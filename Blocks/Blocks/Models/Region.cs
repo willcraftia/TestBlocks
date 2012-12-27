@@ -85,6 +85,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw(View view, PerspectiveFov projection)
         {
+            //----------------------------------------------------------------
+            // Basic Settings
+
             Vector3 eyePosition;
             View.GetEyePosition(ref view.Matrix, out eyePosition);
 
@@ -93,19 +96,34 @@ namespace Willcraftia.Xna.Blocks.Models
 
             ChunkEffect.EyePosition = eyePosition;
             ChunkEffect.ViewProjection = viewProjection;
+
+            //----------------------------------------------------------------
+            // Lighting
+
             ChunkEffect.AmbientLightColor = SceneSettings.AmbientLightColor;
             ChunkEffect.LightDirection = SceneSettings.DirectionalLightDirection;
             ChunkEffect.LightDiffuseColor = SceneSettings.DirectionalLightDiffuseColor;
             ChunkEffect.LightSpecularColor = SceneSettings.DirectionalLightSpecularColor;
+            
+            //----------------------------------------------------------------
+            // Fog
+
             ChunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
             // TODO
             ChunkEffect.FogStart = Math.Max(50, projection.FarPlaneDistance - 50);
             ChunkEffect.FogEnd = projection.FarPlaneDistance;
-            ChunkEffect.FogColor = Color.CornflowerBlue.ToVector3();
+            ChunkEffect.FogColor = SceneSettings.SkyColor;
+
+            //----------------------------------------------------------------
+            // Texture Tables
+
             ChunkEffect.TileMap = TileCatalog.TileMap;
             ChunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
             ChunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
             ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
+
+            //----------------------------------------------------------------
+            // Draw Chunks
 
             chunkManager.Draw(view, projection);
         }

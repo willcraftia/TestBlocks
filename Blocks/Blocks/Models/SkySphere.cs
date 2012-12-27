@@ -60,14 +60,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw(View view, PerspectiveFov projection)
         {
-            // 一日の時間を [0, 1] へ変換。
-            // 0 が 0 時、1 が 24 時。
-            var elapsed = SceneSettings.ElapsedSecondsPerDay / SceneSettings.SecondsPerDay;
-
             // 空の色。
-            Vector3 skyColor;
-            SceneSettings.ColorTable.GetColor(elapsed, out skyColor);
-            Effect.SkyColor = skyColor;
+            Effect.SkyColor = SceneSettings.SkyColor;
 
             // 太陽の情報。
             if (SunVisible)

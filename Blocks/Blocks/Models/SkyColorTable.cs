@@ -38,6 +38,13 @@ namespace Willcraftia.Xna.Blocks.Models
             entries.Insert(index, skyColor);
         }
 
+        public Vector3 GetColor(float time)
+        {
+            Vector3 result;
+            GetColor(time, out result);
+            return result;
+        }
+
         public void GetColor(float time, out Vector3 result)
         {
             int baseIndex = 0;

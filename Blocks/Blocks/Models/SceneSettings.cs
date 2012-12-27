@@ -130,6 +130,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SkyColorTable ColorTable { get; private set; }
 
+        public Vector3 SkyColor { get; private set; }
+
         public float SecondsPerDay
         {
             get { return secondsPerDay; }
@@ -220,6 +222,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             UpdateAmbientLightColor();
             UpdateDirectionalLight();
+
+            UpdateSkyColor();
         }
 
         public void CalculateSkyColor(ref Vector3 middaySkyColor, ref Vector3 midnightSkyColor, out Vector3 resul)
@@ -291,6 +295,15 @@ namespace Willcraftia.Xna.Blocks.Models
                 directionalLightDiffuseColor = new Vector3(0.1f);
                 directionalLightSpecularColor = Vector3.Zero;
             }
+        }
+
+        void UpdateSkyColor()
+        {
+            // 一日の時間を [0, 1] へ変換。
+            // 0 が 0 時、1 が 24 時。
+            var elapsed = ElapsedSecondsPerDay / SecondsPerDay;
+
+            SkyColor = ColorTable.GetColor(elapsed);
         }
 
         void InitializeSunRotationAxis()
