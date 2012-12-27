@@ -222,6 +222,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Region
 
+            regionManager.LoadGrobalSettings();
+
             region = regionManager.LoadRegion("title:Resources/DefaultRegion.json");
 
             //================================================================
@@ -317,7 +319,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // RegionManager
 
-            regionManager.Update();
+            regionManager.Update(gameTime);
 
             //================================================================
             // Debug

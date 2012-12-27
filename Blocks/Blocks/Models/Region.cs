@@ -24,6 +24,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
+        public SceneSettings SceneSettings { get; private set; }
+
         public AssetManager AssetManager { get; private set; }
 
         public string Name { get; set; }
@@ -59,12 +61,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
 #endif
 
-        public void Initialize(GraphicsDevice graphicsDevice, AssetManager assetManager)
+        public void Initialize(GraphicsDevice graphicsDevice, SceneSettings sceneSettings, AssetManager assetManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");
             if (assetManager == null) throw new ArgumentNullException("assetManager");
 
             GraphicsDevice = graphicsDevice;
+            SceneSettings = sceneSettings;
             AssetManager = assetManager;
 
             chunkManager = new ChunkManager(this, ChunkStore, RegionManager.ChunkSize);
@@ -89,13 +93,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             ChunkEffect.EyePosition = eyePosition;
             ChunkEffect.ViewProjection = viewProjection;
-            ChunkEffect.AmbientLightColor = new Vector3(0.6f);
-            // TODO
-            var lightDirection = new Vector3(1, -1, -1);
-            lightDirection.Normalize();
-            ChunkEffect.LightDirection = lightDirection;
-            ChunkEffect.LightDiffuseColor = Vector3.One;
-            ChunkEffect.LightSpecularColor = Vector3.Zero;
+            ChunkEffect.AmbientLightColor = SceneSettings.AmbientLightColor;
+            ChunkEffect.LightDirection = SceneSettings.SunlightDirection;
+            ChunkEffect.LightDiffuseColor = SceneSettings.SunlightDiffuseColor;
+            ChunkEffect.LightSpecularColor = SceneSettings.SunlightSpecularColor;
             ChunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
             // TODO
             ChunkEffect.FogStart = Math.Max(50, (projection as PerspectiveFov).FarPlaneDistance - 50);

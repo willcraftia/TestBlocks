@@ -1,0 +1,8 @@
+{
+  "EarthRotationEnabled": true,
+  "MidnightSunDirection": "0, -1, 1",
+  "AmbientLightColor": "0.6, 0.6, 0.6",
+  "SunlightDiffuseColor": "1, 1, 1",
+  "SunlightSpecularColor": "0, 0, 0",
+  "TimeScale": 0.05
+}

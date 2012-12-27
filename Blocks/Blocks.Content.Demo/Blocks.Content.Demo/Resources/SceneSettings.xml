@@ -1,0 +1,24 @@
+﻿<SceneSettingsDefinition>
+	<EarthRotationEnabled>true</EarthRotationEnabled>
+	<MidnightSunDirection>
+		<X>0</X>
+		<Y>-1</Y>
+		<Z>1</Z>
+	</MidnightSunDirection>
+	<AmbientLightColor>
+		<X>0.6</X>
+		<Y>0.6</Y>
+		<Z>0.6</Z>
+	</AmbientLightColor>
+	<SunlightDiffuseColor>
+		<X>1</X>
+		<Y>1</Y>
+		<Z>1</Z>
+	</SunlightDiffuseColor>
+	<SunlightSpecularColor>
+		<X>0</X>
+		<Y>0</Y>
+		<Z>0</Z>
+	</SunlightSpecularColor>
+	<TimeScale>0.05</TimeScale>
+</SceneSettingsDefinition>

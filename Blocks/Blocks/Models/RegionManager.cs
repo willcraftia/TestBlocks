@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
@@ -34,7 +35,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         GraphicsDevice graphicsDevice;
 
+        ResourceManager globalResourceManager = new ResourceManager();
+
+        AssetManager globalAssetManager;
+
         List<Region> regions = new List<Region>();
+
+        SceneSettings sceneSettings;
 
         public RegionManager(IServiceProvider serviceProvider)
         {
@@ -44,6 +51,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var graphicsDeviceService = serviceProvider.GetRequiredService<IGraphicsDeviceService>();
             graphicsDevice = graphicsDeviceService.GraphicsDevice;
+
+            globalAssetManager = new AssetManager(serviceProvider);
+            globalAssetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
+        }
+
+        public void LoadGrobalSettings()
+        {
+            var sceneSettingsResource = globalResourceManager.Load("title:Resources/SceneSettings.json");
+            sceneSettings = globalAssetManager.Load<SceneSettings>(sceneSettingsResource);
         }
 
         //
@@ -88,7 +104,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(INoiseSource), new NoiseLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
-            region.Initialize(graphicsDevice, assetManager);
+            region.Initialize(graphicsDevice, sceneSettings, assetManager);
 
             lock (regions)
             {
@@ -122,8 +138,10 @@ namespace Willcraftia.Xna.Blocks.Models
             return false;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
+            sceneSettings.Update(gameTime);
+
             foreach (var region in regions) region.Update();
         }
 

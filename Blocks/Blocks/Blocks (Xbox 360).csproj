@@ -104,6 +104,7 @@
     <Compile Include="Content\MeshLoader.cs" />
     <Compile Include="Content\NoiseLoader.cs" />
     <Compile Include="Content\RegionLoader.cs" />
+    <Compile Include="Content\SceneSettingsLoader.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
     <Compile Include="Content\TileLoader.cs" />
     <Compile Include="Landscape\ChunkPartition.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\RegionManager.cs" />
     <Compile Include="Models\RegionMonitor.cs" />
+    <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\StorageChunkStore.cs" />
     <Compile Include="Models\Tile.cs" />
@@ -158,6 +160,7 @@
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
+    <Compile Include="Serialization\SceneSettingsDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
   </ItemGroup>

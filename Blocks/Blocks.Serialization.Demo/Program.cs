@@ -845,6 +845,31 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
+            #region SceneSettingsDefinition
+
+            //================================================================
+            // SceneSettingsDefinition
+
+            Console.WriteLine("SceneSettingsDefinition");
+            {
+                var sceneSettings = new SceneSettingsDefinition
+                {
+                    EarthRotationEnabled = true,
+                    MidnightSunDirection = new Vector3(0, -1, 1),
+                    AmbientLightColor = new Vector3(0.6f),
+                    SunlightDiffuseColor = Vector3.One,
+                    SunlightSpecularColor = Vector3.Zero,
+                    TimeScale = 0.05f
+                };
+                var jsonResource = SerializeToJson<SceneSettingsDefinition>("SceneSettings", sceneSettings);
+                var xmlResource = SerializeToXml<SceneSettingsDefinition>("SceneSettings", sceneSettings);
+                var fromJson = DeserializeFromJson<SceneSettingsDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<SceneSettingsDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
             #region MeshDefinition
 
             //================================================================
