@@ -128,12 +128,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 var camera = Pssm.GetCamera(i);
 
-                // カメラのビュー行列と射影行列を更新。
+                // 光源カメラのビュー行列と射影行列を更新。
                 camera.Update(eyeView);
-                // カメラのビュー×射影行列。
+                // 光源カメラのビュー×射影行列。
                 Matrix lightViewProjection;
                 Matrix.Multiply(ref camera.View.Matrix, ref camera.Projection.Matrix, out lightViewProjection);
-
                 // エフェクトに設定。
                 ShadowMapEffect.LightViewProjection = lightViewProjection;
 
