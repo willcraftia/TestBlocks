@@ -42,11 +42,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Effects\Common.fxh">
+      <Name>Common</Name>
+    </None>
     <Compile Include="Fonts\Demo.spritefont">
       <Name>Demo</Name>
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
     </Compile>
+    <None Include="Effects\Shadow.fxh">
+      <Name>Shadow</Name>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fonts\Debug.spritefont">
@@ -65,6 +71,40 @@
   <ItemGroup>
     <Compile Include="Effects\SkySphereEffect.fx">
       <Name>SkySphereEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Effects\GaussianBlurEffect.fx">
+      <Name>GaussianBlurEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Effects\ScreenSpaceShadowEffect.fx">
+      <Name>ScreenSpaceShadowEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Effects\Pssm.fxh">
+      <Name>Pssm</Name>
+    </None>
+    <Compile Include="Effects\PssmClassicShadowSceneEffect.fx">
+      <Name>PssmClassicShadowSceneEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\PssmPcfSceneEffect.fx">
+      <Name>PssmPcfSceneEffect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\PssmVsmSceneEffect.fx">
+      <Name>PssmVsmSceneEffect</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>

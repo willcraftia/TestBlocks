@@ -42,6 +42,16 @@ namespace Willcraftia.Xna.Framework
         public const float AspectRatio16x9 = 16.0f / 9.0f;
 
         /// <summary>
+        /// 近くのビュー プレーンとの距離のデフォルト。
+        /// </summary>
+        public const float DefaultNearPlaneDistance = 0.1f;
+
+        /// <summary>
+        /// 遠くのビュー プレーンとの距離のデフォルト。
+        /// </summary>
+        public const float DefaultFarPlaneDistance = 1000.0f;
+
+        /// <summary>
         ///  y 方向の視野角 (ラジアン単位)
         /// </summary>
         float fov = DefaultFov;
@@ -50,6 +60,16 @@ namespace Willcraftia.Xna.Framework
         /// アスペクト比。
         /// </summary>
         float aspectRatio = AspectRatio4x3;
+
+        /// <summary>
+        /// 近くのビュー プレーンとの距離。
+        /// </summary>
+        float nearPlaneDistance = DefaultNearPlaneDistance;
+
+        /// <summary>
+        /// 遠くのビュー プレーンとの距離。
+        /// </summary>
+        float farPlaneDistance = DefaultFarPlaneDistance;
 
         /// <summary>
         /// y 方向の視野角 (ラジアン単位) を取得または設定します。
@@ -81,9 +101,39 @@ namespace Willcraftia.Xna.Framework
             }
         }
 
+        /// <summary>
+        /// 近くのビュー プレーンとの距離を取得または設定します。
+        /// </summary>
+        public float NearPlaneDistance
+        {
+            get { return nearPlaneDistance; }
+            set
+            {
+                if (nearPlaneDistance == value) return;
+
+                nearPlaneDistance = value;
+                MatrixDirty = true;
+            }
+        }
+
+        /// <summary>
+        /// 遠くのビュー プレーンとの距離を取得または設定します。
+        /// </summary>
+        public float FarPlaneDistance
+        {
+            get { return farPlaneDistance; }
+            set
+            {
+                if (farPlaneDistance == value) return;
+
+                farPlaneDistance = value;
+                MatrixDirty = true;
+            }
+        }
+
         protected override void UpdateOverride()
         {
-            Matrix.CreatePerspectiveFieldOfView(Fov, AspectRatio, NearPlaneDistance, FarPlaneDistance, out Matrix);
+            Matrix.CreatePerspectiveFieldOfView(fov, aspectRatio, nearPlaneDistance, farPlaneDistance, out Matrix);
             MatrixDirty = false;
         }
     }

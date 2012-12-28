@@ -28,5 +28,15 @@ namespace Willcraftia.Xna.Framework
             if (max < value) return max;
             return value;
         }
+
+        public static float CalculateGaussian(float sigma, float n)
+        {
+            //
+            // REFERENCE: sigmaRoot = (float) Math.Sqrt(2.0f * Math.PI * sigma * sigma)
+            //
+            var twoSigmaSquare = 2.0f * sigma * sigma;
+            var sigmaRoot = (float) Math.Sqrt(Math.PI * twoSigmaSquare);
+            return (float) Math.Exp(-(n * n) / twoSigmaSquare) / sigmaRoot;
+        }
     }
 }

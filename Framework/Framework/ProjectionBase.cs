@@ -23,56 +23,6 @@ namespace Willcraftia.Xna.Framework
         public bool MatrixDirty { get; protected set; }
 
         /// <summary>
-        /// 近くのビュー プレーンとの距離のデフォルト。
-        /// </summary>
-        public const float DefaultNearPlaneDistance = 0.1f;
-
-        /// <summary>
-        /// 遠くのビュー プレーンとの距離のデフォルト。
-        /// </summary>
-        public const float DefaultFarPlaneDistance = 1000.0f;
-
-        /// <summary>
-        /// 近くのビュー プレーンとの距離。
-        /// </summary>
-        float nearPlaneDistance = DefaultNearPlaneDistance;
-
-        /// <summary>
-        /// 遠くのビュー プレーンとの距離。
-        /// </summary>
-        float farPlaneDistance = DefaultFarPlaneDistance;
-
-        /// <summary>
-        /// 近くのビュー プレーンとの距離を取得または設定します。
-        /// </summary>
-        public float NearPlaneDistance
-        {
-            get { return nearPlaneDistance; }
-            set
-            {
-                if (nearPlaneDistance == value) return;
-
-                nearPlaneDistance = value;
-                MatrixDirty = true;
-            }
-        }
-
-        /// <summary>
-        /// 遠くのビュー プレーンとの距離を取得または設定します。
-        /// </summary>
-        public float FarPlaneDistance
-        {
-            get { return farPlaneDistance; }
-            set
-            {
-                if (farPlaneDistance == value) return;
-
-                farPlaneDistance = value;
-                MatrixDirty = true;
-            }
-        }
-
-        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         protected ProjectionBase()
