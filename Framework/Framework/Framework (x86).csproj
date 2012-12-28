@@ -114,7 +114,6 @@
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
-    <Compile Include="Graphics\IPssmSceneEffect.cs" />
     <Compile Include="Graphics\IShadowCaster.cs" />
     <Compile Include="Graphics\LightView.cs" />
     <Compile Include="Graphics\PssmLightCamera.cs" />
