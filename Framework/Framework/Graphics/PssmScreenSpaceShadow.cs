@@ -65,22 +65,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             ShadowDepthBias = DefaultShadowDepthBias;
         }
 
-        protected override void InitializeOverride()
-        {
-            if (ShadowMapEffect == null) throw new InvalidOperationException("ShadowMapEffect is null.");
-            if (PssmSceneEffect == null) throw new InvalidOperationException("PssmSceneEffect is null.");
-
-            Pssm = new Pssm(SplitCount);
-
-            shadowMaps = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount, ShadowMapSize, ShadowMapSize,
-                false, ShadowMapFormat, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PlatformContents);
-
-            vsmBlur = new GaussianBlur(GaussianBlurEffect, SpriteBatch, ShadowMapSize, ShadowMapSize, ShadowMapFormat,
-                VsmBlurRadius, VsmBlurAmount);
-
-            base.InitializeOverride();
-        }
-
         public override void Prepare(View eyeView, PerspectiveFov eyeProjection)
         {
             // ライト ボリュームを初期化。
@@ -112,6 +96,22 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (!casterSphere.Intersects(testSphere)) return;
 
             Pssm.TryAddShadowCaster(shadowCaster);
+        }
+
+        protected override void InitializeOverride()
+        {
+            if (ShadowMapEffect == null) throw new InvalidOperationException("ShadowMapEffect is null.");
+            if (PssmSceneEffect == null) throw new InvalidOperationException("PssmSceneEffect is null.");
+
+            Pssm = new Pssm(SplitCount);
+
+            shadowMaps = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount, ShadowMapSize, ShadowMapSize,
+                false, ShadowMapFormat, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PlatformContents);
+
+            vsmBlur = new GaussianBlur(GaussianBlurEffect, SpriteBatch, ShadowMapSize, ShadowMapSize, ShadowMapFormat,
+                VsmBlurRadius, VsmBlurAmount);
+
+            base.InitializeOverride();
         }
 
         protected override void DrawShadowMap(View eyeView, PerspectiveFov eyeProjection)
