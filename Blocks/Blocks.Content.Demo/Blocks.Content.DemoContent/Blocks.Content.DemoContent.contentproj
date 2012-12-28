@@ -90,21 +90,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Effects\Pssm.fxh">
-      <Name>Pssm</Name>
-    </None>
-    <Compile Include="Effects\PssmClassicShadowSceneEffect.fx">
-      <Name>PssmClassicShadowSceneEffect</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-    <Compile Include="Effects\PssmPcfSceneEffect.fx">
-      <Name>PssmPcfSceneEffect</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-    </Compile>
-    <Compile Include="Effects\PssmVsmSceneEffect.fx">
-      <Name>PssmVsmSceneEffect</Name>
+    <Compile Include="Effects\PssmSceneEffect.fx">
+      <Name>PssmSceneEffect</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
