@@ -135,6 +135,18 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
+        /// パーティションを開放します。
+        /// このメソッドは、非アクティブ化が成功し、
+        /// パーティションがプールへ戻される直前に呼び出されます。
+        /// </summary>
+        internal void Release()
+        {
+            position = VectorI3.Zero;
+
+            ReleaseOverride();
+        }
+
+        /// <summary>
         /// パーティションのアクティブ化を試行します。
         /// このメソッドは非同期に呼び出されます。
         /// </summary>
@@ -208,6 +220,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// true (非アクティブ化を完了した場合)、false (非アクティブ化を取り消した場合)。
         /// </returns>
         protected virtual bool PassivateOverride() { return true; }
+
+        /// <summary>
+        /// パーティションの解放で呼び出されます。
+        /// </summary>
+        protected virtual void ReleaseOverride() { }
 
         /// <summary>
         /// Dispose() メソッドが呼び出される際に呼び出されます。

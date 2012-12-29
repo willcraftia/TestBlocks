@@ -263,6 +263,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティブな隣接パーティションへ非アクティブ化を通知。
                 NortifyNeighborPassivated(partition);
 
+                // 解放処理を呼び出す。
+                partition.Release();
+
                 // 非アクティブ化に成功したのでプールへ戻す。
                 partitionPool.Return(partition);
             }
@@ -308,11 +311,19 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var nearbyPosition = position + side.Direction;
 
                 Partition neighbor;
-                if (activePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
+
+                if (!activePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
                 {
-                    var reverseSide = side.Reverse();
-                    neighbor.OnNeighborPassivated(partition, reverseSide);
+                    // passivatingPartitions にあるパーティションは、
+                    // その非アクティブ化が取り消されて activePartitions に戻され、
+                    // 次の非アクティブ化判定の試行では非アクティブ化対象ではなくなる場合がある。
+                    // このため、passivatingPartitions にあるパーティションについても探索する。
+                    if (!passivatingPartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                        continue;
                 }
+
+                var reverseSide = side.Reverse();
+                neighbor.OnNeighborPassivated(partition, reverseSide);
             }
         }
 
