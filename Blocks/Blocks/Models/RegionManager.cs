@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         // TODO
         // どこで管理する？
-        public static VectorI3 ChunkSize = new VectorI3(16, 16, 16);
+        public static VectorI3 ChunkSize = new VectorI3(16);
 
         //
         //====================================================================
