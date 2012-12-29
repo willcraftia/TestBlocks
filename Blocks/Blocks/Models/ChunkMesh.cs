@@ -183,6 +183,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             occlusionQuery.Begin();
 
+            // チャンクに描画ロックを要求。
+            if (Chunk != null && !Chunk.EnterDraw()) return;
+
             var effect = region.ChunkEffect;
 
             //----------------------------------------------------------------
@@ -206,6 +209,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             occlusionQuery.End();
             occlusionQueryActive = true;
+
+            // 描画ロックを解放。
+            Chunk.ExitDraw();
         }
 
         // I/F
