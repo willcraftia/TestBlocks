@@ -264,10 +264,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // TimeRuler
 
-#if TRACE
             timeRuler.StartFrame();
             updateMarker.Begin();
-#endif
 
             //================================================================
             // Keyboard State
@@ -318,7 +316,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // RegionManager
 
+            updateRegionMarker.Begin();
+
             regionManager.Update(gameTime);
+
+            updateRegionMarker.End();
 
             //================================================================
             // Others
@@ -346,9 +348,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // TimeRuler
 
-#if TRACE
             updateMarker.End();
-#endif
         }
 
         protected override void Draw(GameTime gameTime)
@@ -356,9 +356,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // TimeRuler
 
-#if TRACE
             if (IsActive) drawMarker.Begin();
-#endif
 
             //================================================================
             // SceneManager
@@ -381,9 +379,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // TimeRuler
 
-#if TRACE
             if (IsActive) drawMarker.End();
-#endif
 
             base.Draw(gameTime);
         }
