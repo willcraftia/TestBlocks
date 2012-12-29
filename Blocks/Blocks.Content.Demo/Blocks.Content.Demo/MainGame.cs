@@ -73,6 +73,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         TimeRulerMarker regionUpdateMarker;
 
+        TimeRulerMarker sceneManagerDrawSceneMarker;
+
+        TimeRulerMarker sceneManagerDrawSceneOcclusionQueryMarker;
+
+        TimeRulerMarker sceneManagerDrawSceneRenderingMarker;
+
         string helpMessage =
             "[F1] Help\r\n" +
             "[F2] Chunk bounding box\r\n" +
@@ -150,6 +156,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sceneManager = new SceneManager(GraphicsDevice);
             sceneManager.AddCamera(camera);
             sceneManager.ActiveCameraName = camera.Name;
+
+            sceneManager.Monitor.BeginDrawScene += OnSceneManagerMonitorBeginDrawScene;
+            sceneManager.Monitor.EndDrawScene += OnSceneManagerMonitorEndDrawScene;
+            sceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnSceneManagerMonitorBeginDrawSceneOcclusionQuery;
+            sceneManager.Monitor.EndDrawSceneOcclusionQuery += OnSceneManagerMonitorEndDrawSceneOcclusionQuery;
+            sceneManager.Monitor.BeginDrawSceneRendering += OnSceneManagerMonitorBeginDrawSceneRendering;
+            sceneManager.Monitor.EndDrawSceneRendering += Monitor_EndDrawSceneRendering;
 
             //================================================================
             // RegionManager
@@ -254,6 +267,21 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             drawMarker.Name = "Draw";
             drawMarker.BarIndex = 2;
             drawMarker.Color = Color.White;
+
+            sceneManagerDrawSceneMarker = timeRuler.CreateMarker();
+            sceneManagerDrawSceneMarker.Name = "SceneManagerDrawScene";
+            sceneManagerDrawSceneMarker.BarIndex = 3;
+            sceneManagerDrawSceneMarker.Color = Color.Cyan;
+
+            sceneManagerDrawSceneOcclusionQueryMarker = timeRuler.CreateMarker();
+            sceneManagerDrawSceneOcclusionQueryMarker.Name = "SceneManagerDrawSceneOcclusionQuery";
+            sceneManagerDrawSceneOcclusionQueryMarker.BarIndex = 3;
+            sceneManagerDrawSceneOcclusionQueryMarker.Color = Color.LawnGreen;
+
+            sceneManagerDrawSceneRenderingMarker = timeRuler.CreateMarker();
+            sceneManagerDrawSceneRenderingMarker.Name = "SceneManagerDrawSceneRendering";
+            sceneManagerDrawSceneRenderingMarker.BarIndex = 3;
+            sceneManagerDrawSceneRenderingMarker.Color = Color.Green;
 
             base.Initialize();
         }
@@ -474,9 +502,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("Max(").AppendNumber(region.Monitor.MaxChunkIndexCount).Append(") ");
             sb.Append("Total(").AppendNumber(region.Monitor.TotalChunkIndexCount).Append(")").AppendLine();
 
-            sb.Append("SceneObejcts: ").AppendNumber(sceneManager.DebugRenderedSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManager.DebugVisibleSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManager.DebugTotalSceneObjectCount).AppendLine();
+            sb.Append("SceneObejcts: ").AppendNumber(sceneManager.Monitor.RenderedSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManager.Monitor.VisibleSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManager.Monitor.TotalSceneObjectCount).AppendLine();
             
             sb.Append("MoveVelocity: ");
             sb.AppendNumber(viewInput.MoveVelocity).AppendLine();
@@ -592,6 +620,36 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         void OnPartitionManagerEndActivatePartitions(object sender, EventArgs e)
         {
             partitionManagerActivatePartitionsMarker.End();
+        }
+
+        void OnSceneManagerMonitorBeginDrawScene(object sender, EventArgs e)
+        {
+            sceneManagerDrawSceneMarker.Begin();
+        }
+
+        void OnSceneManagerMonitorEndDrawScene(object sender, EventArgs e)
+        {
+            sceneManagerDrawSceneMarker.End();
+        }
+
+        void OnSceneManagerMonitorBeginDrawSceneOcclusionQuery(object sender, EventArgs e)
+        {
+            sceneManagerDrawSceneOcclusionQueryMarker.Begin();
+        }
+
+        void OnSceneManagerMonitorEndDrawSceneOcclusionQuery(object sender, EventArgs e)
+        {
+            sceneManagerDrawSceneOcclusionQueryMarker.End();
+        }
+
+        void OnSceneManagerMonitorBeginDrawSceneRendering(object sender, EventArgs e)
+        {
+            sceneManagerDrawSceneRenderingMarker.Begin();
+        }
+
+        void Monitor_EndDrawSceneRendering(object sender, EventArgs e)
+        {
+            sceneManagerDrawSceneRenderingMarker.End();
         }
     }
 }

@@ -130,6 +130,7 @@
     <Compile Include="Graphics\PssmSceneEffect.cs" />
     <Compile Include="Graphics\PssmScreenSpaceShadow.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
+    <Compile Include="Graphics\SceneManagerMonitor.cs" />
     <Compile Include="Graphics\ScreenSpaceShadow.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />

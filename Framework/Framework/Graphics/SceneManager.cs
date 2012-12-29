@@ -70,6 +70,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingSphere frustumSphere;
 
+        public SceneManagerMonitor Monitor { get; private set; }
+
         #region Debug
 
         BasicEffect debugEffect;
@@ -77,17 +79,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         BoundingBoxDrawer debugBoundingBoxDrawer;
 
         public static bool DebugBoundingBoxVisible { get; set; }
-
-        public int DebugTotalSceneObjectCount { get; private set; }
-
-        public int DebugVisibleSceneObjectCount { get; private set; }
-
-        public int DebugOccludedSceneObjectCount { get; private set; }
-
-        public int DebugRenderedSceneObjectCount
-        {
-            get { return DebugVisibleSceneObjectCount - DebugOccludedSceneObjectCount; }
-        }
 
         #endregion
 
@@ -126,6 +117,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
             GraphicsDevice = graphicsDevice;
+
+            Monitor = new SceneManagerMonitor(this);
 
 #if DEBUG
             debugEffect = new BasicEffect(GraphicsDevice);
@@ -199,15 +192,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             opaqueSceneObjects.Clear();
             activeShadowCasters.Clear();
 
+            // カウンタをリセット。
+            Monitor.TotalSceneObjectCount = 0;
+            Monitor.VisibleSceneObjectCount = 0;
+            Monitor.OccludedSceneObjectCount = 0;
+
 #if DEBUG
             // デバッグ エフェクトへカメラ情報を設定。
             debugEffect.View = activeCamera.View.Matrix;
             debugEffect.Projection = activeCamera.Projection.Matrix;
-
-            // カウンタをリセット。
-            DebugTotalSceneObjectCount = 0;
-            DebugVisibleSceneObjectCount = 0;
-            DebugOccludedSceneObjectCount = 0;
 #endif
 
             // 長時間のロックの回避。
@@ -217,9 +210,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     workingSceneObjects.Enqueue(sceneObject);
             }
 
-#if DEBUG
-            DebugTotalSceneObjectCount = workingSceneObjects.Count;
-#endif
+            Monitor.TotalSceneObjectCount = workingSceneObjects.Count;
 
             // 可視オブジェクトの収集と種類による分類。
             while (workingSceneObjects.Count != 0)
@@ -237,9 +228,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                         opaqueSceneObjects.Add(sceneObject);
                     }
 
-#if DEBUG
-                    DebugVisibleSceneObjectCount++;
-#endif
+                    Monitor.VisibleSceneObjectCount++;
                 }
 
                 var shadowCaster = sceneObject as IShadowCaster;
@@ -301,12 +290,16 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void DrawScene()
         {
+            Monitor.OnBeginDrawScene();
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             //================================================================
             //
             // OcclusionQuery
             //
+
+            Monitor.OnBeginDrawSceneOcclusionQuery();
 
             GraphicsDevice.BlendState = colorWriteDisable;
 
@@ -316,10 +309,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             foreach (var translucent in translucentSceneObjects)
                 translucent.UpdateOcclusion();
 
+            Monitor.OnEndDrawSceneOcclusionQuery();
+
             //================================================================
             //
             // Rendering
             //
+
+            Monitor.OnBeginDrawSceneRendering();
 
             //----------------------------------------------------------------
             // Opaque Objects
@@ -330,10 +327,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 if (opaque.Occluded)
                 {
-#if DEBUG
-                    DebugOccludedSceneObjectCount++;
+                    Monitor.OccludedSceneObjectCount++;
                     DebugDrawBoundingBox(opaque);
-#endif
                     continue;
                 }
 
@@ -352,10 +347,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 if (translucent.Occluded)
                 {
-#if DEBUG
-                    DebugOccludedSceneObjectCount++;
+                    Monitor.OccludedSceneObjectCount++;
                     DebugDrawBoundingBox(translucent);
-#endif
                     continue;
                 }
 
@@ -365,6 +358,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 DebugDrawBoundingBox(translucent);
             }
+
+            Monitor.OnEndDrawSceneRendering();
+
+            Monitor.OnEndDrawScene();
         }
 
         [Conditional("DEBUG")]
