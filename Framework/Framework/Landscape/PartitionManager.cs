@@ -254,6 +254,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (partition.PassivationCanceled)
                 {
                     // 取り消されていたならばアクティブ リストへ戻し、次回の非アクティブ化に委ねる。
+                    partition.PassivationCanceled = false;
                     partition.PassivationCompleted = false;
                     activePartitions.Enqueue(partition);
                     continue;
@@ -284,6 +285,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (partition.ActivationCanceled)
                 {
                     // 取り消されていたならばプールへ戻す。
+                    partition.PassivationCanceled = false;
                     partition.ActivationCompleted = false;
                     partitionPool.Return(partition);
                     continue;

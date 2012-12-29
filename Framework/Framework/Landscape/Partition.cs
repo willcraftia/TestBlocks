@@ -53,7 +53,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// アクティブ化処理中に処理が取り消されているかどうかを示す値を取得します。
+        /// アクティブ化処理中に処理が取り消されているかどうかを示す値を取得または設定します。
         /// このプロパティは ActivationCompleted が true の場合にのみ有効です。
         /// </summary>
         /// <value>
@@ -62,6 +62,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal bool ActivationCanceled
         {
             get { return activationCanceled; }
+            set { activationCanceled = value; }
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 非アクティブ化処理中に処理が取り消されているかどうかを示す値を取得します。
+        /// 非アクティブ化処理中に処理が取り消されているかどうかを示す値を取得または設定します。
         /// このプロパティは PassivationCompleted が true の場合にのみ有効です。
         /// </summary>
         /// <value>
@@ -87,6 +88,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal bool PassivationCanceled
         {
             get { return passivationCanceled; }
+            set { passivationCanceled = value; }
         }
 
         /// <summary>
@@ -139,6 +141,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void Activate()
         {
             Debug.Assert(!activationCompleted);
+            Debug.Assert(!activationCanceled);
 
             asyncCallEvent.Reset();
 
