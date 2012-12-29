@@ -128,7 +128,11 @@ ColorPair CalculateLight(float3 E, float3 N, float2 texCoord)
     float dt = max(0, dot(L, N));
     result.Diffuse += LightDiffuseColor * dt;
     if (dt != 0)
-        result.Specular += LightSpecularColor * pow(max(0, dot(H, N)), specular.a);
+        result.Specular += LightSpecularColor * pow(max(0.00001f, dot(H, N)), specular.a);
+// XNA 4.0 Release ビルドでは、シェーダが pow(0,e) を exp(log(0) * e) へ展開し、
+// これが exp(-inf * e) となるため、コンパイル エラーとなることが既知の問題らしい。
+// ゆえに、0 の部分を限りなく 0 に近い値にして回避するらしい。
+//        result.Specular += LightSpecularColor * pow(max(0, dot(H, N)), specular.a);
 
     result.Diffuse *= tex2D(DiffuseMapSampler, texCoord);
     result.Diffuse += tex2D(EmissiveMapSampler, texCoord);
