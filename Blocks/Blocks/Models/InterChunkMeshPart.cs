@@ -35,7 +35,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         BoundingBox boundingBox;
 
-        BoundingSphere meshPartSphere;
+        BoundingSphere meshSphere;
 
         Vector3[] corners = new Vector3[8];
 
@@ -99,7 +99,7 @@ namespace Willcraftia.Xna.Blocks.Models
             indices = new ushort[defaultIndexCapacity];
         }
 
-        public void Populate(ChunkMeshPart destination)
+        public void Populate(ChunkMesh destination)
         {
             if (destination == null) throw new ArgumentNullException("destination");
 
@@ -108,17 +108,17 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix.CreateTranslation(ref position, out translation);
 
             // メッシュ パートの位置での AABB。
-            var meshPartBox = new BoundingBox();
-            Vector3.Transform(ref boundingBox.Min, ref translation, out meshPartBox.Min);
-            Vector3.Transform(ref boundingBox.Max, ref translation, out meshPartBox.Max);
+            var meshBox = new BoundingBox();
+            Vector3.Transform(ref boundingBox.Min, ref translation, out meshBox.Min);
+            Vector3.Transform(ref boundingBox.Max, ref translation, out meshBox.Max);
 
-            meshPartBox.GetCorners(corners);
-            meshPartSphere = BoundingSphere.CreateFromPoints(corners);
+            meshBox.GetCorners(corners);
+            meshSphere = BoundingSphere.CreateFromPoints(corners);
 
             destination.SetVertices(vertices, vertexCount);
             destination.SetIndices(indices, indexCount);
-            destination.SetBoundingBox(ref meshPartBox);
-            destination.SetBoundingSphere(ref meshPartSphere);
+            destination.SetBoundingBox(ref meshBox);
+            destination.SetBoundingSphere(ref meshSphere);
         }
 
         public void AddIndex(ushort index)
@@ -144,7 +144,7 @@ namespace Willcraftia.Xna.Blocks.Models
             vertexCount = 0;
             indexCount = 0;
             boundingBox = BoundingBoxHelper.Empty;
-            meshPartSphere = new BoundingSphere();
+            meshSphere = new BoundingSphere();
         }
 
         // TODO

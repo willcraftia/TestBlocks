@@ -114,7 +114,6 @@
     <Compile Include="Models\ChunkCollection.cs" />
     <Compile Include="Models\ChunkManager.cs" />
     <Compile Include="Models\ChunkMesh.cs" />
-    <Compile Include="Models\ChunkMeshPart.cs" />
     <Compile Include="Models\ChunkMeshUpdateManager.cs" />
     <Compile Include="Models\IChunkStore.cs" />
     <Compile Include="Models\Mesh.cs" />

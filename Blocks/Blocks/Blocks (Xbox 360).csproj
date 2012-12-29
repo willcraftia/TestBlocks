@@ -120,8 +120,9 @@
     <Compile Include="Models\ChunkCollection.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\ChunkManager.cs" />
-    <Compile Include="Models\ChunkMesh.cs" />
-    <Compile Include="Models\ChunkMeshPart.cs" />
+    <Compile Include="Models\ChunkMesh.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Models\ChunkMeshUpdateManager.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\DefaultTerrainProcedure.cs" />

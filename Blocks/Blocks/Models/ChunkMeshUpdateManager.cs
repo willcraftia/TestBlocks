@@ -25,9 +25,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
             public bool Completed { get; set; }
 
+            public Action ExecuteAction { get; private set; }
+
             public Task(ChunkMeshUpdateManager chunkMeshUpdateManager)
             {
                 this.chunkMeshUpdateManager = chunkMeshUpdateManager;
+
+                ExecuteAction = new Action(Execute);
             }
 
             public void Execute()
@@ -89,24 +93,20 @@ namespace Willcraftia.Xna.Blocks.Models
             // Task を準備して登録。
             task.Chunk = chunk;
             task.Completed = false;
-            taskQueue.Enqueue(task.Execute);
+            taskQueue.Enqueue(task.ExecuteAction);
             activeTasks.Enqueue(task);
         }
 
         public void Update()
         {
-            DebugUpdateRegionMonitor();
+#if DEBUG
+            region.Monitor.UpdatingChunkCount = updatingChunks.Count;
+#endif
 
             // Update the task queue.
             taskQueue.Update();
 
             CheckCompletedTasks();
-        }
-
-        [Conditional("DEBUG")]
-        void DebugUpdateRegionMonitor()
-        {
-            region.Monitor.UpdatingChunkCount = updatingChunks.Count;
         }
 
         void CheckCompletedTasks()

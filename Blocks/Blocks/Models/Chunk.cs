@@ -38,6 +38,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         object activeNeighborsLock = new object();
 
+        ChunkMesh opaqueMesh;
+
+        ChunkMesh translucentMesh;
+
         public VectorI3 Size
         {
             get { return size; }
@@ -122,26 +126,29 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool MeshDirty { get; set; }
 
-        ChunkMesh mesh;
-
-        public ChunkMesh Mesh
+        public ChunkMesh OpaqueMesh
         {
-            get { return mesh; }
+            get { return opaqueMesh; }
             set
             {
-                if (mesh != null)
-                {
-                    mesh.Opaque.Chunk = null;
-                    mesh.Translucent.Chunk = null;
-                }
+                if (opaqueMesh != null) opaqueMesh.Chunk = null;
 
-                mesh = value;
+                opaqueMesh = value;
 
-                if (mesh != null)
-                {
-                    mesh.Opaque.Chunk = this;
-                    mesh.Translucent.Chunk = this;
-                }
+                if (opaqueMesh != null) opaqueMesh.Chunk = this;
+            }
+        }
+
+        public ChunkMesh TranslucentMesh
+        {
+            get { return translucentMesh; }
+            set
+            {
+                if (translucentMesh != null) translucentMesh.Chunk = null;
+
+                translucentMesh = value;
+
+                if (translucentMesh != null) translucentMesh.Chunk = this;
             }
         }
 
@@ -260,10 +267,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             lock (activeNeighborsLock)
             {
-                var flag = side.ToFlags();
-
-                if ((activeNeighbors & flag) == CubicSide.Flags.None)
-                    activeNeighbors ^= flag;
+                activeNeighbors |= side.ToFlags();
             }
         }
 
