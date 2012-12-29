@@ -259,9 +259,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 球同士で大きく判定。
             if (!objectSphere.Intersects(frustumSphere)) return false;
 
-            // 視錐台と球で大きく判定。
-            if (!objectSphere.Intersects(activeCamera.Frustum)) return false;
-
             // 視錐台と AABB で判定。
             BoundingBox objectBox;
             sceneObject.GetBoundingBox(out objectBox);
