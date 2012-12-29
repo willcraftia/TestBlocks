@@ -18,6 +18,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 
         DebugAppender() { }
 
+        // I/F
         public void Append(ref LogEvent logEvent)
         {
             Debug.WriteLine("{0:HH:mm:ss.fffffff} [{1,2}] {2,-5} {3} - {4}",

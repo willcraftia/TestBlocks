@@ -132,11 +132,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
-#if DEBUG
-
         public PartitionManagerMonitor Monitor { get; private set;}
-
-#endif
 
         public PartitionManager(Vector3 partitionSize)
         {
@@ -148,7 +144,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             partitionPool = new Pool<Partition>(CreatePartition);
 
-            DebugInitialize();
+            Monitor = new PartitionManagerMonitor();
         }
 
         public void Initialize(int minActiveRange, int maxActiveRange)
@@ -167,7 +163,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (Closed) return;
 
-            DebugUpdateMonitor();
+            TraceUpdateMonitor();
 
             eyePosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
             eyePosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
@@ -437,14 +433,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         protected virtual void DisposeOverride(bool disposing) { }
 
-        [Conditional("DEBUG")]
-        void DebugInitialize()
-        {
-            Monitor = new PartitionManagerMonitor();
-        }
-
-        [Conditional("DEBUG")]
-        void DebugUpdateMonitor()
+        [Conditional("TRACE")]
+        void TraceUpdateMonitor()
         {
             Monitor.ActiveClusterCount = activePartitions.ClusterCount;
             Monitor.ActivePartitionCount = activePartitions.Count;

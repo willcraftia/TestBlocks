@@ -1,6 +1,4 @@
-﻿#if DEBUG
-
-#region Using
+﻿#region Using
 
 using System;
 
@@ -19,5 +17,3 @@ namespace Willcraftia.Xna.Framework.Landscape
         public int PassivatingPartitionCount { get; set; }
     }
 }
-
-#endif

@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 #endregion
@@ -51,6 +52,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         /// <summary>
         /// 計測を開始します。
         /// </summary>
+        [Conditional("DEBUG"), Conditional("TRACE")]
         public void Begin()
         {
             timeRuler.Begin(this);
@@ -59,6 +61,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         /// <summary>
         /// 計測を終了します。
         /// </summary>
+        [Conditional("DEBUG"), Conditional("TRACE")]
         public void End()
         {
             timeRuler.End(this);

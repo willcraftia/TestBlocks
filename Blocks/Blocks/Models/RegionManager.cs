@@ -32,11 +32,11 @@ namespace Willcraftia.Xna.Blocks.Models
         //
         //====================================================================
 
-#if DEBUG
+        #region Debug
 
         public static bool DebugWireframe { get; set; }
 
-#endif
+        #endregion
 
         IServiceProvider serviceProvider;
 

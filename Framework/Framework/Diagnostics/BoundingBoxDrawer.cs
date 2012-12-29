@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -55,11 +56,13 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             this.graphicsDevice = graphicsDevice;
         }
 
+        [Conditional("DEBUG")]
         public void Draw(ref BoundingBox box, Effect effect)
         {
             Draw(ref box, effect, ref color);
         }
 
+        [Conditional("DEBUG")]
         public void Draw(ref BoundingBox box, Effect effect, ref Color vertexColor)
         {
             if (effect == null) throw new ArgumentNullException("effect");

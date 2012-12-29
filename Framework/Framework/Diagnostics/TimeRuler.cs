@@ -266,6 +266,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             markers.Remove(marker.Id);
         }
 
+        [Conditional("DEBUG"), Conditional("TRACE")]
         public void StartFrame()
         {
             // currentFrameLog の同期をとるために自身をロック。

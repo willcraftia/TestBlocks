@@ -1,6 +1,4 @@
-﻿#if DEBUG
-
-#region Using
+﻿#region Using
 
 using System;
 
@@ -54,5 +52,3 @@ namespace Willcraftia.Xna.Blocks.Models
         public int UpdatingChunkCount { get; set; }
     }
 }
-
-#endif

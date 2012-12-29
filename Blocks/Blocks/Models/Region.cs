@@ -58,11 +58,11 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return RegionManager.ChunkSize; }
         }
 
-#if DEBUG
+        #region Debug
 
         public RegionMonitor Monitor { get; private set; }
 
-#endif
+        #endregion
 
         public void Initialize(SceneManager sceneManager, SceneSettings sceneSettings, AssetManager assetManager, ChunkEffect chunkEffect)
         {

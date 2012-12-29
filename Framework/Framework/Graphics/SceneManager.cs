@@ -70,7 +70,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingSphere frustumSphere;
 
-#if DEBUG
+        #region Debug
+
         BasicEffect debugEffect;
 
         BoundingBoxDrawer debugBoundingBoxDrawer;
@@ -87,7 +88,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             get { return DebugVisibleSceneObjectCount - DebugOccludedSceneObjectCount; }
         }
-#endif
+
+        #endregion
 
         // I/F
         public ICamera ActiveCamera

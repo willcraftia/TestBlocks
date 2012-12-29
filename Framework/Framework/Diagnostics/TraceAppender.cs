@@ -20,6 +20,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 
         TraceAppender() { }
 
+        // I/F
         public void Append(ref LogEvent logEvent)
         {
 #if WINDOWS

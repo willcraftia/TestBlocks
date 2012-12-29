@@ -28,6 +28,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             this.category = category;
         }
 
+        [Conditional("TRACE"), Conditional("DEBUG")]
         public static void Initialize(IAppender appender)
         {
             Appender = appender;
