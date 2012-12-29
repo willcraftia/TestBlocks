@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class PssmScreenSpaceShadow : ScreenSpaceShadow
     {
-        public const ShadowTests DefaultShadowTest = ShadowTests.Vsm;
+        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
 
         public const bool DefaultVsmBlurEnabled = true;
 
@@ -40,7 +40,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public Pssm Pssm { get; private set; }
 
-        public ShadowTests ShadowTest { get; private set; }
+        public ShadowMapTechniques ShadowMapTechnique { get; set; }
 
         public bool VsmBlurEnabled { get; set; }
 
@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         public PssmScreenSpaceShadow(GraphicsDevice graphicsDevice)
             : base(graphicsDevice)
         {
-            ShadowTest = DefaultShadowTest;
+            ShadowMapTechnique = DefaultShadowMapTechnique;
             VsmBlurEnabled = DefaultVsmBlurEnabled;
             PcfKernelSize = DefaultPcfKernelSize;
             ShadowDepthBias = DefaultShadowDepthBias;
@@ -103,13 +103,32 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (ShadowMapEffect == null) throw new InvalidOperationException("ShadowMapEffect is null.");
             if (PssmSceneEffect == null) throw new InvalidOperationException("PssmSceneEffect is null.");
 
+            //----------------------------------------------------------------
+            // Pssm
+
             Pssm = new Pssm(SplitCount);
+
+            //----------------------------------------------------------------
+            // RenderTarget
 
             shadowMaps = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount, ShadowMapSize, ShadowMapSize,
                 false, ShadowMapFormat, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PlatformContents);
 
+            //----------------------------------------------------------------
+            // GaussianBlur
+
             vsmBlur = new GaussianBlur(GaussianBlurEffect, SpriteBatch, ShadowMapSize, ShadowMapSize, ShadowMapFormat,
                 VsmBlurRadius, VsmBlurAmount);
+
+            //----------------------------------------------------------------
+            // Effect
+
+            PssmSceneEffect.DepthBias = ShadowDepthBias;
+            PssmSceneEffect.SplitCount = SplitCount;
+            PssmSceneEffect.ShadowMapSize = ShadowMapSize;
+            PssmSceneEffect.PcfKernelSize = PcfKernelSize;
+            PssmSceneEffect.InitializePcfKernel();
+            PssmSceneEffect.EnableTechnique(ShadowMapTechnique);
 
             base.InitializeOverride();
         }
@@ -122,7 +141,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             // シャドウ テストの種類に応じたテクニックを設定。
-            ShadowMapEffect.EnableTechnique(ShadowTest);
+            ShadowMapEffect.EnableTechnique(ShadowMapTechnique);
 
             for (int i = 0; i < SplitCount; i++)
             {
@@ -145,11 +164,11 @@ namespace Willcraftia.Xna.Framework.Graphics
                 GraphicsDevice.SetRenderTarget(null);
 
                 // VSM の場合はブラーを適用。
-                if (ShadowTest == ShadowTests.Vsm && VsmBlurEnabled)
+                if (ShadowMapTechnique == ShadowMapTechniques.Vsm && VsmBlurEnabled)
                     vsmBlur.Filter(shadowMaps[i]);
 
                 // 投影オブジェクトなどを削除。
-                //camera.Clear();
+                camera.Clear();
             }
         }
 
@@ -158,16 +177,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            PssmSceneEffect.EnableTechnique(ShadowTest);
-            if (ShadowTest == ShadowTests.Pcf)
-            {
-                PssmSceneEffect.ConfigurePcf(ShadowMapSize, PcfKernelSize);
-            }
-
             PssmSceneEffect.View = eyeView.Matrix;
             PssmSceneEffect.Projection = eyeProjection.Matrix;
-            PssmSceneEffect.DepthBias = ShadowDepthBias;
-            PssmSceneEffect.SplitCount = SplitCount;
             PssmSceneEffect.SplitDistances = Pssm.SplitDistances;
             PssmSceneEffect.SplitViewProjections = Pssm.SplitViewProjections;
             PssmSceneEffect.SetShadowMaps(shadowMaps);
@@ -176,15 +187,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-            for (int i = 0; i < SplitCount; i++)
-            {
-                var camera = Pssm.GetCamera(i);
+            // TODO
 
-                foreach (var caster in camera.ShadowCasters) caster.Draw(PssmSceneEffect);
-
-                // PSSM カメラはこれ以降使わないので投影オブジェクトなどをリストから削除。
-                camera.Clear();
-            }
 
             GraphicsDevice.SetRenderTarget(null);
 

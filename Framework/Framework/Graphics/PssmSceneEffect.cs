@@ -39,9 +39,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectParameter offsetsParameter;
 
-        int shadowMapSize;
-        
-        int kernelSize;
+        public int ShadowMapSize { get; set; }
+
+        public int PcfKernelSize { get; set; }
 
         //
         //--------------------------------------------------------------------
@@ -121,17 +121,17 @@ namespace Willcraftia.Xna.Framework.Graphics
             vsmTechnique = Techniques["Vsm"];
         }
 
-        public void EnableTechnique(ShadowTests shadowTest)
+        public void EnableTechnique(ShadowMapTechniques technique)
         {
-            switch (shadowTest)
+            switch (technique)
             {
-                case ShadowTests.Classic:
+                case ShadowMapTechniques.Classic:
                     CurrentTechnique = classicTechnique;
                     break;
-                case ShadowTests.Pcf:
+                case ShadowMapTechniques.Pcf:
                     CurrentTechnique = pcfTechnique;
                     break;
-                case ShadowTests.Vsm:
+                case ShadowMapTechniques.Vsm:
                     CurrentTechnique = vsmTechnique;
                     break;
             }
@@ -140,44 +140,22 @@ namespace Willcraftia.Xna.Framework.Graphics
         //====================================================================
         // PCF specific
 
-        public void ConfigurePcf(int shadowMapSize, int kernelSize)
+        public void InitializePcfKernel()
         {
-            if (shadowMapSize <= 0) throw new ArgumentOutOfRangeException("shadowMapSize");
-            if (kernelSize <= 0) throw new ArgumentOutOfRangeException("kernelSize");
-
-            bool dirty = false;
-            if (this.shadowMapSize != shadowMapSize)
-            {
-                this.shadowMapSize = shadowMapSize;
-                dirty = true;
-            }
-            if (this.kernelSize != kernelSize)
-            {
-                this.kernelSize = kernelSize;
-                dirty = true;
-            }
-            if (dirty)
-            {
-                PopulateKernel();
-            }
-        }
-
-        void PopulateKernel()
-        {
-            var texelSize = 1.0f / (float) shadowMapSize;
+            var texelSize = 1.0f / (float) ShadowMapSize;
 
             int start;
-            if (kernelSize % 2 == 0)
+            if (PcfKernelSize % 2 == 0)
             {
-                start = -(kernelSize / 2) + 1;
+                start = -(PcfKernelSize / 2) + 1;
             }
             else
             {
-                start = -(kernelSize - 1) / 2;
+                start = -(PcfKernelSize - 1) / 2;
             }
-            var end = start + kernelSize;
+            var end = start + PcfKernelSize;
 
-            var tapCount = kernelSize * kernelSize;
+            var tapCount = PcfKernelSize * PcfKernelSize;
             var offsets = new Vector2[tapCount];
 
             int i = 0;

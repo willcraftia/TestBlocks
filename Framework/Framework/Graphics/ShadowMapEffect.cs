@@ -39,9 +39,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             vsmTechnique = Techniques["Vsm"];
         }
 
-        public void EnableTechnique(ShadowTests shadowTest)
+        public void EnableTechnique(ShadowMapTechniques technique)
         {
-            if (shadowTest == ShadowTests.Vsm)
+            if (technique == ShadowMapTechniques.Vsm)
             {
                 CurrentTechnique = vsmTechnique;
             }

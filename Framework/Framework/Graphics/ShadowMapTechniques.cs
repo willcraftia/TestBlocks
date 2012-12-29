@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public enum ShadowTests
+    public enum ShadowMapTechniques
     {
         /// <summary>
         /// クラシックな検査。

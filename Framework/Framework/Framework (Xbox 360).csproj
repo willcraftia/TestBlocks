@@ -165,7 +165,7 @@
     <Compile Include="Graphics\PssmScreenSpaceShadow.cs" />
     <Compile Include="Graphics\ScreenSpaceShadow.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
-    <Compile Include="Graphics\ShadowTests.cs" />
+    <Compile Include="Graphics\ShadowMapTechniques.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Texture2DExtension.cs" />
     <Compile Include="Graphics\Texture2DHelper.cs" />
