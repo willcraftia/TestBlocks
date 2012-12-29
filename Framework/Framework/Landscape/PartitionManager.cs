@@ -263,7 +263,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティブな隣接パーティションへ非アクティブ化を通知。
                 NortifyNeighborPassivated(partition);
 
-                // 非アクティブ化成功したのでプールへ戻す。
+                // 非アクティブ化に成功したのでプールへ戻す。
                 partitionPool.Return(partition);
             }
         }
