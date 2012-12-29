@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework;
@@ -277,8 +278,9 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var flag = side.ToFlags();
 
-                if ((activeNeighbors & flag) == flag)
-                    activeNeighbors ^= flag;
+                Debug.Assert((activeNeighbors & flag) == flag);
+
+                activeNeighbors ^= flag;
             }
         }
 

@@ -311,7 +311,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var nearbyPosition = position + side.Direction;
 
                 Partition neighbor;
-
                 if (!activePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
                 {
                     // passivatingPartitions にあるパーティションは、
@@ -336,15 +335,22 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var nearbyPosition = position + side.Direction;
 
                 Partition neighbor;
-                if (activePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
+                if (!activePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
                 {
-                    // partition へアクティブな隣接パーティションを通知。
-                    partition.OnNeighborActivated(neighbor, side);
-
-                    // アクティブな隣接パーティションへ partition を通知。
-                    var reverseSide = side.Reverse();
-                    neighbor.OnNeighborActivated(partition, reverseSide);
+                    // passivatingPartitions にあるパーティションは、
+                    // その非アクティブ化が取り消されて activePartitions に戻され、
+                    // 次の非アクティブ化判定の試行では非アクティブ化対象ではなくなる場合がある。
+                    // このため、passivatingPartitions にあるパーティションについても探索する。
+                    if (!passivatingPartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                        continue;
                 }
+
+                // partition へアクティブな隣接パーティションを通知。
+                partition.OnNeighborActivated(neighbor, side);
+
+                // アクティブな隣接パーティションへ partition を通知。
+                var reverseSide = side.Reverse();
+                neighbor.OnNeighborActivated(partition, reverseSide);
             }
         }
 
