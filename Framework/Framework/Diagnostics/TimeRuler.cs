@@ -240,7 +240,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             FrameGridColor = Color.White;
             BarHeight = 4;
             BarVisible = true;
-            BarPadding = 2;
+            BarPadding = 1;
             Fps = 60;
             MaxSampleFrames = 4;
             AutoAdjustDelay = 30;

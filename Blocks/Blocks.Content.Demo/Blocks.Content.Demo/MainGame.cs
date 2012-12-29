@@ -224,6 +224,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // TimeRuler
 
             timeRuler = new TimeRuler(this);
+            timeRuler.BackgroundColor = Color.Black;
             //timeRuler.Enabled = false;
             //timeRuler.Visible = false;
             Components.Add(timeRuler);
