@@ -122,7 +122,28 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool MeshDirty { get; set; }
 
-        public ChunkMesh Mesh { get; set; }
+        ChunkMesh mesh;
+
+        public ChunkMesh Mesh
+        {
+            get { return mesh; }
+            set
+            {
+                if (mesh != null)
+                {
+                    mesh.Opaque.Chunk = null;
+                    mesh.Translucent.Chunk = null;
+                }
+
+                mesh = value;
+
+                if (mesh != null)
+                {
+                    mesh.Opaque.Chunk = this;
+                    mesh.Translucent.Chunk = this;
+                }
+            }
+        }
 
         public InterChunkMesh InterMesh { get; set; }
 

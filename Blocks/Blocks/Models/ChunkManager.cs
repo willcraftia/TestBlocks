@@ -19,55 +19,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkManager
     {
-        #region ChunkDistanceComparer
-
-        class ChunkDistanceComparer : IComparer<Chunk>
-        {
-            VectorI3 chunkSize;
-
-            public Vector3 EyePosition;
-
-            public ChunkDistanceComparer(VectorI3 chunkSize)
-            {
-                this.chunkSize = chunkSize;
-            }
-
-            public int Compare(Chunk chunk0, Chunk chunk1)
-            {
-                float d0;
-                float d1;
-                CalculateDistanceSquared(chunk0, out d0);
-                CalculateDistanceSquared(chunk1, out d1);
-
-                if (d0 == d1) return 0;
-                return (d0 < d1) ? -1 : 1;
-            }
-
-            void CalculateDistanceSquared(Chunk chunk, out float distanceSquared)
-            {
-                var chunkPosition = chunk.Position.ToVector3();
-
-                chunkPosition.X *= chunkSize.X;
-                chunkPosition.Y *= chunkSize.Y;
-                chunkPosition.Z *= chunkSize.Z;
-                chunkPosition.X += 0.5f;
-                chunkPosition.Y += 0.5f;
-                chunkPosition.Z += 0.5f;
-
-                Vector3.DistanceSquared(ref EyePosition, ref chunkPosition, out distanceSquared);
-            }
-        }
-
-        #endregion
-
-#if DEBUG
-
-        public static bool ChunkBoundingBoxVisible { get; set; }
-
-        public static bool Wireframe { get; set; }
-
-#endif
-
         // TODO
         //
         // 実行で最適と思われる値を調べて決定するが、
@@ -85,16 +36,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const int InterChunkMeshCapacity = 100;
 
-        static readonly Logger logger = new Logger(typeof(ChunkManager).Name);
-
-        static readonly BlendState colorWriteDisable = new BlendState
-        {
-            ColorWriteChannels = ColorWriteChannels.None
-        };
-
         Region region;
-
-        IChunkStore chunkStore;
 
         VectorI3 chunkSize;
 
@@ -106,8 +48,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         // 更新の開始インデックス。
         int updateOffset = 0;
-
-        List<Chunk> workingChunks = new List<Chunk>(InitialActiveChunkCapacity);
 
         // チャンク数はパーティション数に等しい。
         // このため、ここでは最大チャンク数を決定できない。
@@ -127,42 +67,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-        BoundingFrustum frustum = new BoundingFrustum(Matrix.Identity);
-
-        Vector3 eyePosition;
-
-        ChunkDistanceComparer chunkDistanceComparer;
-
-        List<Chunk> occlusionQueryChunks = new List<Chunk>();
-
-        List<Chunk> opaqueChunks = new List<Chunk>();
-
-        List<Chunk> translucentChunks = new List<Chunk>();
-
-#if DEBUG
-
-        BasicEffect debugEffect;
-
-        BoundingBoxDrawer boundingBoxDrawer;
-
         bool closing;
 
         bool closed;
-
-#endif
 
         public VectorI3 ChunkSize
         {
             get { return chunkSize; }
         }
 
-        public ChunkManager(Region region, IChunkStore chunkStore, VectorI3 chunkSize)
+        public ChunkManager(Region region, VectorI3 chunkSize)
         {
             if (region == null) throw new ArgumentNullException("region");
-            if (chunkStore == null) throw new ArgumentNullException("chunkStore");
 
             this.region = region;
-            this.chunkStore = chunkStore;
             this.chunkSize = chunkSize;
 
             inverseChunkSize.X = 1 / (float) chunkSize.X;
@@ -178,9 +96,6 @@ namespace Willcraftia.Xna.Blocks.Models
             vertexBufferPool = new Pool<VertexBuffer>(CreateVertexBuffer);
             indexBufferPool = new Pool<IndexBuffer>(CreateIndexBuffer);
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
-            chunkDistanceComparer = new ChunkDistanceComparer(chunkSize);
-
-            InitializeDebugTools();
         }
 
         public void Update()
@@ -200,7 +115,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            DebugUpdateRegionMonitor();
+#if DEBUG
+            region.Monitor.TotalChunkCount = chunkPool.TotalObjectCount;
+            region.Monitor.ActiveChunkCount = activeChunks.Count;
+            region.Monitor.TotalChunkMeshCount = chunkMeshPool.TotalObjectCount;
+            region.Monitor.PassiveChunkMeshCount = chunkMeshPool.Count;
+            region.Monitor.TotalInterChunkMeshCount = interChunkMeshPool.TotalObjectCount;
+            region.Monitor.PassiveInterChunkMeshCount = interChunkMeshPool.Count;
+            region.Monitor.TotalVertexBufferCount = vertexBufferPool.TotalObjectCount;
+            region.Monitor.PassiveVertexBufferCount = vertexBufferPool.Count;
+#endif
 
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
@@ -272,136 +196,49 @@ namespace Willcraftia.Xna.Blocks.Models
                     // メッシュ枯渇ならば次回の試行とする。
                     if (!BorrowChunkMesh(chunk)) continue;
 
-                    UpdateChunkMeshBuffer(chunk);
+                    // メッシュが変わるためシーン マネージャから削除。
+                    region.SceneManager.RemoveSceneObject(chunk.Mesh.Opaque);
+                    region.SceneManager.RemoveSceneObject(chunk.Mesh.Translucent);
+
+#if DEBUG
+                    region.Monitor.TotalChunkVertexCount -= chunk.Mesh.Opaque.VertexCount;
+                    region.Monitor.TotalChunkVertexCount -= chunk.Mesh.Translucent.VertexCount;
+                    region.Monitor.TotalChunkIndexCount -= chunk.Mesh.Opaque.IndexCount;
+                    region.Monitor.TotalChunkIndexCount -= chunk.Mesh.Translucent.IndexCount;
+#endif
+
+                    // メッシュを更新。
+                    UpdateChunkMesh(chunk);
 
                     ReturnInterChunkMesh(chunk.InterMesh);
                     chunk.InterMesh = null;
 
                     chunk.MeshDirty = false;
                     chunk.ExitUpdate();
+
+                    // 頂点を持つメッシュをシーン マネージャへ登録。
+                    if (chunk.Mesh.Opaque.VertexCount != 0 && chunk.Mesh.Opaque.IndexCount != 0)
+                        region.SceneManager.AddSceneObject(chunk.Mesh.Opaque);
+
+                    if (chunk.Mesh.Translucent.VertexCount != 0 && chunk.Mesh.Translucent.IndexCount != 0)
+                        region.SceneManager.AddSceneObject(chunk.Mesh.Translucent);
+
+#if DEBUG
+                    region.Monitor.TotalChunkVertexCount += chunk.Mesh.Opaque.VertexCount;
+                    region.Monitor.TotalChunkVertexCount += chunk.Mesh.Translucent.VertexCount;
+                    region.Monitor.TotalChunkIndexCount += chunk.Mesh.Opaque.IndexCount;
+                    region.Monitor.TotalChunkIndexCount += chunk.Mesh.Translucent.IndexCount;
+                    region.Monitor.MaxChunkVertexCount = Math.Max(region.Monitor.MaxChunkVertexCount, chunk.Mesh.Opaque.VertexCount);
+                    region.Monitor.MaxChunkVertexCount = Math.Max(region.Monitor.MaxChunkVertexCount, chunk.Mesh.Translucent.VertexCount);
+                    region.Monitor.MaxChunkIndexCount = Math.Max(region.Monitor.MaxChunkIndexCount, chunk.Mesh.Opaque.IndexCount);
+                    region.Monitor.MaxChunkIndexCount = Math.Max(region.Monitor.MaxChunkIndexCount, chunk.Mesh.Translucent.IndexCount);
+#endif
                 }
             }
 
             Debug.Assert(updatingChunks.Count == 0);
 
             chunkMeshUpdateManager.Update();
-        }
-
-        public void Draw(View view, Projection projection)
-        {
-            DebugSetEffectTechnique();
-
-            // 長時間のロックを避けるために、一時的に作業リストへコピー。
-            lock (activeChunks)
-            {
-                // 複製ループに入る前に十分な容量を保証。
-                workingChunks.Capacity = activeChunks.Count;
-
-                for (int i = 0; i < activeChunks.Count; i++)
-                    workingChunks.Add(activeChunks[i]);
-            }
-
-            //================================================================
-            //
-            // Frustum Culling
-            //
-
-            View.GetEyePosition(ref view.Matrix, out eyePosition);
-            frustum.Matrix = view.Matrix * projection.Matrix;
-
-            foreach (var chunk in workingChunks)
-            {
-                if (!chunk.EnterDraw()) continue;
-
-                var mesh = chunk.Mesh;
-                if (mesh == null || !chunk.IsInFrustum(frustum))
-                {
-                    chunk.ExitDraw();
-                    continue;
-                }
-
-                if (mesh.Opaque.VertexCount != 0)
-                    opaqueChunks.Add(chunk);
-
-                if (mesh.Translucent.VertexCount != 0)
-                    translucentChunks.Add(chunk);
-            }
-
-            // 現在の視点位置で比較オブジェクトを初期化。
-            chunkDistanceComparer.EyePosition = eyePosition;
-
-            // 視点に近い順にチャンクをソート。
-            opaqueChunks.Sort(chunkDistanceComparer);
-            translucentChunks.Sort(chunkDistanceComparer);
-
-            //================================================================
-            //
-            // OcclusionQuery
-            //
-
-            region.GraphicsDevice.BlendState = colorWriteDisable;
-            region.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            foreach (var chunk in opaqueChunks)
-            {
-                Matrix world;
-                chunk.CreateWorldMatrix(out world);
-
-                chunk.Mesh.Opaque.UpdateOcclusion(region.ChunkEffect, ref world);
-            }
-
-            //================================================================
-            //
-            // Real drawing
-            //
-
-            //----------------------------------------------------------------
-            // Opaque
-
-            region.GraphicsDevice.BlendState = BlendState.Opaque;
-            region.GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            foreach (var chunk in opaqueChunks)
-            {
-                if (chunk.Mesh.Opaque.Occluded)
-                {
-                    DebugIncrementRegionMonitorOccludedChunkCount();
-                    continue;
-                }
-
-                Matrix world;
-                chunk.CreateWorldMatrix(out world);
-
-                chunk.Mesh.Opaque.Draw(region.ChunkEffect, ref world);
-
-                DebugRegionMonitorAddChunkVertexCount(chunk.Mesh.Opaque);
-            }
-
-            //----------------------------------------------------------------
-            // Translucent
-
-            //foreach (var chunk in translucentChunks)
-            //    DrawChunkMeshPart(chunk.ActiveMesh.Translucent);
-
-            //================================================================
-            //
-            // Debug
-            //
-
-            DebugDrawChunkBoundingBoxes(view, projection);
-
-            DebugUpdateRegionMonitorVisibleChunkCounts();
-
-            //================================================================
-            //
-            // Exit
-            //
-
-            opaqueChunks.Clear();
-            translucentChunks.Clear();
-
-            foreach (var chunk in workingChunks) chunk.ExitDraw();
-            workingChunks.Clear();
         }
 
         // 非同期呼び出し。
@@ -412,7 +249,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             Debug.Assert(!chunk.Active);
 
-            if (!chunkStore.GetChunk(ref position, chunk))
+            if (!region.ChunkStore.GetChunk(ref position, chunk))
             {
                 chunk.Position = position;
 
@@ -438,8 +275,22 @@ namespace Willcraftia.Xna.Blocks.Models
 
             lock (activeChunks) activeChunks.Remove(chunk);
 
+            // シーン マネージャから削除。
+            if (chunk.Mesh != null)
+            {
+                region.SceneManager.RemoveSceneObject(chunk.Mesh.Opaque);
+                region.SceneManager.RemoveSceneObject(chunk.Mesh.Translucent);
+
+#if DEBUG
+                region.Monitor.TotalChunkVertexCount -= chunk.Mesh.Opaque.VertexCount;
+                region.Monitor.TotalChunkVertexCount -= chunk.Mesh.Translucent.VertexCount;
+                region.Monitor.TotalChunkIndexCount -= chunk.Mesh.Opaque.IndexCount;
+                region.Monitor.TotalChunkIndexCount -= chunk.Mesh.Translucent.IndexCount;
+#endif
+            }
+
             // 定義に変更があるならば永続化領域を更新。
-            if (chunk.DefinitionDirty) chunkStore.AddChunk(chunk);
+            if (chunk.DefinitionDirty) region.ChunkStore.AddChunk(chunk);
 
             chunk.OnPassivated();
             chunk.ExitPassivate();
@@ -479,7 +330,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMesh CreateChunkMesh()
         {
-            return new ChunkMesh(region.GraphicsDevice);
+            return new ChunkMesh(region);
         }
 
         InterChunkMesh CreateInterChunkMesh()
@@ -580,101 +431,31 @@ namespace Willcraftia.Xna.Blocks.Models
             interChunkMeshPool.Return(interChunkMesh);
         }
 
-        void UpdateChunkMeshBuffer(Chunk chunk)
+        void UpdateChunkMesh(Chunk chunk)
         {
-            var activeMesh = chunk.Mesh;
-            var pendingMesh = chunk.InterMesh;
+            var mesh = chunk.Mesh;
+            var interMesh = chunk.InterMesh;
 
-            UpdateChunkMeshPartBuffer(pendingMesh.Opaque, activeMesh.Opaque);
-            UpdateChunkMeshPartBuffer(pendingMesh.Translucent, activeMesh.Translucent);
+            // メッシュ パートに設定するワールド座標。
+            var position = chunk.WorldPosition;
+
+            UpdateChunkMeshPart(interMesh.Opaque, mesh.Opaque, ref position);
+            UpdateChunkMeshPart(interMesh.Translucent, mesh.Translucent, ref position);
         }
 
-        void UpdateChunkMeshPartBuffer(InterChunkMeshPart source, ChunkMeshPart destination)
+        void UpdateChunkMeshPart(InterChunkMeshPart interMeshPart, ChunkMeshPart meshPart, ref Vector3 position)
         {
-            if (0 < source.VertexCount && 0 < source.IndexCount)
+            // Populate 呼び出しの前に設定。
+            meshPart.Position = position;
+
+            if (0 < interMeshPart.VertexCount && 0 < interMeshPart.IndexCount)
             {
-                BorrowBuffer(destination);
-                source.Populate(destination);
+                BorrowBuffer(meshPart);
+                interMeshPart.Populate(meshPart);
             }
             else
             {
-                ReturnBuffer(destination);
-            }
-        }
-
-        [Conditional("DEBUG")]
-        void InitializeDebugTools()
-        {
-            debugEffect = new BasicEffect(region.GraphicsDevice);
-            debugEffect.AmbientLightColor = Vector3.One;
-            debugEffect.VertexColorEnabled = true;
-            boundingBoxDrawer = new BoundingBoxDrawer(region.GraphicsDevice);
-        }
-
-        [Conditional("DEBUG")]
-        void DebugUpdateRegionMonitor()
-        {
-            var m = region.Monitor;
-            m.TotalChunkCount = chunkPool.TotalObjectCount;
-            m.ActiveChunkCount = activeChunks.Count;
-            m.TotalChunkMeshCount = chunkMeshPool.TotalObjectCount;
-            m.PassiveChunkMeshCount = chunkMeshPool.Count;
-            m.TotalInterChunkMeshCount = interChunkMeshPool.TotalObjectCount;
-            m.PassiveInterChunkMeshCount = interChunkMeshPool.Count;
-            m.TotalVertexBufferCount = vertexBufferPool.TotalObjectCount;
-            m.PassiveVertexBufferCount = vertexBufferPool.Count;
-        }
-
-        [Conditional("DEBUG")]
-        void DebugRegionMonitorAddChunkVertexCount(ChunkMeshPart meshPart)
-        {
-            region.Monitor.AddChunkVertexCount(meshPart.VertexCount);
-            region.Monitor.AddChunkIndexCount(meshPart.IndexCount);
-        }
-
-        [Conditional("DEBUG")]
-        void DebugSetEffectTechnique()
-        {
-            var chunkEffect = region.ChunkEffect;
-
-            if (Wireframe)
-            {
-                chunkEffect.EnableWireframeTechnique();
-            }
-            else
-            {
-                chunkEffect.EnableDefaultTechnique();
-            }
-        }
-
-        [Conditional("DEBUG")]
-        void DebugIncrementRegionMonitorOccludedChunkCount()
-        {
-            region.Monitor.IncrementOccludedOpaqueChunkCount();
-        }
-
-        [Conditional("DEBUG")]
-        void DebugUpdateRegionMonitorVisibleChunkCounts()
-        {
-            var m = region.Monitor;
-            m.VisibleOpaqueChunkCount = opaqueChunks.Count;
-            m.VisibleTranslucentChunkCount = translucentChunks.Count;
-        }
-
-        [Conditional("DEBUG")]
-        void DebugDrawChunkBoundingBoxes(View view, Projection projection)
-        {
-            if (!ChunkBoundingBoxVisible) return;
-
-            debugEffect.View = view.Matrix;
-            debugEffect.Projection = projection.Matrix;
-
-            foreach (var chunk in workingChunks)
-            {
-                if (!chunk.Drawing) continue;
-
-                var box = chunk.BoundingBox;
-                boundingBoxDrawer.Draw(ref box, debugEffect);
+                ReturnBuffer(meshPart);
             }
         }
     }

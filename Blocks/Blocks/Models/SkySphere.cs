@@ -12,7 +12,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SkySphere : IAsset
+    public sealed class SkySphere : IAsset, ISceneObject
     {
         //
         // TODO
@@ -20,8 +20,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // 後々、空テクスチャはバイオームで管理し、
         // バイオームの切り替わりと共に様相が変化するように修正したい。
         //
-
-        GraphicsDevice graphicsDevice;
 
         SphereMesh sphereMesh;
 
@@ -32,6 +30,26 @@ namespace Willcraftia.Xna.Blocks.Models
 
         // I/F
         public IResource Resource { get; set; }
+
+        // I/F
+        public ISceneObjectContext Context { private get; set; }
+
+        // I/F
+        public bool Visible { get; set; }
+
+        // I/F
+        public bool Translucent
+        {
+            get { return false; }
+        }
+
+        // I/F
+        public bool Occluded
+        {
+            get { return false; }
+        }
+
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
         public SkySphereEffect Effect { get; set; }
 
@@ -53,12 +71,37 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
-            this.graphicsDevice = graphicsDevice;
-
-            sphereMesh = new SphereMesh(graphicsDevice);
+            GraphicsDevice = graphicsDevice;
+            
+            sphereMesh = new SphereMesh(GraphicsDevice);
         }
 
-        public void Draw(View view, PerspectiveFov projection)
+        // I/F
+        public void GetDistanceSquared(ref Vector3 eyePosition, out float result)
+        {
+            // 常に再遠に位置させる。
+            result = float.MaxValue;
+        }
+
+        // I/F
+        public void GetBoundingSphere(out BoundingSphere result)
+        {
+            result = new BoundingSphere(Context.ActiveCamera.Position, CalculateRadius());
+        }
+
+        // I/F
+        public void GetBoundingBox(out BoundingBox result)
+        {
+            BoundingSphere sphere;
+            GetBoundingSphere(out sphere);
+            BoundingBox.CreateFromSphere(ref sphere, out result);
+        }
+
+        // I/F
+        public void UpdateOcclusion() { }
+
+        // I/F
+        public void Draw(Texture2D shadowMap)
         {
             // 空の色。
             Effect.SkyColor = SceneSettings.SkyColor;
@@ -76,9 +119,11 @@ namespace Willcraftia.Xna.Blocks.Models
             // 描画は FarPlaneDistance が最遠ではない点に注意。
             // 球メッシュは粗い頂点データである点にも注意。
 
-            var sphereRaridus = projection.FarPlaneDistance * 10;
+            var camera = Context.ActiveCamera;
+            var projection = camera.Projection;
+            
             // 元となる球メッシュは半径 0.5f であるため二倍しておく。
-            var sphereScale = 2 * sphereRaridus;
+            var sphereScale = CalculateRadius();
 
             // FarPlaneDistance を越える位置に描画するため、
             // 専用の FarPlaneDistance でプロジェクション行列を作成して利用。
@@ -89,8 +134,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 projection.Fov, projection.AspectRatio, projection.NearPlaneDistance, specificFar, out specificProjection);
 
             // 球の座標は視点座標。
-            Vector3 eyePosition;
-            View.GetEyePosition(ref view.Matrix, out eyePosition);
+            var eyePosition = camera.Position;
 
             Matrix translation;
             Matrix.CreateTranslation(ref eyePosition, out translation);
@@ -102,19 +146,24 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix.Multiply(ref scale, ref translation, out world);
 
             Matrix worldView;
-            Matrix.Multiply(ref world, ref view.Matrix, out worldView);
+            Matrix.Multiply(ref world, ref camera.View.Matrix, out worldView);
             Matrix worldViewProjection;
             Matrix.Multiply(ref worldView, ref specificProjection, out worldViewProjection);
 
             Effect.WorldViewProjection = worldViewProjection;
 
-            graphicsDevice.SetVertexBuffer(sphereMesh.VertexBuffer);
-            graphicsDevice.Indices = sphereMesh.IndexBuffer;
+            GraphicsDevice.SetVertexBuffer(sphereMesh.VertexBuffer);
+            GraphicsDevice.Indices = sphereMesh.IndexBuffer;
 
             Effect.EnableDefaultTechnique();
             Effect.Apply();
 
-            graphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
+            GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
+        }
+
+        float CalculateRadius()
+        {
+            return Context.ActiveCamera.Projection.FarPlaneDistance * 10;
         }
 
         #region ToString

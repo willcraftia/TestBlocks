@@ -70,10 +70,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         public bool TryAddShadowCaster(IShadowCaster shadowCaster)
         {
             BoundingSphere casterSphere;
-            shadowCaster.GetShadowTestBoundingSphere(out casterSphere);
+            shadowCaster.GetBoundingSphere(out casterSphere);
             
             BoundingBox casterBox;
-            shadowCaster.GetShadowTestBoundingBox(out casterBox);
+            shadowCaster.GetBoundingBox(out casterBox);
             casterBox.GetCorners(casterBoxCorners);
 
             if (casterSphere.Intersects(SplitEyeFrustum))

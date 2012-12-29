@@ -3,15 +3,16 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMeshPart
+    public sealed class ChunkMeshPart : IShadowCaster
     {
-        GraphicsDevice graphicsDevice;
+        Region region;
 
         VertexBuffer vertexBuffer;
 
@@ -23,11 +24,54 @@ namespace Willcraftia.Xna.Blocks.Models
 
         int primitiveCount;
 
+        BoundingSphere boundingSphere;
+
+        BoundingBox boundingBox;
+
         bool occluded;
 
         OcclusionQuery occlusionQuery;
 
         bool occlusionQueryActive;
+
+        Vector3 position;
+
+        Matrix world;
+
+        // I/F
+        public bool CastShadow
+        {
+            // チャンクはブロックの設定とは異なり、常に一定の結果を返す。
+            get { return true; }
+        }
+
+        // I/F
+        public ISceneObjectContext Context
+        {
+            set { }
+        }
+
+        // I/F
+        public bool Visible
+        {
+            // 常に true。
+            // 頂点を持たない場合でも true だが、その場合はシーン マネージャに登録されず、
+            // 結果として描画されない。
+            get { return true; }
+        }
+
+        // I/F
+        public bool Translucent { get; private set; }
+
+        // I/F
+        public bool Occluded
+        {
+            get { return occluded; }
+        }
+
+        public GraphicsDevice GraphicsDevice { get; private set; }
+
+        public Chunk Chunk { get; set; }
 
         public VertexBuffer VertexBuffer
         {
@@ -72,18 +116,132 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public bool Occluded
+        public Vector3 Position
         {
-            get { return occluded; }
+            get { return position; }
+            set
+            {
+                position = value;
+                Matrix.CreateTranslation(ref position, out world);
+            }
         }
 
-        public ChunkMeshPart(GraphicsDevice graphicsDevice)
+        public ChunkMeshPart(Region region, bool translucent)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (region == null) throw new ArgumentNullException("region");
 
-            this.graphicsDevice = graphicsDevice;
+            this.region = region;
+            Translucent = translucent;
 
-            occlusionQuery = new OcclusionQuery(graphicsDevice);
+            GraphicsDevice = region.GraphicsDevice;
+
+            occlusionQuery = new OcclusionQuery(GraphicsDevice);
+        }
+
+        // I/F
+        public void DrawShadow()
+        {
+            throw new NotImplementedException();
+        }
+
+        // I/F
+        public void GetDistanceSquared(ref Vector3 eyePosition, out float result)
+        {
+            // 中心座標を算出。
+            var chunkSize = region.ChunkSize;
+            var halfSize = new Vector3(chunkSize.X * 0.5f, chunkSize.Y * 0.5f, chunkSize.Z * 0.5f);
+            var centerPosition = position + halfSize;
+
+            Vector3.DistanceSquared(ref eyePosition, ref centerPosition, out result);
+        }
+
+        // I/F
+        public void GetBoundingSphere(out BoundingSphere result)
+        {
+            result = boundingSphere;
+        }
+
+        // I/F
+        public void GetBoundingBox(out BoundingBox result)
+        {
+            result = boundingBox;
+        }
+
+        // I/F
+        public void UpdateOcclusion()
+        {
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
+
+            occluded = false;
+
+            if (occlusionQueryActive)
+            {
+                if (!occlusionQuery.IsComplete) return;
+
+                occluded = (occlusionQuery.PixelCount == 0);
+            }
+
+            occlusionQuery.Begin();
+
+            var effect = region.ChunkEffect;
+
+            //----------------------------------------------------------------
+            // タイル カタログのテクスチャ
+
+            var tileCatalog = region.TileCatalog;
+            effect.TileMap = tileCatalog.TileMap;
+            effect.DiffuseMap = tileCatalog.DiffuseColorMap;
+            effect.EmissiveMap = tileCatalog.EmissiveColorMap;
+            effect.SpecularMap = tileCatalog.SpecularColorMap;
+
+            //----------------------------------------------------------------
+            // 変換行列
+
+            effect.World = world;
+            effect.Apply();
+
+            GraphicsDevice.SetVertexBuffer(vertexBuffer);
+            GraphicsDevice.Indices = indexBuffer;
+            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
+
+            occlusionQuery.End();
+            occlusionQueryActive = true;
+        }
+
+        // I/F
+        public void Draw(Texture2D shadowMap)
+        {
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
+            if (occluded) return;
+
+            // チャンクに描画ロックを要求。
+            if (Chunk != null && !Chunk.EnterDraw()) return;
+
+            var effect = region.ChunkEffect;
+
+            //----------------------------------------------------------------
+            // タイル カタログのテクスチャ
+
+            var tileCatalog = region.TileCatalog;
+            effect.TileMap = tileCatalog.TileMap;
+            effect.DiffuseMap = tileCatalog.DiffuseColorMap;
+            effect.EmissiveMap = tileCatalog.EmissiveColorMap;
+            effect.SpecularMap = tileCatalog.SpecularColorMap;
+
+            //----------------------------------------------------------------
+            // 変換行列
+
+            effect.World = world;
+            effect.Apply();
+
+            GraphicsDevice.SetVertexBuffer(vertexBuffer);
+            GraphicsDevice.Indices = indexBuffer;
+            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
+
+            // 描画ロックを解放。
+            Chunk.ExitDraw();
         }
 
         public void SetVertices(VertexPositionNormalTexture[] vertices, int vertexCount)
@@ -120,45 +278,14 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void UpdateOcclusion(ChunkEffect effect, ref Matrix world)
+        internal void SetBoundingSphere(ref BoundingSphere boundingSphere)
         {
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
-
-            occluded = false;
-
-            if (occlusionQueryActive)
-            {
-                if (!occlusionQuery.IsComplete) return;
-
-                occluded = (occlusionQuery.PixelCount == 0);
-            }
-
-            occlusionQuery.Begin();
-
-            effect.World = world;
-            effect.Apply();
-
-            graphicsDevice.SetVertexBuffer(vertexBuffer);
-            graphicsDevice.Indices = indexBuffer;
-            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
-
-            occlusionQuery.End();
-            occlusionQueryActive = true;
+            this.boundingSphere = boundingSphere;
         }
 
-        public void Draw(ChunkEffect effect, ref Matrix world)
+        internal void SetBoundingBox(ref BoundingBox boundingBox)
         {
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
-            if (occluded) return;
-
-            effect.World = world;
-            effect.Apply();
-
-            graphicsDevice.SetVertexBuffer(vertexBuffer);
-            graphicsDevice.Indices = indexBuffer;
-            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
+            this.boundingBox = boundingBox;
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿#region Using
 
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
@@ -30,6 +32,12 @@ namespace Willcraftia.Xna.Blocks.Models
         int vertexCount;
 
         int indexCount;
+
+        BoundingBox boundingBox;
+
+        BoundingSphere meshPartSphere;
+
+        Vector3[] corners = new Vector3[8];
 
         public int VertexCount
         {
@@ -95,8 +103,22 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (destination == null) throw new ArgumentNullException("destination");
 
+            var position = destination.Position;
+            Matrix translation;
+            Matrix.CreateTranslation(ref position, out translation);
+
+            // メッシュ パートの位置での AABB。
+            var meshPartBox = new BoundingBox();
+            Vector3.Transform(ref boundingBox.Min, ref translation, out meshPartBox.Min);
+            Vector3.Transform(ref boundingBox.Max, ref translation, out meshPartBox.Max);
+
+            meshPartBox.GetCorners(corners);
+            meshPartSphere = BoundingSphere.CreateFromPoints(corners);
+
             destination.SetVertices(vertices, vertexCount);
             destination.SetIndices(indices, indexCount);
+            destination.SetBoundingBox(ref meshPartBox);
+            destination.SetBoundingSphere(ref meshPartSphere);
         }
 
         public void AddIndex(ushort index)
@@ -111,12 +133,18 @@ namespace Willcraftia.Xna.Blocks.Models
             if (vertexCount == vertices.Length) EnsureVertexCapacity(vertexCount + 1);
 
             vertices[vertexCount++] = vertex;
+
+            // AABB を更新。
+            Vector3.Max(ref boundingBox.Max, ref vertex.Position, out boundingBox.Max);
+            Vector3.Min(ref boundingBox.Min, ref vertex.Position, out boundingBox.Min);
         }
 
         public void Clear()
         {
             vertexCount = 0;
             indexCount = 0;
+            boundingBox = BoundingBoxHelper.Empty;
+            meshPartSphere = new BoundingSphere();
         }
 
         // TODO

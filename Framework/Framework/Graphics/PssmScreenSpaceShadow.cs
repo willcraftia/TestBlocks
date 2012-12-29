@@ -92,7 +92,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // TODO: 本当にこれで良いのだろうか？
             BoundingSphere casterSphere;
-            shadowCaster.GetShadowTestBoundingSphere(out casterSphere);
+            shadowCaster.GetBoundingSphere(out casterSphere);
             if (!casterSphere.Intersects(testSphere)) return;
 
             Pssm.TryAddShadowCaster(shadowCaster);
@@ -159,7 +159,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                 GraphicsDevice.SetRenderTarget(shadowMaps[i]);
                 GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-                foreach (var caster in camera.ShadowCasters) caster.Draw(ShadowMapEffect);
+                // TODO: シャドウ マップへの描画。
+                //foreach (var caster in camera.ShadowCasters) caster.DrawShadow();
                 
                 GraphicsDevice.SetRenderTarget(null);
 

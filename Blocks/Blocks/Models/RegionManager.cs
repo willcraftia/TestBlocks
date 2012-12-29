@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Noise;
 using Willcraftia.Xna.Framework.Serialization;
@@ -31,9 +32,15 @@ namespace Willcraftia.Xna.Blocks.Models
         //
         //====================================================================
 
+#if DEBUG
+
+        public static bool DebugWireframe { get; set; }
+
+#endif
+
         IServiceProvider serviceProvider;
 
-        GraphicsDevice graphicsDevice;
+        SceneManager sceneManager;
 
         ResourceManager globalResourceManager = new ResourceManager();
 
@@ -43,20 +50,25 @@ namespace Willcraftia.Xna.Blocks.Models
 
         SkySphere skySphere;
 
+        ChunkEffect chunkEffect;
+
+        public GraphicsDevice GraphicsDevice { get; private set; }
+
         public SceneSettings SceneSettings { get; private set; }
 
-        public RegionManager(IServiceProvider serviceProvider)
+        public RegionManager(IServiceProvider serviceProvider, SceneManager sceneManager)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
+            if (sceneManager == null) throw new ArgumentNullException("sceneManager");
 
             this.serviceProvider = serviceProvider;
+            this.sceneManager = sceneManager;
 
-            var graphicsDeviceService = serviceProvider.GetRequiredService<IGraphicsDeviceService>();
-            graphicsDevice = graphicsDeviceService.GraphicsDevice;
+            GraphicsDevice = sceneManager.GraphicsDevice;
 
             globalAssetManager = new AssetManager(serviceProvider);
             globalAssetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
-            globalAssetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(graphicsDevice));
+            globalAssetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
         }
 
         public void LoadGrobalSettings()
@@ -64,10 +76,15 @@ namespace Willcraftia.Xna.Blocks.Models
             var sceneSettingsResource = globalResourceManager.Load("title:Resources/SceneSettings.json");
             SceneSettings = globalAssetManager.Load<SceneSettings>(sceneSettingsResource);
 
-            skySphere = new SkySphere(graphicsDevice);
+            skySphere = new SkySphere(GraphicsDevice);
             var effectResource = globalResourceManager.Load("content:Effects/SkySphereEffect");
             skySphere.Effect = new SkySphereEffect(globalAssetManager.Load<Effect>(effectResource));
             skySphere.SceneSettings = SceneSettings;
+            // シーン マネージャへ登録
+            sceneManager.AddSceneObject(skySphere);
+
+            var chunkEffectResource = globalResourceManager.Load("content:Effects/ChunkEffect");
+            chunkEffect = new ChunkEffect(globalAssetManager.Load<Effect>(chunkEffectResource));
         }
 
         //
@@ -99,10 +116,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(Region), new RegionLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(graphicsDevice));
+            assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
             assetManager.RegisterLoader(typeof(Mesh), new MeshLoader());
             assetManager.RegisterLoader(typeof(Tile), new TileLoader(resourceManager));
-            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(resourceManager, graphicsDevice));
+            assetManager.RegisterLoader(typeof(TileCatalog), new TileCatalogLoader(resourceManager, GraphicsDevice));
             assetManager.RegisterLoader(typeof(Block), new BlockLoader(resourceManager));
             assetManager.RegisterLoader(typeof(BlockCatalog), new BlockCatalogLoader(resourceManager));
             assetManager.RegisterLoader(typeof(IBiome), new BiomeLoader(resourceManager));
@@ -112,7 +129,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(INoiseSource), new NoiseLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
-            region.Initialize(graphicsDevice, SceneSettings, assetManager);
+            region.Initialize(sceneManager, SceneSettings, assetManager, chunkEffect);
 
             lock (regions)
             {
@@ -153,11 +170,41 @@ namespace Willcraftia.Xna.Blocks.Models
             foreach (var region in regions) region.Update();
         }
 
-        public void Draw(View view, PerspectiveFov projection)
+        public void UpdateChunkEffect()
         {
-            foreach (var region in regions) region.Draw(view, projection);
+            var camera = sceneManager.ActiveCamera;
+            var projection = camera.Projection;
 
-            skySphere.Draw(view, projection);
+            //----------------------------------------------------------------
+            // カメラ設定
+
+            chunkEffect.EyePosition = camera.Position;
+            chunkEffect.ViewProjection = camera.Frustum.Matrix;
+
+            //----------------------------------------------------------------
+            // ライティング
+
+            chunkEffect.AmbientLightColor = SceneSettings.AmbientLightColor;
+            chunkEffect.LightDirection = SceneSettings.DirectionalLightDirection;
+            chunkEffect.LightDiffuseColor = SceneSettings.DirectionalLightDiffuseColor;
+            chunkEffect.LightSpecularColor = SceneSettings.DirectionalLightSpecularColor;
+
+            //----------------------------------------------------------------
+            // フォグ
+
+            chunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
+            chunkEffect.FogStart = projection.FarPlaneDistance * 0.6f;
+            chunkEffect.FogEnd = projection.FarPlaneDistance * 0.9f;
+            chunkEffect.FogColor = SceneSettings.SkyColor;
+
+            //----------------------------------------------------------------
+            // テクニック
+
+            chunkEffect.EnableDefaultTechnique();
+
+#if DEBUG
+            if (DebugWireframe) chunkEffect.EnableWireframeTechnique();
+#endif
         }
 
         public void Close()

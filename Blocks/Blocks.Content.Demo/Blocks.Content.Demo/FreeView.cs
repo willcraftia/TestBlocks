@@ -18,6 +18,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         Vector3 forward = Vector3.Backward;
 
+        Vector3 up = Vector3.Up;
+
         /// <summary>
         /// The orientation of the camera.
         /// X = pitch, Y = yaw, Z = roll.
@@ -44,6 +46,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             get { return forward; }
         }
 
+        public Vector3 Up
+        {
+            get { return up; }
+        }
+
         public void Move(float distance)
         {
             if (distance == 0) return;
@@ -62,7 +69,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             MatrixDirty = true;
         }
 
-        public void Up(float distance)
+        public void MoveUp(float distance)
         {
             if (distance == 0) return;
 
@@ -104,9 +111,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             Matrix.CreateFromYawPitchRoll(orientation.Y, orientation.X, orientation.Z, out rotation);
 
             forward = rotation.Forward;
+            up = rotation.Up;
 
             var target = position + rotation.Forward;
-            var up = rotation.Up;
             Matrix.CreateLookAt(ref position, ref target, ref up, out Matrix);
 
             // 逆行列も更新。

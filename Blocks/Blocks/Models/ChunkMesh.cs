@@ -13,12 +13,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkMeshPart Translucent { get; private set; }
 
-        public ChunkMesh(GraphicsDevice graphicsDevice)
+        public ChunkMesh(Region region)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (region == null) throw new ArgumentNullException("region");
 
-            Translucent = new ChunkMeshPart(graphicsDevice);
-            Opaque = new ChunkMeshPart(graphicsDevice);
+            Translucent = new ChunkMeshPart(region, true);
+            Opaque = new ChunkMeshPart(region, false);
         }
     }
 }

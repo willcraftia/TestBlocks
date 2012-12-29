@@ -8,12 +8,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public interface IShadowCaster
+    public interface IShadowCaster : ISceneObject
     {
-        void GetShadowTestBoundingSphere(out BoundingSphere sphere);
+        bool CastShadow { get; }
 
-        void GetShadowTestBoundingBox(out BoundingBox box);
-
-        void Draw(Effect effect);
+        // シャドウ マップへの描画。
+        void DrawShadow();
     }
 }

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 
 #endregion
@@ -22,11 +23,15 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public IResource Resource { get; set; }
 
+        public SceneManager SceneManager { get; private set; }
+
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public SceneSettings SceneSettings { get; private set; }
 
         public AssetManager AssetManager { get; private set; }
+
+        public ChunkEffect ChunkEffect { get; private set; }
 
         public string Name { get; set; }
 
@@ -46,8 +51,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public List<IChunkProcedure> ChunkProcesures { get; set; }
 
-        public ChunkEffect ChunkEffect { get; set; }
-
         public IChunkStore ChunkStore { get; set; }
 
         public VectorI3 ChunkSize
@@ -61,70 +64,28 @@ namespace Willcraftia.Xna.Blocks.Models
 
 #endif
 
-        public void Initialize(GraphicsDevice graphicsDevice, SceneSettings sceneSettings, AssetManager assetManager)
+        public void Initialize(SceneManager sceneManager, SceneSettings sceneSettings, AssetManager assetManager, ChunkEffect chunkEffect)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (sceneManager == null) throw new ArgumentNullException("sceneManager");
             if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");
             if (assetManager == null) throw new ArgumentNullException("assetManager");
 
-            GraphicsDevice = graphicsDevice;
+            SceneManager = sceneManager;
+            GraphicsDevice = sceneManager.GraphicsDevice;
             SceneSettings = sceneSettings;
             AssetManager = assetManager;
+            ChunkEffect = chunkEffect;
 
-            chunkManager = new ChunkManager(this, ChunkStore, RegionManager.ChunkSize);
+            chunkManager = new ChunkManager(this, RegionManager.ChunkSize);
 
-            DebugInitialize();
+#if DEBUG
+            if (Monitor == null) Monitor = new RegionMonitor();
+#endif
         }
 
         public void Update()
         {
-            DebugUpdate();
-
             chunkManager.Update();
-        }
-
-        public void Draw(View view, PerspectiveFov projection)
-        {
-            //----------------------------------------------------------------
-            // Basic Settings
-
-            Vector3 eyePosition;
-            View.GetEyePosition(ref view.Matrix, out eyePosition);
-
-            Matrix viewProjection;
-            Matrix.Multiply(ref view.Matrix, ref projection.Matrix, out viewProjection);
-
-            ChunkEffect.EyePosition = eyePosition;
-            ChunkEffect.ViewProjection = viewProjection;
-
-            //----------------------------------------------------------------
-            // Lighting
-
-            ChunkEffect.AmbientLightColor = SceneSettings.AmbientLightColor;
-            ChunkEffect.LightDirection = SceneSettings.DirectionalLightDirection;
-            ChunkEffect.LightDiffuseColor = SceneSettings.DirectionalLightDiffuseColor;
-            ChunkEffect.LightSpecularColor = SceneSettings.DirectionalLightSpecularColor;
-            
-            //----------------------------------------------------------------
-            // Fog
-
-            ChunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
-            ChunkEffect.FogStart = projection.FarPlaneDistance * 0.6f;
-            ChunkEffect.FogEnd = projection.FarPlaneDistance * 0.9f;
-            ChunkEffect.FogColor = SceneSettings.SkyColor;
-
-            //----------------------------------------------------------------
-            // Texture Tables
-
-            ChunkEffect.TileMap = TileCatalog.TileMap;
-            ChunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
-            ChunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
-            ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
-
-            //----------------------------------------------------------------
-            // Draw Chunks
-
-            chunkManager.Draw(view, projection);
         }
 
         public bool ContainsPosition(ref VectorI3 position)
@@ -156,18 +117,6 @@ namespace Willcraftia.Xna.Blocks.Models
             // チャンク マネージャは即座に更新を終えるのではなく、
             // 更新のために占有しているチャンクの解放を全て待ってから更新を終える。
             chunkManager.Close();
-        }
-
-        [Conditional("DEBUG")]
-        void DebugInitialize()
-        {
-            if (Monitor == null) Monitor = new RegionMonitor();
-        }
-
-        [Conditional("DEBUG")]
-        void DebugUpdate()
-        {
-            Monitor.Clear();
         }
 
         #region ToString

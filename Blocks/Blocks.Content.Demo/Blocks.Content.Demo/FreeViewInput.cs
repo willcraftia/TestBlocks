@@ -68,8 +68,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (keyboardState.IsKeyDown(Keys.S)) FreeView.Move(-distance);
             if (keyboardState.IsKeyDown(Keys.A)) FreeView.Strafe(distance);
             if (keyboardState.IsKeyDown(Keys.D)) FreeView.Strafe(-distance);
-            if (keyboardState.IsKeyDown(Keys.Q)) FreeView.Up(distance);
-            if (keyboardState.IsKeyDown(Keys.Z)) FreeView.Up(-distance);
+            if (keyboardState.IsKeyDown(Keys.Q)) FreeView.MoveUp(distance);
+            if (keyboardState.IsKeyDown(Keys.Z)) FreeView.MoveUp(-distance);
         }
 
         void ResetMousePosition()

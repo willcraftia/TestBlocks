@@ -210,6 +210,8 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             defaultTechnique = backingEffect.Techniques["Default"];
             wireframeTechnique = backingEffect.Techniques["Wireframe"];
+
+            currentPass = defaultTechnique.Passes[0];
         }
     }
 }

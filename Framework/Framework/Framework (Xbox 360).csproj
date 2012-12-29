@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
+    <Compile Include="BoundingBoxHelper.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="CollectionHelper.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
@@ -154,6 +155,9 @@
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
+    <Compile Include="Graphics\ICamera.cs" />
+    <Compile Include="Graphics\ISceneObject.cs" />
+    <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\IShadowCaster.cs" />
     <Compile Include="Graphics\LightFrustumShape.cs" />
     <Compile Include="Graphics\LightView.cs" />
@@ -163,6 +167,7 @@
     <Compile Include="Graphics\PssmLightCamera.cs" />
     <Compile Include="Graphics\PssmSceneEffect.cs" />
     <Compile Include="Graphics\PssmScreenSpaceShadow.cs" />
+    <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\ScreenSpaceShadow.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />

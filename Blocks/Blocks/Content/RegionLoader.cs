@@ -76,9 +76,6 @@ namespace Willcraftia.Xna.Blocks.Content
             };
             region.ChunkProcesures = ToChunkProcedures(resource, definition.ChunkProcedures, region);
 
-            var chunkEffectResource = resourceManager.Load("content:Effects/ChunkEffect");
-            region.ChunkEffect = new ChunkEffect(AssetManager.Load<Effect>(chunkEffectResource));
-
             return region;
         }
 

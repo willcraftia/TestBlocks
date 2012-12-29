@@ -33,9 +33,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         KeyboardState lastKeyboardState;
 
-        FreeView view = new FreeView();
-
-        PerspectiveFov projection = new PerspectiveFov();
+        FreeCamera camera = new FreeCamera("Default");
 
         FreeViewInput viewInput = new FreeViewInput();
 
@@ -44,6 +42,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         float dashFactor = 2;
 
         float farPlaneDistance = (partitionMinActiveRange - 1) * 16;
+
+        SceneManager sceneManager;
 
         RegionManager regionManager;
 
@@ -133,9 +133,16 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             ResourceLoader.Register(FileResourceLoader.Instance);
 
             //================================================================
+            // SceneManager
+
+            sceneManager = new SceneManager(GraphicsDevice);
+            sceneManager.AddCamera(camera);
+            sceneManager.ActiveCameraName = camera.Name;
+
+            //================================================================
             // RegionManager
 
-            regionManager = new RegionManager(Services);
+            regionManager = new RegionManager(Services, sceneManager);
 
             //================================================================
             // ChunkPartitionManager
@@ -149,19 +156,18 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var viewport = GraphicsDevice.Viewport;
             viewInput.InitialMousePositionX = viewport.Width / 2;
             viewInput.InitialMousePositionY = viewport.Height / 2;
-            viewInput.FreeView = view;
+            viewInput.FreeView = camera.FreeView;
             viewInput.MoveVelocity = moveVelocity;
             viewInput.DashFactor = dashFactor;
 
-            //view.Position = new Vector3(0, 16 * 18, 0);
-            view.Position = new Vector3(0, 16 * 16, 0);
-            //view.Position = new Vector3(0, 16 * 3, 0);
-            //view.Position = new Vector3(0, 16 * 2, 0);
-            view.Yaw(MathHelper.Pi);
-            view.Update();
+            //camera.FreeView.Position = new Vector3(0, 16 * 18, 0);
+            camera.FreeView.Position = new Vector3(0, 16 * 16, 0);
+            //camera.FreeView.Position = new Vector3(0, 16 * 3, 0);
+            //camera.FreeView.Position = new Vector3(0, 16 * 2, 0);
+            camera.FreeView.Yaw(MathHelper.Pi);
+            camera.Projection.FarPlaneDistance = farPlaneDistance;
 
-            projection.FarPlaneDistance = farPlaneDistance;
-            projection.Update();
+            camera.Update();
 
             //================================================================
             // Default RasterizerState
@@ -303,15 +309,14 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             }
 
             //================================================================
-            // View/Projection
+            // Camera
 
-            view.Update();
-            projection.Update();
+            camera.Update();
 
             //================================================================
             // PartitionManager
 
-            var eyePosition = view.Position;
+            var eyePosition = camera.FreeView.Position;
             partitionManager.Update(ref eyePosition);
 
             //================================================================
@@ -358,10 +363,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 helpVisible = !helpVisible;
             // F2
             if (keyboardState.IsKeyUp(Keys.F2) && lastKeyboardState.IsKeyDown(Keys.F2))
-                ChunkManager.ChunkBoundingBoxVisible = !ChunkManager.ChunkBoundingBoxVisible;
+                SceneManager.DebugBoundingBoxVisible = !SceneManager.DebugBoundingBoxVisible;
             // F3
             if (keyboardState.IsKeyUp(Keys.F3) && lastKeyboardState.IsKeyDown(Keys.F3))
-                ChunkManager.Wireframe = !ChunkManager.Wireframe;
+                RegionManager.DebugWireframe = !RegionManager.DebugWireframe;
             // F4
             if (keyboardState.IsKeyUp(Keys.F4) && lastKeyboardState.IsKeyDown(Keys.F4))
                 GlobalSceneSettings.FogEnabled = !GlobalSceneSettings.FogEnabled;
@@ -375,14 +380,17 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             DebugBeginDraw();
 
             //================================================================
-            // RegionManager
+            // SceneManager
 
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1, 0);
             GraphicsDevice.RasterizerState = defaultRasterizerState;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
-            regionManager.Draw(view, projection);
+            // チャンク エフェクトを更新。
+            regionManager.UpdateChunkEffect();
+
+            sceneManager.Draw();
 
             //================================================================
             // Help HUD (DEBUG)
@@ -463,25 +471,22 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("Max(").AppendNumber(region.Monitor.MaxChunkIndexCount).Append(") ");
             sb.Append("Total(").AppendNumber(region.Monitor.TotalChunkIndexCount).Append(")").AppendLine();
 
-            sb.Append("VisibleChunk: ");
-            sb.Append("O(").AppendNumber(region.Monitor.VisibleOpaqueChunkCount).Append(") ");
-            sb.Append("T(").AppendNumber(region.Monitor.VisibleTranslucentChunkCount).Append(")").AppendLine();
-            
-            sb.Append("OccludedChunk: ");
-            sb.Append("O(").AppendNumber(region.Monitor.OccludedOpaqueChunkCount).Append(") ").AppendLine();
+            sb.Append("SceneObejcts: ").AppendNumber(sceneManager.DebugRenderedSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManager.DebugVisibleSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManager.DebugTotalSceneObjectCount).AppendLine();
             
             sb.Append("MoveVelocity: ");
             sb.AppendNumber(viewInput.MoveVelocity).AppendLine();
             
             sb.Append("Eye: ");
             sb.Append("P(");
-            sb.AppendNumber(view.Position.X).Append(", ");
-            sb.AppendNumber(view.Position.Y).Append(", ");
-            sb.AppendNumber(view.Position.Z).Append(") ");
+            sb.AppendNumber(camera.Position.X).Append(", ");
+            sb.AppendNumber(camera.Position.Y).Append(", ");
+            sb.AppendNumber(camera.Position.Z).Append(") ");
             sb.Append("D(");
-            sb.AppendNumber(view.Forward.X).Append(", ");
-            sb.AppendNumber(view.Forward.Y).Append(", ");
-            sb.AppendNumber(view.Forward.Z).Append(")");
+            sb.AppendNumber(camera.Forward.X).Append(", ");
+            sb.AppendNumber(camera.Forward.Y).Append(", ");
+            sb.AppendNumber(camera.Forward.Z).Append(")");
         }
 
         [Conditional("DEBUG")]
