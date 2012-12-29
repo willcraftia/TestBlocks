@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const int DefaultPassivationSearchCapacity = 200;
 
-        public const int DefaultActivationSearchCapacity = 1000;
+        public const int DefaultActivationSearchCapacity = 100;
 
         Vector3 partitionSize;
 
@@ -368,9 +368,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             int count = Math.Min(activePartitions.Count, passivationSearchCapacity);
             for (int i = 0; i < count; i++)
             {
-                // 同時非アクティブ化許容数を越えるならば、以降の非アクティブ化を全てスキップ。
+                // 同時非アクティブ化許容数を越えるならば処理終了。
                 if (0 < passivationCapacity && passivationCapacity <= passivatingPartitions.Count)
-                    return;
+                    break;
 
                 var partition = activePartitions.Dequeue();
 
@@ -400,22 +400,23 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             int index = activationSearchOffset;
             bool cycled = false;
-            int count = 0;
-            while (count < activationSearchCapacity)
+            for (int i = 0; i < activationSearchCapacity; i++)
             {
+                // 同時アクティブ化許容数を越えるならば処理終了。
+                if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
+                    break;
+
+                // index が末尾に到達したら先頭へ戻し、循環したとしてマーク。
                 if (minActivePointOffsets.Length <= index)
                 {
                     index = 0;
                     cycled = true;
                 }
 
+                // 循環かつ最初のオフセットに到達しているならば処理終了。
                 if (cycled && activationSearchOffset <= index) break;
 
                 var position = eyePosition + minActivePointOffsets[index++];
-
-                // 同時アクティブ化許容数を越えるならば、以降のアクティブ化を全てスキップ。
-                if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
-                    break;
 
                 // アクティブ化中あるいは非アクティブ化中かどうか。
                 if (activatingPartitions.Contains(position) ||
@@ -441,8 +442,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // 非同期処理を要求。
                 activationTaskQueue.Enqueue(partition.ActivateAction);
-
-                count++;
             }
 
             activationSearchOffset = index;
