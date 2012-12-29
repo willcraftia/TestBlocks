@@ -152,7 +152,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public InterChunkMesh InterMesh { get; set; }
+        public InterChunk InterChunk { get; set; }
 
         public bool Active
         {

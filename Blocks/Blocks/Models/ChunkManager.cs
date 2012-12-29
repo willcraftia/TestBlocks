@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const int InitialActiveChunkCapacity = 3000;
 
-        public const int InterChunkMeshCapacity = 100;
+        public const int InterChunkCapacity = 100;
 
         Region region;
 
@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ConcurrentPool<ChunkMesh> chunkMeshPool;
 
-        Pool<InterChunkMesh> interChunkMeshPool;
+        Pool<InterChunk> interChunkPool;
 
         Pool<VertexBuffer> vertexBufferPool;
 
@@ -89,9 +89,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunkPool = new ConcurrentPool<Chunk>(CreateChunk);
             chunkMeshPool = new ConcurrentPool<ChunkMesh>(CreateChunkMesh);
-            interChunkMeshPool = new Pool<InterChunkMesh>(CreateInterChunkMesh)
+            interChunkPool = new Pool<InterChunk>(CreateInterChunk)
             {
-                MaxCapacity = InterChunkMeshCapacity
+                MaxCapacity = InterChunkCapacity
             };
             vertexBufferPool = new Pool<VertexBuffer>(CreateVertexBuffer);
             indexBufferPool = new Pool<IndexBuffer>(CreateIndexBuffer);
@@ -120,8 +120,8 @@ namespace Willcraftia.Xna.Blocks.Models
             region.Monitor.ActiveChunkCount = activeChunks.Count;
             region.Monitor.TotalChunkMeshCount = chunkMeshPool.TotalObjectCount;
             region.Monitor.PassiveChunkMeshCount = chunkMeshPool.Count;
-            region.Monitor.TotalInterChunkMeshCount = interChunkMeshPool.TotalObjectCount;
-            region.Monitor.PassiveInterChunkMeshCount = interChunkMeshPool.Count;
+            region.Monitor.TotalInterChunkMeshCount = interChunkPool.TotalObjectCount;
+            region.Monitor.PassiveInterChunkMeshCount = interChunkPool.Count;
             region.Monitor.TotalVertexBufferCount = vertexBufferPool.TotalObjectCount;
             region.Monitor.PassiveVertexBufferCount = vertexBufferPool.Count;
 #endif
@@ -129,6 +129,9 @@ namespace Willcraftia.Xna.Blocks.Models
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
             {
+                // アクティブ チャンクが無いならば更新処理終了。
+                if (activeChunks.Count == 0) return;
+
                 int index = updateOffset;
                 bool cycled = false;
                 while (updatingChunks.Count < UpdateCapacity)
@@ -169,34 +172,34 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                if (chunk.InterMesh == null)
+                if (chunk.InterChunk == null)
                 {
-                    // 中間メッシュ未設定ならば設定を試行。
+                    // 中間チャンク未設定ならば設定を試行。
 
                     if (closing)
                     {
                         // クローズが開始したならば新規の更新要求は破棄。
                         chunk.ExitUpdate();
                     }
-                    else if (BorrowInterChunkMesh(chunk))
+                    else if (BorrowInterChunk(chunk))
                     {
-                        chunk.InterMesh.Completed = false;
+                        chunk.InterChunk.Completed = false;
                         chunkMeshUpdateManager.EnqueueChunk(chunk);
                     }
                     else
                     {
-                        // 中間メッシュが枯渇しているため更新を次回の試行に委ねる。
+                        // 中間チャンクが枯渇しているため更新を次回の試行に委ねる。
                         chunk.ExitUpdate();
                     }
                 }
-                else if (chunk.InterMesh.Completed)
+                else if (chunk.InterChunk.Completed)
                 {
-                    // 中間メッシュが更新完了ならば Mesh を更新。
+                    // 中間チャンクが更新完了ならば Mesh を更新。
                     UpdateChunkMesh(chunk);
 
-                    // 中間メッシュは不要となるためプールへ返却。
-                    ReturnInterChunkMesh(chunk.InterMesh);
-                    chunk.InterMesh = null;
+                    // 中間チャンクは不要となるためプールへ返却。
+                    ReturnInterChunk(chunk.InterChunk);
+                    chunk.InterChunk = null;
 
                     chunk.MeshDirty = false;
                     chunk.ExitUpdate();
@@ -252,10 +255,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 PassivateChunkMesh(chunk.TranslucentMesh);
                 chunk.TranslucentMesh = null;
             }
-            if (chunk.InterMesh != null)
+            if (chunk.InterChunk != null)
             {
-                ReturnInterChunkMesh(chunk.InterMesh);
-                chunk.InterMesh = null;
+                ReturnInterChunk(chunk.InterChunk);
+                chunk.InterChunk = null;
             }
 
             // 定義に変更があるならば永続化領域を更新。
@@ -303,9 +306,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return new ChunkMesh(region);
         }
 
-        InterChunkMesh CreateInterChunkMesh()
+        InterChunk CreateInterChunk()
         {
-            return new InterChunkMesh();
+            return new InterChunk();
         }
 
         VertexBuffer CreateVertexBuffer()
@@ -318,19 +321,19 @@ namespace Willcraftia.Xna.Blocks.Models
             return new IndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, IndexCapacity, BufferUsage.WriteOnly);
         }
 
-        bool BorrowInterChunkMesh(Chunk chunk)
+        bool BorrowInterChunk(Chunk chunk)
         {
-            if (chunk.InterMesh == null)
-                chunk.InterMesh = interChunkMeshPool.Borrow();
+            if (chunk.InterChunk == null)
+                chunk.InterChunk = interChunkPool.Borrow();
 
-            return chunk.InterMesh != null;
+            return chunk.InterChunk != null;
         }
 
-        void ReturnInterChunkMesh(InterChunkMesh interChunkMesh)
+        void ReturnInterChunk(InterChunk interChunk)
         {
-            interChunkMesh.Opaque.Clear();
-            interChunkMesh.Translucent.Clear();
-            interChunkMeshPool.Return(interChunkMesh);
+            interChunk.Opaque.Clear();
+            interChunk.Translucent.Clear();
+            interChunkPool.Return(interChunk);
         }
 
         ChunkMesh ActivateChunkMesh(bool translucent)
@@ -373,7 +376,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void UpdateChunkMesh(Chunk chunk)
         {
-            var interMesh = chunk.InterMesh;
+            var interMesh = chunk.InterChunk;
 
             // メッシュに設定するワールド座標。
             var position = chunk.WorldPosition;

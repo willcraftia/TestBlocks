@@ -130,7 +130,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 // 更新の完了した Chunk を記録から消し、完了マークを付ける。
                 updatingChunks.Remove(chunk);
-                chunk.InterMesh.Completed = true;
+                chunk.InterChunk.Completed = true;
             }
         }
 
@@ -140,13 +140,8 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(chunk.Updating);
             Debug.Assert(chunk.MeshDirty);
 
-            BuildChunkMesh(chunk);
-        }
-
-        void BuildChunkMesh(Chunk chunk)
-        {
             var position = chunk.Position;
-            
+
             // この更新で利用する隣接チャンクを探索。
             NearbyChunks nearbyChunks;
             chunkManager.GetNearbyActiveChunks(ref position, out nearbyChunks);
@@ -164,10 +159,10 @@ namespace Willcraftia.Xna.Blocks.Models
             for (int z = 0; z < chunkSize.Z; z++)
                 for (int y = 0; y < chunkSize.Y; y++)
                     for (int x = 0; x < chunkSize.X; x++)
-                        BuildChunkMesh(chunk, x, y, z, ref nearbyChunks);
+                        UpdateChunk(chunk, x, y, z, ref nearbyChunks);
         }
 
-        void BuildChunkMesh(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks)
+        void UpdateChunk(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks)
         {
             var blockIndex = chunk[x, y, z];
 
@@ -203,11 +198,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (block.Fluid || block.IsTranslucentTile(side))
                 {
-                    AddMesh(x, y, z, meshPart, chunk.InterMesh.Translucent);
+                    AddMesh(x, y, z, meshPart, chunk.InterChunk.Translucent);
                 }
                 else
                 {
-                    AddMesh(x, y, z, meshPart, chunk.InterMesh.Opaque);
+                    AddMesh(x, y, z, meshPart, chunk.InterChunk.Opaque);
                 }
             }
         }
@@ -245,7 +240,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        void AddMesh(int x, int y, int z, MeshPart source, InterChunkMeshPart destination)
+        void AddMesh(int x, int y, int z, MeshPart source, InterChunkMesh destination)
         {
             foreach (var index in source.Indices)
                 destination.AddIndex(index);
