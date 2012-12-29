@@ -144,7 +144,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             partitionPool = new Pool<Partition>(CreatePartition);
 
-            Monitor = new PartitionManagerMonitor();
+            Monitor = new PartitionManagerMonitor(this);
         }
 
         public void Initialize(int minActiveRange, int maxActiveRange)
@@ -163,7 +163,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (Closed) return;
 
-            TraceUpdateMonitor();
+            Monitor.ActiveClusterCount = activePartitions.ClusterCount;
+            Monitor.ActivePartitionCount = activePartitions.Count;
+            Monitor.ActivatingPartitionCount = activatingPartitions.Count;
+            Monitor.PassivatingPartitionCount = passivatingPartitions.Count;
 
             eyePosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
             eyePosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
@@ -235,6 +238,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void CheckPassivationCompleted()
         {
+            Monitor.OnBeginCheckPassivationCompleted();
+
             int partitionCount = passivatingPartitions.Count;
             for (int i = 0; i < partitionCount; i++)
             {
@@ -265,10 +270,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 非アクティブ化に成功したのでプールへ戻す。
                 partitionPool.Return(partition);
             }
+
+            Monitor.OnEndCheckPassivationCompleted();
         }
 
         void CheckActivationCompleted()
         {
+            Monitor.OnBeginCheckActivationCompleted();
+
             int partitionCount = activatingPartitions.Count;
             for (int i = 0; i < partitionCount; i++)
             {
@@ -296,6 +305,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティブな隣接パーティションへ通知。
                 NotifyNeighborActivated(partition);
             }
+
+            Monitor.OnEndCheckActivationCompleted();
         }
 
         void NortifyNeighborPassivated(Partition partition)
@@ -352,6 +363,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         void PassivatePartitions()
         {
+            Monitor.OnBeginPassivatePartitions();
+
             int count = Math.Min(activePartitions.Count, passivationSearchCapacity);
             for (int i = 0; i < count; i++)
             {
@@ -377,10 +390,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 非同期処理を要求。
                 passivationTaskQueue.Enqueue(partition.PassivateAction);
             }
+
+            Monitor.OnEndPassivatePartitions();
         }
 
         void ActivatePartitions()
         {
+            Monitor.OnBeginActivatePartitions();
+
             int index = activationSearchOffset;
             bool cycled = false;
             int count = 0;
@@ -398,7 +415,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // 同時アクティブ化許容数を越えるならば、以降のアクティブ化を全てスキップ。
                 if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
-                    return;
+                    break;
 
                 // アクティブ化中あるいは非アクティブ化中かどうか。
                 if (activatingPartitions.Contains(position) ||
@@ -414,7 +431,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // プールからパーティションを取得。
                 // プール枯渇ならば以降のアクティブ化を全てスキップ。
                 var partition = partitionPool.Borrow();
-                if (partition == null) return;
+                if (partition == null) break;
 
                 // パーティションを初期化。
                 partition.Initialize(ref position);
@@ -429,18 +446,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
 
             activationSearchOffset = index;
+
+            Monitor.OnEndActivatePartitions();
         }
 
         protected virtual void DisposeOverride(bool disposing) { }
-
-        [Conditional("TRACE")]
-        void TraceUpdateMonitor()
-        {
-            Monitor.ActiveClusterCount = activePartitions.ClusterCount;
-            Monitor.ActivePartitionCount = activePartitions.Count;
-            Monitor.ActivatingPartitionCount = activatingPartitions.Count;
-            Monitor.PassivatingPartitionCount = passivatingPartitions.Count;
-        }
 
         #region IDisposable
 

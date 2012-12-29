@@ -61,9 +61,17 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         TimeRulerMarker drawMarker;
 
-        TimeRulerMarker updatePartitionMarker;
+        TimeRulerMarker partitionManagerUpdateMarker;
 
-        TimeRulerMarker updateRegionMarker;
+        TimeRulerMarker partitionManagerCheckPassivationCompletedMarker;
+
+        TimeRulerMarker partitionManagerCheckActivationCompletedMarker;
+
+        TimeRulerMarker partitionManagerPassivatePartitionsMarker;
+
+        TimeRulerMarker partitionManagerActivatePartitionsMarker;
+
+        TimeRulerMarker regionUpdateMarker;
 
         string helpMessage =
             "[F1] Help\r\n" +
@@ -154,6 +162,15 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             partitionManager = new ChunkPartitionManager(regionManager);
             partitionManager.Initialize(partitionMinActiveRange, partitionMaxActiveRange);
 
+            partitionManager.Monitor.BeginCheckPassivationCompleted += OnPartitionManagerMonitorBeginCheckPassivationCompleted;
+            partitionManager.Monitor.EndCheckPassivationCompleted += OnPartitionManagerMonitorEndCheckPassivationCompleted;
+            partitionManager.Monitor.BeginCheckActivationCompleted += OnPartitionManagerBeginCheckActivationCompleted;
+            partitionManager.Monitor.EndCheckActivationCompleted += OnPartitionManagerEndCheckActivationCompleted;
+            partitionManager.Monitor.BeginPassivatePartitions += OnPartitionManagerMonitorBeginPassivatePartitions;
+            partitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
+            partitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
+            partitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
+
             //================================================================
             // Camera Settings
 
@@ -201,22 +218,42 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             updateMarker = timeRuler.CreateMarker();
             updateMarker.Name = "Update";
             updateMarker.BarIndex = 0;
-            updateMarker.Color = Color.Cyan;
+            updateMarker.Color = Color.White;
 
-            updatePartitionMarker = timeRuler.CreateMarker();
-            updatePartitionMarker.Name = "UpdatePartition";
-            updatePartitionMarker.BarIndex = 0;
-            updatePartitionMarker.Color = Color.Blue;
+            partitionManagerUpdateMarker = timeRuler.CreateMarker();
+            partitionManagerUpdateMarker.Name = "PartitionManagerUpdate";
+            partitionManagerUpdateMarker.BarIndex = 1;
+            partitionManagerUpdateMarker.Color = Color.Cyan;
 
-            updateRegionMarker = timeRuler.CreateMarker();
-            updateRegionMarker.Name = "UpdateRegion";
-            updateRegionMarker.BarIndex = 0;
-            updateRegionMarker.Color = Color.DarkBlue;
+            partitionManagerCheckPassivationCompletedMarker = timeRuler.CreateMarker();
+            partitionManagerCheckPassivationCompletedMarker.Name = "PartitionManagerCheckPassivationCompleted";
+            partitionManagerCheckPassivationCompletedMarker.BarIndex = 1;
+            partitionManagerCheckPassivationCompletedMarker.Color = Color.LawnGreen;
+
+            partitionManagerCheckActivationCompletedMarker = timeRuler.CreateMarker();
+            partitionManagerCheckActivationCompletedMarker.Name = "PartitionManagerCheckActivationCompleted";
+            partitionManagerCheckActivationCompletedMarker.BarIndex = 1;
+            partitionManagerCheckActivationCompletedMarker.Color = Color.Green;
+
+            partitionManagerPassivatePartitionsMarker = timeRuler.CreateMarker();
+            partitionManagerPassivatePartitionsMarker.Name = "PartitionManagerPassivatePartitions";
+            partitionManagerPassivatePartitionsMarker.BarIndex = 1;
+            partitionManagerPassivatePartitionsMarker.Color = Color.Yellow;
+
+            partitionManagerActivatePartitionsMarker = timeRuler.CreateMarker();
+            partitionManagerActivatePartitionsMarker.Name = "PartitionManagerActivatePartitions";
+            partitionManagerActivatePartitionsMarker.BarIndex = 1;
+            partitionManagerActivatePartitionsMarker.Color = Color.Orange;
+
+            regionUpdateMarker = timeRuler.CreateMarker();
+            regionUpdateMarker.Name = "RegionManagerUpdate";
+            regionUpdateMarker.BarIndex = 1;
+            regionUpdateMarker.Color = Color.Blue;
 
             drawMarker = timeRuler.CreateMarker();
             drawMarker.Name = "Draw";
-            drawMarker.BarIndex = 1;
-            drawMarker.Color = Color.Yellow;
+            drawMarker.BarIndex = 2;
+            drawMarker.Color = Color.White;
 
             base.Initialize();
         }
@@ -249,8 +286,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         protected override void UnloadContent()
         {
             timeRuler.ReleaseMarker(updateMarker);
-            timeRuler.ReleaseMarker(updatePartitionMarker);
-            timeRuler.ReleaseMarker(updateRegionMarker);
+            timeRuler.ReleaseMarker(partitionManagerUpdateMarker);
+            timeRuler.ReleaseMarker(regionUpdateMarker);
             timeRuler.ReleaseMarker(drawMarker);
 
             spriteBatch.Dispose();
@@ -306,21 +343,21 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // PartitionManager
 
-            updatePartitionMarker.Begin();
+            partitionManagerUpdateMarker.Begin();
 
             var eyePosition = camera.FreeView.Position;
             partitionManager.Update(ref eyePosition);
 
-            updatePartitionMarker.End();
+            partitionManagerUpdateMarker.End();
 
             //================================================================
             // RegionManager
 
-            updateRegionMarker.Begin();
+            regionUpdateMarker.Begin();
 
             regionManager.Update(gameTime);
 
-            updateRegionMarker.End();
+            regionUpdateMarker.End();
 
             //================================================================
             // Others
@@ -515,6 +552,46 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             spriteBatch.DrawString(font, helpMessage, new Vector2(layout.ArrangedBounds.X, layout.ArrangedBounds.Y), Color.Yellow);
 
             spriteBatch.End();
+        }
+
+        void OnPartitionManagerMonitorBeginCheckPassivationCompleted(object sender, EventArgs e)
+        {
+            partitionManagerCheckPassivationCompletedMarker.Begin();
+        }
+
+        void OnPartitionManagerMonitorEndCheckPassivationCompleted(object sender, EventArgs e)
+        {
+            partitionManagerCheckPassivationCompletedMarker.End();
+        }
+
+        void OnPartitionManagerBeginCheckActivationCompleted(object sender, EventArgs e)
+        {
+            partitionManagerCheckActivationCompletedMarker.Begin();
+        }
+
+        void OnPartitionManagerEndCheckActivationCompleted(object sender, EventArgs e)
+        {
+            partitionManagerCheckActivationCompletedMarker.End();
+        }
+
+        void OnPartitionManagerMonitorBeginPassivatePartitions(object sender, EventArgs e)
+        {
+            partitionManagerPassivatePartitionsMarker.Begin();
+        }
+
+        void OnPartitionManagerMonitorEndPassivatePartitions(object sender, EventArgs e)
+        {
+            partitionManagerPassivatePartitionsMarker.End();
+        }
+
+        void OnPartitionManagerMonitorBeginActivatePartitions(object sender, EventArgs e)
+        {
+            partitionManagerActivatePartitionsMarker.Begin();
+        }
+
+        void OnPartitionManagerEndActivatePartitions(object sender, EventArgs e)
+        {
+            partitionManagerActivatePartitionsMarker.End();
         }
     }
 }
