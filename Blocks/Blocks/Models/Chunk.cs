@@ -13,7 +13,13 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Chunk
     {
-        VectorI3 size;
+        // チャンク サイズは頂点数に密接に関係するため定数値とする。
+        public static VectorI3 Size
+        {
+            get { return new VectorI3(16); }
+        }
+
+        VectorI3 size = Size;
 
         VectorI3 position;
 
@@ -42,11 +48,6 @@ namespace Willcraftia.Xna.Blocks.Models
         ChunkMesh opaqueMesh;
 
         ChunkMesh translucentMesh;
-
-        public VectorI3 Size
-        {
-            get { return size; }
-        }
 
         public VectorI3 Position
         {

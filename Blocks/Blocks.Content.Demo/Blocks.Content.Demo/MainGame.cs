@@ -399,7 +399,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 SceneManager.DebugBoundingBoxVisible = !SceneManager.DebugBoundingBoxVisible;
             // F3
             if (keyboardState.IsKeyUp(Keys.F3) && lastKeyboardState.IsKeyDown(Keys.F3))
-                RegionManager.DebugWireframe = !RegionManager.DebugWireframe;
+                RegionManager.Wireframe = !RegionManager.Wireframe;
             // F4
             if (keyboardState.IsKeyUp(Keys.F4) && lastKeyboardState.IsKeyDown(Keys.F4))
                 GlobalSceneSettings.FogEnabled = !GlobalSceneSettings.FogEnabled;

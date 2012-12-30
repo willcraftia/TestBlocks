@@ -22,22 +22,6 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         static readonly Logger logger = new Logger(typeof(RegionManager).Name);
 
-        //====================================================================
-        // Efficiency
-
-        // TODO
-        // どこで管理する？
-        public static VectorI3 ChunkSize = new VectorI3(16);
-
-        //
-        //====================================================================
-
-        #region Debug
-
-        public static bool DebugWireframe { get; set; }
-
-        #endregion
-
         IServiceProvider serviceProvider;
 
         SceneManager sceneManager;
@@ -51,6 +35,8 @@ namespace Willcraftia.Xna.Blocks.Models
         SkySphere skySphere;
 
         ChunkEffect chunkEffect;
+
+        public static bool Wireframe { get; set; }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -201,10 +187,8 @@ namespace Willcraftia.Xna.Blocks.Models
             // テクニック
 
             chunkEffect.EnableDefaultTechnique();
-
-#if DEBUG
-            if (DebugWireframe) chunkEffect.EnableWireframeTechnique();
-#endif
+            
+            if (Wireframe) chunkEffect.EnableWireframeTechnique();
         }
 
         public void Close()

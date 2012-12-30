@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class DefaultTerrainProcedure : IChunkProcedure
     {
-        VectorI3 chunkSize;
+        static readonly VectorI3 chunkSize = Chunk.Size;
 
         Vector3 inverseChunkSize;
 
@@ -31,8 +31,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void Initialize()
         {
-            chunkSize = Region.ChunkSize;
-
             inverseChunkSize.X = 1 / (float) chunkSize.X;
             inverseChunkSize.Y = 1 / (float) chunkSize.Y;
             inverseChunkSize.Z = 1 / (float) chunkSize.Z;

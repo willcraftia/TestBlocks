@@ -44,11 +44,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        static readonly VectorI3 chunkSize = Chunk.Size;
+
         Region region;
 
         ChunkManager chunkManager;
-
-        VectorI3 chunkSize;
 
         // TODO
         // プール サイズは、メモリ占有量の観点で決定する。
@@ -71,8 +71,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.region = region;
             this.chunkManager = chunkManager;
-
-            chunkSize = chunkManager.ChunkSize;
 
             taskPool = new Pool<Task>(() => { return new Task(this); });
         }
@@ -99,9 +97,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
-#if DEBUG
             region.Monitor.UpdatingChunkCount = updatingChunks.Count;
-#endif
 
             // Update the task queue.
             taskQueue.Update();

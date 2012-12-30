@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Diagnostics;
 
@@ -12,6 +13,8 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkMesh : IShadowCaster
     {
+        static readonly VectorI3 chunkSize = Chunk.Size;
+
         Region region;
 
         VertexBuffer vertexBuffer;
@@ -147,7 +150,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public void GetDistanceSquared(ref Vector3 eyePosition, out float result)
         {
             // 中心座標を算出。
-            var chunkSize = region.ChunkSize;
             var halfSize = new Vector3(chunkSize.X * 0.5f, chunkSize.Y * 0.5f, chunkSize.Z * 0.5f);
             var centerPosition = position + halfSize;
 

@@ -36,9 +36,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const int InterChunkCapacity = 100;
 
-        Region region;
+        static readonly VectorI3 chunkSize = Chunk.Size;
 
-        VectorI3 chunkSize;
+        Region region;
 
         Vector3 inverseChunkSize;
 
@@ -71,17 +71,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool closed;
 
-        public VectorI3 ChunkSize
-        {
-            get { return chunkSize; }
-        }
-
-        public ChunkManager(Region region, VectorI3 chunkSize)
+        public ChunkManager(Region region)
         {
             if (region == null) throw new ArgumentNullException("region");
 
             this.region = region;
-            this.chunkSize = chunkSize;
 
             inverseChunkSize.X = 1 / (float) chunkSize.X;
             inverseChunkSize.Y = 1 / (float) chunkSize.Y;
@@ -115,7 +109,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-#if DEBUG
             region.Monitor.TotalChunkCount = chunkPool.TotalObjectCount;
             region.Monitor.ActiveChunkCount = activeChunks.Count;
             region.Monitor.TotalChunkMeshCount = chunkMeshPool.TotalObjectCount;
@@ -124,7 +117,6 @@ namespace Willcraftia.Xna.Blocks.Models
             region.Monitor.PassiveInterChunkMeshCount = interChunkPool.Count;
             region.Monitor.TotalVertexBufferCount = vertexBufferPool.TotalObjectCount;
             region.Monitor.PassiveVertexBufferCount = vertexBufferPool.Count;
-#endif
 
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
@@ -351,10 +343,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void PassivateChunkMesh(ChunkMesh chunkMesh)
         {
-#if DEBUG
             region.Monitor.TotalChunkVertexCount -= chunkMesh.VertexCount;
             region.Monitor.TotalChunkIndexCount -= chunkMesh.IndexCount;
-#endif
 
             region.SceneManager.RemoveSceneObject(chunkMesh);
 
@@ -400,21 +390,17 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
                 else
                 {
-#if DEBUG
                     region.Monitor.TotalChunkVertexCount -= chunk.OpaqueMesh.VertexCount;
                     region.Monitor.TotalChunkIndexCount -= chunk.OpaqueMesh.IndexCount;
-#endif
                 }
 
                 chunk.OpaqueMesh.Position = position;
                 interMesh.Opaque.Populate(chunk.OpaqueMesh);
 
-#if DEBUG
                 region.Monitor.TotalChunkVertexCount += chunk.OpaqueMesh.VertexCount;
                 region.Monitor.TotalChunkIndexCount += chunk.OpaqueMesh.IndexCount;
                 region.Monitor.MaxChunkVertexCount = Math.Max(region.Monitor.MaxChunkVertexCount, chunk.OpaqueMesh.VertexCount);
                 region.Monitor.MaxChunkIndexCount = Math.Max(region.Monitor.MaxChunkIndexCount, chunk.OpaqueMesh.IndexCount);
-#endif
             }
 
             //----------------------------------------------------------------
@@ -436,21 +422,17 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
                 else
                 {
-#if DEBUG
                     region.Monitor.TotalChunkVertexCount -= chunk.TranslucentMesh.VertexCount;
                     region.Monitor.TotalChunkIndexCount -= chunk.TranslucentMesh.IndexCount;
-#endif
                 }
 
                 chunk.TranslucentMesh.Position = position;
                 interMesh.Translucent.Populate(chunk.TranslucentMesh);
 
-#if DEBUG
                 region.Monitor.TotalChunkVertexCount += chunk.TranslucentMesh.VertexCount;
                 region.Monitor.TotalChunkIndexCount += chunk.TranslucentMesh.IndexCount;
                 region.Monitor.MaxChunkVertexCount = Math.Max(region.Monitor.MaxChunkVertexCount, chunk.TranslucentMesh.VertexCount);
                 region.Monitor.MaxChunkIndexCount = Math.Max(region.Monitor.MaxChunkIndexCount, chunk.TranslucentMesh.IndexCount);
-#endif
             }
         }
     }

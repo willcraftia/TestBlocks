@@ -53,16 +53,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public IChunkStore ChunkStore { get; set; }
 
-        public VectorI3 ChunkSize
-        {
-            get { return RegionManager.ChunkSize; }
-        }
-
-        #region Debug
-
         public RegionMonitor Monitor { get; private set; }
-
-        #endregion
 
         public void Initialize(SceneManager sceneManager, SceneSettings sceneSettings, AssetManager assetManager, ChunkEffect chunkEffect)
         {
@@ -76,11 +67,9 @@ namespace Willcraftia.Xna.Blocks.Models
             AssetManager = assetManager;
             ChunkEffect = chunkEffect;
 
-            chunkManager = new ChunkManager(this, RegionManager.ChunkSize);
+            chunkManager = new ChunkManager(this);
 
-#if DEBUG
             if (Monitor == null) Monitor = new RegionMonitor();
-#endif
         }
 
         public void Update()

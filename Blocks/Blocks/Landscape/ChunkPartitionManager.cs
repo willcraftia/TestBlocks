@@ -17,7 +17,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
         RegionManager regionManager;
 
         public ChunkPartitionManager(RegionManager regionManager)
-            : base(RegionManager.ChunkSize.ToVector3())
+            : base(Chunk.Size.ToVector3())
         {
             if (regionManager == null) throw new ArgumentNullException("regionManager");
             this.regionManager = regionManager;

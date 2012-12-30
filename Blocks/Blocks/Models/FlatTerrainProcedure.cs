@@ -13,6 +13,8 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public const int DefaultHeight = 256;
 
+        static readonly VectorI3 chunkSize = Chunk.Size;
+
         // I/F
         [PropertyIgnored]
         public IResource Resource { get; set; }
@@ -38,15 +40,13 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             var biome = Region.BiomeManager.GetBiome(chunk);
 
-            var size = chunk.Size;
-
-            for (int x = 0; x < size.X; x++)
+            for (int x = 0; x < chunkSize.X; x++)
             {
-                for (int z = 0; z < size.Z; z++)
+                for (int z = 0; z < chunkSize.Z; z++)
                 {
                     var biomeElement = GetBiomeElement(chunk, biome, x, z);
 
-                    for (int y = 0; y < size.Y; y++)
+                    for (int y = 0; y < chunkSize.Y; y++)
                         Generate(chunk, x, y, z, biomeElement);
                 }
             }
@@ -62,7 +62,7 @@ namespace Willcraftia.Xna.Blocks.Models
         void Generate(Chunk chunk, int x, int y, int z, BiomeElement biomeElement)
         {
             var position = chunk.Position;
-            var h = position.Y * chunk.Size.Y + y;
+            var h = position.Y * chunkSize.Y + y;
 
             byte index = Block.EmptyIndex;
 
