@@ -278,11 +278,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         void DrawShadowMap()
         {
             // TODO: シャドウ モジュールの準備。
-
-            foreach (var shadowCaster in activeShadowCasters)
-            {
-                shadowCaster.DrawShadow();
-            }
         }
 
         void DrawScene()

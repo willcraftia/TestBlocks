@@ -159,6 +159,7 @@
     <Compile Include="Graphics\ISceneObject.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\IShadowCaster.cs" />
+    <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\LightFrustumShape.cs" />
     <Compile Include="Graphics\LightView.cs" />
     <Compile Include="Graphics\MultiRenderTargets.cs" />
@@ -166,10 +167,8 @@
     <Compile Include="Graphics\Pssm.cs" />
     <Compile Include="Graphics\PssmLightCamera.cs" />
     <Compile Include="Graphics\PssmSceneEffect.cs" />
-    <Compile Include="Graphics\PssmScreenSpaceShadow.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
-    <Compile Include="Graphics\ScreenSpaceShadow.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />

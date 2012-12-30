@@ -1,7 +1,9 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 #endregion
 
@@ -27,13 +29,26 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         float inverseSplitCount;
 
-        PssmLightCamera[] cameras;
+        PssmLightCamera[] splitLightCameras;
 
         float[] splitDistances;
 
         Matrix[] splitViewProjections;
 
+        MultiRenderTargets splitRenderTargets;
+
+        Queue<IShadowCaster>[] splitShadowCasters;
+
+        List<Vector3>[] splitLightVolumePoints;
+
+        public GraphicsDevice GraphicsDevice { get; private set; }
+
         public int SplitCount { get; private set; }
+
+        // PSSM で参照する視点カメラ。
+        // 実視点カメラである必要はない。
+        // PSSM 用に状態を設定した視点カメラを設定。
+        public ICamera Camera { get; set; }
 
         public float Lambda
         {
@@ -62,57 +77,77 @@ namespace Willcraftia.Xna.Framework.Graphics
             get
             {
                 for (int i = 0; i < SplitCount; i++)
-                    Matrix.Multiply(ref cameras[i].View.Matrix, ref cameras[i].Projection.Matrix, out splitViewProjections[i]);
+                    splitViewProjections[i] = splitLightCameras[i].ViewProjection;
                 return splitViewProjections;
             }
         }
 
         public int ShadowMapSize { get; set; }
 
-        public Pssm()
-            : this(DefaultCount)
+        public Pssm(GraphicsDevice graphicsDevice)
+            : this(graphicsDevice, DefaultCount)
         {
         }
 
-        public Pssm(int splitCount)
+        public Pssm(GraphicsDevice graphicsDevice, int splitCount)
         {
+            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (splitCount < MinSplitCount || MaxSplitCount < splitCount) throw new ArgumentOutOfRangeException("splitCount");
 
+            GraphicsDevice = graphicsDevice;
             SplitCount = splitCount;
 
             inverseSplitCount = 1.0f / (float) SplitCount;
             splitDistances = new float[SplitCount + 1];
+            splitViewProjections = new Matrix[SplitCount];
 
-            cameras = new PssmLightCamera[SplitCount];
-            for (int i = 0; i < SplitCount; i++) cameras[i] = new PssmLightCamera();
+            splitLightCameras = new PssmLightCamera[SplitCount];
+            for (int i = 0; i < SplitCount; i++) splitLightCameras[i] = new PssmLightCamera();
+
+            // TODO: パラメータ見直し or 外部設定化。
+            splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount, ShadowMapSize, ShadowMapSize,
+                false, SurfaceFormat.Vector2, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PlatformContents);
+
+            // TODO: 初期容量。
+            splitShadowCasters = new Queue<IShadowCaster>[SplitCount];
+            for (int i = 0; i < SplitCount; i++) splitShadowCasters[i] = new Queue<IShadowCaster>();
+
+            // TODO: 初期容量。
+            splitLightVolumePoints = new List<Vector3>[SplitCount];
+            for (int i = 0; i < SplitCount; i++) splitLightVolumePoints[i] = new List<Vector3>();
         }
 
-        public PssmLightCamera GetCamera(int index)
+        public void Prepare()
         {
-            if (index < 0 || SplitCount <= index) throw new ArgumentOutOfRangeException("index");
+            if (Camera == null) throw new InvalidOperationException("Camera is null.");
 
-            return cameras[index];
+            // デフォルトでは視錐台を含む AABB で準備する。
+            Camera.Frustum.GetCorners(corners);
+            var boundingBox = BoundingBox.CreateFromPoints(corners);
+
+            Prepare(ref boundingBox);
         }
 
-        // PSSM で参照する視点の射影は、必ずしも実視点の物でなくとも良い。
-        // 例えば、影を投げる範囲を抑えるために、実視点の射影よりも短い距離の射影を用いるなど。
-        public void Prepare(View eyeView, PerspectiveFov eyeProjection, ref BoundingBox boundingBox)
+        public void Prepare(ref BoundingBox boundingBox)
         {
-            CalculateEyeFarPlaneDistance(eyeView, eyeProjection, ref boundingBox);
-            CalculateSplitDistances(eyeProjection);
+            if (Camera == null) throw new InvalidOperationException("Camera is null.");
+
+            CalculateEyeFarPlaneDistance(ref boundingBox);
+            CalculateSplitDistances();
 
             for (int i = 0; i < SplitCount; i++)
             {
                 var near = splitDistances[i];
                 var far = splitDistances[i + 1];
 
-                cameras[i].ShadowMapSize = ShadowMapSize;
-                cameras[i].View.Direction = lightDirection;
-                cameras[i].SplitEyeProjection.Fov = eyeProjection.Fov;
-                cameras[i].SplitEyeProjection.AspectRatio = eyeProjection.AspectRatio;
-                cameras[i].SplitEyeProjection.NearPlaneDistance = near;
-                cameras[i].SplitEyeProjection.FarPlaneDistance = far;
-                cameras[i].Prepare(eyeView);
+                splitLightCameras[i].ShadowMapSize = ShadowMapSize;
+                splitLightCameras[i].LightView.Direction = lightDirection;
+                splitLightCameras[i].SplitEyeProjection.Fov = Camera.Projection.Fov;
+                splitLightCameras[i].SplitEyeProjection.AspectRatio = Camera.Projection.AspectRatio;
+                splitLightCameras[i].SplitEyeProjection.NearPlaneDistance = near;
+                splitLightCameras[i].SplitEyeProjection.FarPlaneDistance = far;
+                
+                splitLightCameras[i].Prepare(Camera);
             }
         }
 
@@ -120,13 +155,99 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             for (int i = 0; i < SplitCount; i++)
             {
-                if (cameras[i].TryAddShadowCaster(shadowCaster)) return;
+                var lightCamera = splitLightCameras[i];
+                var shadowCasters = splitShadowCasters[i];
+                var lightVolumePoints = splitLightVolumePoints[i];
+
+                BoundingSphere casterSphere;
+                shadowCaster.GetBoundingSphere(out casterSphere);
+
+                BoundingBox casterBox;
+                shadowCaster.GetBoundingBox(out casterBox);
+                casterBox.GetCorners(corners);
+
+                bool shouldAdd = false;
+                if (casterSphere.Intersects(lightCamera.SplitEyeFrustum))
+                {
+                    shouldAdd = true;
+                }
+                else
+                {
+                    var ray = new Ray
+                    {
+                        Direction = lightCamera.LightView.Direction
+                    };
+
+                    // TODO: 要検討。
+                    for (int j = 0; j < 8; j++)
+                    {
+                        // AABB の頂点から光方向の線。
+                        ray.Position = corners[j];
+
+                        // 分割視錐台と交差するか否か。
+                        var distance = ray.Intersects(lightCamera.SplitEyeFrustum);
+                        if (distance == null) continue;
+
+                        // TODO
+                        if (distance < 10)
+                        {
+                            shouldAdd = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (shouldAdd)
+                {
+                    // 投影オブジェクトとして登録。
+                    shadowCasters.Enqueue(shadowCaster);
+
+                    // AABB の頂点を包含座標として登録。
+                    lightCamera.AddLightVolumePoints(corners);
+
+                    break;
+                }
             }
         }
 
-        void CalculateEyeFarPlaneDistance(View eyeView, PerspectiveFov eyeProjection, ref BoundingBox boundingBox)
+        // シャドウ マップを描画。
+        public void Draw(ShadowMapEffect effect)
         {
-            var viewMatrix = eyeView.Matrix;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
+            // 各ライト カメラで描画。
+            for (int i = 0; i < SplitCount; i++)
+            {
+                var lightCamera = splitLightCameras[i];
+                var renderTarget = splitRenderTargets[i];
+                var shadowCasters = splitShadowCasters[i];
+
+                //------------------------------------------------------------
+                // エフェクト
+
+                lightCamera.UpdateViewProjection();
+
+                effect.LightViewProjection = lightCamera.ViewProjection;
+
+                //------------------------------------------------------------
+                // 描画
+
+                GraphicsDevice.SetRenderTarget(renderTarget);
+
+                while (0 < shadowCasters.Count)
+                {
+                    var shadowCaster = shadowCasters.Dequeue();
+                    shadowCaster.DrawShadow(effect);
+                }
+
+                GraphicsDevice.SetRenderTarget(null);
+            }
+        }
+
+        void CalculateEyeFarPlaneDistance(ref BoundingBox boundingBox)
+        {
+            var viewMatrix = Camera.View.Matrix;
 
             //
             // smaller z, more far
@@ -145,12 +266,12 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (z < maxFar) maxFar = z;
             }
 
-            eyeFarPlaneDistance = eyeProjection.NearPlaneDistance - maxFar;
+            eyeFarPlaneDistance = Camera.Projection.NearPlaneDistance - maxFar;
         }
 
-        void CalculateSplitDistances(PerspectiveFov eyeProjection)
+        void CalculateSplitDistances()
         {
-            var near = eyeProjection.NearPlaneDistance;
+            var near = Camera.Projection.NearPlaneDistance;
             var far = eyeFarPlaneDistance;
             var farNearRatio = far / near;
 

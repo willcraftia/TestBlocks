@@ -13,6 +13,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         bool CastShadow { get; }
 
         // シャドウ マップへの描画。
-        void DrawShadow();
+        void DrawShadow(ShadowMapEffect effect);
     }
 }

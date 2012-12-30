@@ -141,12 +141,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public void DrawShadow()
-        {
-            throw new NotImplementedException();
-        }
-
-        // I/F
         public void GetDistanceSquared(ref Vector3 eyePosition, out float result)
         {
             // 中心座標を算出。
@@ -249,6 +243,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 描画ロックを解放。
             Chunk.ExitDraw();
+        }
+
+        // I/F
+        public void DrawShadow(ShadowMapEffect effect)
+        {
+            throw new NotImplementedException();
         }
 
         public void SetVertices(VertexPositionNormalTexture[] vertices, int vertexCount)
