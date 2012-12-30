@@ -81,13 +81,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public float[] SplitDistances
         {
-            get { return splitDistances.GetValueSingleArray(Pssm.MaxSplitCount); }
+            get { return splitDistances.GetValueSingleArray(PssmSettings.MaxSplitCount); }
             set { splitDistances.SetValue(value); }
         }
 
         public Matrix[] SplitViewProjections
         {
-            get { return splitViewProjections.GetValueMatrixArray(Pssm.MaxSplitCount); }
+            get { return splitViewProjections.GetValueMatrixArray(PssmSettings.MaxSplitCount); }
             set { splitViewProjections.SetValue(value); }
         }
 
@@ -109,7 +109,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             splitDistances = Parameters["SplitDistances"];
             splitViewProjections = Parameters["SplitViewProjections"];
 
-            shadowMaps = new EffectParameter[Pssm.MaxSplitCount];
+            shadowMaps = new EffectParameter[PssmSettings.MaxSplitCount];
             for (int i = 0; i < shadowMaps.Length; i++)
                 shadowMaps[i] = Parameters["ShadowMap" + i];
 

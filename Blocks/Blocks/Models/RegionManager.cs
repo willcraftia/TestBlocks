@@ -40,7 +40,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public SceneSettings SceneSettings { get; private set; }
+        public BlocksSceneSettings SceneSettings { get; private set; }
 
         public RegionManager(IServiceProvider serviceProvider, SceneManager sceneManager)
         {
@@ -53,14 +53,14 @@ namespace Willcraftia.Xna.Blocks.Models
             GraphicsDevice = sceneManager.GraphicsDevice;
 
             globalAssetManager = new AssetManager(serviceProvider);
-            globalAssetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
+            globalAssetManager.RegisterLoader(typeof(BlocksSceneSettings), new SceneSettingsLoader());
             globalAssetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
         }
 
         public void LoadGrobalSettings()
         {
             var sceneSettingsResource = globalResourceManager.Load("title:Resources/SceneSettings.json");
-            SceneSettings = globalAssetManager.Load<SceneSettings>(sceneSettingsResource);
+            SceneSettings = globalAssetManager.Load<BlocksSceneSettings>(sceneSettingsResource);
 
             skySphere = new SkySphere(GraphicsDevice);
             var effectResource = globalResourceManager.Load("content:Effects/SkySphereEffect");

@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public enum LightFrustumShape
+    public enum LightFrustumTypes
     {
         /// <summary>
         /// PSSM (Parallel Split Shadow Maps)。
@@ -16,11 +16,11 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// LSPSM (Light Space Perspective Shadow Maps)。
         /// </summary>
-        Lspsm,
+        //Lspsm,
 
         /// <summary>
         /// USM (Uniform Shadow Maps)。
         /// </summary>
-        Usm
+        //Usm
     }
 }

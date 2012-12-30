@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
@@ -42,6 +43,14 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         float dashFactor = 2;
 
         float farPlaneDistance = (partitionMinActiveRange - 1) * 16;
+
+        ResourceManager systemResourceManager;
+
+        AssetManager systemAssetManager;
+
+        SceneModuleFactory sceneModuleFactory;
+
+        SceneSettings sceneSettings;
 
         SceneManager sceneManager;
 
@@ -138,78 +147,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             GraphicsAdapterLog.Info();
 
             //================================================================
-            // StorageManager
-
-            StorageManager.SelectStorageContainer("Blocks.Demo.MainGame");
-
-            //================================================================
-            // ResourceLoader
-
-            ResourceLoader.Register(ContentResourceLoader.Instance);
-            ResourceLoader.Register(TitleResourceLoader.Instance);
-            ResourceLoader.Register(StorageResourceLoader.Instance);
-            ResourceLoader.Register(FileResourceLoader.Instance);
-
-            //================================================================
-            // SceneManager
-
-            sceneManager = new SceneManager(GraphicsDevice);
-            sceneManager.AddCamera(camera);
-            sceneManager.ActiveCameraName = camera.Name;
-
-            sceneManager.Monitor.BeginDrawScene += OnSceneManagerMonitorBeginDrawScene;
-            sceneManager.Monitor.EndDrawScene += OnSceneManagerMonitorEndDrawScene;
-            sceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnSceneManagerMonitorBeginDrawSceneOcclusionQuery;
-            sceneManager.Monitor.EndDrawSceneOcclusionQuery += OnSceneManagerMonitorEndDrawSceneOcclusionQuery;
-            sceneManager.Monitor.BeginDrawSceneRendering += OnSceneManagerMonitorBeginDrawSceneRendering;
-            sceneManager.Monitor.EndDrawSceneRendering += Monitor_EndDrawSceneRendering;
-
-            //================================================================
-            // RegionManager
-
-            regionManager = new RegionManager(Services, sceneManager);
-
-            //================================================================
-            // ChunkPartitionManager
-
-            partitionManager = new ChunkPartitionManager(regionManager);
-            partitionManager.Initialize(partitionMinActiveRange, partitionMaxActiveRange);
-
-            partitionManager.Monitor.BeginCheckPassivationCompleted += OnPartitionManagerMonitorBeginCheckPassivationCompleted;
-            partitionManager.Monitor.EndCheckPassivationCompleted += OnPartitionManagerMonitorEndCheckPassivationCompleted;
-            partitionManager.Monitor.BeginCheckActivationCompleted += OnPartitionManagerBeginCheckActivationCompleted;
-            partitionManager.Monitor.EndCheckActivationCompleted += OnPartitionManagerEndCheckActivationCompleted;
-            partitionManager.Monitor.BeginPassivatePartitions += OnPartitionManagerMonitorBeginPassivatePartitions;
-            partitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
-            partitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
-            partitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
-
-            //================================================================
-            // Camera Settings
-
-            var viewport = GraphicsDevice.Viewport;
-            viewInput.InitialMousePositionX = viewport.Width / 2;
-            viewInput.InitialMousePositionY = viewport.Height / 2;
-            viewInput.FreeView = camera.FreeView;
-            viewInput.MoveVelocity = moveVelocity;
-            viewInput.DashFactor = dashFactor;
-
-            //camera.FreeView.Position = new Vector3(0, 16 * 18, 0);
-            camera.FreeView.Position = new Vector3(0, 16 * 16, 0);
-            //camera.FreeView.Position = new Vector3(0, 16 * 3, 0);
-            //camera.FreeView.Position = new Vector3(0, 16 * 2, 0);
-            camera.FreeView.Yaw(MathHelper.Pi);
-            camera.Projection.FarPlaneDistance = farPlaneDistance;
-
-            camera.Update();
-
-            //================================================================
-            // Default RasterizerState
-
-            defaultRasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-            defaultRasterizerState.FillMode = FillMode.Solid;
-
-            //================================================================
             // FpsCounter
 
             var fpsCounter = new FpsCounter(this);
@@ -290,6 +227,100 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         protected override void LoadContent()
         {
             logger.Info("LoadContent");
+
+            //================================================================
+            // StorageManager
+
+            StorageManager.SelectStorageContainer("Blocks.Demo.MainGame");
+
+            //================================================================
+            // ResourceManager
+
+            systemResourceManager = new ResourceManager();
+
+            //================================================================
+            // AssetManager
+
+            systemAssetManager = new AssetManager(Services);
+
+            //================================================================
+            // ResourceLoader
+
+            ResourceLoader.Register(ContentResourceLoader.Instance);
+            ResourceLoader.Register(TitleResourceLoader.Instance);
+            ResourceLoader.Register(StorageResourceLoader.Instance);
+            ResourceLoader.Register(FileResourceLoader.Instance);
+
+            //================================================================
+            // SceneModuleFactory
+
+            sceneModuleFactory = new SceneModuleFactory(GraphicsDevice, systemResourceManager, systemAssetManager);
+
+            //================================================================
+            // SceneSettings
+
+            // TODO: 定義ファイルからロード。
+            sceneSettings = new SceneSettings();
+
+            //================================================================
+            // SceneManager
+
+            sceneManager = new SceneManager(GraphicsDevice, sceneSettings, sceneModuleFactory);
+            sceneManager.AddCamera(camera);
+            sceneManager.ActiveCameraName = camera.Name;
+            sceneManager.Initialize();
+
+            sceneManager.Monitor.BeginDrawScene += OnSceneManagerMonitorBeginDrawScene;
+            sceneManager.Monitor.EndDrawScene += OnSceneManagerMonitorEndDrawScene;
+            sceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnSceneManagerMonitorBeginDrawSceneOcclusionQuery;
+            sceneManager.Monitor.EndDrawSceneOcclusionQuery += OnSceneManagerMonitorEndDrawSceneOcclusionQuery;
+            sceneManager.Monitor.BeginDrawSceneRendering += OnSceneManagerMonitorBeginDrawSceneRendering;
+            sceneManager.Monitor.EndDrawSceneRendering += Monitor_EndDrawSceneRendering;
+
+            //================================================================
+            // RegionManager
+
+            regionManager = new RegionManager(Services, sceneManager);
+
+            //================================================================
+            // ChunkPartitionManager
+
+            partitionManager = new ChunkPartitionManager(regionManager);
+            partitionManager.Initialize(partitionMinActiveRange, partitionMaxActiveRange);
+
+            partitionManager.Monitor.BeginCheckPassivationCompleted += OnPartitionManagerMonitorBeginCheckPassivationCompleted;
+            partitionManager.Monitor.EndCheckPassivationCompleted += OnPartitionManagerMonitorEndCheckPassivationCompleted;
+            partitionManager.Monitor.BeginCheckActivationCompleted += OnPartitionManagerBeginCheckActivationCompleted;
+            partitionManager.Monitor.EndCheckActivationCompleted += OnPartitionManagerEndCheckActivationCompleted;
+            partitionManager.Monitor.BeginPassivatePartitions += OnPartitionManagerMonitorBeginPassivatePartitions;
+            partitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
+            partitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
+            partitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
+
+            //================================================================
+            // Camera
+
+            var viewport = GraphicsDevice.Viewport;
+            viewInput.InitialMousePositionX = viewport.Width / 2;
+            viewInput.InitialMousePositionY = viewport.Height / 2;
+            viewInput.FreeView = camera.FreeView;
+            viewInput.MoveVelocity = moveVelocity;
+            viewInput.DashFactor = dashFactor;
+
+            //camera.FreeView.Position = new Vector3(0, 16 * 18, 0);
+            camera.FreeView.Position = new Vector3(0, 16 * 16, 0);
+            //camera.FreeView.Position = new Vector3(0, 16 * 3, 0);
+            //camera.FreeView.Position = new Vector3(0, 16 * 2, 0);
+            camera.FreeView.Yaw(MathHelper.Pi);
+            camera.Projection.FarPlaneDistance = farPlaneDistance;
+
+            camera.Update();
+
+            //================================================================
+            // Default RasterizerState
+
+            defaultRasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
+            defaultRasterizerState.FillMode = FillMode.Solid;
 
             //================================================================
             // Region

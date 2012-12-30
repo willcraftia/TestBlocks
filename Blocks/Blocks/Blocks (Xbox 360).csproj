@@ -115,6 +115,7 @@
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\BlockCatalog.cs" />
     <Compile Include="Models\BlockMesh.cs" />
+    <Compile Include="Models\BlocksSceneSettings.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
     <Compile Include="Models\Chunk.cs" />
     <Compile Include="Models\ChunkCollection.cs" />
@@ -146,7 +147,7 @@
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\RegionManager.cs" />
     <Compile Include="Models\RegionMonitor.cs" />
-    <Compile Include="Models\SceneSettings.cs" />
+    <Compile Include="Models\SceneModuleFactory.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\SkyColor.cs" />
     <Compile Include="Models\SkyColorTable.cs" />

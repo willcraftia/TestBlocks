@@ -102,7 +102,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 renderTargets[i] = new RenderTarget2D(
                     graphicsDevice, width, height,
-                    mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, RenderTargetUsage);
+                    mipMap, preferredFormat, preferredDepthFormat, preferredMultiSampleCount, usage);
                 renderTargets[i].Name = CreateRenderTargetName(i);
             }
         }

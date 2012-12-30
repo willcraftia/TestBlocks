@@ -50,6 +50,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             ColorWriteChannels = ColorWriteChannels.None
         };
 
+        ISceneModuleFactory moduleFactory;
+
         List<ISceneObject> sceneObjects = new List<ISceneObject>(InitialSceneObjectCapacity);
 
         Dictionary<string, ICamera> cameraMap = new Dictionary<string, ICamera>(InitialCameraCapacity);
@@ -70,11 +72,17 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingSphere frustumSphere;
 
+        ShadowMapEffect shadowMapEffect;
+
+        Pssm pssm;
+
+        bool shadowingAvailable;
+
         public SceneManagerMonitor Monitor { get; private set; }
 
         #region Debug
 
-        BasicEffect debugEffect;
+        BasicEffect debugBoundingBoxEffect;
 
         BoundingBoxDrawer debugBoundingBoxDrawer;
 
@@ -95,6 +103,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
+        public SceneSettings SceneSettings { get; private set; }
+
         public string ActiveCameraName
         {
             get { return activeCameraName; }
@@ -112,19 +122,43 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public bool ShadowEnabled { get; set; }
 
-        public SceneManager(GraphicsDevice graphicsDevice)
+        public int ShadowMapSize { get; set; }
+
+        public LightFrustumTypes LightFrustumType { get; set; }
+
+        public SceneManager(GraphicsDevice graphicsDevice, SceneSettings sceneSettings, ISceneModuleFactory moduleFactory)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");
+            if (moduleFactory == null) throw new ArgumentNullException("moduleFactory");
 
             GraphicsDevice = graphicsDevice;
+            SceneSettings = sceneSettings;
+            this.moduleFactory = moduleFactory;
 
             Monitor = new SceneManagerMonitor(this);
+        }
+
+        public void Initialize()
+        {
+            var shadowSettings = SceneSettings.Shadow;
+
+            shadowMapEffect = moduleFactory.CreateShadowMapEffect();
+            shadowMapEffect.Technique = shadowSettings.ShadowMap.Technique;
+
+            pssm = moduleFactory.CreatePssm(shadowSettings);
+
+            // TODO
+            if (shadowMapEffect != null && pssm != null)
+                shadowingAvailable = true;
 
 #if DEBUG
-            debugEffect = new BasicEffect(GraphicsDevice);
-            debugEffect.AmbientLightColor = Vector3.One;
-            debugEffect.VertexColorEnabled = true;
-            debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
+            //debugEffect = new BasicEffect(GraphicsDevice);
+            //debugEffect.AmbientLightColor = Vector3.One;
+            //debugEffect.VertexColorEnabled = true;
+            //debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
+            debugBoundingBoxEffect = moduleFactory.CreateDebugBoundingBoxEffect();
+            debugBoundingBoxDrawer = moduleFactory.CreateDebugBoundingBoxDrawer();
 #endif
         }
 
@@ -199,8 +233,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
 #if DEBUG
             // デバッグ エフェクトへカメラ情報を設定。
-            debugEffect.View = activeCamera.View.Matrix;
-            debugEffect.Projection = activeCamera.Projection.Matrix;
+            debugBoundingBoxEffect.View = activeCamera.View.Matrix;
+            debugBoundingBoxEffect.Projection = activeCamera.Projection.Matrix;
 #endif
 
             // 長時間のロックの回避。
@@ -242,7 +276,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             translucentSceneObjects.Sort(DistanceComparer.Instance);
 
             // シャドウ マップの描画。
-            if (ShadowEnabled && activeShadowCasters.Count != 0)
+            if (shadowingAvailable && ShadowEnabled && activeShadowCasters.Count != 0)
             {
                 DrawShadowMap();
             }
@@ -270,14 +304,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (shadowCaster.Translucent) return false;
             if (!shadowCaster.CastShadow) return false;
 
-            // TODO
-            // シャドウ モジュールを用いて判定。
             return false;
         }
 
         void DrawShadowMap()
         {
-            // TODO: シャドウ モジュールの準備。
+            if (LightFrustumType == LightFrustumTypes.Pssm)
+            {
+                // PSSM の状態を準備。
+                pssm.Prepare();
+
+                // 投影オブジェクトを収集。
+                foreach (var shadowCaster in activeShadowCasters)
+                    pssm.TryAddShadowCaster(shadowCaster);
+
+                // シャドウ マップを描画。
+                pssm.Draw(shadowMapEffect);
+            }
         }
 
         void DrawScene()
@@ -363,7 +406,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             BoundingBox boundingBox;
             sceneObject.GetBoundingBox(out boundingBox);
-            debugBoundingBoxDrawer.Draw(ref boundingBox, debugEffect);
+            debugBoundingBoxDrawer.Draw(ref boundingBox, debugBoundingBoxEffect);
         }
     }
 }

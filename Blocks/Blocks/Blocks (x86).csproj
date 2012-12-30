@@ -76,7 +76,8 @@
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
-    <Compile Include="Models\SceneSettings.cs" />
+    <Compile Include="Models\SceneModuleFactory.cs" />
+    <Compile Include="Models\BlocksSceneSettings.cs" />
     <Compile Include="Models\SkyColor.cs" />
     <Compile Include="Models\SkyColorTable.cs" />
     <Compile Include="Models\SkySphere.cs" />

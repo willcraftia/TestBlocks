@@ -19,7 +19,7 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (SceneSettingsDefinition) serializer.Deserialize(resource);
 
-            var sceneSettings = new SceneSettings
+            var sceneSettings = new BlocksSceneSettings
             {
                 EarthRotationEnabled = definition.EarthRotationEnabled,
                 MidnightSunDirection = definition.MidnightSunDirection,
@@ -49,7 +49,7 @@ namespace Willcraftia.Xna.Blocks.Content
 
         public void Save(IResource resource, object asset)
         {
-            var sceneSettings = asset as SceneSettings;
+            var sceneSettings = asset as BlocksSceneSettings;
 
             var definition = new SceneSettingsDefinition
             {

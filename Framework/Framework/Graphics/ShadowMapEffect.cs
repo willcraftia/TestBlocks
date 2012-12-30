@@ -8,15 +8,35 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class ShadowMapEffect : Effect
+    public sealed class ShadowMapEffect
     {
+        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
+
+        //====================================================================
+        // Real Effect
+
+        Effect backingEffect;
+
+        //====================================================================
+        // EffectParameter
+
         EffectParameter world;
         
         EffectParameter lightViewProjection;
 
+        //====================================================================
+        // EffectTechnique
+
+        ShadowMapTechniques technique = DefaultShadowMapTechnique;
+
         EffectTechnique defaultTechnique;
 
         EffectTechnique vsmTechnique;
+
+        //====================================================================
+        // Cached pass
+
+        EffectPass currentPass;
 
         public Matrix World
         {
@@ -30,25 +50,45 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { lightViewProjection.SetValue(value); }
         }
 
-        public ShadowMapEffect(Effect cloneSource)
-            : base(cloneSource)
+        public ShadowMapTechniques Technique
         {
-            world = Parameters["World"];
-            lightViewProjection = Parameters["LightViewProjection"];
-            defaultTechnique = Techniques["Default"];
-            vsmTechnique = Techniques["Vsm"];
+            get { return technique; }
+            set
+            {
+                technique = value;
+
+                switch (technique)
+                {
+                    case ShadowMapTechniques.Vsm:
+                        backingEffect.CurrentTechnique = vsmTechnique;
+                        break;
+                    default:
+                        backingEffect.CurrentTechnique = defaultTechnique;
+                        break;
+                }
+                
+                currentPass = backingEffect.CurrentTechnique.Passes[0];
+            }
         }
 
-        public void EnableTechnique(ShadowMapTechniques technique)
+        public ShadowMapEffect(Effect backingEffect)
         {
-            if (technique == ShadowMapTechniques.Vsm)
-            {
-                CurrentTechnique = vsmTechnique;
-            }
-            else
-            {
-                CurrentTechnique = defaultTechnique;
-            }
+            if (backingEffect == null) throw new ArgumentNullException("backingEffect");
+
+            this.backingEffect = backingEffect;
+
+            world = backingEffect.Parameters["World"];
+            lightViewProjection = backingEffect.Parameters["LightViewProjection"];
+
+            defaultTechnique = backingEffect.Techniques["Default"];
+            vsmTechnique = backingEffect.Techniques["Vsm"];
+
+            Technique = technique;
+        }
+
+        public void Apply()
+        {
+            currentPass.Apply();
         }
     }
 }

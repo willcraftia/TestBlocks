@@ -9,7 +9,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SceneSettings : IAsset
+    public sealed class BlocksSceneSettings : IAsset
     {
         public const float DefaultSecondsPerDay = 10f;
 
@@ -195,7 +195,7 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return 0 <= moonDirection.Y; }
         }
 
-        public SceneSettings()
+        public BlocksSceneSettings()
         {
             ColorTable = new SkyColorTable();
         }

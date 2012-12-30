@@ -11,15 +11,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Pssm
     {
-        public const int MinSplitCount = 1;
+        ShadowSettings shadowSettings;
 
-        public const int MaxSplitCount = 7;
+        ShadowMapSettings shadowMapSettings;
 
-        public const int DefaultCount = 3;
-
-        public const float DefaultLambda = 0.7f;
-
-        float lambda = DefaultLambda;
+        PssmSettings pssmSettings;
 
         Vector3 lightDirection = Vector3.Down;
 
@@ -43,23 +39,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public int SplitCount { get; private set; }
-
         // PSSM で参照する視点カメラ。
         // 実視点カメラである必要はない。
         // PSSM 用に状態を設定した視点カメラを設定。
         public ICamera Camera { get; set; }
-
-        public float Lambda
-        {
-            get { return lambda; }
-            set
-            {
-                if (value < 0 || 1 < value) throw new ArgumentOutOfRangeException("value");
-
-                lambda = value;
-            }
-        }
 
         public Vector3 LightDirection
         {
@@ -76,45 +59,45 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             get
             {
-                for (int i = 0; i < SplitCount; i++)
+                for (int i = 0; i < splitLightCameras.Length; i++)
                     splitViewProjections[i] = splitLightCameras[i].ViewProjection;
                 return splitViewProjections;
             }
         }
 
-        public int ShadowMapSize { get; set; }
-
-        public Pssm(GraphicsDevice graphicsDevice)
-            : this(graphicsDevice, DefaultCount)
-        {
-        }
-
-        public Pssm(GraphicsDevice graphicsDevice, int splitCount)
+        public Pssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-            if (splitCount < MinSplitCount || MaxSplitCount < splitCount) throw new ArgumentOutOfRangeException("splitCount");
+            if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
 
             GraphicsDevice = graphicsDevice;
-            SplitCount = splitCount;
+            this.shadowSettings = shadowSettings;
 
-            inverseSplitCount = 1.0f / (float) SplitCount;
-            splitDistances = new float[SplitCount + 1];
-            splitViewProjections = new Matrix[SplitCount];
+            shadowMapSettings = shadowSettings.ShadowMap;
+            pssmSettings = shadowSettings.LightFrustum.Pssm;
 
-            splitLightCameras = new PssmLightCamera[SplitCount];
-            for (int i = 0; i < SplitCount; i++) splitLightCameras[i] = new PssmLightCamera();
+            inverseSplitCount = 1.0f / (float) pssmSettings.SplitCount;
+            splitDistances = new float[pssmSettings.SplitCount + 1];
+            splitViewProjections = new Matrix[pssmSettings.SplitCount];
+
+            splitLightCameras = new PssmLightCamera[pssmSettings.SplitCount];
+            for (int i = 0; i < splitLightCameras.Length; i++)
+                splitLightCameras[i] = new PssmLightCamera();
 
             // TODO: パラメータ見直し or 外部設定化。
-            splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount, ShadowMapSize, ShadowMapSize,
+            splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", pssmSettings.SplitCount,
+                shadowMapSettings.Size, shadowMapSettings.Size,
                 false, SurfaceFormat.Vector2, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PlatformContents);
 
             // TODO: 初期容量。
-            splitShadowCasters = new Queue<IShadowCaster>[SplitCount];
-            for (int i = 0; i < SplitCount; i++) splitShadowCasters[i] = new Queue<IShadowCaster>();
+            splitShadowCasters = new Queue<IShadowCaster>[pssmSettings.SplitCount];
+            for (int i = 0; i < splitShadowCasters.Length; i++)
+                splitShadowCasters[i] = new Queue<IShadowCaster>();
 
             // TODO: 初期容量。
-            splitLightVolumePoints = new List<Vector3>[SplitCount];
-            for (int i = 0; i < SplitCount; i++) splitLightVolumePoints[i] = new List<Vector3>();
+            splitLightVolumePoints = new List<Vector3>[pssmSettings.SplitCount];
+            for (int i = 0; i < splitLightVolumePoints.Length; i++)
+                splitLightVolumePoints[i] = new List<Vector3>();
         }
 
         public void Prepare()
@@ -135,12 +118,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             CalculateEyeFarPlaneDistance(ref boundingBox);
             CalculateSplitDistances();
 
-            for (int i = 0; i < SplitCount; i++)
+            for (int i = 0; i < splitDistances.Length; i++)
             {
                 var near = splitDistances[i];
                 var far = splitDistances[i + 1];
 
-                splitLightCameras[i].ShadowMapSize = ShadowMapSize;
+                splitLightCameras[i].ShadowMapSize = shadowMapSettings.Size;
                 splitLightCameras[i].LightView.Direction = lightDirection;
                 splitLightCameras[i].SplitEyeProjection.Fov = Camera.Projection.Fov;
                 splitLightCameras[i].SplitEyeProjection.AspectRatio = Camera.Projection.AspectRatio;
@@ -153,7 +136,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public void TryAddShadowCaster(IShadowCaster shadowCaster)
         {
-            for (int i = 0; i < SplitCount; i++)
+            for (int i = 0; i < splitLightCameras.Length; i++)
             {
                 var lightCamera = splitLightCameras[i];
                 var shadowCasters = splitShadowCasters[i];
@@ -217,7 +200,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             // 各ライト カメラで描画。
-            for (int i = 0; i < SplitCount; i++)
+            for (int i = 0; i < splitLightCameras.Length; i++)
             {
                 var lightCamera = splitLightCameras[i];
                 var renderTarget = splitRenderTargets[i];
@@ -274,8 +257,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             var near = Camera.Projection.NearPlaneDistance;
             var far = eyeFarPlaneDistance;
             var farNearRatio = far / near;
+            var splitLambda = pssmSettings.SplitLambda;
 
-            for (int i = 0; i < SplitCount; i++)
+            for (int i = 0; i < splitDistances.Length; i++)
             {
                 float idm = i * inverseSplitCount;
                 float log = (float) (near * Math.Pow(farNearRatio, idm));
@@ -286,11 +270,11 @@ namespace Willcraftia.Xna.Framework.Graphics
                 // i think the following is a wrong formula.
                 //float uniform = (near + idm) * (far - near);
 
-                splitDistances[i] = log * lambda + uniform * (1.0f - lambda);
+                splitDistances[i] = log * splitLambda + uniform * (1.0f - splitLambda);
             }
 
             splitDistances[0] = near;
-            splitDistances[SplitCount] = eyeFarPlaneDistance;
+            splitDistances[splitDistances.Length - 1] = eyeFarPlaneDistance;
         }
     }
 }

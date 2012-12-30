@@ -65,7 +65,7 @@ namespace Willcraftia.Xna.Blocks.Models
             set { sunVisible = value; }
         }
 
-        public SceneSettings SceneSettings { get; set; }
+        public BlocksSceneSettings SceneSettings { get; set; }
 
         public SkySphere(GraphicsDevice graphicsDevice)
         {
