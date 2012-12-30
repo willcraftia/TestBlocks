@@ -172,7 +172,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             var shadowSettings = Settings.Shadow;
 
-            shadowMapEffect = moduleFactory.CreateShadowMapEffect();
+            shadowMapEffect = new ShadowMapEffect(moduleFactory.CreateShadowMapEffect());
             shadowMapEffect.Technique = shadowSettings.ShadowMap.Technique;
 
             pssm = moduleFactory.CreatePssm(shadowSettings);

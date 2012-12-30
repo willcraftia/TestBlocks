@@ -30,16 +30,21 @@ namespace Willcraftia.Xna.Blocks.Models
             this.assetManager = assetManager;
         }
 
-        public ShadowMapEffect CreateShadowMapEffect()
+        public Effect CreateGaussianBlurEffect()
+        {
+            var resource = resourceManager.Load("content:Effects/GaussianBlurEffect");
+            return assetManager.Load<Effect>(resource);
+        }
+
+        public Effect CreateShadowMapEffect()
         {
             var resource = resourceManager.Load("content:Effects/ShadowMapEffect");
-            var effect = assetManager.Load<Effect>(resource);
-            return new ShadowMapEffect(effect);
+            return assetManager.Load<Effect>(resource);
         }
 
         public Pssm CreatePssm(ShadowSettings shadowSettings)
         {
-            return new Pssm(GraphicsDevice, shadowSettings);
+            return new Pssm(GraphicsDevice, shadowSettings, CreateGaussianBlurEffect());
         }
 
         public BasicEffect CreateDebugBoundingBoxEffect()

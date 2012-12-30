@@ -15,6 +15,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ShadowMapSettings shadowMapSettings;
 
+        VsmSettings vsmSettings;
+
         PssmSettings pssmSettings;
 
         Vector3 lightDirection = Vector3.Down;
@@ -34,6 +36,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         MultiRenderTargets splitRenderTargets;
 
         Queue<IShadowCaster>[] splitShadowCasters;
+
+        SpriteBatch blurSpriteBatch;
+
+        GaussianBlur blur;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -67,15 +73,17 @@ namespace Willcraftia.Xna.Framework.Graphics
 #if DEBUG || TRACE
 #endif
 
-        public Pssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings)
+        public Pssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
+            if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
             this.shadowSettings = shadowSettings;
 
             shadowMapSettings = shadowSettings.ShadowMap;
+            vsmSettings = shadowMapSettings.Vsm;
             pssmSettings = shadowSettings.LightFrustum.Pssm;
 
             inverseSplitCount = 1.0f / (float) pssmSettings.SplitCount;
@@ -95,6 +103,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             splitShadowCasters = new Queue<IShadowCaster>[pssmSettings.SplitCount];
             for (int i = 0; i < splitShadowCasters.Length; i++)
                 splitShadowCasters[i] = new Queue<IShadowCaster>();
+
+            blurSpriteBatch = new SpriteBatch(GraphicsDevice);
+            blur = new GaussianBlur(blurEffect, blurSpriteBatch, shadowMapSettings.Size, shadowMapSettings.Size, SurfaceFormat.Vector2,
+                vsmSettings.BlurRadius, vsmSettings.BlurAmount);
 
             Monitor = new PssmMonitor(this);
         }
@@ -224,6 +236,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                     var shadowCaster = shadowCasters.Dequeue();
                     shadowCaster.DrawShadow(effect);
                 }
+
+                if (vsmSettings.BlurEnabled) blur.Filter(renderTarget);
 
                 GraphicsDevice.SetRenderTarget(null);
             }
