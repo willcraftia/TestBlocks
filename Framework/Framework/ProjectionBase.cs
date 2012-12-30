@@ -37,7 +37,11 @@ namespace Willcraftia.Xna.Framework
         /// </summary>
         public sealed override void Update()
         {
-            if (MatrixDirty) UpdateOverride();
+            if (MatrixDirty)
+            {
+                UpdateOverride();
+                MatrixDirty = false;
+            }
         }
 
         /// <summary>

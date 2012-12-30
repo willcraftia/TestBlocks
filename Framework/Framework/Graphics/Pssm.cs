@@ -19,8 +19,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         PssmSettings pssmSettings;
 
-        Vector3 lightDirection = Vector3.Down;
-
         Vector3[] corners = new Vector3[8];
 
         float eyeFarPlaneDistance;
@@ -42,12 +40,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         GaussianBlur blur;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
-
-        public Vector3 LightDirection
-        {
-            get { return lightDirection; }
-            set { lightDirection = value; }
-        }
 
         public float[] SplitDistances
         {
@@ -95,9 +87,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                 splitLightCameras[i] = new PssmLightCamera(shadowMapSettings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
+            var pp = GraphicsDevice.PresentationParameters;
             splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", pssmSettings.SplitCount,
                 shadowMapSettings.Size, shadowMapSettings.Size,
-                false, SurfaceFormat.Vector2, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PlatformContents);
+                false, shadowMapSettings.Format, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
 
             // TODO: 初期容量。
             splitShadowCasters = new Queue<IShadowCaster>[pssmSettings.SplitCount];
@@ -111,7 +104,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new PssmMonitor(this);
         }
 
-        public void Prepare(ICamera camera)
+        public void Prepare(ICamera camera, ref Vector3 lightDirection)
         {
             if (camera == null) throw new ArgumentNullException("camera");
 
@@ -119,10 +112,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             camera.Frustum.GetCorners(corners);
             var boundingBox = BoundingBox.CreateFromPoints(corners);
 
-            Prepare(camera, ref boundingBox);
+            Prepare(camera, ref lightDirection, ref boundingBox);
         }
 
-        public void Prepare(ICamera camera, ref BoundingBox boundingBox)
+        public void Prepare(ICamera camera, ref Vector3 lightDirection, ref BoundingBox boundingBox)
         {
             if (camera == null) throw new InvalidOperationException("Camera is null.");
 
@@ -237,7 +230,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                     shadowCaster.DrawShadow(effect);
                 }
 
-                if (vsmSettings.BlurEnabled) blur.Filter(renderTarget);
+                if (effect.Technique == ShadowMapTechniques.Vsm && vsmSettings.BlurEnabled)
+                    blur.Filter(renderTarget);
 
                 GraphicsDevice.SetRenderTarget(null);
             }
@@ -245,6 +239,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public Texture2D GetShadowMap(int index)
         {
+            if (index < 0 || splitRenderTargets.Count < index) throw new ArgumentOutOfRangeException("index");
+
             return splitRenderTargets[index];
         }
 

@@ -134,7 +134,6 @@ namespace Willcraftia.Xna.Framework
         protected override void UpdateOverride()
         {
             Matrix.CreatePerspectiveFieldOfView(fov, aspectRatio, nearPlaneDistance, farPlaneDistance, out Matrix);
-            MatrixDirty = false;
         }
     }
 }

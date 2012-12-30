@@ -93,7 +93,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public void SetShadowMaps(MultiRenderTargets renderTargets)
         {
-            for (int i = 0; i < renderTargets.RenderTargetCount; i++)
+            for (int i = 0; i < renderTargets.Count; i++)
                 shadowMaps[i].SetValue(renderTargets[i]);
         }
 

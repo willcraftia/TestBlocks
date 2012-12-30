@@ -211,7 +211,7 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public void Draw(Texture2D shadowMap)
+        public void Draw()
         {
             // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)

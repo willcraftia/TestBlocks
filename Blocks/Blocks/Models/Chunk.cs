@@ -279,6 +279,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var flag = side.ToFlags();
 
+                // TODO: 起動してすぐに終了すると発生しやすい。
                 Debug.Assert((activeNeighbors & flag) == flag);
 
                 activeNeighbors ^= flag;

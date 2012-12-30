@@ -29,7 +29,8 @@ VSOutput VS(float4 position : POSITION)
 float4 DefaultPS(VSOutput input) : COLOR0
 {
     float depth = input.PositionWVP.z / input.PositionWVP.w;
-    return float4(depth, 0.0f, 0.0f, 0.0f);
+//    return float4(depth, 0.0f, 0.0f, 0.0f);
+return float4(1, 0.0f, 0.0f, 1);
 }
 
 float4 VsmPS(VSOutput input) : COLOR0

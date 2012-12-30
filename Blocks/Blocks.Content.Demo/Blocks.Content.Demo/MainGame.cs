@@ -316,12 +316,17 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         protected override void Update(GameTime gameTime)
         {
+            //================================================================
+            // TimeRuler
+
+            timeRuler.StartFrame();
+
+            // これをしないとデバッグできない。
             if (!IsActive) return;
 
             //================================================================
             // TimeRuler
 
-            timeRuler.StartFrame();
             updateMarker.Begin();
 
             //================================================================
@@ -401,7 +406,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // TimeRuler
 
-            if (IsActive) drawMarker.Begin();
+            drawMarker.Begin();
 
             //================================================================
             // WorldManager
@@ -416,7 +421,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // TimeRuler
 
-            if (IsActive) drawMarker.End();
+            drawMarker.End();
 
             base.Draw(gameTime);
         }

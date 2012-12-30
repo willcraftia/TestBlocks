@@ -320,7 +320,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // シャドウ マップの描画。
             shadowMapAvailable = false;
-            if (shadowMapEffect != null && Settings.Shadow.Enabled && activeShadowCasters.Count != 0)
+            if (shadowMapEffect != null && Settings.Shadow.Enabled &&
+                activeShadowCasters.Count != 0 &&
+                activeDirectionalLight != null && activeDirectionalLight.Enabled)
             {
                 DrawShadowMap();
             }
@@ -356,7 +358,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (LightFrustumType == LightFrustumTypes.Pssm)
             {
                 // PSSM の状態を準備。
-                pssm.Prepare(activeCamera);
+                var lightDirection = activeDirectionalLight.Direction;
+                pssm.Prepare(activeCamera, ref lightDirection);
 
                 // 投影オブジェクトを収集。
                 foreach (var shadowCaster in activeShadowCasters)
@@ -438,7 +441,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     }
                 }
 
-                if (!rendered) opaque.Draw(null);
+                if (!rendered) opaque.Draw();
 
                 DebugDrawBoundingBox(opaque);
             }
@@ -458,8 +461,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
 
                 // TODO
-                // 半透明に対しては常に null で良いか？
-                translucent.Draw(null);
+                // 半透明に対してシャドウ マップは必要か？
+                translucent.Draw();
 
                 DebugDrawBoundingBox(translucent);
             }

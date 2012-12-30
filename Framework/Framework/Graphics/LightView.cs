@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class LightView : ViewBase
     {
-        Vector3 direction;
+        Vector3 direction = Vector3.Down;
 
         Vector3 position = Vector3.Zero;
 
@@ -20,9 +20,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return direction; }
             set
             {
+                if (value.LengthSquared() == 0) throw new ArgumentException("Invalid vector.");
+
                 if (direction == value) return;
 
                 direction = value;
+                direction.Normalize();
                 MatrixDirty = true;
             }
         }

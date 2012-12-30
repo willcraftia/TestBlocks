@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         //====================================================================
         // EffectTechnique
 
-        ShadowMapTechniques technique = DefaultShadowMapTechnique;
+        ShadowMapTechniques technique;
 
         EffectTechnique defaultTechnique;
 
@@ -83,7 +83,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             defaultTechnique = backingEffect.Techniques["Default"];
             vsmTechnique = backingEffect.Techniques["Vsm"];
 
-            Technique = technique;
+            Technique = DefaultShadowMapTechnique;
         }
 
         public void Apply()

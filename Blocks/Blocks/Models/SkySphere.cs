@@ -101,7 +101,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public void UpdateOcclusion() { }
 
         // I/F
-        public void Draw(Texture2D shadowMap)
+        public void Draw()
         {
             // 空の色。
             Effect.SkyColor = SceneSettings.SkyColor;

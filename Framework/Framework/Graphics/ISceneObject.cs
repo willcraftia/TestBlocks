@@ -27,9 +27,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void UpdateOcclusion();
 
-        // シーン マップへの描画。
-        // シャドウを用いない場合は null 指定の想定。
-        // 実装では、null か否かでエフェクトのテクニックを変更するなど。
-        void Draw(Texture2D shadowMap);
+        void Draw();
     }
 }

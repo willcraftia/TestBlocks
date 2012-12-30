@@ -18,7 +18,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public string Name { get; private set; }
 
-        public int RenderTargetCount { get; private set; }
+        public int Count { get; private set; }
 
         public int Width
         {
@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return currentIndex; }
             set
             {
-                if (value < 0 || RenderTargetCount <= value)
+                if (value < 0 || Count <= value)
                     throw new ArgumentOutOfRangeException("CurrentIndex");
 
                 currentIndex = value;
@@ -92,7 +92,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice = graphicsDevice;
             Name = name;
-            RenderTargetCount = renderTargetCount;
+            Count = renderTargetCount;
 
             currentIndex = 0;
 
@@ -111,7 +111,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (string.IsNullOrEmpty(Name)) return null;
 
-            if (RenderTargetCount == 0) return Name;
+            if (Count == 0) return Name;
             return Name + "." + index;
         }
 

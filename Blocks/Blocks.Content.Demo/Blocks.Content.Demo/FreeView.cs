@@ -118,8 +118,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             // 逆行列も更新。
             Matrix.Invert(ref Matrix, out inverseMatrix);
-
-            MatrixDirty = false;
         }
     }
 }
