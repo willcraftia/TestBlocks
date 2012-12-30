@@ -12,10 +12,9 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         public const int DefaultSize = 512;
 
-        //public const SurfaceFormat DefaultFormat = SurfaceFormat.Vector2;
-        public const SurfaceFormat DefaultFormat = SurfaceFormat.Color;
+        public const SurfaceFormat DefaultFormat = SurfaceFormat.Vector2;
 
-        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Classic;
+        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Vsm;
 
         public const float DefaultDepthBias = 0.005f;
 

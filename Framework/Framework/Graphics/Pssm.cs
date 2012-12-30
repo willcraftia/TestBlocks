@@ -223,6 +223,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 // 描画
 
                 GraphicsDevice.SetRenderTarget(renderTarget);
+                GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
                 while (0 < shadowCasters.Count)
                 {
