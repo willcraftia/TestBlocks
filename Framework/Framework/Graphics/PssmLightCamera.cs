@@ -12,6 +12,8 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         public Matrix ViewProjection = Matrix.Identity;
 
+        int shadowMapSize;
+
         // 分割視錐台の頂点のキャッシュ。
         Vector3[] splitEyeFrustumCorners = new Vector3[8];
 
@@ -28,10 +30,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public PerspectiveFov SplitEyeProjection { get; private set; }
 
-        public int ShadowMapSize { get; set; }
-
-        public PssmLightCamera()
+        public PssmLightCamera(int shadowMapSize)
         {
+            this.shadowMapSize = shadowMapSize;
+
             LightView = new LightView();
             LightProjection = new Orthograph();
             SplitEyeFrustum = new BoundingFrustum(Matrix.Identity);
@@ -153,7 +155,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 包含座標を全て含む領域を基に、光源の射影行列を更新。
             // REFERECE: http://msdn.microsoft.com/ja-jp/library/ee416324(VS.85).aspx
 
-            var texelSize = 1.0f / (float) ShadowMapSize;
+            var texelSize = 1.0f / (float) shadowMapSize;
             LightProjection.Left = AdjustProjectionBoundary(min.X, texelSize);
             LightProjection.Right = AdjustProjectionBoundary(max.X, texelSize);
             LightProjection.Bottom = AdjustProjectionBoundary(min.Y, texelSize);
@@ -169,7 +171,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             var result = value;
             //result /= texelSize;
-            result *= ShadowMapSize;
+            result *= shadowMapSize;
             result = MathExtension.Floor(result);
             result *= texelSize;
             return result;

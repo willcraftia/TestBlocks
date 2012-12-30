@@ -82,7 +82,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             splitLightCameras = new PssmLightCamera[pssmSettings.SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)
-                splitLightCameras[i] = new PssmLightCamera();
+                splitLightCameras[i] = new PssmLightCamera(shadowMapSettings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", pssmSettings.SplitCount,
@@ -123,7 +123,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var near = splitDistances[i];
                 var far = splitDistances[i + 1];
 
-                splitLightCameras[i].ShadowMapSize = shadowMapSettings.Size;
                 splitLightCameras[i].LightView.Direction = lightDirection;
                 splitLightCameras[i].SplitEyeProjection.Fov = Camera.Projection.Fov;
                 splitLightCameras[i].SplitEyeProjection.AspectRatio = Camera.Projection.AspectRatio;
