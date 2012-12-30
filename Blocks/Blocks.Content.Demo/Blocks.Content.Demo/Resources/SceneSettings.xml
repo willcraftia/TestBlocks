@@ -30,6 +30,7 @@
 		<Y>0</Y>
 		<Z>0</Z>
 	</SunlightSpecularColor>
+	<SunlightEnabled>true</SunlightEnabled>
 	<MoonlightDiffuseColor>
 		<X>0.5</X>
 		<Y>0.5</Y>
@@ -40,6 +41,7 @@
 		<Y>0</Y>
 		<Z>0</Z>
 	</MoonlightSpecularColor>
+	<MoonlightEnabled>true</MoonlightEnabled>
 	<ColorTable>
 		<SkyColorDefinition>
 			<Time>0</Time>

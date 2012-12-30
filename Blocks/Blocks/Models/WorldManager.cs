@@ -91,6 +91,10 @@ namespace Willcraftia.Xna.Blocks.Models
             var sceneSettingsResource = resourceManager.Load("title:Resources/SceneSettings.json");
             SceneSettings = assetManager.Load<SceneSettings>(sceneSettingsResource);
 
+            // 太陽と月を登録。
+            SceneManager.AddDirectionalLight(SceneSettings.Sunlight);
+            SceneManager.AddDirectionalLight(SceneSettings.Moonlight);
+
             //----------------------------------------------------------------
             // RegionManager
 
@@ -119,6 +123,19 @@ namespace Willcraftia.Xna.Blocks.Models
             // SceneSettings
 
             SceneSettings.Update(gameTime);
+
+            if (SceneSettings.SunVisible)
+            {
+                SceneManager.ActiveDirectionalLightName = SceneSettings.Sunlight.Name;
+            }
+            else if (SceneSettings.MoonVisible)
+            {
+                SceneManager.ActiveDirectionalLightName = SceneSettings.Moonlight.Name;
+            }
+            else
+            {
+                SceneManager.ActiveDirectionalLightName = null;
+            }
 
             //----------------------------------------------------------------
             // RegionManager
