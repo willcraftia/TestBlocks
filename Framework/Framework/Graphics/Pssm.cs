@@ -227,6 +227,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
+        public Texture2D GetShadowMap(int index)
+        {
+            return splitRenderTargets[index];
+        }
+
         void CalculateEyeFarPlaneDistance(ref BoundingBox boundingBox)
         {
             var viewMatrix = Camera.View.Matrix;

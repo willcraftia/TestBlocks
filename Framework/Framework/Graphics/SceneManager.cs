@@ -76,7 +76,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Pssm pssm;
 
-        bool shadowingAvailable;
+        bool shadowMapAvailable;
 
         public SceneManagerMonitor Monitor { get; private set; }
 
@@ -120,8 +120,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public bool ShadowEnabled { get; set; }
-
         public int ShadowMapSize { get; set; }
 
         public LightFrustumTypes LightFrustumType { get; set; }
@@ -148,16 +146,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             pssm = moduleFactory.CreatePssm(shadowSettings);
 
-            // TODO
-            if (shadowMapEffect != null && pssm != null)
-                shadowingAvailable = true;
-
 #if DEBUG
-            //debugEffect = new BasicEffect(GraphicsDevice);
-            //debugEffect.AmbientLightColor = Vector3.One;
-            //debugEffect.VertexColorEnabled = true;
-            //debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
             debugBoundingBoxEffect = moduleFactory.CreateDebugBoundingBoxEffect();
+            debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
+            debugBoundingBoxEffect.VertexColorEnabled = true;
             debugBoundingBoxDrawer = moduleFactory.CreateDebugBoundingBoxDrawer();
 #endif
         }
@@ -276,7 +268,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             translucentSceneObjects.Sort(DistanceComparer.Instance);
 
             // シャドウ マップの描画。
-            if (shadowingAvailable && ShadowEnabled && activeShadowCasters.Count != 0)
+            shadowMapAvailable = false;
+            if (shadowMapEffect != null && SceneSettings.Shadow.Enabled && activeShadowCasters.Count != 0)
             {
                 DrawShadowMap();
             }
@@ -320,6 +313,18 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 // シャドウ マップを描画。
                 pssm.Draw(shadowMapEffect);
+
+#if DEBUG
+                if (DebugMapDisplay.Available)
+                {
+                    for (int i = 0; i < SceneSettings.Shadow.LightFrustum.Pssm.SplitCount; i++)
+                    {
+                        DebugMapDisplay.Instance.Maps.Add(pssm.GetShadowMap(i));
+                    }
+                }
+#endif
+
+                shadowMapAvailable = true;
             }
         }
 
@@ -358,6 +363,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
+            var usePssm = (SceneSettings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm);
+
             foreach (var opaque in opaqueSceneObjects)
             {
                 if (opaque.Occluded)
@@ -368,7 +375,21 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
 
                 // TODO
-                opaque.Draw(null);
+                bool rendered = false;
+                if (shadowMapAvailable)
+                {
+                    if (usePssm && pssm != null)
+                    {
+                        var pssmSupport = opaque as IPssmSupport;
+                        if (pssmSupport != null)
+                        {
+                            pssmSupport.DrawWithPssm(pssm);
+                            rendered = true;
+                        }
+                    }
+                }
+
+                if (!rendered) opaque.Draw(null);
 
                 DebugDrawBoundingBox(opaque);
             }

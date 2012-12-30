@@ -221,6 +221,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sceneManagerDrawSceneRenderingMarker.BarIndex = 3;
             sceneManagerDrawSceneRenderingMarker.Color = Color.Green;
 
+            //================================================================
+            // DebugMapDisplay
+
+            var debugMapDisplay = new DebugMapDisplay(this);
+            //debugMapDisplay.Visible = false;
+            Components.Add(debugMapDisplay);
+
             base.Initialize();
         }
 

@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         public const bool DefaultShadowEnabled = false;
 
-        bool shadowEnabled;
+        bool enabled;
 
         /// <summary>
         /// 影が有効かどうか。
@@ -18,10 +18,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <value>
         /// true (影が有効)、false (それ以外の場合)。
         /// </value>
-        public bool ShadowEnabled
+        public bool Enabled
         {
-            get { return shadowEnabled; }
-            set { shadowEnabled = value; }
+            get { return enabled; }
+            set { enabled = value; }
         }
 
         /// <summary>
