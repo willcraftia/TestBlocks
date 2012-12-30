@@ -35,14 +35,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Queue<IShadowCaster>[] splitShadowCasters;
 
-        List<Vector3>[] splitLightVolumePoints;
-
         public GraphicsDevice GraphicsDevice { get; private set; }
-
-        // PSSM で参照する視点カメラ。
-        // 実視点カメラである必要はない。
-        // PSSM 用に状態を設定した視点カメラを設定。
-        public ICamera Camera { get; set; }
 
         public Vector3 LightDirection
         {
@@ -64,6 +57,15 @@ namespace Willcraftia.Xna.Framework.Graphics
                 return splitViewProjections;
             }
         }
+
+        #region Debug
+
+        public PssmMonitor Monitor;
+
+        #endregion
+
+#if DEBUG || TRACE
+#endif
 
         public Pssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings)
         {
@@ -94,43 +96,42 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < splitShadowCasters.Length; i++)
                 splitShadowCasters[i] = new Queue<IShadowCaster>();
 
-            // TODO: 初期容量。
-            splitLightVolumePoints = new List<Vector3>[pssmSettings.SplitCount];
-            for (int i = 0; i < splitLightVolumePoints.Length; i++)
-                splitLightVolumePoints[i] = new List<Vector3>();
+            Monitor = new PssmMonitor(this);
         }
 
-        public void Prepare()
+        public void Prepare(ICamera camera)
         {
-            if (Camera == null) throw new InvalidOperationException("Camera is null.");
+            if (camera == null) throw new ArgumentNullException("camera");
 
             // デフォルトでは視錐台を含む AABB で準備する。
-            Camera.Frustum.GetCorners(corners);
+            camera.Frustum.GetCorners(corners);
             var boundingBox = BoundingBox.CreateFromPoints(corners);
 
-            Prepare(ref boundingBox);
+            Prepare(camera, ref boundingBox);
         }
 
-        public void Prepare(ref BoundingBox boundingBox)
+        public void Prepare(ICamera camera, ref BoundingBox boundingBox)
         {
-            if (Camera == null) throw new InvalidOperationException("Camera is null.");
+            if (camera == null) throw new InvalidOperationException("Camera is null.");
 
-            CalculateEyeFarPlaneDistance(ref boundingBox);
-            CalculateSplitDistances();
+            CalculateEyeFarPlaneDistance(camera, ref boundingBox);
+            CalculateSplitDistances(camera);
 
-            for (int i = 0; i < splitDistances.Length; i++)
+            for (int i = 0; i < splitDistances.Length - 1; i++)
             {
                 var near = splitDistances[i];
                 var far = splitDistances[i + 1];
 
                 splitLightCameras[i].LightView.Direction = lightDirection;
-                splitLightCameras[i].SplitEyeProjection.Fov = Camera.Projection.Fov;
-                splitLightCameras[i].SplitEyeProjection.AspectRatio = Camera.Projection.AspectRatio;
+                splitLightCameras[i].SplitEyeProjection.Fov = camera.Projection.Fov;
+                splitLightCameras[i].SplitEyeProjection.AspectRatio = camera.Projection.AspectRatio;
                 splitLightCameras[i].SplitEyeProjection.NearPlaneDistance = near;
                 splitLightCameras[i].SplitEyeProjection.FarPlaneDistance = far;
-                
-                splitLightCameras[i].Prepare(Camera);
+
+                splitLightCameras[i].Prepare(camera);
             }
+
+            Monitor.TotalShadowCasterCount = 0;
         }
 
         public void TryAddShadowCaster(IShadowCaster shadowCaster)
@@ -139,7 +140,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 var lightCamera = splitLightCameras[i];
                 var shadowCasters = splitShadowCasters[i];
-                var lightVolumePoints = splitLightVolumePoints[i];
 
                 BoundingSphere casterSphere;
                 shadowCaster.GetBoundingSphere(out casterSphere);
@@ -155,28 +155,28 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
                 else
                 {
-                    var ray = new Ray
-                    {
-                        Direction = lightCamera.LightView.Direction
-                    };
+                    //var ray = new Ray
+                    //{
+                    //    Direction = lightCamera.LightView.Direction
+                    //};
 
-                    // TODO: 要検討。
-                    for (int j = 0; j < 8; j++)
-                    {
-                        // AABB の頂点から光方向の線。
-                        ray.Position = corners[j];
+                    //// TODO: 要検討。
+                    //for (int j = 0; j < 8; j++)
+                    //{
+                    //    // AABB の頂点から光方向の線。
+                    //    ray.Position = corners[j];
 
-                        // 分割視錐台と交差するか否か。
-                        var distance = ray.Intersects(lightCamera.SplitEyeFrustum);
-                        if (distance == null) continue;
+                    //    // 分割視錐台と交差するか否か。
+                    //    var distance = ray.Intersects(lightCamera.SplitEyeFrustum);
+                    //    if (distance == null) continue;
 
-                        // TODO
-                        if (distance < 10)
-                        {
-                            shouldAdd = true;
-                            break;
-                        }
-                    }
+                    //    // TODO
+                    //    if (distance < 10)
+                    //    {
+                    //        shouldAdd = true;
+                    //        break;
+                    //    }
+                    //}
                 }
 
                 if (shouldAdd)
@@ -186,6 +186,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                     // AABB の頂点を包含座標として登録。
                     lightCamera.AddLightVolumePoints(corners);
+
+                    Monitor.TotalShadowCasterCount++;
 
                     break;
                 }
@@ -232,9 +234,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             return splitRenderTargets[index];
         }
 
-        void CalculateEyeFarPlaneDistance(ref BoundingBox boundingBox)
+        void CalculateEyeFarPlaneDistance(ICamera camera, ref BoundingBox boundingBox)
         {
-            var viewMatrix = Camera.View.Matrix;
+            var viewMatrix = camera.View.Matrix;
 
             //
             // smaller z, more far
@@ -253,12 +255,12 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (z < maxFar) maxFar = z;
             }
 
-            eyeFarPlaneDistance = Camera.Projection.NearPlaneDistance - maxFar;
+            eyeFarPlaneDistance = camera.Projection.NearPlaneDistance - maxFar;
         }
 
-        void CalculateSplitDistances()
+        void CalculateSplitDistances(ICamera camera)
         {
-            var near = Camera.Projection.NearPlaneDistance;
+            var near = camera.Projection.NearPlaneDistance;
             var far = eyeFarPlaneDistance;
             var farNearRatio = far / near;
             var splitLambda = pssmSettings.SplitLambda;

@@ -213,6 +213,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void Draw(Texture2D shadowMap)
         {
+            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
                 return;
             if (occluded) return;
@@ -248,7 +249,22 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void DrawShadow(ShadowMapEffect effect)
         {
-            throw new NotImplementedException();
+            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
+
+            // チャンクに描画ロックを要求。
+            if (Chunk != null && !Chunk.EnterDraw()) return;
+
+            effect.World = world;
+            effect.Apply();
+
+            GraphicsDevice.SetVertexBuffer(vertexBuffer);
+            GraphicsDevice.Indices = indexBuffer;
+            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
+
+            // 描画ロックを解放。
+            Chunk.ExitDraw();
         }
 
         public void SetVertices(VertexPositionNormalTexture[] vertices, int vertexCount)

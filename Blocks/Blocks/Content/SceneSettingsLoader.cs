@@ -19,19 +19,22 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (SceneSettingsDefinition) serializer.Deserialize(resource);
 
-            var sceneSettings = new BlocksSceneSettings
+            var sceneSettings = new SceneSettings
             {
                 EarthRotationEnabled = definition.EarthRotationEnabled,
                 MidnightSunDirection = definition.MidnightSunDirection,
                 MidnightMoonDirection = definition.MidnightMoonDirection,
                 MiddayAmbientLightColor = definition.MiddayAmbientLightColor,
                 MidnightAmbientLightColor = definition.MidnightAmbientLightColor,
-                SunlightDiffuseColor = definition.SunlightDiffuseColor,
-                SunlightSpecularColor = definition.SunlightSpecularColor,
-                MoonlightDiffuseColor = definition.MoonlightDiffuseColor,
-                MoonlightSpecularColor = definition.MoonlightSpecularColor,
                 SecondsPerDay = definition.SecondsPerDay
             };
+
+            sceneSettings.Sunlight.DiffuseColor = definition.SunlightDiffuseColor;
+            sceneSettings.Sunlight.SpecularColor = definition.SunlightSpecularColor;
+            sceneSettings.Sunlight.Enabled = definition.SunlightEnabled;
+            sceneSettings.Moonlight.DiffuseColor = definition.MoonlightDiffuseColor;
+            sceneSettings.Moonlight.SpecularColor = definition.MoonlightSpecularColor;
+            sceneSettings.Moonlight.Enabled = definition.MoonlightEnabled;
 
             if (!ArrayHelper.IsNullOrEmpty(definition.ColorTable))
             {
@@ -49,7 +52,7 @@ namespace Willcraftia.Xna.Blocks.Content
 
         public void Save(IResource resource, object asset)
         {
-            var sceneSettings = asset as BlocksSceneSettings;
+            var sceneSettings = asset as SceneSettings;
 
             var definition = new SceneSettingsDefinition
             {
@@ -58,10 +61,12 @@ namespace Willcraftia.Xna.Blocks.Content
                 MidnightMoonDirection = sceneSettings.MidnightMoonDirection,
                 MiddayAmbientLightColor = sceneSettings.MiddayAmbientLightColor,
                 MidnightAmbientLightColor = sceneSettings.MidnightAmbientLightColor,
-                SunlightDiffuseColor = sceneSettings.SunlightDiffuseColor,
-                SunlightSpecularColor = sceneSettings.SunlightSpecularColor,
-                MoonlightDiffuseColor = sceneSettings.MoonlightDiffuseColor,
-                MoonlightSpecularColor = sceneSettings.MoonlightSpecularColor,
+                SunlightDiffuseColor = sceneSettings.Sunlight.DiffuseColor,
+                SunlightSpecularColor = sceneSettings.Sunlight.SpecularColor,
+                SunlightEnabled = sceneSettings.Sunlight.Enabled,
+                MoonlightDiffuseColor = sceneSettings.Moonlight.DiffuseColor,
+                MoonlightSpecularColor = sceneSettings.Moonlight.SpecularColor,
+                MoonlightEnabled = sceneSettings.Moonlight.Enabled,
                 SecondsPerDay = sceneSettings.SecondsPerDay
             };
 

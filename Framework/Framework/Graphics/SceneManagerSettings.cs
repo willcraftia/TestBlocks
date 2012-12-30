@@ -6,14 +6,14 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class SceneSettings
+    public sealed class SceneManagerSettings
     {
         /// <summary>
         /// 影設定。
         /// </summary>
         public ShadowSettings Shadow { get; private set; }
 
-        public SceneSettings()
+        public SceneManagerSettings()
         {
             Shadow = new ShadowSettings();
         }

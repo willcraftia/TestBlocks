@@ -116,6 +116,7 @@
     <Compile Include="Diagnostics\DebugMapDisplay.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
+    <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\IEffectPssm.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
@@ -132,11 +133,12 @@
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\Pssm.cs" />
+    <Compile Include="Graphics\PssmMonitor.cs" />
     <Compile Include="Graphics\PssmSceneEffect.cs" />
     <Compile Include="Graphics\PssmSettings.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
-    <Compile Include="Graphics\SceneSettings.cs" />
+    <Compile Include="Graphics\SceneManagerSettings.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />

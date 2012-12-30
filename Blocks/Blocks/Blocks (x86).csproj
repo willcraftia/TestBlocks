@@ -76,12 +76,14 @@
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
+    <Compile Include="Models\RegionManagerMonitor.cs" />
     <Compile Include="Models\SceneModuleFactory.cs" />
-    <Compile Include="Models\BlocksSceneSettings.cs" />
+    <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SkyColor.cs" />
     <Compile Include="Models\SkyColorTable.cs" />
     <Compile Include="Models\SkySphere.cs" />
     <Compile Include="Models\SkySphereEffect.cs" />
+    <Compile Include="Models\WorldManager.cs" />
     <Compile Include="Serialization\ChunkStoreTypes.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />

@@ -65,7 +65,7 @@ namespace Willcraftia.Xna.Blocks.Models
             set { sunVisible = value; }
         }
 
-        public BlocksSceneSettings SceneSettings { get; set; }
+        public SceneSettings SceneSettings { get; set; }
 
         public SkySphere(GraphicsDevice graphicsDevice)
         {
@@ -109,7 +109,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 太陽の情報。
             if (SunVisible)
             {
-                Effect.SunDiffuseColor = SceneSettings.SunlightDiffuseColor;
+                Effect.SunDiffuseColor = SceneSettings.Sunlight.DiffuseColor;
                 Effect.SunDirection = SceneSettings.SunDirection;
                 Effect.SunThreshold = sunThreshold;
             }

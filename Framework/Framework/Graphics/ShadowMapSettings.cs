@@ -24,7 +24,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultNearPlaneDistance = 0.1f;
 
-        public const float DefaultFarPlaneDistance = 500.0f;
+        public const float DefaultFarPlaneDistance = 100.0f;
 
         ShadowMapTechniques technique = DefaultTechnique;
 

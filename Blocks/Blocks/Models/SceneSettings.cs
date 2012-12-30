@@ -4,12 +4,13 @@ using System;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework.Graphics;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class BlocksSceneSettings : IAsset
+    public sealed class SceneSettings : IAsset
     {
         public const float DefaultSecondsPerDay = 10f;
 
@@ -35,19 +36,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 sunDirection;
 
-        Vector3 sunlightDirection;
-
         Vector3 moonDirection;
 
-        Vector3 moonlightDirection;
-
         Vector3 ambientLightColor;
-
-        Vector3 directionalLightDirection;
-
-        Vector3 directionalLightDiffuseColor;
-
-        Vector3 directionalLightSpecularColor;
 
         public static Vector3 DefaultMidnightSunDirection
         {
@@ -120,13 +111,9 @@ namespace Willcraftia.Xna.Blocks.Models
             set { midnightAmbientLightColor = value; }
         }
 
-        public Vector3 SunlightDiffuseColor { get; set; }
+        public DirectionalLight Sunlight { get; private set; }
 
-        public Vector3 SunlightSpecularColor { get; set; }
-
-        public Vector3 MoonlightDiffuseColor { get; set; }
-
-        public Vector3 MoonlightSpecularColor { get; set; }
+        public DirectionalLight Moonlight { get; private set; }
 
         public SkyColorTable ColorTable { get; private set; }
 
@@ -155,34 +142,9 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return sunDirection; }
         }
 
-        public Vector3 SunlightDirection
-        {
-            get { return sunlightDirection; }
-        }
-
         public Vector3 MoonDirection
         {
             get { return moonDirection; }
-        }
-
-        public Vector3 MoonlightDirection
-        {
-            get { return moonlightDirection; }
-        }
-
-        public Vector3 DirectionalLightDirection
-        {
-            get { return directionalLightDirection; }
-        }
-
-        public Vector3 DirectionalLightDiffuseColor
-        {
-            get { return directionalLightDiffuseColor; }
-        }
-
-        public Vector3 DirectionalLightSpecularColor
-        {
-            get { return directionalLightSpecularColor; }
         }
 
         public bool SunVisible
@@ -195,8 +157,14 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return 0 <= moonDirection.Y; }
         }
 
-        public BlocksSceneSettings()
+        public SceneSettings()
         {
+            Sunlight = new DirectionalLight("Sun");
+            Sunlight.Direction = -DefaultMidnightSunDirection;
+
+            Moonlight = new DirectionalLight("Moon");
+            Moonlight.Direction = -DefaultMidnightMoonDirection;
+
             ColorTable = new SkyColorTable();
         }
 
@@ -217,11 +185,10 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             ElapsedSecondsPerDay = (float) gameTime.TotalGameTime.TotalSeconds % secondsPerDay;
 
-            UpdateSunDirection();
-            UpdateMoonDirection();
+            UpdateSun();
+            UpdateMoon();
 
             UpdateAmbientLightColor();
-            UpdateDirectionalLight();
 
             UpdateSkyColor();
         }
@@ -240,24 +207,26 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        void UpdateSunDirection()
+        void UpdateSun()
         {
             var angle = (ElapsedSecondsPerDay / secondsPerDay) * MathHelper.TwoPi;
-            var transform = Matrix.CreateFromAxisAngle(sunRotationAxis, angle);
-            sunDirection = Vector3.Transform(midnightSunDirection, transform);
+            Matrix transform;
+            Matrix.CreateFromAxisAngle(ref sunRotationAxis, angle, out transform);
+            Vector3.Transform(ref midnightSunDirection, ref transform, out sunDirection);
             sunDirection.Normalize();
 
-            sunlightDirection = -sunDirection;
+            Sunlight.Direction = -sunDirection;
         }
 
-        void UpdateMoonDirection()
+        void UpdateMoon()
         {
             var angle = (ElapsedSecondsPerDay / secondsPerDay) * MathHelper.TwoPi;
-            var transform = Matrix.CreateFromAxisAngle(moonRotationAxis, angle);
-            moonDirection = Vector3.Transform(midnightMoonDirection, transform);
+            Matrix transform;
+            Matrix.CreateFromAxisAngle(ref moonRotationAxis, angle, out transform);
+            Vector3.Transform(ref midnightMoonDirection, ref transform, out moonDirection);
             moonDirection.Normalize();
 
-            moonlightDirection = -moonDirection;
+            Moonlight.Direction = -moonDirection;
         }
 
         void UpdateAmbientLightColor()
@@ -271,29 +240,6 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var amount = (ElapsedSecondsPerDay - halfDaySeconds) * inverseHalfDaySeconds;
                 Vector3.Lerp(ref middayAmbientLightColor, ref midnightAmbientLightColor, amount, out ambientLightColor);
-            }
-        }
-
-        void UpdateDirectionalLight()
-        {
-            if (SunVisible)
-            {
-                directionalLightDirection = sunlightDirection;
-                directionalLightDiffuseColor = SunlightDiffuseColor;
-                directionalLightSpecularColor = SunlightSpecularColor;
-            }
-            else if (MoonVisible)
-            {
-                directionalLightDirection = moonlightDirection;
-                directionalLightDiffuseColor = MoonlightDiffuseColor;
-                directionalLightSpecularColor = MoonlightSpecularColor;
-            }
-            else
-            {
-                // TODO
-                directionalLightDirection = Vector3.Up;
-                directionalLightDiffuseColor = new Vector3(0.1f);
-                directionalLightSpecularColor = Vector3.Zero;
             }
         }
 

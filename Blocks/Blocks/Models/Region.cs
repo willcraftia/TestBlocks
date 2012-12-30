@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public BlocksSceneSettings SceneSettings { get; private set; }
+        public SceneSettings SceneSettings { get; private set; }
 
         public AssetManager AssetManager { get; private set; }
 
@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public RegionMonitor Monitor { get; private set; }
 
-        public void Initialize(SceneManager sceneManager, BlocksSceneSettings sceneSettings, AssetManager assetManager, ChunkEffect chunkEffect)
+        public void Initialize(SceneManager sceneManager, SceneSettings sceneSettings, AssetManager assetManager, ChunkEffect chunkEffect)
         {
             if (sceneManager == null) throw new ArgumentNullException("sceneManager");
             if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");

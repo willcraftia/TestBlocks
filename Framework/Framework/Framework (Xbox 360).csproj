@@ -154,6 +154,7 @@
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
+    <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\ICamera.cs" />
@@ -170,11 +171,12 @@
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\Pssm.cs" />
     <Compile Include="Graphics\PssmLightCamera.cs" />
+    <Compile Include="Graphics\PssmMonitor.cs" />
     <Compile Include="Graphics\PssmSceneEffect.cs" />
     <Compile Include="Graphics\PssmSettings.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
-    <Compile Include="Graphics\SceneSettings.cs" />
+    <Compile Include="Graphics\SceneManagerSettings.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />

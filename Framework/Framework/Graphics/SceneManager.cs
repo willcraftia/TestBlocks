@@ -41,6 +41,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int InitialCameraCapacity = 10;
 
+        public const int InitialDirectionalLightCapacity = 10;
+
         public const int InitialVisibleObjectCapacity = 500;
 
         public const int InitialShadowCasterCapacity = 1000;
@@ -56,9 +58,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Dictionary<string, ICamera> cameraMap = new Dictionary<string, ICamera>(InitialCameraCapacity);
 
+        Dictionary<string, DirectionalLight> directionalLightMap = new Dictionary<string, DirectionalLight>(InitialDirectionalLightCapacity);
+
         string activeCameraName;
 
         ICamera activeCamera;
+
+        string activeDirectionalLightName;
+
+        DirectionalLight activeDirectionalLight;
 
         Queue<ISceneObject> workingSceneObjects = new Queue<ISceneObject>(InitialSceneObjectCapacity);
 
@@ -101,9 +109,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
+        // I/F
+        public DirectionalLight ActiveDirectionalLight
+        {
+            get { return activeDirectionalLight; }
+        }
+
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public SceneSettings SceneSettings { get; private set; }
+        public SceneManagerSettings Settings { get; private set; }
 
         public string ActiveCameraName
         {
@@ -120,33 +134,51 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
+        public string ActiveDirectionalLightName
+        {
+            get { return activeDirectionalLightName; }
+            set
+            {
+                if (value != null && !directionalLightMap.ContainsKey(value))
+                    throw new ArgumentException("DirectionalLight not found: " + value);
+
+                if (activeDirectionalLightName == value) return;
+
+                activeDirectionalLightName = value;
+                activeDirectionalLight = (activeDirectionalLightName != null) ? directionalLightMap[activeDirectionalLightName] : null;
+            }
+        }
+
         public int ShadowMapSize { get; set; }
 
         public LightFrustumTypes LightFrustumType { get; set; }
 
-        public SceneManager(GraphicsDevice graphicsDevice, SceneSettings sceneSettings, ISceneModuleFactory moduleFactory)
+        public SceneManager(GraphicsDevice graphicsDevice, ISceneModuleFactory moduleFactory)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-            if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");
             if (moduleFactory == null) throw new ArgumentNullException("moduleFactory");
 
             GraphicsDevice = graphicsDevice;
-            SceneSettings = sceneSettings;
             this.moduleFactory = moduleFactory;
 
             Monitor = new SceneManagerMonitor(this);
         }
 
-        public void Initialize()
+        public void Initialize(SceneManagerSettings settings)
         {
-            var shadowSettings = SceneSettings.Shadow;
+            if (settings == null) throw new ArgumentNullException("settings");
+
+            Settings = settings;
+
+            var shadowSettings = Settings.Shadow;
 
             shadowMapEffect = moduleFactory.CreateShadowMapEffect();
             shadowMapEffect.Technique = shadowSettings.ShadowMap.Technique;
 
             pssm = moduleFactory.CreatePssm(shadowSettings);
+            if (pssm != null) Monitor.Pssm = pssm.Monitor;
 
-#if DEBUG
+#if DEBUG || TRACE
             debugBoundingBoxEffect = moduleFactory.CreateDebugBoundingBoxEffect();
             debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
             debugBoundingBoxEffect.VertexColorEnabled = true;
@@ -171,6 +203,25 @@ namespace Willcraftia.Xna.Framework.Graphics
         public void ClearCameras()
         {
             cameraMap.Clear();
+        }
+
+        public void AddDirectionalLight(DirectionalLight directionalLight)
+        {
+            if (directionalLight == null) throw new ArgumentNullException("directionalLight");
+
+            directionalLightMap[directionalLight.Name] = directionalLight;
+        }
+
+        public void RemoveDirectionalLight(string name)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+
+            directionalLightMap.Remove(name);
+        }
+
+        public void ClearDirectionalLights()
+        {
+            directionalLightMap.Clear();
         }
 
         public void AddSceneObject(ISceneObject sceneObject)
@@ -223,7 +274,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.VisibleSceneObjectCount = 0;
             Monitor.OccludedSceneObjectCount = 0;
 
-#if DEBUG
+#if DEBUG || TRACE
             // デバッグ エフェクトへカメラ情報を設定。
             debugBoundingBoxEffect.View = activeCamera.View.Matrix;
             debugBoundingBoxEffect.Projection = activeCamera.Projection.Matrix;
@@ -269,7 +320,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // シャドウ マップの描画。
             shadowMapAvailable = false;
-            if (shadowMapEffect != null && SceneSettings.Shadow.Enabled && activeShadowCasters.Count != 0)
+            if (shadowMapEffect != null && Settings.Shadow.Enabled && activeShadowCasters.Count != 0)
             {
                 DrawShadowMap();
             }
@@ -297,7 +348,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (shadowCaster.Translucent) return false;
             if (!shadowCaster.CastShadow) return false;
 
-            return false;
+            return true;
         }
 
         void DrawShadowMap()
@@ -305,7 +356,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (LightFrustumType == LightFrustumTypes.Pssm)
             {
                 // PSSM の状態を準備。
-                pssm.Prepare();
+                pssm.Prepare(activeCamera);
 
                 // 投影オブジェクトを収集。
                 foreach (var shadowCaster in activeShadowCasters)
@@ -314,15 +365,13 @@ namespace Willcraftia.Xna.Framework.Graphics
                 // シャドウ マップを描画。
                 pssm.Draw(shadowMapEffect);
 
-#if DEBUG
                 if (DebugMapDisplay.Available)
                 {
-                    for (int i = 0; i < SceneSettings.Shadow.LightFrustum.Pssm.SplitCount; i++)
+                    for (int i = 0; i < Settings.Shadow.LightFrustum.Pssm.SplitCount; i++)
                     {
                         DebugMapDisplay.Instance.Maps.Add(pssm.GetShadowMap(i));
                     }
                 }
-#endif
 
                 shadowMapAvailable = true;
             }
@@ -363,7 +412,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            var usePssm = (SceneSettings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm);
+            var usePssm = (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm);
 
             foreach (var opaque in opaqueSceneObjects)
             {
@@ -420,7 +469,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.OnEndDrawScene();
         }
 
-        [Conditional("DEBUG")]
+        [Conditional("DEBUG"), Conditional("TRACE")]
         void DebugDrawBoundingBox(ISceneObject sceneObject)
         {
             if (!DebugBoundingBoxVisible) return;

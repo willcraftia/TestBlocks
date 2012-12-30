@@ -165,6 +165,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             LightProjection.Update();
 
             Matrix.Multiply(ref LightView.Matrix, ref LightProjection.Matrix, out ViewProjection);
+
+            // クリア。
+            lightVolumePoints.Clear();
         }
 
         float AdjustProjectionBoundary(float value, float texelSize)

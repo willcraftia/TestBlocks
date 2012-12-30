@@ -8,6 +8,10 @@ namespace Willcraftia.Xna.Framework.Landscape
 {
     public sealed class PartitionManagerMonitor
     {
+        public event EventHandler BeginUpdate = delegate { };
+
+        public event EventHandler EndUpdate = delegate { };
+
         public event EventHandler BeginCheckPassivationCompleted = delegate { };
 
         public event EventHandler EndCheckPassivationCompleted = delegate { };
@@ -39,6 +43,16 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (partitionManager == null) throw new ArgumentNullException("partitionManager");
 
             this.partitionManager = partitionManager;
+        }
+
+        internal void OnBeginUpdate()
+        {
+            BeginUpdate(partitionManager, EventArgs.Empty);
+        }
+
+        internal void OnEndUpdate()
+        {
+            EndUpdate(partitionManager, EventArgs.Empty);
         }
 
         internal void OnBeginCheckPassivationCompleted()

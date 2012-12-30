@@ -33,6 +33,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return VisibleSceneObjectCount - OccludedSceneObjectCount; }
         }
 
+        public PssmMonitor Pssm { get; set; }
+
         public SceneManagerMonitor(SceneManager sceneManager)
         {
             if (sceneManager == null) throw new ArgumentNullException("sceneManager");

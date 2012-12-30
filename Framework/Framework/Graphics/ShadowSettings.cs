@@ -8,9 +8,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class ShadowSettings
     {
-        public const bool DefaultShadowEnabled = false;
+        public const bool DefaultShadowEnabled = true;
 
-        bool enabled;
+        bool enabled = DefaultShadowEnabled;
 
         /// <summary>
         /// 影が有効かどうか。

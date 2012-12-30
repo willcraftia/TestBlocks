@@ -26,9 +26,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         SceneManager sceneManager;
 
-        ResourceManager globalResourceManager = new ResourceManager();
+        ResourceManager resourceManager = new ResourceManager();
 
-        AssetManager globalAssetManager;
+        AssetManager assetManager;
 
         List<Region> regions = new List<Region>();
 
@@ -40,7 +40,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public BlocksSceneSettings SceneSettings { get; private set; }
+        public SceneSettings SceneSettings { get; private set; }
+
+        public RegionManagerMonitor Monitor { get; private set; }
 
         public RegionManager(IServiceProvider serviceProvider, SceneManager sceneManager)
         {
@@ -52,25 +54,31 @@ namespace Willcraftia.Xna.Blocks.Models
 
             GraphicsDevice = sceneManager.GraphicsDevice;
 
-            globalAssetManager = new AssetManager(serviceProvider);
-            globalAssetManager.RegisterLoader(typeof(BlocksSceneSettings), new SceneSettingsLoader());
-            globalAssetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
+            assetManager = new AssetManager(serviceProvider);
+            assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
+
+            Monitor = new RegionManagerMonitor(this);
         }
 
-        public void LoadGrobalSettings()
+        public void Initialize()
         {
-            var sceneSettingsResource = globalResourceManager.Load("title:Resources/SceneSettings.json");
-            SceneSettings = globalAssetManager.Load<BlocksSceneSettings>(sceneSettingsResource);
-
             skySphere = new SkySphere(GraphicsDevice);
-            var effectResource = globalResourceManager.Load("content:Effects/SkySphereEffect");
-            skySphere.Effect = new SkySphereEffect(globalAssetManager.Load<Effect>(effectResource));
-            skySphere.SceneSettings = SceneSettings;
+            var effectResource = resourceManager.Load("content:Effects/SkySphereEffect");
+            skySphere.Effect = new SkySphereEffect(assetManager.Load<Effect>(effectResource));
             // シーン マネージャへ登録
             sceneManager.AddSceneObject(skySphere);
 
-            var chunkEffectResource = globalResourceManager.Load("content:Effects/ChunkEffect");
-            chunkEffect = new ChunkEffect(globalAssetManager.Load<Effect>(chunkEffectResource));
+            var chunkEffectResource = resourceManager.Load("content:Effects/ChunkEffect");
+            chunkEffect = new ChunkEffect(assetManager.Load<Effect>(chunkEffectResource));
+        }
+
+        public void SetSceneSettings(SceneSettings sceneSettings)
+        {
+            if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");
+
+            SceneSettings = sceneSettings;
+
+            skySphere.SceneSettings = SceneSettings;
         }
 
         //
@@ -151,9 +159,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
+            Monitor.OnBeginUpdate();
+
             SceneSettings.Update(gameTime);
 
             foreach (var region in regions) region.Update();
+
+            Monitor.OnEndUpdate();
         }
 
         public void UpdateChunkEffect()
@@ -171,9 +183,25 @@ namespace Willcraftia.Xna.Blocks.Models
             // ライティング
 
             chunkEffect.AmbientLightColor = SceneSettings.AmbientLightColor;
-            chunkEffect.LightDirection = SceneSettings.DirectionalLightDirection;
-            chunkEffect.LightDiffuseColor = SceneSettings.DirectionalLightDiffuseColor;
-            chunkEffect.LightSpecularColor = SceneSettings.DirectionalLightSpecularColor;
+
+            //
+            // TODO
+            //
+            // ChunkEffect に DirectionalLight プロパティを作る。
+            //
+            var activeDirectionalLight = sceneManager.ActiveDirectionalLight;
+            if (activeDirectionalLight != null && activeDirectionalLight.Enabled)
+            {
+                chunkEffect.LightDirection = activeDirectionalLight.Direction;
+                chunkEffect.LightDiffuseColor = activeDirectionalLight.DiffuseColor;
+                chunkEffect.LightSpecularColor = activeDirectionalLight.SpecularColor;
+            }
+            else
+            {
+                chunkEffect.LightDirection = Vector3.Down;
+                chunkEffect.LightDiffuseColor = Vector3.Zero;
+                chunkEffect.LightSpecularColor = Vector3.Zero;
+            }
 
             //----------------------------------------------------------------
             // フォグ

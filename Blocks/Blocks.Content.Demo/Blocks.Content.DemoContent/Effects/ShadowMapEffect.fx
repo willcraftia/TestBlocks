@@ -32,7 +32,7 @@ float4 DefaultPS(VSOutput input) : COLOR0
     return float4(depth, 0.0f, 0.0f, 0.0f);
 }
 
-float4 VmsPS(VSOutput input) : COLOR0
+float4 VsmPS(VSOutput input) : COLOR0
 {
     float depth = input.PositionWVP.z / input.PositionWVP.w;
     return float4(depth, depth * depth, 0.0f, 0.0f);
@@ -55,6 +55,6 @@ technique Vsm
     pass P0
     {
           VertexShader = compile vs_2_0 VS();
-          PixelShader = compile ps_2_0 VmsPS();
+          PixelShader = compile ps_2_0 VsmPS();
     }
 }

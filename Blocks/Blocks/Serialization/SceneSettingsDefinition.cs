@@ -23,9 +23,13 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public Vector3 SunlightSpecularColor;
 
+        public bool SunlightEnabled;
+
         public Vector3 MoonlightDiffuseColor;
 
         public Vector3 MoonlightSpecularColor;
+
+        public bool MoonlightEnabled;
 
         public SkyColorDefinition[] ColorTable;
 

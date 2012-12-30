@@ -9,13 +9,9 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Willcraftia.Xna.Framework;
-using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
-using Willcraftia.Xna.Framework.Serialization;
-using Willcraftia.Xna.Framework.Serialization.Json;
-using Willcraftia.Xna.Blocks.Landscape;
 using Willcraftia.Xna.Blocks.Models;
 
 #endregion
@@ -44,21 +40,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         float farPlaneDistance = (partitionMinActiveRange - 1) * 16;
 
-        ResourceManager systemResourceManager;
-
-        AssetManager systemAssetManager;
-
-        SceneModuleFactory sceneModuleFactory;
-
-        SceneSettings sceneSettings;
-
-        SceneManager sceneManager;
-
-        RegionManager regionManager;
-
-        ChunkPartitionManager partitionManager;
-
-        RasterizerState defaultRasterizerState = new RasterizerState();
+        WorldManager worldManager;
 
         Region region;
 
@@ -241,16 +223,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             StorageManager.SelectStorageContainer("Blocks.Demo.MainGame");
 
             //================================================================
-            // ResourceManager
-
-            systemResourceManager = new ResourceManager();
-
-            //================================================================
-            // AssetManager
-
-            systemAssetManager = new AssetManager(Services);
-
-            //================================================================
             // ResourceLoader
 
             ResourceLoader.Register(ContentResourceLoader.Instance);
@@ -259,50 +231,30 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             ResourceLoader.Register(FileResourceLoader.Instance);
 
             //================================================================
-            // SceneModuleFactory
+            // WorldManager
 
-            sceneModuleFactory = new SceneModuleFactory(GraphicsDevice, systemResourceManager, systemAssetManager);
+            worldManager = new WorldManager(Services, GraphicsDevice);
+            worldManager.Initialize();
 
-            //================================================================
-            // SceneSettings
-
-            // TODO: 定義ファイルからロード。
-            sceneSettings = new SceneSettings();
-
-            //================================================================
-            // SceneManager
-
-            sceneManager = new SceneManager(GraphicsDevice, sceneSettings, sceneModuleFactory);
-            sceneManager.AddCamera(camera);
-            sceneManager.ActiveCameraName = camera.Name;
-            sceneManager.Initialize();
-
-            sceneManager.Monitor.BeginDrawScene += OnSceneManagerMonitorBeginDrawScene;
-            sceneManager.Monitor.EndDrawScene += OnSceneManagerMonitorEndDrawScene;
-            sceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnSceneManagerMonitorBeginDrawSceneOcclusionQuery;
-            sceneManager.Monitor.EndDrawSceneOcclusionQuery += OnSceneManagerMonitorEndDrawSceneOcclusionQuery;
-            sceneManager.Monitor.BeginDrawSceneRendering += OnSceneManagerMonitorBeginDrawSceneRendering;
-            sceneManager.Monitor.EndDrawSceneRendering += Monitor_EndDrawSceneRendering;
-
-            //================================================================
-            // RegionManager
-
-            regionManager = new RegionManager(Services, sceneManager);
-
-            //================================================================
-            // ChunkPartitionManager
-
-            partitionManager = new ChunkPartitionManager(regionManager);
-            partitionManager.Initialize(partitionMinActiveRange, partitionMaxActiveRange);
-
-            partitionManager.Monitor.BeginCheckPassivationCompleted += OnPartitionManagerMonitorBeginCheckPassivationCompleted;
-            partitionManager.Monitor.EndCheckPassivationCompleted += OnPartitionManagerMonitorEndCheckPassivationCompleted;
-            partitionManager.Monitor.BeginCheckActivationCompleted += OnPartitionManagerBeginCheckActivationCompleted;
-            partitionManager.Monitor.EndCheckActivationCompleted += OnPartitionManagerEndCheckActivationCompleted;
-            partitionManager.Monitor.BeginPassivatePartitions += OnPartitionManagerMonitorBeginPassivatePartitions;
-            partitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
-            partitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
-            partitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
+            // TODO: 暫定
+            worldManager.SceneManager.AddCamera(camera);
+            worldManager.SceneManager.ActiveCameraName = camera.Name;
+            worldManager.SceneManager.Monitor.BeginDrawScene += OnSceneManagerMonitorBeginDrawScene;
+            worldManager.SceneManager.Monitor.EndDrawScene += OnSceneManagerMonitorEndDrawScene;
+            worldManager.SceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnSceneManagerMonitorBeginDrawSceneOcclusionQuery;
+            worldManager.SceneManager.Monitor.EndDrawSceneOcclusionQuery += OnSceneManagerMonitorEndDrawSceneOcclusionQuery;
+            worldManager.SceneManager.Monitor.BeginDrawSceneRendering += OnSceneManagerMonitorBeginDrawSceneRendering;
+            worldManager.SceneManager.Monitor.EndDrawSceneRendering += Monitor_EndDrawSceneRendering;
+            worldManager.PartitionManager.Monitor.BeginUpdate += OnPartitionManagerMonitorBeginUpdate;
+            worldManager.PartitionManager.Monitor.EndUpdate += OnPartitionManagerMonitorEndUpdate;
+            worldManager.PartitionManager.Monitor.BeginCheckPassivationCompleted += OnPartitionManagerMonitorBeginCheckPassivationCompleted;
+            worldManager.PartitionManager.Monitor.EndCheckPassivationCompleted += OnPartitionManagerMonitorEndCheckPassivationCompleted;
+            worldManager.PartitionManager.Monitor.BeginCheckActivationCompleted += OnPartitionManagerBeginCheckActivationCompleted;
+            worldManager.PartitionManager.Monitor.EndCheckActivationCompleted += OnPartitionManagerEndCheckActivationCompleted;
+            worldManager.PartitionManager.Monitor.BeginPassivatePartitions += OnPartitionManagerMonitorBeginPassivatePartitions;
+            worldManager.PartitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
+            worldManager.PartitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
+            worldManager.PartitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
 
             //================================================================
             // Camera
@@ -324,17 +276,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             camera.Update();
 
             //================================================================
-            // Default RasterizerState
-
-            defaultRasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-            defaultRasterizerState.FillMode = FillMode.Solid;
-
-            //================================================================
             // Region
 
-            regionManager.LoadGrobalSettings();
-
-            region = regionManager.LoadRegion("title:Resources/DefaultRegion.json");
+            region = worldManager.Load("dummy");
 
             //================================================================
             // Others
@@ -352,10 +296,19 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         protected override void UnloadContent()
         {
+            worldManager.Unload();
+
             timeRuler.ReleaseMarker(updateMarker);
             timeRuler.ReleaseMarker(partitionManagerUpdateMarker);
+            timeRuler.ReleaseMarker(partitionManagerCheckPassivationCompletedMarker);
+            timeRuler.ReleaseMarker(partitionManagerCheckActivationCompletedMarker);
+            timeRuler.ReleaseMarker(partitionManagerCheckPassivationCompletedMarker);
+            timeRuler.ReleaseMarker(partitionManagerCheckActivationCompletedMarker);
             timeRuler.ReleaseMarker(regionUpdateMarker);
             timeRuler.ReleaseMarker(drawMarker);
+            timeRuler.ReleaseMarker(sceneManagerDrawSceneMarker);
+            timeRuler.ReleaseMarker(sceneManagerDrawSceneOcclusionQueryMarker);
+            timeRuler.ReleaseMarker(sceneManagerDrawSceneRenderingMarker);
 
             spriteBatch.Dispose();
             fillTexture.Dispose();
@@ -379,14 +332,16 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // Exit
 
-            if (!partitionManager.Closing && !partitionManager.Closed && keyboardState.IsKeyDown(Keys.Escape))
+            // TODO
+            if (!worldManager.PartitionManager.Closing && !worldManager.PartitionManager.Closed &&
+                keyboardState.IsKeyDown(Keys.Escape))
             {
-                partitionManager.Close();
+                worldManager.PartitionManager.Close();
 
                 logger.Info("Wait until all partitions are passivated...");
             }
 
-            if (partitionManager.Closed)
+            if (worldManager.PartitionManager.Closed)
                 Exit();
 
             //================================================================
@@ -408,23 +363,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             camera.Update();
 
             //================================================================
-            // PartitionManager
+            // WorldManager
 
-            partitionManagerUpdateMarker.Begin();
-
-            var eyePosition = camera.FreeView.Position;
-            partitionManager.Update(ref eyePosition);
-
-            partitionManagerUpdateMarker.End();
-
-            //================================================================
-            // RegionManager
-
-            regionUpdateMarker.Begin();
-
-            regionManager.Update(gameTime);
-
-            regionUpdateMarker.End();
+            worldManager.Update(gameTime);
 
             //================================================================
             // Others
@@ -463,17 +404,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (IsActive) drawMarker.Begin();
 
             //================================================================
-            // SceneManager
+            // WorldManager
 
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1, 0);
-            GraphicsDevice.RasterizerState = defaultRasterizerState;
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            // チャンク エフェクトを更新。
-            regionManager.UpdateChunkEffect();
-
-            sceneManager.Draw();
+            worldManager.Draw(gameTime);
 
             //================================================================
             // Help HUD
@@ -514,37 +447,46 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             sb.Append("FarPlane: ");
             sb.AppendNumber(farPlaneDistance).AppendLine();
-            
-            sb.Append("Partition: ");
-            sb.Append("A(").AppendNumber(partitionManager.Monitor.ActiveClusterCount).Append(":");
-            sb.AppendNumber(partitionManager.Monitor.ActivePartitionCount).Append(") ");
-            sb.Append("W(").AppendNumber(partitionManager.Monitor.ActivatingPartitionCount).Append(") ");
-            sb.Append("P(").AppendNumber(partitionManager.Monitor.PassivatingPartitionCount).Append(")").AppendLine();
-            
-            sb.Append("Chunk: ").AppendNumber(region.Monitor.ActiveChunkCount).Append("/");
-            sb.AppendNumber(region.Monitor.TotalChunkCount).Append(" ");
-            sb.Append("Mesh: ").AppendNumber(region.Monitor.ActiveChunkMeshCount).Append("/");
-            sb.AppendNumber(region.Monitor.TotalChunkMeshCount).Append(" ");
-            sb.Append("InterMesh: ").AppendNumber(region.Monitor.ActiveInterChunkMeshCount).Append("/");
-            sb.AppendNumber(region.Monitor.TotalInterChunkMeshCount).AppendLine();
-            
-            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(region.Monitor.ActiveVertexBufferCount).Append("/");
-            sb.AppendNumber(region.Monitor.TotalVertexBufferCount).AppendLine();
 
-            sb.Append("UpdatingChunk: ").AppendNumber(region.Monitor.UpdatingChunkCount).AppendLine();
+            var partitionManagerMonitor = worldManager.PartitionManager.Monitor;
+            sb.Append("Partition: ");
+            sb.Append("A(").AppendNumber(partitionManagerMonitor.ActiveClusterCount).Append(":");
+            sb.AppendNumber(partitionManagerMonitor.ActivePartitionCount).Append(") ");
+            sb.Append("W(").AppendNumber(partitionManagerMonitor.ActivatingPartitionCount).Append(") ");
+            sb.Append("P(").AppendNumber(partitionManagerMonitor.PassivatingPartitionCount).Append(")").AppendLine();
+
+            var regionMonitor = region.Monitor;
+            sb.Append("Chunk: ").AppendNumber(regionMonitor.ActiveChunkCount).Append("/");
+            sb.AppendNumber(regionMonitor.TotalChunkCount).Append(" ");
+            sb.Append("Mesh: ").AppendNumber(regionMonitor.ActiveChunkMeshCount).Append("/");
+            sb.AppendNumber(regionMonitor.TotalChunkMeshCount).Append(" ");
+            sb.Append("InterMesh: ").AppendNumber(regionMonitor.ActiveInterChunkMeshCount).Append("/");
+            sb.AppendNumber(regionMonitor.TotalInterChunkMeshCount).AppendLine();
+
+            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(regionMonitor.ActiveVertexBufferCount).Append("/");
+            sb.AppendNumber(regionMonitor.TotalVertexBufferCount).AppendLine();
+
+            sb.Append("UpdatingChunk: ").AppendNumber(regionMonitor.UpdatingChunkCount).AppendLine();
 
             sb.Append("ChunkVertex: ");
-            sb.Append("Max(").AppendNumber(region.Monitor.MaxChunkVertexCount).Append(") ");
-            sb.Append("Total(").AppendNumber(region.Monitor.TotalChunkVertexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(regionMonitor.MaxChunkVertexCount).Append(") ");
+            sb.Append("Total(").AppendNumber(regionMonitor.TotalChunkVertexCount).Append(")").AppendLine();
 
             sb.Append("ChunkIndex: ");
-            sb.Append("Max(").AppendNumber(region.Monitor.MaxChunkIndexCount).Append(") ");
-            sb.Append("Total(").AppendNumber(region.Monitor.TotalChunkIndexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(regionMonitor.MaxChunkIndexCount).Append(") ");
+            sb.Append("Total(").AppendNumber(regionMonitor.TotalChunkIndexCount).Append(")").AppendLine();
 
-            sb.Append("SceneObejcts: ").AppendNumber(sceneManager.Monitor.RenderedSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManager.Monitor.VisibleSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManager.Monitor.TotalSceneObjectCount).AppendLine();
+            var sceneManagerMonitor = worldManager.SceneManager.Monitor;
+            sb.Append("SceneObejcts: ").AppendNumber(sceneManagerMonitor.RenderedSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManagerMonitor.VisibleSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManagerMonitor.TotalSceneObjectCount).AppendLine();
             
+            var pssmMonitor = sceneManagerMonitor.Pssm;
+            if (pssmMonitor != null)
+            {
+                sb.Append("TotalShadowCaster: ").AppendNumber(pssmMonitor.TotalShadowCasterCount).AppendLine();
+            }
+
             sb.Append("MoveVelocity: ");
             sb.AppendNumber(viewInput.MoveVelocity).AppendLine();
             
@@ -619,6 +561,16 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             spriteBatch.DrawString(font, helpMessage, new Vector2(layout.ArrangedBounds.X, layout.ArrangedBounds.Y), Color.Yellow);
 
             spriteBatch.End();
+        }
+
+        void OnPartitionManagerMonitorEndUpdate(object sender, EventArgs e)
+        {
+            partitionManagerUpdateMarker.End();
+        }
+
+        void OnPartitionManagerMonitorBeginUpdate(object sender, EventArgs e)
+        {
+            partitionManagerUpdateMarker.Begin();
         }
 
         void OnPartitionManagerMonitorBeginCheckPassivationCompleted(object sender, EventArgs e)

@@ -163,6 +163,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (Closed) return;
 
+            Monitor.OnBeginUpdate();
+
             Monitor.ActiveClusterCount = activePartitions.ClusterCount;
             Monitor.ActivePartitionCount = activePartitions.Count;
             Monitor.ActivatingPartitionCount = activatingPartitions.Count;
@@ -210,6 +212,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                     OnClosed();
                 }
             }
+
+            Monitor.OnEndUpdate();
         }
 
         public void Close()
