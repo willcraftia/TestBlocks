@@ -39,6 +39,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         float dashFactor = 2;
 
         float farPlaneDistance = (partitionMinActiveRange - 1) * 16;
+        //float farPlaneDistance = 2000;
 
         WorldManager worldManager;
 
@@ -493,7 +494,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var pssmMonitor = sceneManagerMonitor.Pssm;
             if (pssmMonitor != null)
             {
-                sb.Append("TotalShadowCaster: ").AppendNumber(pssmMonitor.TotalShadowCasterCount).AppendLine();
+                sb.Append("ShadowCaster: ");
+                for (int i = 0; i < pssmMonitor.SplitCount; i++)
+                {
+                    if (0 < i) sb.Append(":");
+                    sb.AppendNumber(pssmMonitor[i].ShadowCasterCount);
+                }
+                sb.Append("/").AppendNumber(pssmMonitor.TotalShadowCasterCount).AppendLine();
             }
 
             sb.Append("MoveVelocity: ");

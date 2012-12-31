@@ -475,9 +475,9 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Monitor.OnBeginDrawScene();
 
-            GraphicsDevice.SetRenderTarget(renderTarget);
-
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            GraphicsDevice.SetRenderTarget(renderTarget);
             GraphicsDevice.Clear(Color.White);
 
             //================================================================

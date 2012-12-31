@@ -11,8 +11,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Pssm
     {
-        ShadowSettings shadowSettings;
-
         ShadowMapSettings shadowMapSettings;
 
         VsmSettings vsmSettings;
@@ -42,6 +40,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         GaussianBlur blur;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
+
+        public ShadowSettings ShadowSettings { get; private set; }
+
+        public int SplitCount { get; private set; }
 
         public float[] SplitDistances
         {
@@ -81,30 +83,31 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
-            this.shadowSettings = shadowSettings;
+            ShadowSettings = shadowSettings;
 
             shadowMapSettings = shadowSettings.ShadowMap;
             vsmSettings = shadowMapSettings.Vsm;
             pssmSettings = shadowSettings.LightFrustum.Pssm;
 
-            inverseSplitCount = 1.0f / (float) pssmSettings.SplitCount;
-            splitDistances = new float[pssmSettings.SplitCount + 1];
-            splitViewProjections = new Matrix[pssmSettings.SplitCount];
-            splitShadowMaps = new Texture2D[pssmSettings.SplitCount];
+            SplitCount = pssmSettings.SplitCount;
+            inverseSplitCount = 1.0f / (float) SplitCount;
+            splitDistances = new float[SplitCount + 1];
+            splitViewProjections = new Matrix[SplitCount];
+            splitShadowMaps = new Texture2D[SplitCount];
 
-            splitLightCameras = new PssmLightCamera[pssmSettings.SplitCount];
+            splitLightCameras = new PssmLightCamera[SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)
                 splitLightCameras[i] = new PssmLightCamera(shadowMapSettings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
             // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
-            splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", pssmSettings.SplitCount,
+            splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount,
                 shadowMapSettings.Size, shadowMapSettings.Size,
                 false, shadowMapSettings.Format, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
 
             // TODO: 初期容量。
-            splitShadowCasters = new Queue<IShadowCaster>[pssmSettings.SplitCount];
+            splitShadowCasters = new Queue<IShadowCaster>[SplitCount];
             for (int i = 0; i < splitShadowCasters.Length; i++)
                 splitShadowCasters[i] = new Queue<IShadowCaster>();
 
@@ -112,7 +115,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             blur = new GaussianBlur(blurEffect, blurSpriteBatch, shadowMapSettings.Size, shadowMapSettings.Size, SurfaceFormat.Vector2,
                 vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
 
-            Monitor = new PssmMonitor(this);
+            Monitor = new PssmMonitor(this, SplitCount);
         }
 
         public void Prepare(ICamera camera, ref Vector3 lightDirection)
@@ -145,7 +148,22 @@ namespace Willcraftia.Xna.Framework.Graphics
                 splitLightCameras[i].SplitEyeProjection.FarPlaneDistance = far;
 
                 splitLightCameras[i].Prepare(camera);
+
+                Monitor[i].ShadowCasterCount = 0;
             }
+
+            // TODO: 必要？
+            //Matrix invertView;
+            //Matrix.Invert(ref camera.View.Matrix, out invertView);
+            //Vector3 position = camera.Position;
+            //var back = position + invertView.Backward * 10;
+            //var left = position + invertView.Left * 10;
+            //var right = position + invertView.Right * 10;
+            //var up = position + invertView.Up * 10;
+            //splitLightCameras[0].AddLightVolumePoint(ref back);
+            //splitLightCameras[0].AddLightVolumePoint(ref left);
+            //splitLightCameras[0].AddLightVolumePoint(ref right);
+            //splitLightCameras[0].AddLightVolumePoint(ref up);
 
             Monitor.TotalShadowCasterCount = 0;
         }
@@ -166,6 +184,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 bool shouldAdd = false;
                 if (casterSphere.Intersects(lightCamera.SplitEyeFrustum))
+                {
+                    shouldAdd = true;
+                }
+                else if (casterBox.Intersects(lightCamera.SplitEyeFrustum))
                 {
                     shouldAdd = true;
                 }
@@ -203,6 +225,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     // AABB の頂点を包含座標として登録。
                     lightCamera.AddLightVolumePoints(corners);
 
+                    Monitor[i].ShadowCasterCount++;
                     Monitor.TotalShadowCasterCount++;
 
                     break;
@@ -224,9 +247,12 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var shadowCasters = splitShadowCasters[i];
 
                 //------------------------------------------------------------
-                // エフェクト
+                // ライトのビュー×射影行列の更新
 
                 lightCamera.UpdateViewProjection();
+
+                //------------------------------------------------------------
+                // エフェクト
 
                 effect.LightViewProjection = lightCamera.ViewProjection;
 
