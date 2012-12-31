@@ -39,6 +39,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         GaussianBlur blur;
 
+        BoundingBox frustumBoundingBox;
+
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public ShadowSettings ShadowSettings { get; private set; }
@@ -129,9 +131,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // デフォルトでは視錐台を含む AABB で準備する。
             camera.Frustum.GetCorners(corners);
-            var boundingBox = BoundingBox.CreateFromPoints(corners);
+            frustumBoundingBox = BoundingBox.CreateFromPoints(corners);
 
-            Prepare(camera, ref lightDirection, ref boundingBox);
+            Prepare(camera, ref lightDirection, ref frustumBoundingBox);
         }
 
         public void Prepare(ICamera camera, ref Vector3 lightDirection, ref BoundingBox sceneBoundingBox)
@@ -176,17 +178,20 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public void TryAddShadowCaster(IShadowCaster shadowCaster)
         {
+            BoundingSphere casterSphere;
+            shadowCaster.GetBoundingSphere(out casterSphere);
+
+            if (!casterSphere.Intersects(frustumBoundingBox)) return;
+
+            BoundingBox casterBox;
+            shadowCaster.GetBoundingBox(out casterBox);
+            casterBox.GetCorners(corners);
+
+            if (!casterBox.Intersects(frustumBoundingBox)) return;
+
             for (int i = 0; i < splitLightCameras.Length; i++)
             {
                 var lightCamera = splitLightCameras[i];
-                var shadowCasters = splitShadowCasters[i];
-
-                BoundingSphere casterSphere;
-                shadowCaster.GetBoundingSphere(out casterSphere);
-
-                BoundingBox casterBox;
-                shadowCaster.GetBoundingBox(out casterBox);
-                casterBox.GetCorners(corners);
 
                 bool shouldAdd = false;
                 if (casterSphere.Intersects(lightCamera.Frustum))
@@ -226,7 +231,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (shouldAdd)
                 {
                     // 投影オブジェクトとして登録。
-                    shadowCasters.Enqueue(shadowCaster);
+                    splitShadowCasters[i].Enqueue(shadowCaster);
 
                     // AABB の頂点を包含座標として登録。
                     lightCamera.AddLightVolumePoints(corners);
