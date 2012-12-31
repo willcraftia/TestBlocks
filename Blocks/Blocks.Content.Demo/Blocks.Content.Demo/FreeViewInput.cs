@@ -12,6 +12,16 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
     {
         const float twoPi = 2 * MathHelper.Pi;
 
+        Vector3 position = Vector3.Zero;
+
+        float yaw;
+
+        float pitch;
+
+        float roll;
+
+        Matrix invertView;
+
         public int InitialMousePositionX { get; set; }
 
         public int InitialMousePositionY { get; set; }
@@ -40,6 +50,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         public void Update(GameTime gameTime)
         {
+            position = FreeView.Position;
+            Matrix.Invert(ref FreeView.Matrix, out invertView);
+
             var deltaTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
 
             var mouseState = Mouse.GetState();
@@ -47,11 +60,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 InitialMousePositionY != mouseState.Y)
             {
                 // yaw
-                var yaw = -(mouseState.X - InitialMousePositionX);
-                FreeView.Yaw(yaw * RotationVelocity * deltaTime);
+                var yawAmount = -(mouseState.X - InitialMousePositionX);
+                Yaw(yawAmount * RotationVelocity * deltaTime);
+                
                 // pitch
-                var pitch = -(mouseState.Y - InitialMousePositionY);
-                FreeView.Pitch(pitch * RotationVelocity * deltaTime);
+                var pitchAmount = -(mouseState.Y - InitialMousePositionY);
+                Pitch(pitchAmount * RotationVelocity * deltaTime);
 
                 ResetMousePosition();
             }
@@ -64,12 +78,67 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
                 distance *= DashFactor;
 
-            if (keyboardState.IsKeyDown(Keys.W)) FreeView.Move(distance);
-            if (keyboardState.IsKeyDown(Keys.S)) FreeView.Move(-distance);
-            if (keyboardState.IsKeyDown(Keys.A)) FreeView.Strafe(distance);
-            if (keyboardState.IsKeyDown(Keys.D)) FreeView.Strafe(-distance);
-            if (keyboardState.IsKeyDown(Keys.Q)) FreeView.MoveUp(distance);
-            if (keyboardState.IsKeyDown(Keys.Z)) FreeView.MoveUp(-distance);
+            if (keyboardState.IsKeyDown(Keys.W)) Move(distance);
+            if (keyboardState.IsKeyDown(Keys.S)) Move(-distance);
+            if (keyboardState.IsKeyDown(Keys.A)) Strafe(distance);
+            if (keyboardState.IsKeyDown(Keys.D)) Strafe(-distance);
+            if (keyboardState.IsKeyDown(Keys.Q)) MoveUp(distance);
+            if (keyboardState.IsKeyDown(Keys.Z)) MoveUp(-distance);
+
+            Matrix rotation;
+            Matrix.CreateFromYawPitchRoll(yaw, pitch, roll, out rotation);
+
+            FreeView.Position = position;
+            FreeView.Forward = rotation.Forward;
+            FreeView.Up = rotation.Up;
+        }
+
+        public void Move(float distance)
+        {
+            if (distance == 0) return;
+
+            var direction = invertView.Forward;
+            position += direction * distance;
+        }
+
+        public void Strafe(float distance)
+        {
+            if (distance == 0) return;
+
+            var direction = invertView.Left;
+            position += direction * distance;
+        }
+
+        public void MoveUp(float distance)
+        {
+            if (distance == 0) return;
+
+            var direction = invertView.Up;
+            position += direction * distance;
+        }
+
+        public void Yaw(float amount)
+        {
+            if (amount == 0) return;
+
+            yaw += amount;
+            yaw %= MathHelper.TwoPi;
+        }
+
+        public void Pitch(float amount)
+        {
+            if (amount == 0) return;
+
+            pitch += amount;
+            pitch %= MathHelper.TwoPi;
+        }
+
+        public void Roll(float amount)
+        {
+            if (amount == 0) return;
+
+            roll += amount;
+            roll %= MathHelper.TwoPi;
         }
 
         void ResetMousePosition()
