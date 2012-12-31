@@ -8,7 +8,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class ShadowSceneSettings
     {
-        public const bool DefaultEnabled = false;
+        public const bool DefaultEnabled = true;
 
         public const float DefaultMapScale = 0.25f;
 

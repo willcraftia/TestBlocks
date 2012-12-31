@@ -74,9 +74,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-#if DEBUG || TRACE
-#endif
-
         public Pssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
