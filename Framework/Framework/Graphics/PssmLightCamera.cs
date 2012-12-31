@@ -8,42 +8,74 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class PssmLightCamera
+    public sealed class PssmLightCamera : ICamera
     {
-        public Matrix ViewProjection = Matrix.Identity;
+        public Matrix LightViewProjection = Matrix.Identity;
 
         int shadowMapSize;
 
         // 分割視錐台の頂点のキャッシュ。
-        Vector3[] splitEyeFrustumCorners = new Vector3[8];
+        Vector3[] frustumCorners = new Vector3[8];
 
         // 投影オブジェクト判定で用いる作業配列。
         Vector3[] casterBoxCorners = new Vector3[8];
 
         List<Vector3> lightVolumePoints;
 
+        // I/F
+        public string Name { get; private set; }
+
+        // I/F
+        public View View { get; private set; }
+
+        // I/F
+        public PerspectiveFov Projection { get; private set; }
+
+        // I/F
+        public BoundingFrustum Frustum { get; private set; }
+
         public View LightView { get; private set; }
 
         public Orthograph LightProjection { get; private set; }
 
-        public BoundingFrustum SplitEyeFrustum { get; private set; }
-
-        public PerspectiveFov SplitEyeProjection { get; private set; }
-
-        public PssmLightCamera(int shadowMapSize)
+        public PssmLightCamera(string name, int shadowMapSize)
         {
+            if (name == null) throw new ArgumentNullException("name");
+            if (shadowMapSize < 1) throw new ArgumentOutOfRangeException("shadowMapSize");
+
+            Name = name;
             this.shadowMapSize = shadowMapSize;
 
-            LightView = new View();
-            LightProjection = new Orthograph();
-            SplitEyeFrustum = new BoundingFrustum(Matrix.Identity);
-            SplitEyeProjection = new PerspectiveFov
+            // カメラ。
+            View = new View();
+            Projection = new PerspectiveFov
             {
                 AspectRatio = PerspectiveFov.AspectRatio1x1
             };
+            Frustum = new BoundingFrustum(Matrix.Identity);
+
+            // ライト視点。
+            LightView = new View();
+            LightProjection = new Orthograph();
 
             // TODO: 初期容量
             lightVolumePoints = new List<Vector3>();
+        }
+
+        // I/F
+        public void Update()
+        {
+            // ビュー行列と射影行列を更新。
+            View.Update();
+            Projection.Update();
+
+            // 視錐台。
+            Matrix viewProjection;
+            Matrix.Multiply(ref View.Matrix, ref Projection.Matrix, out viewProjection);
+            Frustum.Matrix = viewProjection;
+
+            // 頂点をキャッシュ。
+            Frustum.GetCorners(frustumCorners);
         }
 
         public void AddLightVolumePoint(ref Vector3 point)
@@ -59,34 +91,20 @@ namespace Willcraftia.Xna.Framework.Graphics
                 lightVolumePoints.Add(points[i]);
         }
 
-        public void Prepare(ICamera camera)
-        {
-            // 分割視点の射影行列を更新。
-            SplitEyeProjection.Update();
-
-            // 視点のビュー行列と分割視点の射影行列で視錐台を構築。
-            Matrix splitViewProjection;
-            Matrix.Multiply(ref camera.View.Matrix, ref SplitEyeProjection.Matrix, out splitViewProjection);
-            SplitEyeFrustum.Matrix = splitViewProjection;
-
-            // 頂点をキャッシュ。
-            SplitEyeFrustum.GetCorners(splitEyeFrustumCorners);
-        }
-
-        public void UpdateViewProjection()
+        public void UpdateLightViewProjection()
         {
             //----------------------------------------------------------------
             // 光源のビュー行列を更新
 
             // 分割視錐台の中心
             var frustumCenter = Vector3.Zero;
-            for (int i = 0; i < 8; i++) frustumCenter += splitEyeFrustumCorners[i];
+            for (int i = 0; i < 8; i++) frustumCenter += frustumCorners[i];
             frustumCenter /= 8;
 
             // 分割視錐台の中心からどの程度の距離に光源を位置させるか
             float farExtent;
-            Vector3.Distance(ref splitEyeFrustumCorners[4], ref splitEyeFrustumCorners[5], out farExtent);
-            var centerDistance = MathHelper.Max(SplitEyeProjection.FarPlaneDistance - SplitEyeProjection.NearPlaneDistance, farExtent);
+            Vector3.Distance(ref frustumCorners[4], ref frustumCorners[5], out farExtent);
+            var centerDistance = MathHelper.Max(Projection.FarPlaneDistance - Projection.NearPlaneDistance, farExtent);
 
             // 光源位置を算出して設定
             LightView.Position = frustumCenter - LightView.Direction * centerDistance;
@@ -98,16 +116,18 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 包含座標を全て含む領域を算出
 
             Vector3 initialPointLS;
-            Vector3.Transform(ref splitEyeFrustumCorners[0], ref LightView.Matrix, out initialPointLS);
+            Vector3.Transform(ref frustumCorners[0], ref LightView.Matrix, out initialPointLS);
             var min = initialPointLS;
             var max = initialPointLS;
 
             // 分割視錐台の頂点を包含座標として判定。
             for (int i = 0; i < 8; i++)
             {
-                Vector3 pointWS = splitEyeFrustumCorners[i];
+                Vector3 pointWS = frustumCorners[i];
                 Vector3 pointLS;
                 Vector3.Transform(ref pointWS, ref LightView.Matrix, out pointLS);
+
+                // TODO: Vector3.Min/Max で良いのでは？
                 if (max.X < pointLS.X)
                 {
                     max.X = pointLS.X;
@@ -139,6 +159,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                 Vector3 pointWS = lightVolumePoints[i];
                 Vector3 pointLS;
                 Vector3.Transform(ref pointWS, ref LightView.Matrix, out pointLS);
+
+                // TODO: Vector3.Min/Max で良いのでは？
                 if (max.X < pointLS.X)
                 {
                     max.X = pointLS.X;
@@ -178,7 +200,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             LightProjection.ZFarPlane = -min.Z;
             LightProjection.Update();
 
-            Matrix.Multiply(ref LightView.Matrix, ref LightProjection.Matrix, out ViewProjection);
+            Matrix.Multiply(ref LightView.Matrix, ref LightProjection.Matrix, out LightViewProjection);
 
             // クリア。
             lightVolumePoints.Clear();

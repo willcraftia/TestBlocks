@@ -19,8 +19,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Vector3[] corners = new Vector3[8];
 
-        //float farPlaneDistance;
-
         float inverseSplitCount;
 
         PssmLightCamera[] splitLightCameras;
@@ -55,7 +53,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             get
             {
                 for (int i = 0; i < splitLightCameras.Length; i++)
-                    splitViewProjections[i] = splitLightCameras[i].ViewProjection;
+                    splitViewProjections[i] = splitLightCameras[i].LightViewProjection;
                 return splitViewProjections;
             }
         }
@@ -97,7 +95,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             splitLightCameras = new PssmLightCamera[SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)
-                splitLightCameras[i] = new PssmLightCamera(shadowMapSettings.Size);
+                splitLightCameras[i] = new PssmLightCamera("PssmLight" + i, shadowMapSettings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
@@ -129,22 +127,26 @@ namespace Willcraftia.Xna.Framework.Graphics
             Prepare(camera, ref lightDirection, ref boundingBox);
         }
 
-        public void Prepare(ICamera camera, ref Vector3 lightDirection, ref BoundingBox boundingBox)
+        public void Prepare(ICamera camera, ref Vector3 lightDirection, ref BoundingBox sceneBoundingBox)
         {
             if (camera == null) throw new ArgumentNullException("camera");
 
-            var far = CalculateFarPlaneDistance(camera, ref boundingBox);
+            var far = CalculateFarPlaneDistance(camera, ref sceneBoundingBox);
             CalculateSplitDistances(camera, far);
 
             for (int i = 0; i < splitDistances.Length - 1; i++)
             {
                 splitLightCameras[i].LightView.Direction = lightDirection;
-                splitLightCameras[i].SplitEyeProjection.Fov = camera.Projection.Fov;
-                splitLightCameras[i].SplitEyeProjection.AspectRatio = camera.Projection.AspectRatio;
-                splitLightCameras[i].SplitEyeProjection.NearPlaneDistance = splitDistances[i];
-                splitLightCameras[i].SplitEyeProjection.FarPlaneDistance = splitDistances[i + 1];
+                splitLightCameras[i].View.Position = camera.View.Position;
+                splitLightCameras[i].View.Direction = camera.View.Direction;
+                splitLightCameras[i].View.Up = camera.View.Up;
+                splitLightCameras[i].Projection.Fov = camera.Projection.Fov;
+                splitLightCameras[i].Projection.AspectRatio = camera.Projection.AspectRatio;
+                splitLightCameras[i].Projection.NearPlaneDistance = splitDistances[i];
+                splitLightCameras[i].Projection.FarPlaneDistance = splitDistances[i + 1];
 
-                splitLightCameras[i].Prepare(camera);
+                // 分割カメラのビュー行列と射影行列を更新。
+                splitLightCameras[i].Update();
 
                 Monitor[i].ShadowCasterCount = 0;
             }
@@ -180,11 +182,11 @@ namespace Willcraftia.Xna.Framework.Graphics
                 casterBox.GetCorners(corners);
 
                 bool shouldAdd = false;
-                if (casterSphere.Intersects(lightCamera.SplitEyeFrustum))
+                if (casterSphere.Intersects(lightCamera.Frustum))
                 {
                     shouldAdd = true;
                 }
-                else if (casterBox.Intersects(lightCamera.SplitEyeFrustum))
+                else if (casterBox.Intersects(lightCamera.Frustum))
                 {
                     shouldAdd = true;
                 }
@@ -246,12 +248,12 @@ namespace Willcraftia.Xna.Framework.Graphics
                 //------------------------------------------------------------
                 // ライトのビュー×射影行列の更新
 
-                lightCamera.UpdateViewProjection();
+                lightCamera.UpdateLightViewProjection();
 
                 //------------------------------------------------------------
                 // エフェクト
 
-                effect.LightViewProjection = lightCamera.ViewProjection;
+                effect.LightViewProjection = lightCamera.LightViewProjection;
 
                 //------------------------------------------------------------
                 // 描画
@@ -279,7 +281,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             return splitRenderTargets[index];
         }
 
-        float CalculateFarPlaneDistance(ICamera camera, ref BoundingBox boundingBox)
+        float CalculateFarPlaneDistance(ICamera camera, ref BoundingBox sceneBoundingBox)
         {
             var viewMatrix = camera.View.Matrix;
 
@@ -287,7 +289,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // z = 0 は視点。
             // より小さな z がより遠い点。
             var maxFar = 0.0f;
-            boundingBox.GetCorners(corners);
+            sceneBoundingBox.GetCorners(corners);
             for (int i = 0; i < 8; i++)
             {
                 // ビュー座標へ変換。
