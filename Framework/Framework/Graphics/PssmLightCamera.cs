@@ -78,6 +78,20 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 光源のビュー行列を更新
 
+            // 分割視錐台の中心
+            var frustumCenter = Vector3.Zero;
+            for (int i = 0; i < 8; i++) frustumCenter += splitEyeFrustumCorners[i];
+            frustumCenter /= 8;
+
+            // 分割視錐台の中心からどの程度の距離に光源を位置させるか
+            float farExtent;
+            Vector3.Distance(ref splitEyeFrustumCorners[4], ref splitEyeFrustumCorners[5], out farExtent);
+            var centerDistance = MathHelper.Max(SplitEyeProjection.FarPlaneDistance - SplitEyeProjection.NearPlaneDistance, farExtent);
+
+            // 光源位置を算出して設定
+            LightView.Position = frustumCenter - LightView.Direction * centerDistance;
+            
+            // 行列を更新
             LightView.Update();
 
             //----------------------------------------------------------------

@@ -15,6 +15,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Vector3 up = Vector3.Up;
 
+        public Vector3 Position
+        {
+            get { return position; }
+            set { position = value; }
+        }
+
         public Vector3 Direction
         {
             get { return direction; }

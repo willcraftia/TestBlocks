@@ -22,6 +22,11 @@ namespace Willcraftia.Xna.Framework
         /// </summary>
         public bool MatrixDirty { get; protected set; }
 
+        protected ViewBase()
+        {
+            MatrixDirty = true;
+        }
+
         /// <summary>
         /// MatrixDirty プロパティが true の場合は、
         /// UpdateOverride() メソッドを呼び出して Matrix プロパティを更新します。
