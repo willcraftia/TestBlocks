@@ -39,7 +39,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         float dashFactor = 2;
 
         float farPlaneDistance = (partitionMinActiveRange - 1) * 16;
-        //float farPlaneDistance = 2000;
 
         WorldManager worldManager;
 
