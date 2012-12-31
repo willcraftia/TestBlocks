@@ -19,6 +19,11 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return new VectorI3(16); }
         }
 
+        public static VectorI3 HalfSize
+        {
+            get { return new VectorI3(8); }
+        }
+
         VectorI3 size = Size;
 
         VectorI3 position;

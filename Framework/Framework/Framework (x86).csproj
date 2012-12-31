@@ -125,9 +125,9 @@
     <Compile Include="Graphics\IEffectShadowScene.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\IPssmSupport.cs" />
-    <Compile Include="Graphics\ISceneObject.cs" />
+    <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
-    <Compile Include="Graphics\IShadowCaster.cs" />
+    <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\IShadowSceneSupport.cs" />
     <Compile Include="Graphics\LightFrustumSettings.cs" />
     <Compile Include="Graphics\PssmLightCamera.cs" />

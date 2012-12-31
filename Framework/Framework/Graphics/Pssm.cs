@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Texture2D[] safeSplitShadowMaps;
 
-        Queue<IShadowCaster>[] splitShadowCasters;
+        Queue<ShadowCaster>[] splitShadowCasters;
 
         SpriteBatch blurSpriteBatch;
 
@@ -114,9 +114,9 @@ namespace Willcraftia.Xna.Framework.Graphics
                 false, shadowMapSettings.Format, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
 
             // TODO: 初期容量。
-            splitShadowCasters = new Queue<IShadowCaster>[SplitCount];
+            splitShadowCasters = new Queue<ShadowCaster>[SplitCount];
             for (int i = 0; i < splitShadowCasters.Length; i++)
-                splitShadowCasters[i] = new Queue<IShadowCaster>();
+                splitShadowCasters[i] = new Queue<ShadowCaster>();
 
             blurSpriteBatch = new SpriteBatch(GraphicsDevice);
             blur = new GaussianBlur(blurEffect, blurSpriteBatch, shadowMapSettings.Size, shadowMapSettings.Size, SurfaceFormat.Vector2,
@@ -176,56 +176,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.TotalShadowCasterCount = 0;
         }
 
-        public void TryAddShadowCaster(IShadowCaster shadowCaster)
+        public void TryAddShadowCaster(ShadowCaster shadowCaster)
         {
-            BoundingSphere casterSphere;
-            shadowCaster.GetBoundingSphere(out casterSphere);
-
-            if (!casterSphere.Intersects(frustumBoundingBox)) return;
-
-            BoundingBox casterBox;
-            shadowCaster.GetBoundingBox(out casterBox);
-            casterBox.GetCorners(corners);
-
-            if (!casterBox.Intersects(frustumBoundingBox)) return;
+            if (!shadowCaster.BoundingSphere.Intersects(frustumBoundingBox)) return;
+            if (!shadowCaster.BoundingBox.Intersects(frustumBoundingBox)) return;
 
             for (int i = 0; i < splitLightCameras.Length; i++)
             {
                 var lightCamera = splitLightCameras[i];
 
                 bool shouldAdd = false;
-                if (casterSphere.Intersects(lightCamera.Frustum))
+                if (shadowCaster.BoundingSphere.Intersects(lightCamera.Frustum))
                 {
                     shouldAdd = true;
                 }
-                else if (casterBox.Intersects(lightCamera.Frustum))
+                else if (shadowCaster.BoundingBox.Intersects(lightCamera.Frustum))
                 {
                     shouldAdd = true;
-                }
-                else
-                {
-                    //var ray = new Ray
-                    //{
-                    //    Direction = lightCamera.LightView.Direction
-                    //};
-
-                    //// TODO: 要検討。
-                    //for (int j = 0; j < 8; j++)
-                    //{
-                    //    // AABB の頂点から光方向の線。
-                    //    ray.Position = corners[j];
-
-                    //    // 分割視錐台と交差するか否か。
-                    //    var distance = ray.Intersects(lightCamera.SplitEyeFrustum);
-                    //    if (distance == null) continue;
-
-                    //    // TODO
-                    //    if (distance < 10)
-                    //    {
-                    //        shouldAdd = true;
-                    //        break;
-                    //    }
-                    //}
                 }
 
                 if (shouldAdd)

@@ -165,9 +165,7 @@
     <Compile Include="Graphics\IEffectShadowScene.cs" />
     <Compile Include="Graphics\IPssmSupport.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
-    <Compile Include="Graphics\ISceneObject.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
-    <Compile Include="Graphics\IShadowCaster.cs" />
     <Compile Include="Graphics\IShadowSceneSupport.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -185,8 +183,10 @@
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
     <Compile Include="Graphics\SceneManagerSettings.cs" />
+    <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ScreenSpaceShadow.cs" />
     <Compile Include="Graphics\ScreenSpaceShadowMonitor.cs" />
+    <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />

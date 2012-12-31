@@ -12,7 +12,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SkySphere : IAsset, ISceneObject
+    public sealed class SkySphere : SceneObject, IAsset
     {
         //
         // TODO
@@ -30,24 +30,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         // I/F
         public IResource Resource { get; set; }
-
-        // I/F
-        public ISceneObjectContext Context { private get; set; }
-
-        // I/F
-        public bool Visible { get; set; }
-
-        // I/F
-        public bool Translucent
-        {
-            get { return false; }
-        }
-
-        // I/F
-        public bool Occluded
-        {
-            get { return false; }
-        }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -76,32 +58,17 @@ namespace Willcraftia.Xna.Blocks.Models
             sphereMesh = new SphereMesh(GraphicsDevice);
         }
 
-        // I/F
-        public void GetDistanceSquared(ref Vector3 eyePosition, out float result)
+        public void Update(ICamera camera)
         {
-            // 常に再遠に位置させる。
-            result = float.MaxValue;
+            if (camera == null) throw new ArgumentNullException("camera");
+
+            Position = camera.View.Position;
+            BoundingSphere.Center = Position;
+            BoundingSphere.Radius = camera.Projection.FarPlaneDistance * 10;
+            BoundingBox.CreateFromSphere(ref BoundingSphere, out BoundingBox);
         }
 
-        // I/F
-        public void GetBoundingSphere(out BoundingSphere result)
-        {
-            result = new BoundingSphere(Context.ActiveCamera.View.Position, CalculateRadius());
-        }
-
-        // I/F
-        public void GetBoundingBox(out BoundingBox result)
-        {
-            BoundingSphere sphere;
-            GetBoundingSphere(out sphere);
-            BoundingBox.CreateFromSphere(ref sphere, out result);
-        }
-
-        // I/F
-        public void UpdateOcclusion() { }
-
-        // I/F
-        public void Draw()
+        public override void Draw()
         {
             // 空の色。
             Effect.SkyColor = SceneSettings.SkyColor;
@@ -122,25 +89,20 @@ namespace Willcraftia.Xna.Blocks.Models
             var camera = Context.ActiveCamera;
             var projection = camera.Projection;
             
-            // 元となる球メッシュは半径 0.5f であるため二倍しておく。
-            var sphereScale = CalculateRadius();
-
             // FarPlaneDistance を越える位置に描画するため、
             // 専用の FarPlaneDistance でプロジェクション行列を作成して利用。
             // この FarPlaneDistance は球の半径より少し大きければ良い。
-            var specificFar = sphereScale + 1;
+            var specificFar = BoundingSphere.Radius + 1;
             Matrix specificProjection;
             Matrix.CreatePerspectiveFieldOfView(
                 projection.Fov, projection.AspectRatio, projection.NearPlaneDistance, specificFar, out specificProjection);
 
-            // 球の座標は視点座標。
-            var eyePosition = camera.View.Position;
-
             Matrix translation;
-            Matrix.CreateTranslation(ref eyePosition, out translation);
+            Matrix.CreateTranslation(ref Position, out translation);
 
+            // 元となる球メッシュは半径 0.5f であるため二倍しておく。
             Matrix scale;
-            Matrix.CreateScale(sphereScale, out scale);
+            Matrix.CreateScale(BoundingSphere.Radius * 2, out scale);
 
             Matrix world;
             Matrix.Multiply(ref scale, ref translation, out world);
@@ -159,11 +121,6 @@ namespace Willcraftia.Xna.Blocks.Models
             Effect.Apply();
 
             GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
-        }
-
-        float CalculateRadius()
-        {
-            return Context.ActiveCamera.Projection.FarPlaneDistance * 10;
         }
 
         #region ToString

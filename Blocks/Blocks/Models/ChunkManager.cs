@@ -38,6 +38,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly VectorI3 chunkSize = Chunk.Size;
 
+        static readonly Vector3 chunkMeshOffset = Chunk.HalfSize.ToVector3();
+
         Region region;
 
         Vector3 inverseChunkSize;
@@ -369,7 +371,12 @@ namespace Willcraftia.Xna.Blocks.Models
             var interMesh = chunk.InterChunk;
 
             // メッシュに設定するワールド座標。
-            var position = chunk.WorldPosition;
+            // チャンクの中心をメッシュの位置とする。
+            var position = chunk.WorldPosition + chunkMeshOffset;
+
+            // メッシュに設定するワールド行列。
+            Matrix world;
+            Matrix.CreateTranslation(ref position, out world);
 
             //----------------------------------------------------------------
             // Opaque
@@ -395,6 +402,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 chunk.OpaqueMesh.Position = position;
+                chunk.OpaqueMesh.World = world;
                 interMesh.Opaque.Populate(chunk.OpaqueMesh);
 
                 region.Monitor.TotalChunkVertexCount += chunk.OpaqueMesh.VertexCount;
@@ -427,6 +435,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 chunk.TranslucentMesh.Position = position;
+                chunk.TranslucentMesh.World = world;
                 interMesh.Translucent.Populate(chunk.TranslucentMesh);
 
                 region.Monitor.TotalChunkVertexCount += chunk.TranslucentMesh.VertexCount;

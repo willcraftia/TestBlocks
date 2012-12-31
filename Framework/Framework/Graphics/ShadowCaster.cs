@@ -8,11 +8,16 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public interface IShadowCaster : ISceneObject
+    public abstract class ShadowCaster : SceneObject
     {
-        bool CastShadow { get; }
+        public bool CastShadow { get; set; }
+
+        protected ShadowCaster()
+        {
+            CastShadow = true;
+        }
 
         // シャドウ マップ/シャドウ シーンへの描画。
-        void Draw(IEffectShadow effect);
+        public abstract void Draw(IEffectShadow effect);
     }
 }

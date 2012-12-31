@@ -11,11 +11,13 @@ using Willcraftia.Xna.Framework.Diagnostics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMesh : IShadowCaster, IShadowSceneSupport
+    public sealed class ChunkMesh : ShadowCaster, IShadowSceneSupport
     {
         static readonly VectorI3 chunkSize = Chunk.Size;
 
         Region region;
+
+        Matrix world = Matrix.Identity;
 
         VertexBuffer vertexBuffer;
 
@@ -27,54 +29,19 @@ namespace Willcraftia.Xna.Blocks.Models
 
         int primitiveCount;
 
-        BoundingSphere boundingSphere;
-
-        BoundingBox boundingBox;
-
-        bool occluded;
-
         OcclusionQuery occlusionQuery;
 
         bool occlusionQueryActive;
 
-        Vector3 position;
-
-        Matrix world;
-
-        // I/F
-        public bool CastShadow
-        {
-            // チャンクはブロックの設定とは異なり、常に一定の結果を返す。
-            get { return true; }
-        }
-
-        // I/F
-        public ISceneObjectContext Context
-        {
-            set { }
-        }
-
-        // I/F
-        public bool Visible
-        {
-            // 常に true。
-            // 頂点を持たない場合でも true だが、その場合はシーン マネージャに登録されず、
-            // 結果として描画されない。
-            get { return true; }
-        }
-
-        // I/F
-        public bool Translucent { get; set; }
-
-        // I/F
-        public bool Occluded
-        {
-            get { return occluded; }
-        }
-
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public Chunk Chunk { get; set; }
+
+        public Matrix World
+        {
+            get { return world; }
+            set { world = value; }
+        }
 
         public VertexBuffer VertexBuffer
         {
@@ -119,16 +86,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public Vector3 Position
-        {
-            get { return position; }
-            set
-            {
-                position = value;
-                Matrix.CreateTranslation(ref position, out world);
-            }
-        }
-
         public ChunkMesh(Region region)
         {
             if (region == null) throw new ArgumentNullException("region");
@@ -136,45 +93,21 @@ namespace Willcraftia.Xna.Blocks.Models
             this.region = region;
 
             GraphicsDevice = region.GraphicsDevice;
-
             occlusionQuery = new OcclusionQuery(GraphicsDevice);
         }
 
-        // I/F
-        public void GetDistanceSquared(ref Vector3 eyePosition, out float result)
-        {
-            // 中心座標を算出。
-            var halfSize = new Vector3(chunkSize.X * 0.5f, chunkSize.Y * 0.5f, chunkSize.Z * 0.5f);
-            var centerPosition = position + halfSize;
-
-            Vector3.DistanceSquared(ref eyePosition, ref centerPosition, out result);
-        }
-
-        // I/F
-        public void GetBoundingSphere(out BoundingSphere result)
-        {
-            result = boundingSphere;
-        }
-
-        // I/F
-        public void GetBoundingBox(out BoundingBox result)
-        {
-            result = boundingBox;
-        }
-
-        // I/F
-        public void UpdateOcclusion()
+        public override void UpdateOcclusion()
         {
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
                 return;
 
-            occluded = false;
+            Occluded = false;
 
             if (occlusionQueryActive)
             {
                 if (!occlusionQuery.IsComplete) return;
 
-                occluded = (occlusionQuery.PixelCount == 0);
+                Occluded = (occlusionQuery.PixelCount == 0);
             }
 
             occlusionQuery.Begin();
@@ -193,6 +126,8 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // 変換行列
 
+            Matrix world;
+            Matrix.CreateTranslation(ref Position, out world);
             effect.World = world;
             effect.Apply();
 
@@ -205,13 +140,12 @@ namespace Willcraftia.Xna.Blocks.Models
             occlusionQueryActive = true;
         }
 
-        // I/F
-        public void Draw()
+        public override void Draw()
         {
             // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
                 return;
-            if (occluded) return;
+            if (Occluded) return;
 
             var effect = region.ChunkEffect;
 
@@ -236,8 +170,7 @@ namespace Willcraftia.Xna.Blocks.Models
             DrawCore();
         }
 
-        // I/F
-        public void Draw(IEffectShadow effect)
+        public override void Draw(IEffectShadow effect)
         {
             // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
@@ -319,16 +252,6 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 IndexCount = 0;
             }
-        }
-
-        internal void SetBoundingSphere(ref BoundingSphere boundingSphere)
-        {
-            this.boundingSphere = boundingSphere;
-        }
-
-        internal void SetBoundingBox(ref BoundingBox boundingBox)
-        {
-            this.boundingBox = boundingBox;
         }
     }
 }

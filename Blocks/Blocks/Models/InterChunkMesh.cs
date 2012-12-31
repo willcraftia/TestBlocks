@@ -35,8 +35,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         BoundingBox boundingBox;
 
-        BoundingSphere meshSphere;
-
         Vector3[] corners = new Vector3[8];
 
         public int VertexCount
@@ -103,22 +101,17 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (destination == null) throw new ArgumentNullException("destination");
 
-            var position = destination.Position;
-            Matrix translation;
-            Matrix.CreateTranslation(ref position, out translation);
+            // メッシュの BoundingBox。
+            var transform = destination.World;
+            Vector3.Transform(ref boundingBox.Min, ref transform, out destination.BoundingBox.Min);
+            Vector3.Transform(ref boundingBox.Max, ref transform, out destination.BoundingBox.Max);
 
-            // メッシュ パートの位置での AABB。
-            var meshBox = new BoundingBox();
-            Vector3.Transform(ref boundingBox.Min, ref translation, out meshBox.Min);
-            Vector3.Transform(ref boundingBox.Max, ref translation, out meshBox.Max);
-
-            meshBox.GetCorners(corners);
-            meshSphere = BoundingSphere.CreateFromPoints(corners);
+            // メッシュの BoundingSphere。
+            destination.BoundingBox.GetCorners(corners);
+            destination.BoundingSphere = BoundingSphere.CreateFromPoints(corners);
 
             destination.SetVertices(vertices, vertexCount);
             destination.SetIndices(indices, indexCount);
-            destination.SetBoundingBox(ref meshBox);
-            destination.SetBoundingSphere(ref meshSphere);
         }
 
         public void AddIndex(ushort index)
@@ -144,7 +137,6 @@ namespace Willcraftia.Xna.Blocks.Models
             vertexCount = 0;
             indexCount = 0;
             boundingBox = BoundingBoxHelper.Empty;
-            meshSphere = new BoundingSphere();
         }
 
         // TODO

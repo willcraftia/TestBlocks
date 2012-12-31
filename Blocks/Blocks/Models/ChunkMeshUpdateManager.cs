@@ -46,6 +46,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly VectorI3 chunkSize = Chunk.Size;
 
+        static readonly Vector3 chunkMeshOffset = Chunk.HalfSize.ToVector3();
+
+        static readonly Vector3 blockMeshOffset = new Vector3(0.5f);
+
         Region region;
 
         ChunkManager chunkManager;
@@ -245,13 +249,18 @@ namespace Willcraftia.Xna.Blocks.Models
             for (int i = 0; i < vertices.Length; i++)
             {
                 var vertex = vertices[i];
+
+                // チャンク座標内での位置へ移動。
                 vertex.Position.X += x;
                 vertex.Position.Y += y;
                 vertex.Position.Z += z;
-                // Block の MeshPart はその中心に原点があるため、半 Block サイズだけずらす必要がある。
-                vertex.Position.X += 0.5f;
-                vertex.Position.Y += 0.5f;
-                vertex.Position.Z += 0.5f;
+
+                // ブロックの MeshPart はその中心に原点があるため、半ブロック移動。
+                vertex.Position += blockMeshOffset;
+                
+                // チャンク メッシュはチャンクの中心位置を原点とするため、半チャンク移動。
+                vertex.Position -= chunkMeshOffset;
+
                 destination.AddVertex(ref vertex);
             }
         }

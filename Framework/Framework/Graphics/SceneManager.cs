@@ -15,7 +15,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         #region DistanceComparer
 
-        sealed class DistanceComparer : IComparer<ISceneObject>
+        sealed class DistanceComparer : IComparer<SceneObject>
         {
             public static DistanceComparer Instance = new DistanceComparer();
 
@@ -23,12 +23,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             DistanceComparer() { }
 
-            public int Compare(ISceneObject o1, ISceneObject o2)
+            public int Compare(SceneObject o1, SceneObject o2)
             {
                 float d1;
                 float d2;
-                o1.GetDistanceSquared(ref EyePosition, out d1);
-                o2.GetDistanceSquared(ref EyePosition, out d2);
+                Vector3.DistanceSquared(ref EyePosition, ref o1.Position, out d1);
+                Vector3.DistanceSquared(ref EyePosition, ref o2.Position, out d2);
 
                 if (d1 == d2) return 0;
                 return (d1 < d2) ? -1 : 1;
@@ -54,7 +54,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ISceneModuleFactory moduleFactory;
 
-        List<ISceneObject> sceneObjects = new List<ISceneObject>(InitialSceneObjectCapacity);
+        List<SceneObject> sceneObjects = new List<SceneObject>(InitialSceneObjectCapacity);
 
         Dictionary<string, ICamera> cameraMap = new Dictionary<string, ICamera>(InitialCameraCapacity);
 
@@ -68,13 +68,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         DirectionalLight activeDirectionalLight;
 
-        Queue<ISceneObject> workingSceneObjects = new Queue<ISceneObject>(InitialSceneObjectCapacity);
+        Queue<SceneObject> workingSceneObjects = new Queue<SceneObject>(InitialSceneObjectCapacity);
 
-        List<ISceneObject> opaqueSceneObjects = new List<ISceneObject>(InitialVisibleObjectCapacity);
+        List<SceneObject> opaqueSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
 
-        List<ISceneObject> translucentSceneObjects = new List<ISceneObject>(InitialVisibleObjectCapacity);
+        List<SceneObject> translucentSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
 
-        List<IShadowCaster> activeShadowCasters = new List<IShadowCaster>(InitialShadowCasterCapacity);
+        List<ShadowCaster> activeShadowCasters = new List<ShadowCaster>(InitialShadowCasterCapacity);
 
         Vector3[] frustumCorners = new Vector3[8];
 
@@ -268,7 +268,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             directionalLightMap.Clear();
         }
 
-        public void AddSceneObject(ISceneObject sceneObject)
+        public void AddSceneObject(SceneObject sceneObject)
         {
             if (sceneObject == null) throw new ArgumentNullException("sceneObject");
 
@@ -279,7 +279,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public void RemoveSceneObject(ISceneObject sceneObject)
+        public void RemoveSceneObject(SceneObject sceneObject)
         {
             if (sceneObject == null) throw new ArgumentNullException("sceneObject");
 
@@ -352,8 +352,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                     Monitor.VisibleSceneObjectCount++;
                 }
 
-                var shadowCaster = sceneObject as IShadowCaster;
-                if (shadowCaster != null &&IsActiveShadowCaster(shadowCaster))
+                var shadowCaster = sceneObject as ShadowCaster;
+                if (shadowCaster != null && IsActiveShadowCaster(shadowCaster))
                     activeShadowCasters.Add(shadowCaster);
             }
 
@@ -428,21 +428,19 @@ namespace Willcraftia.Xna.Framework.Graphics
             return null;
         }
 
-        bool IsVisibleObject(ISceneObject sceneObject)
+        bool IsVisibleObject(SceneObject sceneObject)
         {
-            BoundingSphere objectSphere;
-            sceneObject.GetBoundingSphere(out objectSphere);
+            // 球同士で判定。
+            if (!sceneObject.BoundingSphere.Intersects(frustumSphere)) return false;
 
-            // 球同士で大きく判定。
-            if (!objectSphere.Intersects(frustumSphere)) return false;
+            // 球と視錐台で判定。
+            if (!sceneObject.BoundingSphere.Intersects(frustumSphere)) return false;
 
             // 視錐台と AABB で判定。
-            BoundingBox objectBox;
-            sceneObject.GetBoundingBox(out objectBox);
-            return objectBox.Intersects(activeCamera.Frustum);
+            return sceneObject.BoundingBox.Intersects(activeCamera.Frustum);
         }
 
-        bool IsActiveShadowCaster(IShadowCaster shadowCaster)
+        bool IsActiveShadowCaster(ShadowCaster shadowCaster)
         {
             if (shadowCaster.Translucent) return false;
             if (!shadowCaster.CastShadow) return false;
@@ -558,15 +556,12 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         [Conditional("DEBUG"), Conditional("TRACE")]
-        void DebugDrawBoundingBox(ISceneObject sceneObject)
+        void DebugDrawBoundingBox(SceneObject sceneObject)
         {
             if (!DebugBoundingBoxVisible) return;
 
             var color = (sceneObject.Occluded) ? Color.DimGray : Color.Yellow;
-
-            BoundingBox boundingBox;
-            sceneObject.GetBoundingBox(out boundingBox);
-            debugBoundingBoxDrawer.Draw(ref boundingBox, debugBoundingBoxEffect, ref color);
+            debugBoundingBoxDrawer.Draw(ref sceneObject.BoundingBox, debugBoundingBoxEffect, ref color);
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new PssmSceneMonitor(this);
         }
 
-        public void Draw(ICamera camera, Pssm pssm, IEnumerable<ISceneObject> sceneObjects)
+        public void Draw(ICamera camera, Pssm pssm, IEnumerable<SceneObject> sceneObjects)
         {
             if (camera == null) throw new ArgumentNullException("camera");
             if (pssm == null) throw new ArgumentNullException("pssm");
