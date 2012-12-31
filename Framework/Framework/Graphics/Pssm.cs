@@ -25,11 +25,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         float[] splitDistances;
 
-        Matrix[] splitViewProjections;
+        float[] safeSplitDistances;
+
+        Matrix[] safeSplitLightViewProjections;
 
         MultiRenderTargets splitRenderTargets;
 
-        Texture2D[] splitShadowMaps;
+        Texture2D[] safeSplitShadowMaps;
 
         Queue<IShadowCaster>[] splitShadowCasters;
 
@@ -45,16 +47,20 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public float[] SplitDistances
         {
-            get { return splitDistances; }
+            get
+            {
+                Array.Copy(splitDistances, safeSplitDistances, splitDistances.Length);
+                return safeSplitDistances;
+            }
         }
 
-        public Matrix[] SplitViewProjections
+        public Matrix[] SplitLightViewProjections
         {
             get
             {
                 for (int i = 0; i < splitLightCameras.Length; i++)
-                    splitViewProjections[i] = splitLightCameras[i].LightViewProjection;
-                return splitViewProjections;
+                    safeSplitLightViewProjections[i] = splitLightCameras[i].LightViewProjection;
+                return safeSplitLightViewProjections;
             }
         }
 
@@ -62,9 +68,9 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             get
             {
-                for (int i = 0; i < splitShadowMaps.Length; i++)
-                    splitShadowMaps[i] = splitRenderTargets[i];
-                return splitShadowMaps;
+                for (int i = 0; i < safeSplitShadowMaps.Length; i++)
+                    safeSplitShadowMaps[i] = splitRenderTargets[i];
+                return safeSplitShadowMaps;
             }
         }
 
@@ -90,8 +96,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             SplitCount = pssmSettings.SplitCount;
             inverseSplitCount = 1.0f / (float) SplitCount;
             splitDistances = new float[SplitCount + 1];
-            splitViewProjections = new Matrix[SplitCount];
-            splitShadowMaps = new Texture2D[SplitCount];
+            safeSplitDistances = new float[SplitCount + 1];
+            safeSplitLightViewProjections = new Matrix[SplitCount];
+            safeSplitShadowMaps = new Texture2D[SplitCount];
 
             splitLightCameras = new PssmLightCamera[SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)

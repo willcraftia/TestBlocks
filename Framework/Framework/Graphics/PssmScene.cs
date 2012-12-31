@@ -71,7 +71,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             shadowSceneEffect.DepthBias = shadowMapSettings.DepthBias;
             shadowSceneEffect.SplitCount = pssmSettings.SplitCount;
             shadowSceneEffect.SplitDistances = pssm.SplitDistances;
-            shadowSceneEffect.SplitViewProjections = pssm.SplitViewProjections;
+            shadowSceneEffect.SplitLightViewProjections = pssm.SplitLightViewProjections;
             shadowSceneEffect.SplitShadowMaps = pssm.SplitShadowMaps;
 
             //----------------------------------------------------------------

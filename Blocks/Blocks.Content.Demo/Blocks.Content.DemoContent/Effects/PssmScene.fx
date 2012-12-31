@@ -14,7 +14,7 @@ float DepthBias;
 
 int SplitCount = MAX_SPLIT_COUNT;
 float SplitDistances[MAX_SPLIT_COUNT + 1];
-float4x4 SplitViewProjections[MAX_SPLIT_COUNT];
+float4x4 SplitLightViewProjections[MAX_SPLIT_COUNT];
 
 texture ShadowMap0;
 #if MAX_SPLIT_COUNT > 1
@@ -136,7 +136,7 @@ VSOutput VS(VSInput input)
     output.LightingPosition[0] = viewPosition;
     for (int i = 0; i < SplitCount; i++)
     {
-        output.LightingPosition[i + 1] = mul(worldPosition, SplitViewProjections[i]);
+        output.LightingPosition[i + 1] = mul(worldPosition, SplitLightViewProjections[i]);
     }
 
     return output;
@@ -233,6 +233,7 @@ technique Classic
 {
     pass P0
     {
+        CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
         PixelShader = compile ps_3_0 ClassicPS();
     }
@@ -242,6 +243,7 @@ technique Pcf
 {
     pass P0
     {
+        CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
         PixelShader = compile ps_3_0 PcfPS();
     }
@@ -251,6 +253,7 @@ technique Vsm
 {
     pass P0
     {
+        CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
         PixelShader = compile ps_3_0 VsmPS();
     }

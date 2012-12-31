@@ -32,7 +32,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         
         EffectParameter splitDistances;
         
-        EffectParameter splitViewProjections;
+        EffectParameter splitLightViewProjections;
         
         EffectParameter[] shadowMaps;
 
@@ -96,10 +96,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { splitDistances.SetValue(value); }
         }
 
-        public Matrix[] SplitViewProjections
+        public Matrix[] SplitLightViewProjections
         {
-            get { return splitViewProjections.GetValueMatrixArray(PssmSettings.MaxSplitCount); }
-            set { splitViewProjections.SetValue(value); }
+            get { return splitLightViewProjections.GetValueMatrixArray(PssmSettings.MaxSplitCount); }
+            set { splitLightViewProjections.SetValue(value); }
         }
 
         Texture2D[] shadowMapBuffer = new Texture2D[PssmSettings.MaxSplitCount];
@@ -168,7 +168,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             depthBias = backingEffect.Parameters["DepthBias"];
             splitCount = backingEffect.Parameters["SplitCount"];
             splitDistances = backingEffect.Parameters["SplitDistances"];
-            splitViewProjections = backingEffect.Parameters["SplitViewProjections"];
+            splitLightViewProjections = backingEffect.Parameters["SplitLightViewProjections"];
 
             shadowMaps = new EffectParameter[PssmSettings.MaxSplitCount];
             for (int i = 0; i < shadowMaps.Length; i++)
