@@ -209,7 +209,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     Monitor[i].ShadowCasterCount++;
                     Monitor.TotalShadowCasterCount++;
 
-                    break;
+                    //break;
                 }
             }
         }
