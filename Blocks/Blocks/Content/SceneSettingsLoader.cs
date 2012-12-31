@@ -27,7 +27,9 @@ namespace Willcraftia.Xna.Blocks.Content
                 MiddayAmbientLightColor = definition.MiddayAmbientLightColor,
                 MidnightAmbientLightColor = definition.MidnightAmbientLightColor,
                 ShadowColor = definition.ShadowColor,
-                SecondsPerDay = definition.SecondsPerDay
+                SecondsPerDay = definition.SecondsPerDay,
+                TimeStopped = definition.TimeStopped,
+                FixedSecondsPerDay = definition.FixedSecondsPerDay
             };
 
             sceneSettings.Sunlight.DiffuseColor = definition.SunlightDiffuseColor;
@@ -69,7 +71,9 @@ namespace Willcraftia.Xna.Blocks.Content
                 MoonlightDiffuseColor = sceneSettings.Moonlight.DiffuseColor,
                 MoonlightSpecularColor = sceneSettings.Moonlight.SpecularColor,
                 MoonlightEnabled = sceneSettings.Moonlight.Enabled,
-                SecondsPerDay = sceneSettings.SecondsPerDay
+                SecondsPerDay = sceneSettings.SecondsPerDay,
+                TimeStopped = sceneSettings.TimeStopped,
+                FixedSecondsPerDay = sceneSettings.FixedSecondsPerDay
             };
 
             if (sceneSettings.SkyColorTable.Count != 0)

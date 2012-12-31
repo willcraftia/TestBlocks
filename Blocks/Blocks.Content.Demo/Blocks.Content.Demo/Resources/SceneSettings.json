@@ -41,5 +41,7 @@
       "Color": "0, 0, 0"
     }
   ],
-  "SecondsPerDay": 20.0
+  "SecondsPerDay": 20.0,
+  "TimeStopped": true,
+  "FixedSecondsPerDay": 8.3
 }

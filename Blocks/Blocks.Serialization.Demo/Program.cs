@@ -860,7 +860,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         new SkyColorDefinition { Time = 0.84f, Color = Color.Black.ToVector3() },
                         new SkyColorDefinition { Time = 1, Color = Color.Black.ToVector3() },
                     },
-                    SecondsPerDay = 20f
+                    SecondsPerDay = 20f,
+                    TimeStopped = false,
+                    FixedSecondsPerDay = 0
                 };
                 var jsonResource = SerializeToJson<SceneSettingsDefinition>("SceneSettings", sceneSettings);
                 var xmlResource = SerializeToXml<SceneSettingsDefinition>("SceneSettings", sceneSettings);

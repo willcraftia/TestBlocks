@@ -36,5 +36,9 @@ namespace Willcraftia.Xna.Blocks.Serialization
         public SkyColorDefinition[] SkyColorTable;
 
         public float SecondsPerDay;
+
+        public bool TimeStopped;
+
+        public float FixedSecondsPerDay;
     }
 }

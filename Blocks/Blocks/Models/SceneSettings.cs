@@ -30,6 +30,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         float secondsPerDay = DefaultSecondsPerDay;
 
+        float fixedSecondsPerDay;
+
         float halfDaySeconds;
 
         float inverseHalfDaySeconds;
@@ -138,6 +140,19 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public bool TimeStopped { get; set; }
+
+        public float FixedSecondsPerDay
+        {
+            get { return fixedSecondsPerDay; }
+            set
+            {
+                if (value <= 0) throw new ArgumentOutOfRangeException("value");
+
+                fixedSecondsPerDay = value;
+            }
+        }
+
         public float ElapsedSecondsPerDay { get; private set; }
 
         public Vector3 AmbientLightColor
@@ -191,7 +206,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
-            ElapsedSecondsPerDay = (float) gameTime.TotalGameTime.TotalSeconds % secondsPerDay;
+            if (!TimeStopped)
+            {
+                ElapsedSecondsPerDay = (float) gameTime.TotalGameTime.TotalSeconds % secondsPerDay;
+            }
+            else
+            {
+                ElapsedSecondsPerDay = fixedSecondsPerDay;
+            }
 
             UpdateSun();
             UpdateMoon();
