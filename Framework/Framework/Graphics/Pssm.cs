@@ -301,7 +301,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             // 見つかった最も遠い点の z で farPlaneDistance を決定。
-            //farPlaneDistance = camera.Projection.NearPlaneDistance - maxFar;
             return camera.Projection.NearPlaneDistance - maxFar;
         }
 
@@ -320,7 +319,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 // REFERENCE: the version in the main PSSM paper
                 float uniform = near + (far - near) * idm;
                 // REFERENCE: the version (?) in some actual codes,
-                // i think the following is a wrong formula.
                 //float uniform = (near + idm) * (far - near);
 
                 splitDistances[i] = log * splitLambda + uniform * (1.0f - splitLambda);
