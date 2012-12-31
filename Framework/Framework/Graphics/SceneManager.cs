@@ -560,7 +560,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (!DebugBoundingBoxVisible) return;
 
-            var color = (sceneObject.Occluded) ? Color.DimGray : Color.Yellow;
+            var color = (sceneObject.Occluded) ? Color.Gray : Color.White;
             debugBoundingBoxDrawer.Draw(ref sceneObject.BoundingBox, debugBoundingBoxEffect, ref color);
         }
     }
