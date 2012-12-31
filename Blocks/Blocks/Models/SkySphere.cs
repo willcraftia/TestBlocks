@@ -58,13 +58,20 @@ namespace Willcraftia.Xna.Blocks.Models
             sphereMesh = new SphereMesh(GraphicsDevice);
         }
 
+        Vector3[] frustumCorners = new Vector3[8];
+
         public void Update(ICamera camera)
         {
             if (camera == null) throw new ArgumentNullException("camera");
 
+            // 視錐台の頂点で最も遠い場所を半径にする。
+            // インデックス 4 から 7 の頂点のどれでも良い。
+            camera.Frustum.GetCorners(frustumCorners);
+            var far = Vector3.Distance(Vector3.Zero, frustumCorners[4]);
+
             Position = camera.View.Position;
             BoundingSphere.Center = Position;
-            BoundingSphere.Radius = camera.Projection.FarPlaneDistance * 10;
+            BoundingSphere.Radius = far;
             BoundingBox.CreateFromSphere(ref BoundingSphere, out BoundingBox);
         }
 
