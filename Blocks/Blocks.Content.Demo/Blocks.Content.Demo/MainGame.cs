@@ -30,7 +30,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         KeyboardState lastKeyboardState;
 
-        FreeCamera camera = new FreeCamera("Default");
+        BasicCamera camera = new BasicCamera("Default");
 
         FreeViewInput viewInput = new FreeViewInput();
 
@@ -264,13 +264,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var viewport = GraphicsDevice.Viewport;
             viewInput.InitialMousePositionX = viewport.Width / 2;
             viewInput.InitialMousePositionY = viewport.Height / 2;
-            viewInput.FreeView = camera.FreeView;
+            viewInput.View = camera.View;
             viewInput.MoveVelocity = moveVelocity;
             viewInput.DashFactor = dashFactor;
             viewInput.Yaw(MathHelper.Pi);
 
             //camera.FreeView.Position = new Vector3(0, 16 * 18, 0);
-            camera.FreeView.Position = new Vector3(0, 16 * 16, 0);
+            camera.View.Position = new Vector3(0, 16 * 16, 0);
             //camera.FreeView.Position = new Vector3(0, 16 * 3, 0);
             //camera.FreeView.Position = new Vector3(0, 16 * 2, 0);
             camera.Projection.FarPlaneDistance = farPlaneDistance;
@@ -508,13 +508,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             
             sb.Append("Eye: ");
             sb.Append("P(");
-            sb.AppendNumber(camera.Position.X).Append(", ");
-            sb.AppendNumber(camera.Position.Y).Append(", ");
-            sb.AppendNumber(camera.Position.Z).Append(") ");
+            sb.AppendNumber(camera.View.Position.X).Append(", ");
+            sb.AppendNumber(camera.View.Position.Y).Append(", ");
+            sb.AppendNumber(camera.View.Position.Z).Append(") ");
             sb.Append("D(");
-            sb.AppendNumber(camera.Forward.X).Append(", ");
-            sb.AppendNumber(camera.Forward.Y).Append(", ");
-            sb.AppendNumber(camera.Forward.Z).Append(")");
+            sb.AppendNumber(camera.View.Direction.X).Append(", ");
+            sb.AppendNumber(camera.View.Direction.Y).Append(", ");
+            sb.AppendNumber(camera.View.Direction.Z).Append(")");
         }
 
         void DrawHelp()

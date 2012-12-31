@@ -81,8 +81,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FreeCamera.cs" />
-    <Compile Include="FreeView.cs" />
     <Compile Include="FreeViewInput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

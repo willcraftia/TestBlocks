@@ -358,7 +358,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             // 視点からの距離でソート。
-            DistanceComparer.Instance.EyePosition = activeCamera.Position;
+            DistanceComparer.Instance.EyePosition = activeCamera.View.Position;
             opaqueSceneObjects.Sort(DistanceComparer.Instance);
             translucentSceneObjects.Sort(DistanceComparer.Instance);
 

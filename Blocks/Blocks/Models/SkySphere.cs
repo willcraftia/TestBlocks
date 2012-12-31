@@ -86,7 +86,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void GetBoundingSphere(out BoundingSphere result)
         {
-            result = new BoundingSphere(Context.ActiveCamera.Position, CalculateRadius());
+            result = new BoundingSphere(Context.ActiveCamera.View.Position, CalculateRadius());
         }
 
         // I/F
@@ -134,7 +134,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 projection.Fov, projection.AspectRatio, projection.NearPlaneDistance, specificFar, out specificProjection);
 
             // 球の座標は視点座標。
-            var eyePosition = camera.Position;
+            var eyePosition = camera.View.Position;
 
             Matrix translation;
             Matrix.CreateTranslation(ref eyePosition, out translation);

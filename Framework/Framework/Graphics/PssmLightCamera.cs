@@ -22,7 +22,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         List<Vector3> lightVolumePoints;
 
-        public LightView LightView { get; private set; }
+        public View LightView { get; private set; }
 
         public Orthograph LightProjection { get; private set; }
 
@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             this.shadowMapSize = shadowMapSize;
 
-            LightView = new LightView();
+            LightView = new View();
             LightProjection = new Orthograph();
             SplitEyeFrustum = new BoundingFrustum(Matrix.Identity);
             SplitEyeProjection = new PerspectiveFov

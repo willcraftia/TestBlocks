@@ -17,12 +17,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingFrustum Frustum { get; }
 
-        Vector3 Position { get; }
-
-        Vector3 Forward { get; }
-
-        Vector3 Up { get; }
-
         void Update();
     }
 }

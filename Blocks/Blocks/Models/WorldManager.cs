@@ -112,7 +112,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Update(GameTime gameTime)
         {
             var camera = SceneManager.ActiveCamera;
-            var cameraPosition = camera.Position;
+            var cameraPosition = camera.View.Position;
 
             //----------------------------------------------------------------
             // PartitionManager

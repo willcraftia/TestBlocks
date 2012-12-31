@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
@@ -32,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         public float DashFactor { get; set; }
 
-        public FreeView FreeView { get; set; }
+        public View View { get; set; }
 
         public FreeViewInput()
         {
@@ -50,8 +51,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         public void Update(GameTime gameTime)
         {
-            position = FreeView.Position;
-            Matrix.Invert(ref FreeView.Matrix, out invertView);
+            position = View.Position;
+            Matrix.Invert(ref View.Matrix, out invertView);
 
             var deltaTime = (float) gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -88,9 +89,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             Matrix rotation;
             Matrix.CreateFromYawPitchRoll(yaw, pitch, roll, out rotation);
 
-            FreeView.Position = position;
-            FreeView.Forward = rotation.Forward;
-            FreeView.Up = rotation.Up;
+            View.Position = position;
+            View.Direction = rotation.Forward;
+            View.Up = rotation.Up;
         }
 
         public void Move(float distance)

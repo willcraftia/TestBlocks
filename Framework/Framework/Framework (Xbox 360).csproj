@@ -153,6 +153,7 @@
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
+    <Compile Include="Graphics\BasicCamera.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
@@ -172,7 +173,6 @@
     </Compile>
     <Compile Include="Graphics\LightFrustumSettings.cs" />
     <Compile Include="Graphics\LightFrustumTypes.cs" />
-    <Compile Include="Graphics\LightView.cs" />
     <Compile Include="Graphics\MultiRenderTargets.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\Pssm.cs" />
@@ -284,7 +284,6 @@
     <Compile Include="Threading\TaskQueue.cs" />
     <Compile Include="VectorI3.cs" />
     <Compile Include="View.cs" />
-    <Compile Include="ViewBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
