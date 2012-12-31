@@ -130,7 +130,7 @@
     <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\IShadowSceneSupport.cs" />
     <Compile Include="Graphics\LightFrustumSettings.cs" />
-    <Compile Include="Graphics\PssmLightCamera.cs" />
+    <Compile Include="Graphics\PssmLightVolume.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\LightFrustumTypes.cs" />
     <Compile Include="Graphics\MultiRenderTargets.cs" />

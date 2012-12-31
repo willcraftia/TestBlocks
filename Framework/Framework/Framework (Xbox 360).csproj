@@ -174,7 +174,7 @@
     <Compile Include="Graphics\MultiRenderTargets.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\Pssm.cs" />
-    <Compile Include="Graphics\PssmLightCamera.cs" />
+    <Compile Include="Graphics\PssmLightVolume.cs" />
     <Compile Include="Graphics\PssmMonitor.cs" />
     <Compile Include="Graphics\PssmScene.cs" />
     <Compile Include="Graphics\PssmSceneEffect.cs" />

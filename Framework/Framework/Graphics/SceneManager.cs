@@ -452,16 +452,16 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (LightFrustumType == LightFrustumTypes.Pssm)
             {
-                // PSSM の状態を準備。
-                var lightDirection = activeDirectionalLight.Direction;
-                pssm.Prepare(activeCamera, ref lightDirection);
+                // PSSM の分割カメラを準備。
+                pssm.PrepareSplitCameras(activeCamera);
 
                 // 投影オブジェクトを収集。
                 foreach (var shadowCaster in activeShadowCasters)
                     pssm.TryAddShadowCaster(shadowCaster);
 
                 // シャドウ マップを描画。
-                pssm.Draw(shadowMapEffect);
+                var lightDirection = activeDirectionalLight.Direction;
+                pssm.Draw(shadowMapEffect, ref lightDirection);
 
                 if (DebugMapDisplay.Available)
                 {
