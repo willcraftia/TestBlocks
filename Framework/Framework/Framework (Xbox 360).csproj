@@ -153,17 +153,23 @@
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
+    <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\IEffectPssm.cs" />
+    <Compile Include="Graphics\IEffectShadow.cs" />
+    <Compile Include="Graphics\IEffectShadowScene.cs" />
     <Compile Include="Graphics\IPssmSupport.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\ISceneObject.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\IShadowCaster.cs" />
+    <Compile Include="Graphics\IShadowSceneSupport.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Graphics\LightFrustumSettings.cs" />
     <Compile Include="Graphics\LightFrustumTypes.cs" />
     <Compile Include="Graphics\LightView.cs" />
@@ -172,7 +178,9 @@
     <Compile Include="Graphics\Pssm.cs" />
     <Compile Include="Graphics\PssmLightCamera.cs" />
     <Compile Include="Graphics\PssmMonitor.cs" />
+    <Compile Include="Graphics\PssmScene.cs" />
     <Compile Include="Graphics\PssmSceneEffect.cs" />
+    <Compile Include="Graphics\PssmSceneMonitor.cs" />
     <Compile Include="Graphics\PssmSettings.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
@@ -180,6 +188,7 @@
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />
+    <Compile Include="Graphics\ShadowSceneSettings.cs" />
     <Compile Include="Graphics\ShadowSettings.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Texture2DExtension.cs" />
@@ -205,11 +214,12 @@
     <Compile Include="Landscape\Cluster.cs" />
     <Compile Include="Landscape\ClusteredPartitionQueue.cs" />
     <Compile Include="Landscape\ClusterManager.cs" />
+    <Compile Include="Landscape\DefaultLandscapeVolume.cs" />
+    <Compile Include="Landscape\ILandscapeVolume.cs" />
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
     <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
-    <Compile Include="Landscape\PartitionSpaceBounds.cs" />
     <Compile Include="MathExtension.cs" />
     <Compile Include="Noise\Add.cs" />
     <Compile Include="Noise\Billow.cs" />

@@ -20,9 +20,9 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 
         SpriteBatch spriteBatch;
 
-        int mapSize = DefaultMapSize;
+        int textureSize = DefaultMapSize;
 
-        List<Texture2D> maps = new List<Texture2D>(10);
+        Queue<Texture2D> textures = new Queue<Texture2D>(10);
 
         public static bool Available
         {
@@ -32,17 +32,17 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         public static DebugMapDisplay Instance { get; private set; }
 
         /// <summary>
-        /// テクスチャ描画領域のサイズを取得または設定します。
+        /// テクスチャの描画サイズを取得または設定します。
         /// </summary>
-        public int MapSize
+        public int TextureSize
         {
-            get { return mapSize; }
-            set { mapSize = value; }
-        }
+            get { return textureSize; }
+            set
+            {
+                if (textureSize < 1) throw new ArgumentOutOfRangeException("value");
 
-        public List<Texture2D> Maps
-        {
-            get { return maps; }
+                textureSize = value;
+            }
         }
 
         /// <summary>
@@ -54,9 +54,58 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         {
             game.Components.ComponentAdded += OnComponentAdded;
             game.Components.ComponentRemoved += OnComponentRemoved;
+        }
 
-            // 更新処理は行いません。
-            Enabled = false;
+        /// <summary>
+        /// テクスチャ一覧をリセットします。
+        /// </summary>
+        /// <param name="gameTime">前回の Update が呼び出されてからの経過時間。</param>
+        public override void Update(GameTime gameTime)
+        {
+            // Visible = false の場合、
+            // 登録済テクスチャが残骸として残る可能性があるため、ここで破棄。
+            textures.Clear();
+
+            base.Update(gameTime);
+        }
+
+        /// <summary>
+        /// 登録されているテクスチャを描画します。
+        /// </summary>
+        /// <param name="gameTime">前回の Update が呼び出されてからの経過時間。</param>
+        public override void Draw(GameTime gameTime)
+        {
+            int offsetX = DefaultMapOffsetX;
+            int offsetY = DefaultMapOffsetY;
+            int width = TextureSize;
+            int height = TextureSize;
+            var rect = new Rectangle(offsetX, offsetY, width, height);
+
+            while (0 < textures.Count)
+            {
+                var texture = textures.Dequeue();
+
+                var samplerState = texture.GetPreferredSamplerState();
+
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null);
+                spriteBatch.Draw(texture, rect, Color.White);
+                spriteBatch.End();
+
+                rect.X += width + offsetX;
+                if (GraphicsDevice.Viewport.Width < rect.X + width)
+                {
+                    rect.X = offsetX;
+                    rect.Y += height + offsetY;
+                }
+            }
+        }
+
+        public void Add(Texture2D texture)
+        {
+            if (texture == null) throw new ArgumentNullException("texture");
+            if (texture.IsDisposed) throw new ArgumentException("Texture already disposed.");
+
+            if (Visible && Enabled) textures.Enqueue(texture);
         }
 
         protected override void LoadContent()
@@ -85,37 +134,6 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         void OnComponentRemoved(object sender, GameComponentCollectionEventArgs e)
         {
             if (e.GameComponent == this) Instance = null;
-        }
-
-        /// <summary>
-        /// 登録されているテクスチャを描画します。
-        /// </summary>
-        /// <param name="gameTime">前回の Update が呼び出されてからの経過時間。</param>
-        public override void Draw(GameTime gameTime)
-        {
-            int offsetX = DefaultMapOffsetX;
-            int offsetY = DefaultMapOffsetY;
-            int width = MapSize;
-            int height = MapSize;
-            var rect = new Rectangle(offsetX, offsetY, width, height);
-
-            foreach (var map in maps)
-            {
-                var samplerState = map.GetPreferredSamplerState();
-
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null);
-                spriteBatch.Draw(map, rect, Color.White);
-                spriteBatch.End();
-
-                rect.X += width + offsetX;
-                if (GraphicsDevice.Viewport.Width < rect.X + width)
-                {
-                    rect.X = offsetX;
-                    rect.Y += height + offsetY;
-                }
-            }
-
-            maps.Clear();
         }
     }
 }

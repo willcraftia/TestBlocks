@@ -75,6 +75,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             "[F2] Chunk bounding box\r\n" +
             "[F3] Wireframe\r\n" +
             "[F4] Fog\r\n" +
+            "[F5] InterMap\r\n" +
             "[w][s][a][d][q][z] Movement\r\n" +
             "[Mouse] Camera orientation\r\n" +
             "[PageUp][PageDown] Move velocity";
@@ -207,7 +208,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // DebugMapDisplay
 
             var debugMapDisplay = new DebugMapDisplay(this);
-            //debugMapDisplay.Visible = false;
+            debugMapDisplay.Visible = false;
             Components.Add(debugMapDisplay);
 
             base.Initialize();
@@ -387,6 +388,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // F4
             if (keyboardState.IsKeyUp(Keys.F4) && lastKeyboardState.IsKeyDown(Keys.F4))
                 GlobalSceneSettings.FogEnabled = !GlobalSceneSettings.FogEnabled;
+            // F5
+            if (DebugMapDisplay.Available && keyboardState.IsKeyUp(Keys.F5) && lastKeyboardState.IsKeyDown(Keys.F5))
+                DebugMapDisplay.Instance.Visible = !DebugMapDisplay.Instance.Visible;
 
             //================================================================
             // Keyboard State

@@ -11,7 +11,7 @@ using Willcraftia.Xna.Framework.Diagnostics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMesh : IShadowCaster
+    public sealed class ChunkMesh : IShadowCaster, IShadowSceneSupport
     {
         static readonly VectorI3 chunkSize = Chunk.Size;
 
@@ -179,9 +179,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             occlusionQuery.Begin();
 
-            // チャンクに描画ロックを要求。
-            if (Chunk != null && !Chunk.EnterDraw()) return;
-
             var effect = region.ChunkEffect;
 
             //----------------------------------------------------------------
@@ -199,15 +196,13 @@ namespace Willcraftia.Xna.Blocks.Models
             effect.World = world;
             effect.Apply();
 
-            GraphicsDevice.SetVertexBuffer(vertexBuffer);
-            GraphicsDevice.Indices = indexBuffer;
-            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
+            //----------------------------------------------------------------
+            // 描画
+
+            DrawCore();
 
             occlusionQuery.End();
             occlusionQueryActive = true;
-
-            // 描画ロックを解放。
-            Chunk.ExitDraw();
         }
 
         // I/F
@@ -218,9 +213,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 return;
             if (occluded) return;
 
-            // チャンクに描画ロックを要求。
-            if (Chunk != null && !Chunk.EnterDraw()) return;
-
             var effect = region.ChunkEffect;
 
             //----------------------------------------------------------------
@@ -238,26 +230,54 @@ namespace Willcraftia.Xna.Blocks.Models
             effect.World = world;
             effect.Apply();
 
-            GraphicsDevice.SetVertexBuffer(vertexBuffer);
-            GraphicsDevice.Indices = indexBuffer;
-            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
+            //----------------------------------------------------------------
+            // 描画
 
-            // 描画ロックを解放。
-            Chunk.ExitDraw();
+            DrawCore();
         }
 
         // I/F
-        public void DrawShadow(ShadowMapEffect effect)
+        public void Draw(IEffectShadow effect)
         {
             // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
                 return;
 
-            // チャンクに描画ロックを要求。
-            if (Chunk != null && !Chunk.EnterDraw()) return;
+            //----------------------------------------------------------------
+            // 変換行列
 
             effect.World = world;
             effect.Apply();
+
+            //----------------------------------------------------------------
+            // 描画
+
+            DrawCore();
+        }
+
+        // I/F
+        public void Draw(IEffectShadowScene effect)
+        {
+            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
+
+            //----------------------------------------------------------------
+            // 変換行列
+
+            effect.World = world;
+            effect.Apply();
+
+            //----------------------------------------------------------------
+            // 描画
+
+            DrawCore();
+        }
+
+        void DrawCore()
+        {
+            // チャンクに描画ロックを要求。
+            if (Chunk != null && !Chunk.EnterDraw()) return;
 
             GraphicsDevice.SetVertexBuffer(vertexBuffer);
             GraphicsDevice.Indices = indexBuffer;

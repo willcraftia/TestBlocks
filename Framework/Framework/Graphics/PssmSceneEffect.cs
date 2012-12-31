@@ -8,8 +8,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class PssmSceneEffect : Effect, IEffectMatrices
+    public sealed class PssmSceneEffect : IEffectShadowScene
     {
+        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
+
+        //====================================================================
+        // Real Effect
+
+        Effect backingEffect;
+
+        //====================================================================
+        // EffectParameter
+
         EffectParameter projection;
 
         EffectParameter view;
@@ -26,12 +36,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         
         EffectParameter[] shadowMaps;
 
-        EffectTechnique classicTechnique;
-
-        EffectTechnique pcfTechnique;
-
-        EffectTechnique vsmTechnique;
-
         //--------------------------------------------------------------------
         // PCF specific
 
@@ -39,32 +43,39 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectParameter offsetsParameter;
 
-        public int ShadowMapSize { get; set; }
+        //====================================================================
+        // EffectTechnique
 
-        public int PcfKernelSize { get; set; }
+        ShadowMapTechniques technique;
 
-        //
-        //--------------------------------------------------------------------
+        EffectTechnique classicTechnique;
 
-        // I/F
-        public Matrix Projection
-        {
-            get { return projection.GetValueMatrix(); }
-            set { projection.SetValue(value); }
-        }
+        EffectTechnique pcfTechnique;
 
-        // I/F
-        public Matrix View
-        {
-            get { return view.GetValueMatrix(); }
-            set { view.SetValue(value); }
-        }
+        EffectTechnique vsmTechnique;
+
+        //====================================================================
+        // Cached pass
+
+        EffectPass currentPass;
 
         // I/F
         public Matrix World
         {
             get { return world.GetValueMatrix(); }
             set { world.SetValue(value); }
+        }
+
+        public Matrix View
+        {
+            get { return view.GetValueMatrix(); }
+            set { view.SetValue(value); }
+        }
+
+        public Matrix Projection
+        {
+            get { return projection.GetValueMatrix(); }
+            set { projection.SetValue(value); }
         }
 
         public float DepthBias
@@ -91,50 +102,92 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { splitViewProjections.SetValue(value); }
         }
 
-        public void SetShadowMaps(MultiRenderTargets renderTargets)
+        Texture2D[] shadowMapBuffer = new Texture2D[PssmSettings.MaxSplitCount];
+
+        public Texture2D[] SplitShadowMaps
         {
-            for (int i = 0; i < renderTargets.Count; i++)
-                shadowMaps[i].SetValue(renderTargets[i]);
+            get
+            {
+                for (int i = 0; i < PssmSettings.MaxSplitCount; i++)
+                    shadowMapBuffer[i] = shadowMaps[i].GetValueTexture2D();
+                return shadowMapBuffer;
+            }
+            set
+            {
+                if (value == null) return;
+
+                for (int i = 0; i < value.Length; i++)
+                    shadowMaps[i].SetValue(value[i]);
+            }
         }
 
-        public PssmSceneEffect(Effect cloneSource)
-            : base(cloneSource)
-        {
-            world = Parameters["World"];
-            view = Parameters["View"];
-            projection = Parameters["Projection"];
+        //--------------------------------------------------------------------
+        // PCF specific
 
-            depthBias = Parameters["DepthBias"];
-            splitCount = Parameters["SplitCount"];
-            splitDistances = Parameters["SplitDistances"];
-            splitViewProjections = Parameters["SplitViewProjections"];
+        public int ShadowMapSize { get; set; }
+
+        public int PcfKernelSize { get; set; }
+
+        //
+        //--------------------------------------------------------------------
+
+        public ShadowMapTechniques Technique
+        {
+            get { return technique; }
+            set
+            {
+                technique = value;
+
+                switch (technique)
+                {
+                    case ShadowMapTechniques.Vsm:
+                        backingEffect.CurrentTechnique = vsmTechnique;
+                        break;
+                    case ShadowMapTechniques.Pcf:
+                        backingEffect.CurrentTechnique = pcfTechnique;
+                        break;
+                    default:
+                        backingEffect.CurrentTechnique = classicTechnique;
+                        break;
+                }
+
+                currentPass = backingEffect.CurrentTechnique.Passes[0];
+            }
+        }
+
+        public PssmSceneEffect(Effect backingEffect)
+        {
+            if (backingEffect == null) throw new ArgumentNullException("backingEffect");
+
+            this.backingEffect = backingEffect;
+
+            world = backingEffect.Parameters["World"];
+            view = backingEffect.Parameters["View"];
+            projection = backingEffect.Parameters["Projection"];
+
+            depthBias = backingEffect.Parameters["DepthBias"];
+            splitCount = backingEffect.Parameters["SplitCount"];
+            splitDistances = backingEffect.Parameters["SplitDistances"];
+            splitViewProjections = backingEffect.Parameters["SplitViewProjections"];
 
             shadowMaps = new EffectParameter[PssmSettings.MaxSplitCount];
             for (int i = 0; i < shadowMaps.Length; i++)
-                shadowMaps[i] = Parameters["ShadowMap" + i];
+                shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
 
-            tapCountParameter = Parameters["TapCount"];
-            offsetsParameter = Parameters["Offsets"];
+            tapCountParameter = backingEffect.Parameters["TapCount"];
+            offsetsParameter = backingEffect.Parameters["Offsets"];
 
-            classicTechnique = Techniques["Classic"];
-            pcfTechnique = Techniques["Pcf"];
-            vsmTechnique = Techniques["Vsm"];
+            classicTechnique = backingEffect.Techniques["Classic"];
+            pcfTechnique = backingEffect.Techniques["Pcf"];
+            vsmTechnique = backingEffect.Techniques["Vsm"];
+
+            Technique = DefaultShadowMapTechnique;
         }
 
-        public void EnableTechnique(ShadowMapTechniques technique)
+        // I/F
+        public void Apply()
         {
-            switch (technique)
-            {
-                case ShadowMapTechniques.Classic:
-                    CurrentTechnique = classicTechnique;
-                    break;
-                case ShadowMapTechniques.Pcf:
-                    CurrentTechnique = pcfTechnique;
-                    break;
-                case ShadowMapTechniques.Vsm:
-                    CurrentTechnique = vsmTechnique;
-                    break;
-            }
+            currentPass.Apply();
         }
 
         //====================================================================

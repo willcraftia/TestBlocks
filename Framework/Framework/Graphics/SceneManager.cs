@@ -84,6 +84,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Pssm pssm;
 
+        PssmScene pssmScene;
+
         bool shadowMapAvailable;
 
         public SceneManagerMonitor Monitor { get; private set; }
@@ -177,6 +179,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             pssm = moduleFactory.CreatePssm(shadowSettings);
             if (pssm != null) Monitor.Pssm = pssm.Monitor;
+
+            pssmScene = moduleFactory.CreatePssmScene(shadowSettings);
+            if (pssmScene != null) Monitor.PssmScene = pssmScene.Monitor;
 
 #if DEBUG || TRACE
             debugBoundingBoxEffect = moduleFactory.CreateDebugBoundingBoxEffect();
@@ -327,8 +332,23 @@ namespace Willcraftia.Xna.Framework.Graphics
                 DrawShadowMap();
             }
 
-            // シーンの描画。
-            DrawScene();
+            bool shadowSceneAvailable = false;
+            if (Settings.Shadow.ShadowScene.Enabled)
+            {
+                if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm && pssmScene != null)
+                {
+                    // TODO: Transculent は要らない？
+                    pssmScene.Draw(activeCamera, pssm, opaqueSceneObjects);
+
+                    shadowSceneAvailable = true;
+                }
+            }
+
+            if (!shadowSceneAvailable)
+            {
+                // シーンの描画。
+                DrawScene();
+            }
         }
 
         bool IsVisibleObject(ISceneObject sceneObject)
@@ -372,7 +392,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 {
                     for (int i = 0; i < Settings.Shadow.LightFrustum.Pssm.SplitCount; i++)
                     {
-                        DebugMapDisplay.Instance.Maps.Add(pssm.GetShadowMap(i));
+                        DebugMapDisplay.Instance.Add(pssm.GetShadowMap(i));
                     }
                 }
 

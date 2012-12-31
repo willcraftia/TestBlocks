@@ -8,30 +8,45 @@ using System.Collections.ObjectModel;
 
 namespace Willcraftia.Xna.Framework.Landscape
 {
-    internal struct PartitionSpaceBounds
+    internal sealed class DefaultLandscapeVolume : ILandscapeVolume
     {
-        public VectorI3 Center;
+        VectorI3 center;
 
-        public int Radius;
+        int radius;
 
-        public PartitionSpaceBounds(VectorI3 center, int radius)
+        int radiusSquared;
+
+        // I/F
+        public VectorI3 Center
+        {
+            get { return center; }
+            set { center = value; }
+        }
+
+        public int Radius
+        {
+            get { return radius; }
+        }
+
+        public DefaultLandscapeVolume(VectorI3 center, int radius)
         {
             if (radius < 0) throw new ArgumentOutOfRangeException("radius");
 
-            Center = center;
-            Radius = radius;
+            this.center = center;
+            this.radius = radius;
+
+            radiusSquared = radius * radius;
         }
 
+        // I/F
         public VectorI3[] GetPoints()
         {
-            var radiusSquared = Radius * Radius;
-
             int size = 0;
-            for (int z = -Radius; z < Radius; z++)
+            for (int z = -radius; z < radius; z++)
             {
-                for (int y = -Radius; y < Radius; y++)
+                for (int y = -radius; y < radius; y++)
                 {
-                    for (int x = -Radius; x < Radius; x++)
+                    for (int x = -radius; x < radius; x++)
                     {
                         var lengthSquared = new VectorI3(x, y, z).LengthSquared();
                         if (lengthSquared <= radiusSquared)
@@ -43,11 +58,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             var points = new VectorI3[size];
 
             int index = 0;
-            for (int z = -Radius; z < Radius; z++)
+            for (int z = -radius; z < radius; z++)
             {
-                for (int y = -Radius; y < Radius; y++)
+                for (int y = -radius; y < radius; y++)
                 {
-                    for (int x = -Radius; x < Radius; x++)
+                    for (int x = -radius; x < radius; x++)
                     {
                         var point = new VectorI3(x, y, z);
                         var lengthSquared = point.LengthSquared();
@@ -60,19 +75,13 @@ namespace Willcraftia.Xna.Framework.Landscape
             return points;
         }
 
-        public bool Contains(VectorI3 point)
-        {
-            bool result;
-            Contains(ref point, out result);
-            return result;
-        }
-
+        // I/F
         public void Contains(ref VectorI3 point, out bool result)
         {
             int distanceSquared;
-            VectorI3.DistanceSquared(ref Center, ref point, out distanceSquared);
+            VectorI3.DistanceSquared(ref center, ref point, out distanceSquared);
 
-            result = distanceSquared <= (Radius * Radius);
+            result = distanceSquared <= radiusSquared;
         }
     }
 }

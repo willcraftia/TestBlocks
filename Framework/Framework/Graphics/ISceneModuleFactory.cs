@@ -14,7 +14,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Effect CreateShadowMapEffect();
 
+        Effect CreatePssmSceneEffect();
+
         Pssm CreatePssm(ShadowSettings shadowSettings);
+
+        PssmScene CreatePssmScene(ShadowSettings shadowSettings);
 
 #if DEBUG
         BasicEffect CreateDebugBoundingBoxEffect();

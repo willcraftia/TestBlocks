@@ -109,7 +109,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             PassivateAction = new Action(Passivate);
         }
 
-        internal bool IsInBounds(ref PartitionSpaceBounds volume)
+        internal bool IsInLandscapeVolume(ILandscapeVolume volume)
         {
             bool result;
             volume.Contains(ref position, out result);

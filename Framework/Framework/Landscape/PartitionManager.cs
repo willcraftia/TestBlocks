@@ -81,10 +81,13 @@ namespace Willcraftia.Xna.Framework.Landscape
             SlotCount = DefaultTaskQueueSlotCount
         };
 
-        // 最大アクティブ化領域。
-        PartitionSpaceBounds maxActiveBounds;
+        // 最大アクティブ領域。
+        ILandscapeVolume maxActiveBounds;
 
-        // 最小アクティブ化領域に含まれる座標の配列。
+        // 最小アクティブ領域。
+        ILandscapeVolume minActiveBounds;
+
+        // 最小アクティブ領域に含まれる座標の配列。
         VectorI3[] minActivePointOffsets;
 
         VectorI3 eyePosition;
@@ -153,10 +156,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (maxActiveRange < 0 || maxActiveRange <= minActiveRange)
                 throw new ArgumentOutOfRangeException("maxActiveRange");
 
-            maxActiveBounds = new PartitionSpaceBounds { Radius = maxActiveRange };
-
-            var dummyBounds = new PartitionSpaceBounds { Radius = minActiveRange };
-            minActivePointOffsets = dummyBounds.GetPoints();
+            maxActiveBounds = new DefaultLandscapeVolume(VectorI3.Zero, maxActiveRange);
+            minActiveBounds = new DefaultLandscapeVolume(VectorI3.Zero, minActiveRange);
+            minActivePointOffsets = minActiveBounds.GetPoints();
         }
 
         public void Update(ref Vector3 eyeWorldPosition)
@@ -380,7 +382,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (partition.IsInBounds(ref maxActiveBounds))
+                    if (partition.IsInLandscapeVolume(maxActiveBounds))
                     {
                         // アクティブ状態維持領域内ならばアクティブ リストへ戻す。
                         activePartitions.Enqueue(partition);

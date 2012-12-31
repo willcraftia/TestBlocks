@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class ShadowMapEffect
+    public sealed class ShadowMapEffect : IEffectShadow
     {
         public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
 
@@ -38,6 +38,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectPass currentPass;
 
+        // I/F
         public Matrix World
         {
             get { return world.GetValueMatrix(); }

@@ -33,6 +33,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         MultiRenderTargets splitRenderTargets;
 
+        Texture2D[] splitShadowMaps;
+
         Queue<IShadowCaster>[] splitShadowCasters;
 
         SpriteBatch blurSpriteBatch;
@@ -53,6 +55,16 @@ namespace Willcraftia.Xna.Framework.Graphics
                 for (int i = 0; i < splitLightCameras.Length; i++)
                     splitViewProjections[i] = splitLightCameras[i].ViewProjection;
                 return splitViewProjections;
+            }
+        }
+
+        public Texture2D[] SplitShadowMaps
+        {
+            get
+            {
+                for (int i = 0; i < splitShadowMaps.Length; i++)
+                    splitShadowMaps[i] = splitRenderTargets[i];
+                return splitShadowMaps;
             }
         }
 
@@ -81,6 +93,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             inverseSplitCount = 1.0f / (float) pssmSettings.SplitCount;
             splitDistances = new float[pssmSettings.SplitCount + 1];
             splitViewProjections = new Matrix[pssmSettings.SplitCount];
+            splitShadowMaps = new Texture2D[pssmSettings.SplitCount];
 
             splitLightCameras = new PssmLightCamera[pssmSettings.SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)
@@ -88,9 +101,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
+            // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
             splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", pssmSettings.SplitCount,
                 shadowMapSettings.Size, shadowMapSettings.Size,
-                false, shadowMapSettings.Format, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
+                false, shadowMapSettings.Format, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
 
             // TODO: 初期容量。
             splitShadowCasters = new Queue<IShadowCaster>[pssmSettings.SplitCount];
@@ -99,7 +113,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             blurSpriteBatch = new SpriteBatch(GraphicsDevice);
             blur = new GaussianBlur(blurEffect, blurSpriteBatch, shadowMapSettings.Size, shadowMapSettings.Size, SurfaceFormat.Vector2,
-                vsmSettings.BlurRadius, vsmSettings.BlurAmount);
+                vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
 
             Monitor = new PssmMonitor(this);
         }
@@ -228,10 +242,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                 while (0 < shadowCasters.Count)
                 {
                     var shadowCaster = shadowCasters.Dequeue();
-                    shadowCaster.DrawShadow(effect);
+                    shadowCaster.Draw(effect);
                 }
 
-                if (effect.Technique == ShadowMapTechniques.Vsm && vsmSettings.BlurEnabled)
+                if (effect.Technique == ShadowMapTechniques.Vsm && vsmSettings.Blur.Enabled)
                     blur.Filter(renderTarget);
 
                 GraphicsDevice.SetRenderTarget(null);
