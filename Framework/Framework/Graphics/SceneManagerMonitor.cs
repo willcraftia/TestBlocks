@@ -37,6 +37,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public PssmSceneMonitor PssmScene { get; internal set; }
 
+        public ScreenSpaceShadowMonitor ScreenSpaceShadow { get; internal set; }
+
         public SceneManagerMonitor(SceneManager sceneManager)
         {
             if (sceneManager == null) throw new ArgumentNullException("sceneManager");

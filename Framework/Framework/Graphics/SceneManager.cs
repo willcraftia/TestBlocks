@@ -86,9 +86,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         PssmScene pssmScene;
 
+        ScreenSpaceShadow screenSpaceShadow;
+
         bool shadowMapAvailable;
-        
-        bool shadowSceneAvailable;
+
+        RenderTarget2D renderTarget;
+
+        RenderTarget2D postProcessRenderTarget;
+
+        SpriteBatch spriteBatch;
 
         public SceneManagerMonitor Monitor { get; private set; }
 
@@ -174,6 +180,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             Settings = settings;
 
+            //----------------------------------------------------------------
+            // シャドウ モジュール
+
             var shadowSettings = Settings.Shadow;
 
             shadowMapEffect = new ShadowMapEffect(moduleFactory.CreateShadowMapEffect());
@@ -184,6 +193,32 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             pssmScene = moduleFactory.CreatePssmScene(shadowSettings);
             if (pssmScene != null) Monitor.PssmScene = pssmScene.Monitor;
+
+            screenSpaceShadow = moduleFactory.CreateScreenSpaceShadow(shadowSettings.ShadowScene);
+            if (screenSpaceShadow != null) Monitor.ScreenSpaceShadow = screenSpaceShadow.Monitor;
+
+            //----------------------------------------------------------------
+            // シーン描画のためのレンダ ターゲット
+
+            var pp = GraphicsDevice.PresentationParameters;
+            var width = pp.BackBufferWidth;
+            var height = pp.BackBufferHeight;
+            var format = pp.BackBufferFormat;
+            var depthFormat = pp.DepthStencilFormat;
+            var multiSampleCount = pp.MultiSampleCount;
+            renderTarget = new RenderTarget2D(GraphicsDevice, width, height,
+                false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
+
+            //----------------------------------------------------------------
+            // シーンへのポスト プロセスのためのレンダ ターゲット
+
+            postProcessRenderTarget = new RenderTarget2D(GraphicsDevice, width, height,
+                false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
+
+            //----------------------------------------------------------------
+            // シーン描画のためのスプライト バッチ
+
+            spriteBatch = new SpriteBatch(GraphicsDevice);
 
 #if DEBUG || TRACE
             debugBoundingBoxEffect = moduleFactory.CreateDebugBoundingBoxEffect();
@@ -325,7 +360,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             opaqueSceneObjects.Sort(DistanceComparer.Instance);
             translucentSceneObjects.Sort(DistanceComparer.Instance);
 
-            // シャドウ マップの描画。
+            //----------------------------------------------------------------
+            // シャドウ マップ
+
             shadowMapAvailable = false;
             if (shadowMapEffect != null && Settings.Shadow.Enabled &&
                 activeShadowCasters.Count != 0 &&
@@ -334,31 +371,55 @@ namespace Willcraftia.Xna.Framework.Graphics
                 DrawShadowMap();
             }
 
+            //----------------------------------------------------------------
+            // シャドウ シーン
+
+            RenderTarget2D shadowScene = null;
             if (shadowMapAvailable && Settings.Shadow.ShadowScene.Enabled)
             {
-                shadowSceneAvailable = false;
-
-                DrawShadowScene();
+                shadowScene = DrawShadowScene();
             }
 
-            if (!shadowSceneAvailable)
+            //----------------------------------------------------------------
+            // シーン
+
+            DrawScene();
+
+            //----------------------------------------------------------------
+            // スクリーン スペース シャドウ
+
+            if (shadowScene != null && screenSpaceShadow != null && Settings.Shadow.ShadowScene.Enabled)
             {
-                // シーンの描画。
-                DrawScene();
+                // TODO: ShadowColor
+                screenSpaceShadow.Filter(renderTarget, shadowScene, postProcessRenderTarget);
+
+                // TODO: スワップ管理クラスを作る？
+                var temp = renderTarget;
+                renderTarget = postProcessRenderTarget;
+                postProcessRenderTarget = temp;
             }
+
+            //----------------------------------------------------------------
+            // レンダ ターゲットの反映
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+            spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
         }
 
-        void DrawShadowScene()
+        RenderTarget2D DrawShadowScene()
         {
             if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm && pssmScene != null)
             {
                 // TODO: Transculent は要らない？
                 pssmScene.Draw(activeCamera, pssm, opaqueSceneObjects);
 
-                shadowSceneAvailable = true;
-
                 if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(pssmScene.ShadowScene);
+
+                return pssmScene.ShadowScene;
             }
+
+            return null;
         }
 
         bool IsVisibleObject(ISceneObject sceneObject)
@@ -414,7 +475,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Monitor.OnBeginDrawScene();
 
+            GraphicsDevice.SetRenderTarget(renderTarget);
+
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.Clear(Color.White);
 
             //================================================================
             //
@@ -445,8 +509,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            var usePssm = (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm);
-
             foreach (var opaque in opaqueSceneObjects)
             {
                 if (opaque.Occluded)
@@ -456,22 +518,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     continue;
                 }
 
-                // TODO
-                bool rendered = false;
-                if (shadowMapAvailable)
-                {
-                    if (usePssm && pssm != null)
-                    {
-                        var pssmSupport = opaque as IPssmSupport;
-                        if (pssmSupport != null)
-                        {
-                            pssmSupport.DrawWithPssm(pssm);
-                            rendered = true;
-                        }
-                    }
-                }
-
-                if (!rendered) opaque.Draw();
+                opaque.Draw();
 
                 DebugDrawBoundingBox(opaque);
             }
@@ -499,6 +546,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             Monitor.OnEndDrawSceneRendering();
 
+            GraphicsDevice.SetRenderTarget(null);
+
             Monitor.OnEndDrawScene();
         }
 
@@ -507,9 +556,11 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (!DebugBoundingBoxVisible) return;
 
+            var color = (sceneObject.Occluded) ? Color.DimGray : Color.Yellow;
+
             BoundingBox boundingBox;
             sceneObject.GetBoundingBox(out boundingBox);
-            debugBoundingBoxDrawer.Draw(ref boundingBox, debugBoundingBoxEffect);
+            debugBoundingBoxDrawer.Draw(ref boundingBox, debugBoundingBoxEffect, ref color);
         }
     }
 }

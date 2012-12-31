@@ -15,27 +15,22 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D renderTarget;
 
-        SpriteBatch blurSpriteBatch;
-
-        GaussianBlur blur;
-
         PssmSceneEffect shadowSceneEffect;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public PssmSceneMonitor Monitor { get; private set; }
 
-        public Texture2D ShadowScene
+        public RenderTarget2D ShadowScene
         {
             get { return renderTarget; }
         }
 
-        public PssmScene(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect shadowSceneEffect, Effect blurEffect)
+        public PssmScene(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect shadowSceneEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
             if (shadowSceneEffect == null) throw new ArgumentNullException("shadowSceneEffect");
-            if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
             this.shadowSettings = shadowSettings;
@@ -53,15 +48,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
             renderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
-
-            //----------------------------------------------------------------
-            // Blur
-
-            blurSpriteBatch = new SpriteBatch(GraphicsDevice);
-
-            var blurSettings = shadowSceneSettings.Blur;
-            blur = new GaussianBlur(blurEffect, blurSpriteBatch, width, height, SurfaceFormat.Vector2,
-                blurSettings.Radius, blurSettings.Amount);
 
             Monitor = new PssmSceneMonitor(this);
         }

@@ -90,12 +90,11 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Effect.CurrentTechnique = technique;
 
-            var bounds = destination.GetBounds();
             var samplerState = destination.GetPreferredSamplerState();
 
             GraphicsDevice.SetRenderTarget(destination);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, Effect);
-            SpriteBatch.Draw(source, bounds, Color.White);
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }

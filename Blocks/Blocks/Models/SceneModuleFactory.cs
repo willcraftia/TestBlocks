@@ -33,21 +33,27 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public Effect CreateGaussianBlurEffect()
         {
-            var resource = resourceManager.Load("content:Effects/GaussianBlurEffect");
+            var resource = resourceManager.Load("content:Effects/GaussianBlur");
             return assetManager.Load<Effect>(resource);
         }
 
         // I/F
         public Effect CreateShadowMapEffect()
         {
-            var resource = resourceManager.Load("content:Effects/ShadowMapEffect");
+            var resource = resourceManager.Load("content:Effects/ShadowMap");
             return assetManager.Load<Effect>(resource);
         }
 
         // I/F
         public Effect CreatePssmSceneEffect()
         {
-            var resource = resourceManager.Load("content:Effects/PssmSceneEffect");
+            var resource = resourceManager.Load("content:Effects/PssmScene");
+            return assetManager.Load<Effect>(resource);
+        }
+
+        public Effect CreateScreenSpaceShadowEffect()
+        {
+            var resource = resourceManager.Load("content:Effects/ScreenSpaceShadow");
             return assetManager.Load<Effect>(resource);
         }
 
@@ -60,7 +66,13 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public PssmScene CreatePssmScene(ShadowSettings shadowSettings)
         {
-            return new PssmScene(GraphicsDevice, shadowSettings, CreatePssmSceneEffect(), CreateGaussianBlurEffect());
+            return new PssmScene(GraphicsDevice, shadowSettings, CreatePssmSceneEffect());
+        }
+
+        // I/F
+        public ScreenSpaceShadow CreateScreenSpaceShadow(ShadowSceneSettings shadowSceneSettings)
+        {
+            return new ScreenSpaceShadow(GraphicsDevice, shadowSceneSettings, CreateScreenSpaceShadowEffect(), CreateGaussianBlurEffect());
         }
 
         // I/F
