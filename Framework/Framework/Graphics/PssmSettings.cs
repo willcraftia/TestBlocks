@@ -40,7 +40,12 @@ namespace Willcraftia.Xna.Framework.Graphics
         public float SplitLambda
         {
             get { return splitLambda; }
-            set { splitLambda = value; }
+            set
+            {
+                if (value < 0 || 1 < value) throw new ArgumentOutOfRangeException("value");
+
+                splitLambda = value;
+            }
         }
     }
 }
