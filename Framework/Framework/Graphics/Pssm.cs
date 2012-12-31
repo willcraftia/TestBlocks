@@ -19,7 +19,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Vector3[] corners = new Vector3[8];
 
-        float eyeFarPlaneDistance;
+        //float farPlaneDistance;
 
         float inverseSplitCount;
 
@@ -131,21 +131,18 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public void Prepare(ICamera camera, ref Vector3 lightDirection, ref BoundingBox boundingBox)
         {
-            if (camera == null) throw new InvalidOperationException("Camera is null.");
+            if (camera == null) throw new ArgumentNullException("camera");
 
-            CalculateEyeFarPlaneDistance(camera, ref boundingBox);
-            CalculateSplitDistances(camera);
+            var far = CalculateFarPlaneDistance(camera, ref boundingBox);
+            CalculateSplitDistances(camera, far);
 
             for (int i = 0; i < splitDistances.Length - 1; i++)
             {
-                var near = splitDistances[i];
-                var far = splitDistances[i + 1];
-
                 splitLightCameras[i].LightView.Direction = lightDirection;
                 splitLightCameras[i].SplitEyeProjection.Fov = camera.Projection.Fov;
                 splitLightCameras[i].SplitEyeProjection.AspectRatio = camera.Projection.AspectRatio;
-                splitLightCameras[i].SplitEyeProjection.NearPlaneDistance = near;
-                splitLightCameras[i].SplitEyeProjection.FarPlaneDistance = far;
+                splitLightCameras[i].SplitEyeProjection.NearPlaneDistance = splitDistances[i];
+                splitLightCameras[i].SplitEyeProjection.FarPlaneDistance = splitDistances[i + 1];
 
                 splitLightCameras[i].Prepare(camera);
 
@@ -282,18 +279,18 @@ namespace Willcraftia.Xna.Framework.Graphics
             return splitRenderTargets[index];
         }
 
-        void CalculateEyeFarPlaneDistance(ICamera camera, ref BoundingBox boundingBox)
+        float CalculateFarPlaneDistance(ICamera camera, ref BoundingBox boundingBox)
         {
             var viewMatrix = camera.View.Matrix;
 
-            //
-            // smaller z, more far
-            // z == 0 means the point of view
-            //
+            // 領域の最も遠い点を探す。
+            // z = 0 は視点。
+            // より小さな z がより遠い点。
             var maxFar = 0.0f;
             boundingBox.GetCorners(corners);
             for (int i = 0; i < 8; i++)
             {
+                // ビュー座標へ変換。
                 var z =
                     corners[i].X * viewMatrix.M13 +
                     corners[i].Y * viewMatrix.M23 +
@@ -303,13 +300,15 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (z < maxFar) maxFar = z;
             }
 
-            eyeFarPlaneDistance = camera.Projection.NearPlaneDistance - maxFar;
+            // 見つかった最も遠い点の z で farPlaneDistance を決定。
+            //farPlaneDistance = camera.Projection.NearPlaneDistance - maxFar;
+            return camera.Projection.NearPlaneDistance - maxFar;
         }
 
-        void CalculateSplitDistances(ICamera camera)
+        void CalculateSplitDistances(ICamera camera, float farPlaneDistance)
         {
             var near = camera.Projection.NearPlaneDistance;
-            var far = eyeFarPlaneDistance;
+            var far = farPlaneDistance;
             var farNearRatio = far / near;
             var splitLambda = pssmSettings.SplitLambda;
 
@@ -328,7 +327,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             splitDistances[0] = near;
-            splitDistances[splitDistances.Length - 1] = eyeFarPlaneDistance;
+            splitDistances[splitDistances.Length - 1] = farPlaneDistance;
         }
     }
 }
