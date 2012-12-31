@@ -22,6 +22,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         List<Vector3> lightVolumePoints;
 
+        View lightView;
+
+        Orthograph lightProjection;
+
         // I/F
         public string Name { get; private set; }
 
@@ -34,9 +38,11 @@ namespace Willcraftia.Xna.Framework.Graphics
         // I/F
         public BoundingFrustum Frustum { get; private set; }
 
-        public View LightView { get; private set; }
-
-        public Orthograph LightProjection { get; private set; }
+        public Vector3 LightDirection
+        {
+            get { return lightView.Direction; }
+            set { lightView.Direction = value; }
+        }
 
         public PssmLightCamera(string name, int shadowMapSize)
         {
@@ -55,8 +61,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             Frustum = new BoundingFrustum(Matrix.Identity);
 
             // ライト視点。
-            LightView = new View();
-            LightProjection = new Orthograph();
+            lightView = new View();
+            lightProjection = new Orthograph();
 
             // TODO: 初期容量
             lightVolumePoints = new List<Vector3>();
@@ -107,16 +113,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             var centerDistance = MathHelper.Max(Projection.FarPlaneDistance - Projection.NearPlaneDistance, farExtent);
 
             // 光源位置を算出して設定
-            LightView.Position = frustumCenter - LightView.Direction * centerDistance;
+            lightView.Position = frustumCenter - lightView.Direction * centerDistance;
             
             // 行列を更新
-            LightView.Update();
+            lightView.Update();
 
             //----------------------------------------------------------------
             // 包含座標を全て含む領域を算出
 
             Vector3 initialPointLS;
-            Vector3.Transform(ref frustumCorners[0], ref LightView.Matrix, out initialPointLS);
+            Vector3.Transform(ref frustumCorners[0], ref lightView.Matrix, out initialPointLS);
             var min = initialPointLS;
             var max = initialPointLS;
 
@@ -125,7 +131,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 Vector3 pointWS = frustumCorners[i];
                 Vector3 pointLS;
-                Vector3.Transform(ref pointWS, ref LightView.Matrix, out pointLS);
+                Vector3.Transform(ref pointWS, ref lightView.Matrix, out pointLS);
 
                 // TODO: Vector3.Min/Max で良いのでは？
                 if (max.X < pointLS.X)
@@ -158,7 +164,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 Vector3 pointWS = lightVolumePoints[i];
                 Vector3 pointLS;
-                Vector3.Transform(ref pointWS, ref LightView.Matrix, out pointLS);
+                Vector3.Transform(ref pointWS, ref lightView.Matrix, out pointLS);
 
                 // TODO: Vector3.Min/Max で良いのでは？
                 if (max.X < pointLS.X)
@@ -192,15 +198,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             // REFERECE: http://msdn.microsoft.com/ja-jp/library/ee416324(VS.85).aspx
 
             var texelSize = 1.0f / (float) shadowMapSize;
-            LightProjection.Left = AdjustProjectionBoundary(min.X, texelSize);
-            LightProjection.Right = AdjustProjectionBoundary(max.X, texelSize);
-            LightProjection.Bottom = AdjustProjectionBoundary(min.Y, texelSize);
-            LightProjection.Top = AdjustProjectionBoundary(max.Y, texelSize);
-            LightProjection.ZNearPlane = -max.Z;
-            LightProjection.ZFarPlane = -min.Z;
-            LightProjection.Update();
+            lightProjection.Left = AdjustProjectionBoundary(min.X, texelSize);
+            lightProjection.Right = AdjustProjectionBoundary(max.X, texelSize);
+            lightProjection.Bottom = AdjustProjectionBoundary(min.Y, texelSize);
+            lightProjection.Top = AdjustProjectionBoundary(max.Y, texelSize);
+            lightProjection.ZNearPlane = -max.Z;
+            lightProjection.ZFarPlane = -min.Z;
+            lightProjection.Update();
 
-            Matrix.Multiply(ref LightView.Matrix, ref LightProjection.Matrix, out LightViewProjection);
+            Matrix.Multiply(ref lightView.Matrix, ref lightProjection.Matrix, out LightViewProjection);
 
             // クリア。
             lightVolumePoints.Clear();

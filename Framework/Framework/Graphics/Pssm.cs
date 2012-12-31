@@ -145,7 +145,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             for (int i = 0; i < splitDistances.Length - 1; i++)
             {
-                splitLightCameras[i].LightView.Direction = lightDirection;
+                splitLightCameras[i].LightDirection = lightDirection;
                 splitLightCameras[i].View.Position = camera.View.Position;
                 splitLightCameras[i].View.Direction = camera.View.Direction;
                 splitLightCameras[i].View.Up = camera.View.Up;
