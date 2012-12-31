@@ -15,8 +15,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Vector3 specularColor = Vector3.One;
 
-        Vector3 shadowColor = Vector3.Zero;
-
         bool enabled = true;
 
         public string Name { get; private set; }
@@ -58,20 +56,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                     throw new ArgumentException("Invalid vector.");
 
                 specularColor = value;
-            }
-        }
-
-        public Vector3 ShadowColor
-        {
-            get { return shadowColor; }
-            set
-            {
-                if (value.X < 0 || 1 < value.X ||
-                    value.Y < 0 || 1 < value.Y ||
-                    value.Z < 0 || 1 < value.Z)
-                    throw new ArgumentException("Invalid vector.");
-
-                shadowColor = value;
             }
         }
 

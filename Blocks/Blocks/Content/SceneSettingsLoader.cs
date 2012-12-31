@@ -26,6 +26,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 MidnightMoonDirection = definition.MidnightMoonDirection,
                 MiddayAmbientLightColor = definition.MiddayAmbientLightColor,
                 MidnightAmbientLightColor = definition.MidnightAmbientLightColor,
+                ShadowColor = definition.ShadowColor,
                 SecondsPerDay = definition.SecondsPerDay
             };
 
@@ -36,12 +37,12 @@ namespace Willcraftia.Xna.Blocks.Content
             sceneSettings.Moonlight.SpecularColor = definition.MoonlightSpecularColor;
             sceneSettings.Moonlight.Enabled = definition.MoonlightEnabled;
 
-            if (!ArrayHelper.IsNullOrEmpty(definition.ColorTable))
+            if (!ArrayHelper.IsNullOrEmpty(definition.SkyColorTable))
             {
-                for (int i = 0; i < definition.ColorTable.Length; i++)
+                for (int i = 0; i < definition.SkyColorTable.Length; i++)
                 {
-                    var skyColor = ToSkyColor(ref definition.ColorTable[i]);
-                    sceneSettings.ColorTable.AddColor(skyColor);
+                    var skyColor = ToSkyColor(ref definition.SkyColorTable[i]);
+                    sceneSettings.SkyColorTable.AddColor(skyColor);
                 }
             }
 
@@ -61,6 +62,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 MidnightMoonDirection = sceneSettings.MidnightMoonDirection,
                 MiddayAmbientLightColor = sceneSettings.MiddayAmbientLightColor,
                 MidnightAmbientLightColor = sceneSettings.MidnightAmbientLightColor,
+                ShadowColor = sceneSettings.ShadowColor,
                 SunlightDiffuseColor = sceneSettings.Sunlight.DiffuseColor,
                 SunlightSpecularColor = sceneSettings.Sunlight.SpecularColor,
                 SunlightEnabled = sceneSettings.Sunlight.Enabled,
@@ -70,13 +72,13 @@ namespace Willcraftia.Xna.Blocks.Content
                 SecondsPerDay = sceneSettings.SecondsPerDay
             };
 
-            if (sceneSettings.ColorTable.Count != 0)
+            if (sceneSettings.SkyColorTable.Count != 0)
             {
-                definition.ColorTable = new SkyColorDefinition[sceneSettings.ColorTable.Count];
+                definition.SkyColorTable = new SkyColorDefinition[sceneSettings.SkyColorTable.Count];
                 int index = 0;
-                foreach (var skyColor in sceneSettings.ColorTable)
+                foreach (var skyColor in sceneSettings.SkyColorTable)
                 {
-                    definition.ColorTable[index++] = new SkyColorDefinition
+                    definition.SkyColorTable[index++] = new SkyColorDefinition
                     {
                         Time = skyColor.Time,
                         Color = skyColor.Color

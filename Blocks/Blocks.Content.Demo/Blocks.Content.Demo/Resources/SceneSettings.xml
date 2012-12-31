@@ -20,6 +20,11 @@
 		<Y>0.1</Y>
 		<Z>0.1</Z>
 	</MidnightAmbientLightColor>
+	<ShadowColor>
+		<X>0.4117647</X>
+		<Y>0.4117647</Y>
+		<Z>0.4117647</Z>
+	</ShadowColor>
 	<SunlightDiffuseColor>
 		<X>1</X>
 		<Y>1</Y>
@@ -42,7 +47,7 @@
 		<Z>0</Z>
 	</MoonlightSpecularColor>
 	<MoonlightEnabled>true</MoonlightEnabled>
-	<ColorTable>
+	<SkyColorTable>
 		<SkyColorDefinition>
 			<Time>0</Time>
 			<Color>
@@ -99,6 +104,6 @@
 				<Z>0</Z>
 			</Color>
 		</SkyColorDefinition>
-	</ColorTable>
+	</SkyColorTable>
 	<SecondsPerDay>20</SecondsPerDay>
 </SceneSettingsDefinition>

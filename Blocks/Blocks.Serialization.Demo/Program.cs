@@ -843,13 +843,14 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     MidnightMoonDirection = new Vector3(0, 1, 1),
                     MiddayAmbientLightColor = new Vector3(0.6f),
                     MidnightAmbientLightColor = new Vector3(0.1f),
+                    ShadowColor = Color.DimGray.ToVector3(),
                     SunlightDiffuseColor = Vector3.One,
                     SunlightSpecularColor = Vector3.Zero,
                     SunlightEnabled = true,
                     MoonlightDiffuseColor = new Vector3(0.5f),
                     MoonlightSpecularColor = Vector3.Zero,
                     MoonlightEnabled = true,
-                    ColorTable = new SkyColorDefinition[]
+                    SkyColorTable = new SkyColorDefinition[]
                     {
                         new SkyColorDefinition { Time = 0, Color = Color.Black.ToVector3() },
                         new SkyColorDefinition { Time = 0.15f, Color = Color.Black.ToVector3() },

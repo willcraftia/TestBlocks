@@ -4,13 +4,14 @@
   "MidnightMoonDirection": "0, 1, 1",
   "MiddayAmbientLightColor": "0.6, 0.6, 0.6",
   "MidnightAmbientLightColor": "0.1, 0.1, 0.1",
+  "ShadowColor": "0.4117647, 0.4117647, 0.4117647",
   "SunlightDiffuseColor": "1, 1, 1",
   "SunlightSpecularColor": "0, 0, 0",
   "SunlightEnabled": true,
   "MoonlightDiffuseColor": "0.5, 0.5, 0.5",
   "MoonlightSpecularColor": "0, 0, 0",
   "MoonlightEnabled": true,
-  "ColorTable": [
+  "SkyColorTable": [
     {
       "Time": 0.0,
       "Color": "0, 0, 0"

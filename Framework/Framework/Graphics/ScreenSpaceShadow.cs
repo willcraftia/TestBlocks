@@ -92,6 +92,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
+            shadowColorParameter.SetValue(shadowColor);
             shadowSceneMapParameter.SetValue(shadowScene);
 
             //----------------------------------------------------------------

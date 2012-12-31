@@ -22,6 +22,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 midnightAmbientLightColor = new Vector3(0.1f);
 
+        Vector3 shadowColor = Vector3.Zero;
+
         Vector3 sunRotationAxis;
 
         Vector3 moonRotationAxis;
@@ -89,16 +91,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public Vector3 SunRotationAxis
-        {
-            get { return sunRotationAxis; }
-        }
-
-        public Vector3 MoonRotationAxis
-        {
-            get { return moonRotationAxis; }
-        }
-
         public Vector3 MiddayAmbientLightColor
         {
             get { return middayAmbientLightColor; }
@@ -111,11 +103,27 @@ namespace Willcraftia.Xna.Blocks.Models
             set { midnightAmbientLightColor = value; }
         }
 
+        public Vector3 ShadowColor
+        {
+            get { return shadowColor; }
+            set { shadowColor = value; }
+        }
+
+        public Vector3 SunRotationAxis
+        {
+            get { return sunRotationAxis; }
+        }
+
+        public Vector3 MoonRotationAxis
+        {
+            get { return moonRotationAxis; }
+        }
+
         public DirectionalLight Sunlight { get; private set; }
 
         public DirectionalLight Moonlight { get; private set; }
 
-        public SkyColorTable ColorTable { get; private set; }
+        public SkyColorTable SkyColorTable { get; private set; }
 
         public Vector3 SkyColor { get; private set; }
 
@@ -165,7 +173,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Moonlight = new DirectionalLight("Moon");
             Moonlight.Direction = -DefaultMidnightMoonDirection;
 
-            ColorTable = new SkyColorTable();
+            SkyColorTable = new SkyColorTable();
         }
 
         public void Initialize()
@@ -249,7 +257,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 0 が 0 時、1 が 24 時。
             var elapsed = ElapsedSecondsPerDay / SecondsPerDay;
 
-            SkyColor = ColorTable.GetColor(elapsed);
+            SkyColor = SkyColorTable.GetColor(elapsed);
         }
 
         void InitializeSunRotationAxis()

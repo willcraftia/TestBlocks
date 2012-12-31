@@ -163,6 +163,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public LightFrustumTypes LightFrustumType { get; set; }
 
+        public Vector3 ShadowColor { get; set; }
+
         public SceneManager(GraphicsDevice graphicsDevice, ISceneModuleFactory moduleFactory)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -390,13 +392,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (shadowScene != null && screenSpaceShadow != null && Settings.Shadow.ShadowScene.Enabled)
             {
-                // TODO: ShadowColor
+                screenSpaceShadow.ShadowColor = ShadowColor;
                 screenSpaceShadow.Filter(renderTarget, shadowScene, postProcessRenderTarget);
 
-                // TODO: スワップ管理クラスを作る？
-                var temp = renderTarget;
-                renderTarget = postProcessRenderTarget;
-                postProcessRenderTarget = temp;
+                SwapRenderTargets();
             }
 
             //----------------------------------------------------------------
@@ -405,6 +404,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
+        }
+
+        void SwapRenderTargets()
+        {
+            var temp = renderTarget;
+            renderTarget = postProcessRenderTarget;
+            postProcessRenderTarget = temp;
         }
 
         RenderTarget2D DrawShadowScene()

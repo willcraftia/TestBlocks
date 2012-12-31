@@ -137,6 +137,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 SceneManager.ActiveDirectionalLightName = null;
             }
 
+            SceneManager.ShadowColor = SceneSettings.ShadowColor;
+
             //----------------------------------------------------------------
             // RegionManager
 

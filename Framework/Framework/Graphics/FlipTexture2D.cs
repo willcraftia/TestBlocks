@@ -38,17 +38,40 @@ namespace Willcraftia.Xna.Framework.Graphics
                 index = 0;
         }
 
+        #region IDisposable
+
         public void Dispose()
         {
-            for (int i = 0; i < textures.Length; ++i)
-            {
-                if (textures[i] != null)
-                {
-                    textures[i].Dispose();
-                    textures[i] = null;
-                }
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
+        bool disposed;
+
+        ~FlipTexture2D()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                for (int i = 0; i < textures.Length; ++i)
+                {
+                    if (textures[i] != null)
+                    {
+                        textures[i].Dispose();
+                        textures[i] = null;
+                    }
+                }
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }

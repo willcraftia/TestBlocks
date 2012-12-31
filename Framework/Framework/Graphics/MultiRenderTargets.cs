@@ -10,8 +10,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class MultiRenderTargets : IDisposable
     {
-        int currentIndex;
-        
         RenderTarget2D[] renderTargets;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
@@ -22,57 +20,42 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public int Width
         {
-            get { return Current.Width; }
+            get { return renderTargets[0].Width; }
         }
 
         public int Height
         {
-            get { return Current.Height; }
+            get { return renderTargets[0].Height; }
         }
 
         public SurfaceFormat Format
         {
-            get { return Current.Format; }
+            get { return renderTargets[0].Format; }
         }
 
         public DepthFormat DepthStencilFormat
         {
-            get { return Current.DepthStencilFormat; }
+            get { return renderTargets[0].DepthStencilFormat; }
         }
 
         public RenderTargetUsage RenderTargetUsage
         {
-            get { return Current.RenderTargetUsage; }
+            get { return renderTargets[0].RenderTargetUsage; }
         }
 
         public int MultiSampleCount
         {
-            get { return Current.MultiSampleCount; }
-        }
-
-        public int CurrentIndex
-        {
-            get { return currentIndex; }
-            set
-            {
-                if (value < 0 || Count <= value)
-                    throw new ArgumentOutOfRangeException("CurrentIndex");
-
-                currentIndex = value;
-            }
+            get { return renderTargets[0].MultiSampleCount; }
         }
 
         public RenderTarget2D this[int index]
         {
             get
             {
+                if (index < 0 || Count < index) throw new ArgumentOutOfRangeException("index");
+
                 return renderTargets[index];
             }
-        }
-
-        public RenderTarget2D Current
-        {
-            get { return renderTargets[currentIndex]; }
         }
 
         public Rectangle Bounds
@@ -94,8 +77,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             Name = name;
             Count = renderTargetCount;
 
-            currentIndex = 0;
-
             renderTargets = new RenderTarget2D[renderTargetCount];
 
             for (int i = 0; i < renderTargetCount; i++)
@@ -113,16 +94,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (Count == 0) return Name;
             return Name + "." + index;
-        }
-
-        void DisposeRenderTargets()
-        {
-            if (renderTargets == null) return;
-
-            for (int i = 0; i < renderTargets.Length; i++)
-            {
-                if (renderTargets[i] != null) renderTargets[i].Dispose();
-            }
         }
 
         #region IDisposable
@@ -146,7 +117,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (disposing)
             {
-                DisposeRenderTargets();
+                for (int i = 0; i < renderTargets.Length; i++)
+                {
+                    if (renderTargets[i] != null) renderTargets[i].Dispose();
+                }
             }
 
             disposed = true;

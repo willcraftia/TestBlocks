@@ -81,7 +81,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             GraphicsDevice.SetRenderTarget(renderTarget);
-
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
             foreach (var sceneObject in sceneObjects)
