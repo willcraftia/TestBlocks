@@ -63,12 +63,12 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Initialize()
         {
             skySphere = new SkySphere(GraphicsDevice);
-            var effectResource = resourceManager.Load("content:Effects/SkySphereEffect");
+            var effectResource = resourceManager.Load("content:Effects/SkySphere");
             skySphere.Effect = new SkySphereEffect(assetManager.Load<Effect>(effectResource));
             // シーン マネージャへ登録
             sceneManager.AddSceneObject(skySphere);
 
-            var chunkEffectResource = resourceManager.Load("content:Effects/ChunkEffect");
+            var chunkEffectResource = resourceManager.Load("content:Effects/Chunk");
             chunkEffect = new ChunkEffect(assetManager.Load<Effect>(chunkEffectResource));
         }
 
