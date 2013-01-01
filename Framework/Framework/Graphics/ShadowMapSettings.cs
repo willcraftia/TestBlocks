@@ -43,7 +43,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         float farPlaneDistance = DefaultFarPlaneDistance;
 
         /// <summary>
-        /// シャドウ マッピングの種類。
+        /// シャドウ マップ生成方法の種類。
         /// </summary>
         public ShadowMapTechniques Technique
         {
