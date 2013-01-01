@@ -35,10 +35,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice = graphicsDevice;
             this.shadowSettings = shadowSettings;
 
+            //----------------------------------------------------------------
+            // エフェクト
+
             this.shadowSceneEffect = new PssmSceneEffect(shadowSceneEffect);
+            this.shadowSceneEffect.DepthBias = shadowSettings.ShadowMap.DepthBias;
+            this.shadowSceneEffect.SplitCount = shadowSettings.LightFrustum.Pssm.SplitCount;
 
             //----------------------------------------------------------------
-            // RenderTarget
+            // レンダ ターゲット
 
             var shadowSceneSettings = shadowSettings.ShadowScene;
             var pp = GraphicsDevice.PresentationParameters;
@@ -68,8 +73,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             shadowSceneEffect.View = camera.View.Matrix;
             shadowSceneEffect.Projection = camera.Projection.Matrix;
-            shadowSceneEffect.DepthBias = shadowMapSettings.DepthBias;
-            shadowSceneEffect.SplitCount = pssmSettings.SplitCount;
             shadowSceneEffect.SplitDistances = pssm.SplitDistances;
             shadowSceneEffect.SplitLightViewProjections = pssm.SplitLightViewProjections;
             shadowSceneEffect.SplitShadowMaps = pssm.SplitShadowMaps;
