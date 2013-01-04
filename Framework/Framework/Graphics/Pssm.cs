@@ -128,7 +128,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             blur = new GaussianBlur(blurEffect, blurSpriteBatch, shadowMapSettings.Size, shadowMapSettings.Size, SurfaceFormat.Vector2,
                 vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
 
-            Monitor = new PssmMonitor(this, SplitCount);
+            Monitor = new PssmMonitor(SplitCount);
         }
 
         public void PrepareSplitCameras(ICamera camera)
@@ -145,6 +145,9 @@ namespace Willcraftia.Xna.Framework.Graphics
         public void PrepareSplitCameras(ICamera camera, ref BoundingBox sceneBoundingBox)
         {
             if (camera == null) throw new ArgumentNullException("camera");
+
+            camera.Frustum.GetCorners(corners);
+            frustumBoundingBox = BoundingBox.CreateFromPoints(corners);
 
             var far = CalculateFarPlaneDistance(camera, ref sceneBoundingBox);
             CalculateSplitDistances(camera, far);

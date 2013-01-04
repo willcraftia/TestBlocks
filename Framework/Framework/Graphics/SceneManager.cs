@@ -86,6 +86,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         PssmShadowScene pssmShadowScene;
 
+        Usm usm;
+
+        UsmShadowScene usmShadowScene;
+
         Sssm sssm;
 
         bool shadowMapAvailable;
@@ -161,8 +165,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public int ShadowMapSize { get; set; }
 
-        public LightFrustumTypes LightFrustumType { get; set; }
-
         public Vector3 ShadowColor { get; set; }
 
         public SceneManager(GraphicsDevice graphicsDevice, ISceneModuleFactory moduleFactory)
@@ -190,14 +192,33 @@ namespace Willcraftia.Xna.Framework.Graphics
             shadowMapEffect = new ShadowMapEffect(moduleFactory.CreateShadowMapEffect());
             shadowMapEffect.Technique = shadowSettings.ShadowMap.Technique;
 
-            pssm = moduleFactory.CreatePssm(shadowSettings);
-            if (pssm != null) Monitor.Pssm = pssm.Monitor;
+            if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Pssm)
+            {
+                pssm = moduleFactory.CreatePssm(shadowSettings);
+                if (pssm != null) Monitor.Pssm = pssm.Monitor;
+            }
+            else if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Usm)
+            {
+                usm = moduleFactory.CreateUsm(shadowSettings);
+                if (usm != null) Monitor.Usm = usm.Monitor;
+            }
 
-            pssmShadowScene = moduleFactory.CreatePssmShadowScene(shadowSettings);
-            if (pssmShadowScene != null) Monitor.PssmScene = pssmShadowScene.Monitor;
+            if (shadowSettings.Sssm.Enabled)
+            {
+                if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Pssm)
+                {
+                    pssmShadowScene = moduleFactory.CreatePssmShadowScene(shadowSettings);
+                    if (pssmShadowScene != null) Monitor.PssmShadowScene = pssmShadowScene.Monitor;
+                }
+                else if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Usm)
+                {
+                    usmShadowScene = moduleFactory.CreateUsmShadowScene(shadowSettings);
+                    if (usmShadowScene != null) Monitor.UsmShadowScene = usmShadowScene.Monitor;
+                }
 
-            sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
-            if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
+                sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
+                if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
+            }
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -388,7 +409,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             DrawScene();
 
             //----------------------------------------------------------------
-            // スクリーン スペース シャドウ
+            // スクリーン スペース シャドウ マッピング
 
             if (shadowScene != null && sssm != null && Settings.Shadow.Sssm.Enabled)
             {
@@ -424,6 +445,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 return pssmShadowScene.ShadowScene;
             }
+            else if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Usm && usmShadowScene != null)
+            {
+                usmShadowScene.Draw(activeCamera, usm, opaqueSceneObjects);
+
+                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(usmShadowScene.ShadowScene);
+
+                return usmShadowScene.ShadowScene;
+            }
 
             return null;
         }
@@ -450,7 +479,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void DrawShadowMap()
         {
-            if (LightFrustumType == LightFrustumTypes.Pssm)
+            if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm)
             {
                 // PSSM の分割カメラを準備。
                 pssm.PrepareSplitCameras(activeCamera);
@@ -470,6 +499,23 @@ namespace Willcraftia.Xna.Framework.Graphics
                         DebugMapDisplay.Instance.Add(pssm.GetShadowMap(i));
                     }
                 }
+
+                shadowMapAvailable = true;
+            }
+            else if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Usm)
+            {
+                usm.Prepare(activeCamera);
+
+                // 投影オブジェクトを収集。
+                foreach (var shadowCaster in activeShadowCasters)
+                    usm.TryAddShadowCaster(shadowCaster);
+
+                // シャドウ マップを描画。
+                var lightDirection = activeDirectionalLight.Direction;
+                usm.Draw(shadowMapEffect, ref lightDirection);
+
+                if (DebugMapDisplay.Available)
+                    DebugMapDisplay.Instance.Add(usm.ShadowMap);
 
                 shadowMapAvailable = true;
             }

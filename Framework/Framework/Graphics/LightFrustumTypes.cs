@@ -21,6 +21,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// USM (Uniform Shadow Maps)。
         /// </summary>
-        //Usm
+        Usm
     }
 }

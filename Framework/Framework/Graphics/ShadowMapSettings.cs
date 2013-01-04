@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const SurfaceFormat DefaultFormat = SurfaceFormat.Vector2;
 
-        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Vsm;
+        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Classic;
 
         public const float DefaultDepthBias = 0.05f;
 

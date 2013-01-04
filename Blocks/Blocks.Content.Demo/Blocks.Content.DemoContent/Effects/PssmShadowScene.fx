@@ -41,6 +41,7 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
     sampler_state
     {
         Texture = <ShadowMap0>;
+// TODO: üŒ`‘Î‰B
         MinFilter = Point;
         MagFilter = Point;
         MipFilter = None;

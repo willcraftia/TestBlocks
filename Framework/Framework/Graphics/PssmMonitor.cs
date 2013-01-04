@@ -19,8 +19,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        Pssm pssm;
-
         Split[] split;
 
         public int SplitCount { get; private set; }
@@ -36,11 +34,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public int TotalShadowCasterCount { get; set; }
 
-        public PssmMonitor(Pssm pssm, int splitCount)
+        public PssmMonitor(int splitCount)
         {
-            if (pssm == null) throw new ArgumentNullException("pssm");
-
-            this.pssm = pssm;
             SplitCount = splitCount;
 
             split = new Split[SplitCount];

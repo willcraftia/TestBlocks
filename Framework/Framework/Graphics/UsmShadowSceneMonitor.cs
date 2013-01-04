@@ -6,15 +6,15 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class PssmShadowSceneMonitor
+    public sealed class UsmShadowSceneMonitor
     {
         public event EventHandler BeginDraw = delegate { };
 
         public event EventHandler EndDraw = delegate { };
 
-        PssmShadowScene shadowScene;
+        UsmShadowScene shadowScene;
 
-        public PssmShadowSceneMonitor(PssmShadowScene shadowScene)
+        public UsmShadowSceneMonitor(UsmShadowScene shadowScene)
         {
             if (shadowScene == null) throw new ArgumentNullException("shadowScene");
 

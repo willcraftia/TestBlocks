@@ -194,6 +194,12 @@
     <Compile Include="Graphics\SssmSettings.cs" />
     <Compile Include="Graphics\Texture2DHelper.cs" />
     <Compile Include="Graphics\TextureExtension.cs" />
+    <Compile Include="Graphics\Usm.cs" />
+    <Compile Include="Graphics\UsmLightVolume.cs" />
+    <Compile Include="Graphics\UsmMonitor.cs" />
+    <Compile Include="Graphics\UsmShadowScene.cs" />
+    <Compile Include="Graphics\UsmShadowSceneEffect.cs" />
+    <Compile Include="Graphics\UsmShadowSceneMonitor.cs" />
     <Compile Include="Graphics\VertexPositionNormal.cs" />
     <Compile Include="Graphics\VsmSettings.cs" />
     <Compile Include="Graphics\WritableVertexBuffer.cs" />
