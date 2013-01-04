@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class PssmSceneEffect : IEffectShadowScene
+    public sealed class PssmShadowSceneEffect : IEffectShadowScene
     {
         public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
 
@@ -155,7 +155,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public PssmSceneEffect(Effect backingEffect)
+        public PssmShadowSceneEffect(Effect backingEffect)
         {
             if (backingEffect == null) throw new ArgumentNullException("backingEffect");
 

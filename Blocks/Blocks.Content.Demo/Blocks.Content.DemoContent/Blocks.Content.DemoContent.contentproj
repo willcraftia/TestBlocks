@@ -88,15 +88,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Effects\ScreenSpaceShadow.fx">
-      <Name>ScreenSpaceShadow</Name>
+    <Compile Include="Effects\Sssm.fx">
+      <Name>Sssm</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Effects\PssmScene.fx">
-      <Name>PssmScene</Name>
+    <Compile Include="Effects\PssmShadowScene.fx">
+      <Name>PssmShadowScene</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>

@@ -35,9 +35,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public PssmMonitor Pssm { get; internal set; }
 
-        public PssmSceneMonitor PssmScene { get; internal set; }
+        public PssmShadowSceneMonitor PssmScene { get; internal set; }
 
-        public ScreenSpaceShadowMonitor ScreenSpaceShadow { get; internal set; }
+        public SssmMonitor ScreenSpaceShadow { get; internal set; }
 
         public SceneManagerMonitor(SceneManager sceneManager)
         {

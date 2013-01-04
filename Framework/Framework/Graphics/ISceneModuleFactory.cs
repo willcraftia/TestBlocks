@@ -14,15 +14,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Effect CreateShadowMapEffect();
 
-        Effect CreatePssmSceneEffect();
+        Effect CreatePssmShadowSceneEffect();
 
-        Effect CreateScreenSpaceShadowEffect();
+        Effect CreateSssmEffect();
 
         Pssm CreatePssm(ShadowSettings shadowSettings);
 
-        PssmScene CreatePssmScene(ShadowSettings shadowSettings);
+        PssmShadowScene CreatePssmShadowScene(ShadowSettings shadowSettings);
 
-        ScreenSpaceShadow CreateScreenSpaceShadow(ShadowSceneSettings shadowSceneSettings);
+        Sssm CreateSssm(SssmSettings sssmSettings);
 
         #region Debug
 

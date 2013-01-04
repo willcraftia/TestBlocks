@@ -16,7 +16,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Vsm;
 
-        public const float DefaultDepthBias = 0.005f;
+        public const float DefaultDepthBias = 0.05f;
 
         public const float DefaultFov = MathHelper.PiOver4;
 

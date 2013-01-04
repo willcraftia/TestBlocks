@@ -219,11 +219,14 @@ float4 VsmPS(VSOutput input) : COLOR0
         }
     }
 
+/*
     splitIndex %= 3;
     float r = shadow;
     float g = (splitIndex == 1) ? shadow : 0;
     float b = (splitIndex == 2) ? shadow : 0;
     return float4(r, g, b, 1);
+*/
+    return float4(shadow, 1, 1, 1);
 }
 
 //=============================================================================

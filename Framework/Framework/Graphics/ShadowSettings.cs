@@ -35,15 +35,15 @@ namespace Willcraftia.Xna.Framework.Graphics
         public LightFrustumSettings LightFrustum { get; private set; }
 
         /// <summary>
-        /// シャドウ シーン設定を取得します。
+        /// Sssm 設定を取得します。
         /// </summary>
-        public ShadowSceneSettings ShadowScene { get; private set; }
+        public SssmSettings Sssm { get; private set; }
 
         public ShadowSettings()
         {
             ShadowMap = new ShadowMapSettings();
             LightFrustum = new LightFrustumSettings();
-            ShadowScene = new ShadowSceneSettings();
+            Sssm = new SssmSettings();
         }
     }
 }

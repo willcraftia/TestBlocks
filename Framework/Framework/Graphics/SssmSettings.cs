@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class ShadowSceneSettings
+    public sealed class SssmSettings
     {
         public const bool DefaultEnabled = true;
 
@@ -17,10 +17,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         float mapScale = DefaultMapScale;
 
         /// <summary>
-        /// シャドウ シーンが有効か否かを示す値を取得または設定します。
+        /// Sssm が有効か否かを示す値を取得または設定します。
         /// </summary>
         /// <value>
-        /// true (シャドウ シーンが有効な場合)、false (それ以外の場合)。
+        /// true (Sssm が有効な場合)、false (それ以外の場合)。
         /// </value>
         public bool Enabled
         {
@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public ShadowSceneSettings()
+        public SssmSettings()
         {
             Blur = new BlurSettings();
         }

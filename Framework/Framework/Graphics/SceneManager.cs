@@ -84,9 +84,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Pssm pssm;
 
-        PssmScene pssmScene;
+        PssmShadowScene pssmShadowScene;
 
-        ScreenSpaceShadow screenSpaceShadow;
+        Sssm sssm;
 
         bool shadowMapAvailable;
 
@@ -193,11 +193,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             pssm = moduleFactory.CreatePssm(shadowSettings);
             if (pssm != null) Monitor.Pssm = pssm.Monitor;
 
-            pssmScene = moduleFactory.CreatePssmScene(shadowSettings);
-            if (pssmScene != null) Monitor.PssmScene = pssmScene.Monitor;
+            pssmShadowScene = moduleFactory.CreatePssmShadowScene(shadowSettings);
+            if (pssmShadowScene != null) Monitor.PssmScene = pssmShadowScene.Monitor;
 
-            screenSpaceShadow = moduleFactory.CreateScreenSpaceShadow(shadowSettings.ShadowScene);
-            if (screenSpaceShadow != null) Monitor.ScreenSpaceShadow = screenSpaceShadow.Monitor;
+            sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
+            if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -377,7 +377,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // シャドウ シーン
 
             RenderTarget2D shadowScene = null;
-            if (shadowMapAvailable && Settings.Shadow.ShadowScene.Enabled)
+            if (shadowMapAvailable && Settings.Shadow.Sssm.Enabled)
             {
                 shadowScene = DrawShadowScene();
             }
@@ -390,10 +390,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // スクリーン スペース シャドウ
 
-            if (shadowScene != null && screenSpaceShadow != null && Settings.Shadow.ShadowScene.Enabled)
+            if (shadowScene != null && sssm != null && Settings.Shadow.Sssm.Enabled)
             {
-                screenSpaceShadow.ShadowColor = ShadowColor;
-                screenSpaceShadow.Filter(renderTarget, shadowScene, postProcessRenderTarget);
+                sssm.ShadowColor = ShadowColor;
+                sssm.Filter(renderTarget, shadowScene, postProcessRenderTarget);
 
                 SwapRenderTargets();
             }
@@ -415,14 +415,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D DrawShadowScene()
         {
-            if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm && pssmScene != null)
+            if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm && pssmShadowScene != null)
             {
                 // TODO: Transculent は要らない？
-                pssmScene.Draw(activeCamera, pssm, opaqueSceneObjects);
+                pssmShadowScene.Draw(activeCamera, pssm, opaqueSceneObjects);
 
-                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(pssmScene.ShadowScene);
+                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(pssmShadowScene.ShadowScene);
 
-                return pssmScene.ShadowScene;
+                return pssmShadowScene.ShadowScene;
             }
 
             return null;

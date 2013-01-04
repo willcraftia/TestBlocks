@@ -9,24 +9,24 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class PssmScene
+    public sealed class PssmShadowScene
     {
         ShadowSettings shadowSettings;
 
         RenderTarget2D renderTarget;
 
-        PssmSceneEffect shadowSceneEffect;
+        PssmShadowSceneEffect shadowSceneEffect;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public PssmSceneMonitor Monitor { get; private set; }
+        public PssmShadowSceneMonitor Monitor { get; private set; }
 
         public RenderTarget2D ShadowScene
         {
             get { return renderTarget; }
         }
 
-        public PssmScene(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect shadowSceneEffect)
+        public PssmShadowScene(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect shadowSceneEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
@@ -38,14 +38,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
-            this.shadowSceneEffect = new PssmSceneEffect(shadowSceneEffect);
+            this.shadowSceneEffect = new PssmShadowSceneEffect(shadowSceneEffect);
             this.shadowSceneEffect.DepthBias = shadowSettings.ShadowMap.DepthBias;
             this.shadowSceneEffect.SplitCount = shadowSettings.LightFrustum.Pssm.SplitCount;
 
             //----------------------------------------------------------------
             // レンダ ターゲット
 
-            var shadowSceneSettings = shadowSettings.ShadowScene;
+            var shadowSceneSettings = shadowSettings.Sssm;
             var pp = GraphicsDevice.PresentationParameters;
             var width = (int) (pp.BackBufferWidth * shadowSceneSettings.MapScale);
             var height = (int) (pp.BackBufferHeight * shadowSceneSettings.MapScale);
@@ -54,7 +54,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             renderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
 
-            Monitor = new PssmSceneMonitor(this);
+            Monitor = new PssmShadowSceneMonitor(this);
         }
 
         public void Draw(ICamera camera, Pssm pssm, IEnumerable<SceneObject> sceneObjects)

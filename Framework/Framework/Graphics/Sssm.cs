@@ -8,13 +8,16 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class ScreenSpaceShadow
+    /// <summary>
+    /// スクリーン スペース シャドウ マッピング (Screen Space Shadow Mapping) を行うためのクラスです。
+    /// </summary>
+    public sealed class Sssm
     {
-        ShadowSceneSettings shadowSceneSettings;
+        SssmSettings sssmSettings;
 
         SpriteBatch spriteBatch;
 
-        Effect screenSpaceShadowEffect;
+        Effect sssmEffect;
 
         EffectParameter shadowColorParameter;
         
@@ -28,7 +31,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public ScreenSpaceShadowMonitor Monitor { get; private set; }
+        public SssmMonitor Monitor { get; private set; }
 
         public Vector3 ShadowColor
         {
@@ -42,17 +45,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public ScreenSpaceShadow(GraphicsDevice graphicsDevice, ShadowSceneSettings shadowSceneSettings,
-            Effect screenSpaceShadowEffect, Effect blurEffect)
+        public Sssm(GraphicsDevice graphicsDevice, SssmSettings sssmSettings, Effect sssmEffect, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-            if (shadowSceneSettings == null) throw new ArgumentNullException("shadowSceneSettings");
-            if (screenSpaceShadowEffect == null) throw new ArgumentNullException("screenSpaceShadowEffect");
+            if (sssmSettings == null) throw new ArgumentNullException("sssmSettings");
+            if (sssmEffect == null) throw new ArgumentNullException("sssmEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
-            this.shadowSceneSettings = shadowSceneSettings;
-            this.screenSpaceShadowEffect = screenSpaceShadowEffect;
+            this.sssmSettings = sssmSettings;
+            this.sssmEffect = sssmEffect;
 
             //----------------------------------------------------------------
             // スプライト バッチ
@@ -62,32 +64,32 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
-            shadowColorParameter = screenSpaceShadowEffect.Parameters["ShadowColor"];
-            shadowSceneMapParameter = screenSpaceShadowEffect.Parameters["ShadowSceneMap"];
-            currentPass = screenSpaceShadowEffect.CurrentTechnique.Passes[0];
+            shadowColorParameter = sssmEffect.Parameters["ShadowColor"];
+            shadowSceneMapParameter = sssmEffect.Parameters["ShadowSceneMap"];
+            currentPass = sssmEffect.CurrentTechnique.Passes[0];
 
             //----------------------------------------------------------------
             // ブラー
 
             var pp = GraphicsDevice.PresentationParameters;
-            var width = (int) (pp.BackBufferWidth * shadowSceneSettings.MapScale);
-            var height = (int) (pp.BackBufferHeight * shadowSceneSettings.MapScale);
+            var width = (int) (pp.BackBufferWidth * sssmSettings.MapScale);
+            var height = (int) (pp.BackBufferHeight * sssmSettings.MapScale);
 
-            var blurSettings = shadowSceneSettings.Blur;
+            var blurSettings = sssmSettings.Blur;
             blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Vector2,
                 blurSettings.Radius, blurSettings.Amount);
 
             //----------------------------------------------------------------
             // モニタ
 
-            Monitor = new ScreenSpaceShadowMonitor(this);
+            Monitor = new SssmMonitor(this);
         }
 
         public void Filter(RenderTarget2D scene, RenderTarget2D shadowScene, RenderTarget2D result)
         {
             Monitor.OnBeginFilter();
 
-            if (shadowSceneSettings.Blur.Enabled) blur.Filter(shadowScene);
+            if (sssmSettings.Blur.Enabled) blur.Filter(shadowScene);
 
             //----------------------------------------------------------------
             // エフェクト
@@ -102,7 +104,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             var samplerState = result.GetPreferredSamplerState();
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, screenSpaceShadowEffect);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, sssmEffect);
             spriteBatch.Draw(scene, result.Bounds, Color.White);
             spriteBatch.End();
 
