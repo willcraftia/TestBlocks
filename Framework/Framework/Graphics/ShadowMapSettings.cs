@@ -11,7 +11,8 @@ namespace Willcraftia.Xna.Framework.Graphics
     public sealed class ShadowMapSettings
     {
         //public const int DefaultSize = 512;
-        public const int DefaultSize = 1024;
+        //public const int DefaultSize = 1024;
+        public const int DefaultSize = 2048;
 
         public const SurfaceFormat DefaultFormat = SurfaceFormat.Vector2;
 

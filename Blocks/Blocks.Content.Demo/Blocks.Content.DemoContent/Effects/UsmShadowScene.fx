@@ -38,8 +38,7 @@ struct VSInput
 struct VSOutput
 {
     float4 Position         : POSITION;
-    float4 WorldPosition    : TEXCOORD0;
-//    float4 LightingPosition : TEXCOORD0;
+    float4 LightingPosition : TEXCOORD0;
 };
 
 //=============================================================================
@@ -53,8 +52,7 @@ VSOutput VS(VSInput input)
     float4 viewPosition = mul(worldPosition, View);
 
     output.Position = mul(viewPosition, Projection);
-//    output.LightingPosition = mul(worldPosition, LightViewProjection);
-    output.WorldPosition = worldPosition;
+    output.LightingPosition = mul(worldPosition, LightViewProjection);
 
     return output;
 }
@@ -64,8 +62,7 @@ VSOutput VS(VSInput input)
 //-----------------------------------------------------------------------------
 float4 ClassicPS(VSOutput input) : COLOR0
 {
-//    float4 lightingPosition = input.LightingPosition;
-    float4 lightingPosition = mul(input.WorldPosition, LightViewProjection);
+    float4 lightingPosition = input.LightingPosition;
 
     float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
     float shadow = TestClassicShadowMap(
@@ -79,8 +76,7 @@ float4 ClassicPS(VSOutput input) : COLOR0
 
 float4 TODO_PcfPS(VSOutput input) : COLOR
 {
-//    float4 lightingPosition = input.LightingPosition;
-    float4 lightingPosition = mul(input.WorldPosition, LightViewProjection);
+    float4 lightingPosition = input.LightingPosition;
     float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
 
     float shadow = TestPcfShadowMap(ShadowMapSampler, shadowTexCoord, lightingPosition, DepthBias, TapCount, Offsets);
@@ -95,8 +91,7 @@ float4 PcfPS(VSOutput input) : COLOR
 
 float4 VsmPS(VSOutput input) : COLOR0
 {
-//    float4 lightingPosition = input.LightingPosition;
-    float4 lightingPosition = mul(input.WorldPosition, LightViewProjection);
+    float4 lightingPosition = input.LightingPosition;
     float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
 
     float4 result = float4(1, 0, 0, 1);

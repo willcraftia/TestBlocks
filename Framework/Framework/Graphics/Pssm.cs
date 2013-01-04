@@ -301,13 +301,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < splitDistances.Length; i++)
             {
                 float idm = i * inverseSplitCount;
+
+                // CL = n * (f / n)^(i / m)
                 float log = (float) (near * Math.Pow(farNearRatio, idm));
 
-                // REFERENCE: the version in the main PSSM paper
+                // CU = n + (f - n) * (i / m)
                 float uniform = near + (far - near) * idm;
                 // REFERENCE: the version (?) in some actual codes,
                 //float uniform = (near + idm) * (far - near);
 
+                // C = CL * lambda + CU * (1 - lambda)
                 splitDistances[i] = log * splitLambda + uniform * (1.0f - splitLambda);
             }
 

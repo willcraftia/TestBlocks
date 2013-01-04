@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int DefaultSplitCount = 3;
 
-        public const float DefaultSplitLambda = 0.7f;
+        public const float DefaultSplitLambda = 0.5f;
 
         int splitCount = DefaultSplitCount;
 
