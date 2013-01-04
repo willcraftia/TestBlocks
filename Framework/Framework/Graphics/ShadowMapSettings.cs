@@ -10,13 +10,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class ShadowMapSettings
     {
-        public const int DefaultSize = 512;
+        //public const int DefaultSize = 512;
+        public const int DefaultSize = 1024;
 
         public const SurfaceFormat DefaultFormat = SurfaceFormat.Vector2;
 
-        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Classic;
+        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Vsm;
 
-        public const float DefaultDepthBias = 0.05f;
+        public const float DefaultDepthBias = 0.001f;
 
         public const float DefaultFov = MathHelper.PiOver4;
 

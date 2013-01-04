@@ -117,7 +117,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
             splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount,
                 shadowMapSettings.Size, shadowMapSettings.Size,
-                false, shadowMapSettings.Format, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
+                false, shadowMapSettings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
             // TODO: 初期容量。
             splitShadowCasters = new Queue<ShadowCaster>[SplitCount];

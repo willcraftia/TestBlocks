@@ -64,7 +64,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var pp = GraphicsDevice.PresentationParameters;
             // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
             renderTarget = new RenderTarget2D(GraphicsDevice, shadowMapSettings.Size, shadowMapSettings.Size,
-                false, shadowMapSettings.Format, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
+                false, shadowMapSettings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
             renderTarget.Name = "ShadowMap";
 
             blurSpriteBatch = new SpriteBatch(GraphicsDevice);
@@ -111,7 +111,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 shadowCasters.Enqueue(shadowCaster);
 
                 // AABB の頂点を包含座標として登録。
-                lightVolume.AddLightVolumePoints(corners);
+                //lightVolume.AddLightVolumePoints(corners);
 
                 Monitor.ShadowCasterCount++;
 

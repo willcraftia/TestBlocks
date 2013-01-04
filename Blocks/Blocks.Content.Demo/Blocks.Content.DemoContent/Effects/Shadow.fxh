@@ -20,13 +20,13 @@ float TestClassicShadowMap(
     float4 position,
     float depthBias)
 {
-    float lightingDepth = tex2D(shadowMap, shadowTexCoord).x;
+    float depth = tex2D(shadowMap, shadowTexCoord).x;
 
     // optimaization by avoiding division and using multiplication
     //
-    // lightingDepth < position.z / position.w - depthBias
+    // depth < position.z / position.w - depthBias
     //
-    if (position.w * (lightingDepth + depthBias) < position.z)
+    if (position.w * (depth + depthBias) < position.z)
     {
         return 0;
     }
@@ -49,20 +49,20 @@ float TestPcfShadowMap(
     float tapCount,
     float2 offsets[MAX_PCF_TAP_COUNT])
 {
-    float lightingDepth = 0;
+    float depth = 0;
     for (int i = 0; i < tapCount && i < MAX_PCF_TAP_COUNT; i++)
     {
-//        lightingDepth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
+//        depth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
 // TODO: correct?
-        lightingDepth += tex2Dlod(shadowMap, float4(shadowTexCoord + offsets[i], 0, 1)).x;
+        depth += tex2Dlod(shadowMap, float4(shadowTexCoord + offsets[i], 0, 1)).x;
     }
-    lightingDepth /= tapCount;
+    depth /= tapCount;
 
     // optimaization by avoiding division and using multiplication
     //
-    // lightingDepth < position.z / position.w - depthBias
+    // depth < position.z / position.w - depthBias
     //
-    if (position.w * (lightingDepth + depthBias) < position.z)
+    if (position.w * (depth + depthBias) < position.z)
     {
         return 0;
     }
@@ -79,18 +79,18 @@ float TestPcf3x3ShadowMap(
     float depthBias,
     float2 offsets[9])
 {
-    float lightingDepth = 0;
+    float depth = 0;
     for (int i = 0; i < 9; i++)
     {
-        lightingDepth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
+        depth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
     }
-    lightingDepth /= 9.0f;
+    depth /= 9.0f;
 
     // optimaization by avoiding division and using multiplication
     //
-    // lightingDepth < position.z / position.w - depthBias
+    // depth < position.z / position.w - depthBias
     //
-    if (position.w * (lightingDepth + depthBias) < position.z)
+    if (position.w * (depth + depthBias) < position.z)
     {
         return 0;
     }
@@ -107,18 +107,18 @@ float TestPcf4x4ShadowMap(
     float depthBias,
     float2 offsets[16])
 {
-    float lightingDepth = 0;
+    float depth = 0;
     for (int i = 0; i < 16; i++)
     {
-        lightingDepth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
+        depth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
     }
-    lightingDepth /= 16.0f;
+    depth /= 16.0f;
 
     // optimaization by avoiding division and using multiplication
     //
-    // lightingDepth < position.z / position.w - depthBias
+    // depth < position.z / position.w - depthBias
     //
-    if (position.w * (lightingDepth + depthBias) < position.z)
+    if (position.w * (depth + depthBias) < position.z)
     {
         return 0;
     }
@@ -135,18 +135,18 @@ float TestPcf5x5ShadowMap(
     float depthBias,
     float2 offsets[25])
 {
-    float lightingDepth = 0;
+    float depth = 0;
     for (int i = 0; i < 25; i++)
     {
-        lightingDepth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
+        depth += tex2D(shadowMap, shadowTexCoord + offsets[i]).x;
     }
-    lightingDepth /= 25.0f;
+    depth /= 25.0f;
 
     // optimaization by avoiding division and using multiplication
     //
-    // lightingDepth < position.z / position.w - depthBias
+    // depth < position.z / position.w - depthBias
     //
-    if (position.w * (lightingDepth + depthBias) < position.z)
+    if (position.w * (depth + depthBias) < position.z)
     {
         return 0;
     }

@@ -222,7 +222,7 @@ float3x3 CreateWorldToTangentSpace(float3 normal, float3 binormal, float3 tangen
 //-----------------------------------------------------------------------------
 float2 ProjectionToTexCoord(float4 position)
 {
-    return position.xy / position.w * float2(0.5f, -0.5f) + 0.5f;
+    return position.xy / position.w * float2(0.5f, -0.5f) + float2(0.5f, 0.5f);
 }
 
 //-----------------------------------------------------------------------------

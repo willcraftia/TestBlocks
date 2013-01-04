@@ -8,7 +8,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class LightFrustumSettings
     {
-        public const LightFrustumTypes DefaultType = LightFrustumTypes.Usm;
+        public const LightFrustumTypes DefaultType = LightFrustumTypes.Pssm;
 
         /// <summary>
         /// ライト カメラの種類。

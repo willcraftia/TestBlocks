@@ -41,6 +41,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             this.shadowSceneEffect = new PssmShadowSceneEffect(shadowSceneEffect);
             this.shadowSceneEffect.DepthBias = shadowSettings.ShadowMap.DepthBias;
             this.shadowSceneEffect.SplitCount = shadowSettings.LightFrustum.Pssm.SplitCount;
+            this.shadowSceneEffect.Technique = shadowSettings.ShadowMap.Technique;
 
             //----------------------------------------------------------------
             // レンダ ターゲット
@@ -52,7 +53,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
             renderTarget = new RenderTarget2D(GraphicsDevice, width, height,
-                false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.PreserveContents);
+                false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
             Monitor = new PssmShadowSceneMonitor(this);
         }
