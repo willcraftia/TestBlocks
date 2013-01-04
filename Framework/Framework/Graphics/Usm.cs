@@ -15,7 +15,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         VsmSettings vsmSettings;
 
-        UsmLightVolume lightVolume = new UsmLightVolume();
+        UsmLightVolume lightVolume;
 
         SpriteBatch blurSpriteBatch;
 
@@ -59,6 +59,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             shadowMapSettings = shadowSettings.ShadowMap;
             vsmSettings = shadowMapSettings.Vsm;
+
+            lightVolume = new UsmLightVolume(shadowMapSettings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
@@ -111,7 +113,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 shadowCasters.Enqueue(shadowCaster);
 
                 // AABB の頂点を包含座標として登録。
-                //lightVolume.AddLightVolumePoints(corners);
+                lightVolume.AddLightVolumePoints(corners);
 
                 Monitor.ShadowCasterCount++;
 

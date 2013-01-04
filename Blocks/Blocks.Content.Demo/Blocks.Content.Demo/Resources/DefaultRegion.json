@@ -2,14 +2,14 @@
   "Name": "Default Region",
   "Bounds": {
     "Min": {
-      "X": -128,
+      "X": -64,
       "Y": 0,
-      "Z": -128
+      "Z": -64
     },
     "Max": {
-      "X": 128,
+      "X": 64,
       "Y": 16,
-      "Z": 128
+      "Z": 64
     }
   },
   "TileCatalog": "DefaultTileCatalog.json",

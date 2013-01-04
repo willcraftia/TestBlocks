@@ -15,9 +15,9 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class WorldManager
     {
-        const int partitionMinActiveRange = 13;
+        const int partitionMinActiveRange = 10;
 
-        const int partitionMaxActiveRange = 15;
+        const int partitionMaxActiveRange = 12;
 
         IServiceProvider serviceProvider;
 

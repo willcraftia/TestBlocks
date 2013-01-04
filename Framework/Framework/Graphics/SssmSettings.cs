@@ -50,6 +50,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         public SssmSettings()
         {
             Blur = new BlurSettings();
+            Blur.Enabled = true;
         }
     }
 }

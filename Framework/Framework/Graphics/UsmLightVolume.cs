@@ -19,6 +19,19 @@ namespace Willcraftia.Xna.Framework.Graphics
         // TODO: 初期容量
         List<Vector3> lightVolumePoints = new List<Vector3>();
 
+        int shadowMapSize;
+
+        float shadowMapTexelSize;
+
+        public UsmLightVolume(int shadowMapSize)
+        {
+            if (shadowMapSize < 1) throw new ArgumentOutOfRangeException("shadowMapSize");
+
+            this.shadowMapSize = shadowMapSize;
+        
+            shadowMapTexelSize = 1 / (float) shadowMapSize;
+        }
+
         public void AddLightVolumePoint(ref Vector3 point)
         {
             lightVolumePoints.Add(point);
@@ -54,13 +67,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             var boxSize = lightVolume.Max - lightVolume.Min;
             var halfBoxSize = boxSize * 0.5f;
 
-            // ライト空間での光源位置を算出。
+            // 仮ライト空間での仮光源位置を算出。
             var lightPosition = lightVolume.Min + halfBoxSize;
-            // TODO: XNA サンプルでは Min.Z だが、Max.Z の方が良い？
             lightPosition.Z = lightVolume.Min.Z;
-            //lightPosition.Z = lightBox.Max.Z;
 
-            // 光源位置をライト空間からワールド空間へ変換。
+            // 仮光源位置を仮ライト空間からワールド空間へ変換。
             Matrix lightViewInv;
             Matrix.Invert(ref tempLightView, out lightViewInv);
             Vector3.Transform(ref lightPosition, ref lightViewInv, out lightPosition);
@@ -70,6 +81,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             Matrix lightView;
             Matrix.CreateLookAt(ref lightPosition, ref target, ref up, out lightView);
 
+            // TODO: XNA サンプルにはない補正を追加。この補正は必要？
+            boxSize.X = Adjust(boxSize.X);
+            boxSize.Y = Adjust(boxSize.Y);
+            boxSize.Z = Adjust(boxSize.Z);
+
             Matrix lightProjection;
             Matrix.CreateOrthographic(boxSize.X, boxSize.Y, -boxSize.Z, boxSize.Z, out lightProjection);
 
@@ -77,6 +93,26 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // クリア。
             lightVolumePoints.Clear();
+        }
+
+        void Adjust(ref BoundingBox lightVolume)
+        {
+            lightVolume.Min.X = Adjust(lightVolume.Min.X);
+            lightVolume.Min.Y = Adjust(lightVolume.Min.Y);
+            lightVolume.Min.Z = Adjust(lightVolume.Min.Z);
+
+            lightVolume.Max.X = Adjust(lightVolume.Max.X);
+            lightVolume.Max.Y = Adjust(lightVolume.Max.Y);
+            lightVolume.Max.Z = Adjust(lightVolume.Max.Z);
+        }
+
+        float Adjust(float value)
+        {
+            var result = value;
+            result *= shadowMapSize;
+            result = MathExtension.Floor(result);
+            result *= shadowMapTexelSize;
+            return result;
         }
     }
 }
