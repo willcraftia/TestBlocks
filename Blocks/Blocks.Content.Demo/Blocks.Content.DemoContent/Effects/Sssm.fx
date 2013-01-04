@@ -25,8 +25,8 @@ sampler2D ShadowSceneMapSampler = sampler_state
     Texture = <ShadowSceneMap>;
     AddressU = Clamp;
     AddressV = Clamp;
-    MinFilter = Linear;
-    MagFilter = Linear;
+    MinFilter = Point;
+    MagFilter = Point;
     MipFilter = None;
 };
 
