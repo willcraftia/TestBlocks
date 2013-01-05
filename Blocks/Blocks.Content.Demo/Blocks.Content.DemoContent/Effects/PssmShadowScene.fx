@@ -54,6 +54,12 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
 };
 
 //-----------------------------------------------------------------------------
+// Classic specifiec
+
+float ShadowMapSize;
+float ShadowMapTexelSize;
+
+//-----------------------------------------------------------------------------
 // PCF specifiec
 
 float2 PcfOffsets[MAX_PCF_TAP_COUNT];
@@ -111,6 +117,8 @@ float4 ClassicPS(VSOutput input) : COLOR0
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
             shadow = TestClassicShadowMap(
                 ShadowMapSampler[i],
+                ShadowMapSize,
+                ShadowMapTexelSize,
                 shadowTexCoord,
                 lightingPosition,
                 DepthBias);

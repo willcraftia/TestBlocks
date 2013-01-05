@@ -16,11 +16,21 @@
 //-----------------------------------------------------------------------------
 float TestClassicShadowMap(
     sampler2D shadowMap,
+    float shadowMapSize,
+    float shadowMapTexelSize,
     float2 shadowTexCoord,
     float4 position,
     float depthBias)
 {
-    float depth = tex2D(shadowMap, shadowTexCoord).x;
+    // Bilinear interpolation manually.
+    float tl = tex2D(shadowMap, shadowTexCoord).x;
+    float tr = tex2D(shadowMap, shadowTexCoord + float2(shadowMapTexelSize, 0)).x;
+    float bl = tex2D(shadowMap, shadowTexCoord + float2(0, shadowMapTexelSize)).x;
+    float br = tex2D(shadowMap, shadowTexCoord + float2(shadowMapTexelSize, shadowMapTexelSize)).x;
+    float2 f = frac(shadowTexCoord * shadowMapSize);
+    float t = lerp(tl, tr, f.x);
+    float b = lerp(bl, br, f.x);
+    float depth = lerp(t, b, f.y);
 
     // èúéZÇâÒîÇµÇƒèÊéZÇ÷
     // REFERENCE: depth < position.z / position.w - depthBias

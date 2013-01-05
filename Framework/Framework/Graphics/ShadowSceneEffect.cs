@@ -37,6 +37,13 @@ namespace Willcraftia.Xna.Framework.Graphics
         EffectParameter[] shadowMaps;
 
         //--------------------------------------------------------------------
+        // Classic specific
+
+        EffectParameter shadowMapSize;
+
+        EffectParameter shadowMapTexelSize;
+
+        //--------------------------------------------------------------------
         // PCF specific
 
         EffectParameter pcfOffsetsParameter;
@@ -122,10 +129,20 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         //--------------------------------------------------------------------
-        // PCF specific
+        // Classic & PCF specific
 
-        // PCF へテクニックを変更する前に必ず設定していなければならない。
-        public int ShadowMapSize { get; set; }
+        // PCF の場合、PCF テクニックを設定する前に必ず設定していなければならない。
+        public int ShadowMapSize
+        {
+            get { return shadowMapSize.GetValueInt32(); }
+            set
+            {
+                if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                shadowMapSize.SetValue(value);
+                shadowMapTexelSize.SetValue(1 / (float) value);
+            }
+        }
 
         //
         //--------------------------------------------------------------------
@@ -178,6 +195,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < shadowMaps.Length; i++)
                 shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
 
+            shadowMapSize = backingEffect.Parameters["ShadowMapSize"];
+            shadowMapTexelSize = backingEffect.Parameters["ShadowMapTexelSize"];
+
             pcfOffsetsParameter = backingEffect.Parameters["PcfOffsets"];
 
             classicTechnique = backingEffect.Techniques["Classic"];
@@ -199,7 +219,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void InitializePcfKernel(int kernelSize)
         {
-            var texelSize = 1.0f / (float) ShadowMapSize;
+            var texelSize = shadowMapTexelSize.GetValueSingle();
 
             int start;
             if (kernelSize % 2 == 0)
