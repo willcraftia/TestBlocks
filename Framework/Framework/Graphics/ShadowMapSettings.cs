@@ -22,10 +22,12 @@ namespace Willcraftia.Xna.Framework.Graphics
         //
         // Pcf は、3x3 程度なら Classic とそれ程変わりがない。
         //
+        // 最も無難な設定が Classic であり、ライト ブリーディングを解決できるならば VSM。
+        //
 
-        public const SurfaceFormat DefaultFormat = SurfaceFormat.Vector2;
+        public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
 
-        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Vsm;
+        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Classic;
 
         // シャドウ マップのサイズに従って適切な値が変わるので注意。
         // シャドウ マップ サイズを小さくすると、より大きな深度バイアスが必要。
