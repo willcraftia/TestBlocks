@@ -168,17 +168,10 @@
     <Compile Include="Graphics\IShadowSceneSupport.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Graphics\LightFrustumSettings.cs" />
-    <Compile Include="Graphics\LightFrustumTypes.cs" />
-    <Compile Include="Graphics\MultiRenderTargets.cs" />
+    <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\Pssm.cs" />
-    <Compile Include="Graphics\PssmLightVolume.cs" />
     <Compile Include="Graphics\PssmMonitor.cs" />
-    <Compile Include="Graphics\PssmSettings.cs" />
-    <Compile Include="Graphics\PssmShadowScene.cs" />
-    <Compile Include="Graphics\PssmShadowSceneEffect.cs" />
-    <Compile Include="Graphics\PssmShadowSceneMonitor.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
     <Compile Include="Graphics\SceneManagerSettings.cs" />
@@ -187,6 +180,9 @@
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />
+    <Compile Include="Graphics\ShadowScene.cs" />
+    <Compile Include="Graphics\ShadowSceneEffect.cs" />
+    <Compile Include="Graphics\ShadowSceneMonitor.cs" />
     <Compile Include="Graphics\ShadowSettings.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Sssm.cs" />
@@ -194,12 +190,6 @@
     <Compile Include="Graphics\SssmSettings.cs" />
     <Compile Include="Graphics\Texture2DHelper.cs" />
     <Compile Include="Graphics\TextureExtension.cs" />
-    <Compile Include="Graphics\Usm.cs" />
-    <Compile Include="Graphics\UsmLightVolume.cs" />
-    <Compile Include="Graphics\UsmMonitor.cs" />
-    <Compile Include="Graphics\UsmShadowScene.cs" />
-    <Compile Include="Graphics\UsmShadowSceneEffect.cs" />
-    <Compile Include="Graphics\UsmShadowSceneMonitor.cs" />
     <Compile Include="Graphics\VertexPositionNormal.cs" />
     <Compile Include="Graphics\VsmSettings.cs" />
     <Compile Include="Graphics\WritableVertexBuffer.cs" />

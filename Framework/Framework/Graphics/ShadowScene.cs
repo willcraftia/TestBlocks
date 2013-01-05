@@ -9,24 +9,24 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class UsmShadowScene
+    public sealed class ShadowScene
     {
         ShadowSettings shadowSettings;
 
         RenderTarget2D renderTarget;
 
-        UsmShadowSceneEffect shadowSceneEffect;
+        ShadowSceneEffect shadowSceneEffect;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public UsmShadowSceneMonitor Monitor { get; private set; }
+        public ShadowSceneMonitor Monitor { get; private set; }
 
-        public RenderTarget2D ShadowScene
+        public RenderTarget2D RenderTarget
         {
             get { return renderTarget; }
         }
 
-        public UsmShadowScene(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect shadowSceneEffect)
+        public ShadowScene(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect shadowSceneEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
@@ -38,8 +38,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
-            this.shadowSceneEffect = new UsmShadowSceneEffect(shadowSceneEffect);
+            this.shadowSceneEffect = new ShadowSceneEffect(shadowSceneEffect);
             this.shadowSceneEffect.DepthBias = shadowSettings.ShadowMap.DepthBias;
+            this.shadowSceneEffect.SplitCount = shadowSettings.ShadowMap.SplitCount;
             this.shadowSceneEffect.Technique = shadowSettings.ShadowMap.Technique;
 
             //----------------------------------------------------------------
@@ -54,27 +55,25 @@ namespace Willcraftia.Xna.Framework.Graphics
             renderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
-            Monitor = new UsmShadowSceneMonitor(this);
+            Monitor = new ShadowSceneMonitor(this);
         }
 
-        public void Draw(ICamera camera, Usm usm, IEnumerable<SceneObject> sceneObjects)
+        public void Draw(ICamera camera, Pssm pssm, IEnumerable<SceneObject> sceneObjects)
         {
             if (camera == null) throw new ArgumentNullException("camera");
-            if (usm == null) throw new ArgumentNullException("pssm");
+            if (pssm == null) throw new ArgumentNullException("pssm");
             if (sceneObjects == null) throw new ArgumentNullException("sceneObjects");
 
             Monitor.OnBeginDraw();
-
-            var shadowMapSettings = shadowSettings.ShadowMap;
-            var pssmSettings = shadowSettings.LightFrustum.Pssm;
 
             //----------------------------------------------------------------
             // エフェクト
 
             shadowSceneEffect.View = camera.View.Matrix;
             shadowSceneEffect.Projection = camera.Projection.Matrix;
-            shadowSceneEffect.LightViewProjection = usm.LightViewProjection;
-            shadowSceneEffect.ShadowMap = usm.ShadowMap;
+            shadowSceneEffect.SplitDistances = pssm.SplitDistances;
+            shadowSceneEffect.SplitLightViewProjections = pssm.SplitLightViewProjections;
+            shadowSceneEffect.SplitShadowMaps = pssm.SplitShadowMaps;
 
             //----------------------------------------------------------------
             // 描画

@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class UsmLightVolume
+    public sealed class LightCamera
     {
         public Matrix LightViewProjection = Matrix.Identity;
 
@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         float shadowMapTexelSize;
 
-        public UsmLightVolume(int shadowMapSize)
+        public LightCamera(int shadowMapSize)
         {
             if (shadowMapSize < 1) throw new ArgumentOutOfRangeException("shadowMapSize");
 
@@ -81,7 +81,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Matrix lightView;
             Matrix.CreateLookAt(ref lightPosition, ref target, ref up, out lightView);
 
-            // TODO: XNA サンプルにはない補正を追加。この補正は必要？
+            // REFERECE: http://msdn.microsoft.com/ja-jp/library/ee416324(VS.85).aspx
             boxSize.X = Adjust(boxSize.X);
             boxSize.Y = Adjust(boxSize.Y);
             boxSize.Z = Adjust(boxSize.Z);

@@ -176,8 +176,8 @@ float TestVarianceShadowMap(
     float tMinusM = t - Ex;
     float p = Vx / (Vx + tMinusM * tMinusM);
 
-    // チェビシェフの不等式により t > Ex で p が有効.
-    // t <= Ex では p = 1.
+    // チェビシェフの不等式により t > Ex で p が有効。
+    // t <= Ex では p = 1、つまり、影がない。
     return saturate(max(p, t <= Ex));
 }
 

@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class UsmShadowSceneEffect : IEffectShadowScene
+    public sealed class ShadowSceneEffect : IEffectShadowScene
     {
         public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
 
@@ -28,9 +28,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectParameter depthBias;
         
-        EffectParameter lightViewProjection;
+        EffectParameter splitCount;
         
-        EffectParameter shadowMap;
+        EffectParameter splitDistances;
+        
+        EffectParameter splitLightViewProjections;
+        
+        EffectParameter[] shadowMaps;
 
         //--------------------------------------------------------------------
         // PCF specific
@@ -80,16 +84,41 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { depthBias.SetValue(value); }
         }
 
-        public Matrix LightViewProjection
+        public int SplitCount
         {
-            get { return lightViewProjection.GetValueMatrix(); }
-            set { lightViewProjection.SetValue(value); }
+            get { return splitCount.GetValueInt32(); }
+            set { splitCount.SetValue(value); }
         }
 
-        public Texture2D ShadowMap
+        public float[] SplitDistances
         {
-            get { return shadowMap.GetValueTexture2D(); }
-            set { shadowMap.SetValue(value); }
+            get { return splitDistances.GetValueSingleArray(ShadowMapSettings.MaxSplitCount); }
+            set { splitDistances.SetValue(value); }
+        }
+
+        public Matrix[] SplitLightViewProjections
+        {
+            get { return splitLightViewProjections.GetValueMatrixArray(ShadowMapSettings.MaxSplitCount); }
+            set { splitLightViewProjections.SetValue(value); }
+        }
+
+        Texture2D[] shadowMapBuffer = new Texture2D[ShadowMapSettings.MaxSplitCount];
+
+        public Texture2D[] SplitShadowMaps
+        {
+            get
+            {
+                for (int i = 0; i < ShadowMapSettings.MaxSplitCount; i++)
+                    shadowMapBuffer[i] = shadowMaps[i].GetValueTexture2D();
+                return shadowMapBuffer;
+            }
+            set
+            {
+                if (value == null) return;
+
+                for (int i = 0; i < value.Length; i++)
+                    shadowMaps[i].SetValue(value[i]);
+            }
         }
 
         //--------------------------------------------------------------------
@@ -126,7 +155,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public UsmShadowSceneEffect(Effect backingEffect)
+        public ShadowSceneEffect(Effect backingEffect)
         {
             if (backingEffect == null) throw new ArgumentNullException("backingEffect");
 
@@ -137,9 +166,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             projection = backingEffect.Parameters["Projection"];
 
             depthBias = backingEffect.Parameters["DepthBias"];
-            lightViewProjection = backingEffect.Parameters["LightViewProjection"];
+            splitCount = backingEffect.Parameters["SplitCount"];
+            splitDistances = backingEffect.Parameters["SplitDistances"];
+            splitLightViewProjections = backingEffect.Parameters["SplitLightViewProjections"];
 
-            shadowMap = backingEffect.Parameters["ShadowMap"];
+            shadowMaps = new EffectParameter[ShadowMapSettings.MaxSplitCount];
+            for (int i = 0; i < shadowMaps.Length; i++)
+                shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
 
             tapCountParameter = backingEffect.Parameters["TapCount"];
             offsetsParameter = backingEffect.Parameters["Offsets"];

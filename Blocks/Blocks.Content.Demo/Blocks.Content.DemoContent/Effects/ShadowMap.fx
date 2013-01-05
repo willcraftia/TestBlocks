@@ -44,8 +44,7 @@ technique Default
     pass P0
     {
 //        CullMode = CW;
-        CullMode = None;
-//        CullMode = CCW;
+        CullMode = CCW;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 DefaultPS();
     }

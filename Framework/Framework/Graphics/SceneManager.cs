@@ -84,11 +84,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Pssm pssm;
 
-        PssmShadowScene pssmShadowScene;
-
-        Usm usm;
-
-        UsmShadowScene usmShadowScene;
+        ShadowScene shadowScene;
 
         Sssm sssm;
 
@@ -192,29 +188,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             shadowMapEffect = new ShadowMapEffect(moduleFactory.CreateShadowMapEffect());
             shadowMapEffect.Technique = shadowSettings.ShadowMap.Technique;
 
-            if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Pssm)
-            {
-                pssm = moduleFactory.CreatePssm(shadowSettings);
-                if (pssm != null) Monitor.Pssm = pssm.Monitor;
-            }
-            else if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Usm)
-            {
-                usm = moduleFactory.CreateUsm(shadowSettings);
-                if (usm != null) Monitor.Usm = usm.Monitor;
-            }
+            pssm = moduleFactory.CreatePssm(shadowSettings);
+            if (pssm != null) Monitor.Pssm = pssm.Monitor;
 
             if (shadowSettings.Sssm.Enabled)
             {
-                if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Pssm)
-                {
-                    pssmShadowScene = moduleFactory.CreatePssmShadowScene(shadowSettings);
-                    if (pssmShadowScene != null) Monitor.PssmShadowScene = pssmShadowScene.Monitor;
-                }
-                else if (shadowSettings.LightFrustum.Type == LightFrustumTypes.Usm)
-                {
-                    usmShadowScene = moduleFactory.CreateUsmShadowScene(shadowSettings);
-                    if (usmShadowScene != null) Monitor.UsmShadowScene = usmShadowScene.Monitor;
-                }
+                shadowScene = moduleFactory.CreateShadowScene(shadowSettings);
+                if (shadowScene != null) Monitor.ShadowScene = shadowScene.Monitor;
 
                 sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
                 if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
@@ -436,22 +416,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D DrawShadowScene()
         {
-            if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm && pssmShadowScene != null)
+            if (shadowScene != null)
             {
                 // TODO: Transculent は要らない？
-                pssmShadowScene.Draw(activeCamera, pssm, opaqueSceneObjects);
+                shadowScene.Draw(activeCamera, pssm, opaqueSceneObjects);
 
-                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(pssmShadowScene.ShadowScene);
+                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowScene.RenderTarget);
 
-                return pssmShadowScene.ShadowScene;
-            }
-            else if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Usm && usmShadowScene != null)
-            {
-                usmShadowScene.Draw(activeCamera, usm, opaqueSceneObjects);
-
-                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(usmShadowScene.ShadowScene);
-
-                return usmShadowScene.ShadowScene;
+                return shadowScene.RenderTarget;
             }
 
             return null;
@@ -479,46 +451,26 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void DrawShadowMap()
         {
-            if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Pssm)
+            // PSSM の分割カメラを準備。
+            pssm.PrepareSplitCameras(activeCamera);
+
+            // 投影オブジェクトを収集。
+            foreach (var shadowCaster in activeShadowCasters)
+                pssm.TryAddShadowCaster(shadowCaster);
+
+            // シャドウ マップを描画。
+            var lightDirection = activeDirectionalLight.Direction;
+            pssm.Draw(shadowMapEffect, ref lightDirection);
+
+            if (DebugMapDisplay.Available)
             {
-                // PSSM の分割カメラを準備。
-                pssm.PrepareSplitCameras(activeCamera);
-
-                // 投影オブジェクトを収集。
-                foreach (var shadowCaster in activeShadowCasters)
-                    pssm.TryAddShadowCaster(shadowCaster);
-
-                // シャドウ マップを描画。
-                var lightDirection = activeDirectionalLight.Direction;
-                pssm.Draw(shadowMapEffect, ref lightDirection);
-
-                if (DebugMapDisplay.Available)
+                for (int i = 0; i < Settings.Shadow.ShadowMap.SplitCount; i++)
                 {
-                    for (int i = 0; i < Settings.Shadow.LightFrustum.Pssm.SplitCount; i++)
-                    {
-                        DebugMapDisplay.Instance.Add(pssm.GetShadowMap(i));
-                    }
+                    DebugMapDisplay.Instance.Add(pssm.GetShadowMap(i));
                 }
-
-                shadowMapAvailable = true;
             }
-            else if (Settings.Shadow.LightFrustum.Type == LightFrustumTypes.Usm)
-            {
-                usm.Prepare(activeCamera);
 
-                // 投影オブジェクトを収集。
-                foreach (var shadowCaster in activeShadowCasters)
-                    usm.TryAddShadowCaster(shadowCaster);
-
-                // シャドウ マップを描画。
-                var lightDirection = activeDirectionalLight.Direction;
-                usm.Draw(shadowMapEffect, ref lightDirection);
-
-                if (DebugMapDisplay.Available)
-                    DebugMapDisplay.Instance.Add(usm.ShadowMap);
-
-                shadowMapAvailable = true;
-            }
+            shadowMapAvailable = true;
         }
 
         void DrawScene()

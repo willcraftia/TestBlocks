@@ -30,11 +30,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         public ShadowMapSettings ShadowMap { get; private set; }
 
         /// <summary>
-        /// ライト カメラ設定を取得します。
-        /// </summary>
-        public LightFrustumSettings LightFrustum { get; private set; }
-
-        /// <summary>
         /// Sssm 設定を取得します。
         /// </summary>
         public SssmSettings Sssm { get; private set; }
@@ -42,7 +37,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         public ShadowSettings()
         {
             ShadowMap = new ShadowMapSettings();
-            LightFrustum = new LightFrustumSettings();
             Sssm = new SssmSettings();
         }
     }

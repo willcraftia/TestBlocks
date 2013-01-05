@@ -15,8 +15,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         VsmSettings vsmSettings;
 
-        PssmSettings pssmSettings;
-
         Vector3[] corners = new Vector3[8];
 
         float inverseSplitCount;
@@ -27,11 +25,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         float[] safeSplitDistances;
 
-        PssmLightVolume[] splitLightVolumes;
+        LightCamera[] splitLightCameras;
 
         Matrix[] safeSplitLightViewProjections;
 
-        MultiRenderTargets splitRenderTargets;
+        RenderTarget2D[] splitRenderTargets;
 
         Texture2D[] safeSplitShadowMaps;
 
@@ -62,8 +60,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             get
             {
-                for (int i = 0; i < splitLightVolumes.Length; i++)
-                    safeSplitLightViewProjections[i] = splitLightVolumes[i].LightViewProjection;
+                for (int i = 0; i < splitLightCameras.Length; i++)
+                    safeSplitLightViewProjections[i] = splitLightCameras[i].LightViewProjection;
                 return safeSplitLightViewProjections;
             }
         }
@@ -95,9 +93,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             shadowMapSettings = shadowSettings.ShadowMap;
             vsmSettings = shadowMapSettings.Vsm;
-            pssmSettings = shadowSettings.LightFrustum.Pssm;
 
-            SplitCount = pssmSettings.SplitCount;
+            SplitCount = shadowMapSettings.SplitCount;
             inverseSplitCount = 1.0f / (float) SplitCount;
             splitDistances = new float[SplitCount + 1];
             safeSplitDistances = new float[SplitCount + 1];
@@ -108,16 +105,20 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < splitCameras.Length; i++)
                 splitCameras[i] = new BasicCamera("PssmLight" + i);
 
-            splitLightVolumes = new PssmLightVolume[SplitCount];
-            for (int i = 0; i < splitLightVolumes.Length; i++)
-                splitLightVolumes[i] = new PssmLightVolume(shadowMapSettings.Size);
+            splitLightCameras = new LightCamera[SplitCount];
+            for (int i = 0; i < splitLightCameras.Length; i++)
+                splitLightCameras[i] = new LightCamera(shadowMapSettings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
             // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
-            splitRenderTargets = new MultiRenderTargets(GraphicsDevice, "ShadowMap", SplitCount,
-                shadowMapSettings.Size, shadowMapSettings.Size,
-                false, shadowMapSettings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+            splitRenderTargets = new RenderTarget2D[SplitCount];
+            for (int i = 0; i < splitRenderTargets.Length; i++)
+            {
+                splitRenderTargets[i] = new RenderTarget2D(GraphicsDevice, shadowMapSettings.Size, shadowMapSettings.Size,
+                    false, shadowMapSettings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+                splitRenderTargets[i].Name = "ShadowMap" + i;
+            }
 
             // TODO: 初期容量。
             splitShadowCasters = new Queue<ShadowCaster>[SplitCount];
@@ -207,7 +208,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     splitShadowCasters[i].Enqueue(shadowCaster);
 
                     // AABB の頂点を包含座標として登録。
-                    splitLightVolumes[i].AddLightVolumePoints(corners);
+                    splitLightCameras[i].AddLightVolumePoints(corners);
 
                     Monitor[i].ShadowCasterCount++;
                     Monitor.TotalShadowCasterCount++;
@@ -233,12 +234,12 @@ namespace Willcraftia.Xna.Framework.Graphics
                 //------------------------------------------------------------
                 // ライトのビュー×射影行列の更新
 
-                splitLightVolumes[i].Update(camera, ref lightDirection);
+                splitLightCameras[i].Update(camera, ref lightDirection);
 
                 //------------------------------------------------------------
                 // エフェクト
 
-                effect.LightViewProjection = splitLightVolumes[i].LightViewProjection;
+                effect.LightViewProjection = splitLightCameras[i].LightViewProjection;
 
                 //------------------------------------------------------------
                 // 描画
@@ -261,7 +262,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public Texture2D GetShadowMap(int index)
         {
-            if (index < 0 || splitRenderTargets.Count < index) throw new ArgumentOutOfRangeException("index");
+            if (index < 0 || splitRenderTargets.Length < index) throw new ArgumentOutOfRangeException("index");
 
             return splitRenderTargets[index];
         }
@@ -296,7 +297,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var near = camera.Projection.NearPlaneDistance;
             var far = farPlaneDistance;
             var farNearRatio = far / near;
-            var splitLambda = pssmSettings.SplitLambda;
+            var splitLambda = shadowMapSettings.SplitLambda;
 
             for (int i = 0; i < splitDistances.Length; i++)
             {
