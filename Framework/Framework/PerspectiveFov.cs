@@ -49,7 +49,7 @@ namespace Willcraftia.Xna.Framework
         /// <summary>
         /// 近くのビュー プレーンとの距離のデフォルト。
         /// </summary>
-        public const float DefaultNearPlaneDistance = 0.1f;
+        public const float DefaultNearPlaneDistance = 1f;
 
         /// <summary>
         /// 遠くのビュー プレーンとの距離のデフォルト。

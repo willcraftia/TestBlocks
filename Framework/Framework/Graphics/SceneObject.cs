@@ -32,5 +32,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         public virtual void UpdateOcclusion() { }
 
         public abstract void Draw();
+
+        public abstract void Draw(ShadowMap shadowMap);
     }
 }

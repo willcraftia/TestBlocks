@@ -1,8 +1,14 @@
+#include "Common.fxh"
+#include "Shadow.fxh"
+
 //=============================================================================
-// Variables
+//
+// 変数宣言
+//
 //-----------------------------------------------------------------------------
 float4x4 World;
-float4x4 ViewProjection;
+float4x4 View;
+float4x4 Projection;
 
 float3 EyePosition;
 
@@ -60,8 +66,65 @@ sampler SpecularMapSampler = sampler_state
     MipFilter = None;
 };
 
+//-----------------------------------------------------------------------------
+// シャドウ マッピング用
+
+float DepthBias;
+
+#define MAX_SPLIT_COUNT 3
+
+int SplitCount = MAX_SPLIT_COUNT;
+float SplitDistances[MAX_SPLIT_COUNT + 1];
+float4x4 SplitLightViewProjections[MAX_SPLIT_COUNT];
+
+texture ShadowMap0;
+#if MAX_SPLIT_COUNT > 1
+texture ShadowMap1;
+#endif
+#if MAX_SPLIT_COUNT > 2
+texture ShadowMap2;
+#endif
+
+sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
+{
+    sampler_state
+    {
+        Texture = <ShadowMap0>;
+        MinFilter = Point;
+        MagFilter = Point;
+        MipFilter = None;
+    },
+#if MAX_SPLIT_COUNT > 1
+    sampler_state
+    {
+        Texture = <ShadowMap1>;
+        MinFilter = Point;
+        MagFilter = Point;
+        MipFilter = None;
+    },
+#endif
+#if MAX_SPLIT_COUNT > 2
+    sampler_state
+    {
+        Texture = <ShadowMap2>;
+        MinFilter = Point;
+        MagFilter = Point;
+        MipFilter = None;
+    },
+#endif
+};
+
+// Classic specific
+float ShadowMapSize;
+float ShadowMapTexelSize;
+
+// PCF specific
+float2 PcfOffsets[MAX_PCF_TAP_COUNT];
+
 //=============================================================================
-// Structures
+//
+// 構造体宣言
+//
 //-----------------------------------------------------------------------------
 struct ColorPair
 {
@@ -84,35 +147,62 @@ struct VSOutput
     float FogFactor : TEXCOORD1;
 };
 
-//=============================================================================
-// Vertex shader helper
-//-----------------------------------------------------------------------------
-float CalculateFogFactor(float d)
+struct ShadowVSOutput
 {
-    return saturate((d - FogStart) / (FogEnd - FogStart)) * FogEnabled;
-}
+    float4 Position         : POSITION0;
+    float3 Normal           : NORMAL0;
+    float2 TexCoord         : TEXCOORD0;
+    float FogFactor         : TEXCOORD1;
+    float4 WorldPosition    : TEXCOORD2;
+    float4 ViewPosition     : TEXCOORD3;
+};
 
 //=============================================================================
-// Vertex shader
+//
+// 頂点シェーダ
+//
 //-----------------------------------------------------------------------------
 VSOutput VS(VSInput input)
 {
     VSOutput output;
 
     float4 worldPosition = mul(input.Position, World);
+    float4 viewPosition = mul(worldPosition, View);
 
-    output.Position = mul(worldPosition, ViewProjection);
+    output.Position = mul(viewPosition, Projection);
     output.Normal = input.Normal;
     output.TexCoord = input.TexCoord;
 
     float eyeDistance = distance(worldPosition, EyePosition);
-    output.FogFactor = CalculateFogFactor(eyeDistance);
+    output.FogFactor = CalculateFogFactor(FogStart, FogEnd, eyeDistance, FogEnabled);
+
+    return output;
+}
+
+ShadowVSOutput ShadowVS(VSInput input)
+{
+    ShadowVSOutput output;
+
+    float4 worldPosition = mul(input.Position, World);
+    float4 viewPosition = mul(worldPosition, View);
+
+    output.Position = mul(viewPosition, Projection);
+    output.Normal = input.Normal;
+    output.TexCoord = input.TexCoord;
+
+    float eyeDistance = distance(worldPosition, EyePosition);
+    output.FogFactor = CalculateFogFactor(FogStart, FogEnd, eyeDistance, FogEnabled);
+
+    output.WorldPosition = worldPosition;
+    output.ViewPosition = viewPosition;
 
     return output;
 }
 
 //=============================================================================
-// Pixel shader helper
+//
+// ピクセル シェーダ用関数
+//
 //-----------------------------------------------------------------------------
 ColorPair CalculateLight(float3 E, float3 N, float2 texCoord)
 {
@@ -141,8 +231,34 @@ ColorPair CalculateLight(float3 E, float3 N, float2 texCoord)
     return result;
 }
 
+ColorPair CalculateLightWithShadow(float3 E, float3 N, float2 texCoord, float shadow)
+{
+    ColorPair result;
+
+    result.Diffuse = AmbientLightColor;
+    result.Specular = 0;
+
+    float4 specular = tex2D(SpecularMapSampler, texCoord);
+
+    float3 L = -LightDirection;
+    float3 H = normalize(E + L);
+    float dt = max(0, dot(L, N));
+    dt = min(dt, shadow);
+    result.Diffuse += LightDiffuseColor * dt;
+    if (dt != 0)
+        result.Specular += LightSpecularColor * pow(max(0.00001f, dot(H, N)), specular.a);
+
+    result.Diffuse *= tex2D(DiffuseMapSampler, texCoord);
+    result.Diffuse += tex2D(EmissiveMapSampler, texCoord);
+    result.Specular *= specular.rgb;
+
+    return result;
+}
+
 //=============================================================================
-// Pixel shader
+//
+// ピクセル シェーダ
+//
 //-----------------------------------------------------------------------------
 float4 DefaultPS(VSOutput input) : COLOR0
 {
@@ -169,8 +285,162 @@ float4 WireframePS(VSOutput input) : COLOR0
     return float4(0, 0, 0, 1);
 }
 
+float4 ClassicShadowPS(ShadowVSOutput input) : COLOR0
+{
+    // シャドウ
+    float distance = abs(input.ViewPosition.z);
+    float shadow = 1;
+    for (int i = 0; i < SplitCount; i++)
+    {
+        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        {
+            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
+            shadow = TestClassicShadowMap(
+                ShadowMapSampler[i],
+                ShadowMapSize,
+                ShadowMapTexelSize,
+                shadowTexCoord,
+                lightingPosition,
+                DepthBias);
+        }
+    }
+
+    float4 color = float4(0, 0, 0, 1);
+
+    // 基本カラー
+    color += tex2D(TileMapSampler, input.TexCoord);
+
+    // ライティング
+    float3 E = normalize(-EyePosition);
+    float3 N = normalize(input.Normal);
+    ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
+    color.rgb *= light.Diffuse;
+    color.rgb += light.Specular;
+
+    // フォグ
+    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
+
+    return color;
+}
+
+float4 Pcf2x2PS(ShadowVSOutput input) : COLOR
+{
+    // シャドウ
+    float distance = abs(input.ViewPosition.z);
+    float shadow = 1;
+    for (int i = 0; i < SplitCount; i++)
+    {
+        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        {
+            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
+            shadow = TestPcf2x2ShadowMap(
+                ShadowMapSampler[i],
+                shadowTexCoord,
+                lightingPosition,
+                DepthBias,
+                PcfOffsets);
+        }
+    }
+
+    float4 color = float4(0, 0, 0, 1);
+
+    // 基本カラー
+    color += tex2D(TileMapSampler, input.TexCoord);
+
+    // ライティング
+    float3 E = normalize(-EyePosition);
+    float3 N = normalize(input.Normal);
+    ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
+    color.rgb *= light.Diffuse;
+    color.rgb += light.Specular;
+
+    // フォグ
+    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
+
+    return color;
+}
+
+float4 Pcf3x3PS(ShadowVSOutput input) : COLOR
+{
+    // シャドウ
+    float distance = abs(input.ViewPosition.z);
+    float shadow = 1;
+    for (int i = 0; i < SplitCount; i++)
+    {
+        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        {
+            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
+            shadow = TestPcf3x3ShadowMap(
+                ShadowMapSampler[i],
+                shadowTexCoord,
+                lightingPosition,
+                DepthBias,
+                PcfOffsets);
+        }
+    }
+
+    float4 color = float4(0, 0, 0, 1);
+
+    // 基本カラー
+    color += tex2D(TileMapSampler, input.TexCoord);
+
+    // ライティング
+    float3 E = normalize(-EyePosition);
+    float3 N = normalize(input.Normal);
+    ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
+    color.rgb *= light.Diffuse;
+    color.rgb += light.Specular;
+
+    // フォグ
+    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
+
+    return color;
+}
+
+float4 VsmShadowPS(ShadowVSOutput input) : COLOR0
+{
+    // シャドウ
+    float distance = abs(input.ViewPosition.z);
+    float shadow = 1;
+    for (int i = 0; i < SplitCount; i++)
+    {
+        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        {
+            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
+            shadow = TestVarianceShadowMap(
+                ShadowMapSampler[i],
+                shadowTexCoord,
+                lightingPosition,
+                DepthBias);
+        }
+    }
+
+    float4 color = float4(0, 0, 0, 1);
+
+    // 基本カラー
+    color += tex2D(TileMapSampler, input.TexCoord);
+
+    // ライティング
+    float3 E = normalize(-EyePosition);
+    float3 N = normalize(input.Normal);
+    ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
+    color.rgb *= light.Diffuse;
+    color.rgb += light.Specular;
+
+    // フォグ
+    color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
+
+    return color;
+}
+
 //=============================================================================
-// Technique
+//
+// テクニック
+//
 //-----------------------------------------------------------------------------
 technique Default
 {
@@ -191,5 +461,49 @@ technique Wireframe
         CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
         PixelShader = compile ps_3_0 WireframePS();
+    }
+}
+
+technique ClassicShadow
+{
+    pass P0
+    {
+        FillMode = SOLID;
+        CullMode = CCW;
+        VertexShader = compile vs_3_0 ShadowVS();
+        PixelShader = compile ps_3_0 ClassicShadowPS();
+    }
+}
+
+technique Pcf2x2Shadow
+{
+    pass P0
+    {
+        FillMode = SOLID;
+        CullMode = CCW;
+        VertexShader = compile vs_3_0 ShadowVS();
+        PixelShader = compile ps_3_0 Pcf2x2PS();
+    }
+}
+
+technique Pcf3x3Shadow
+{
+    pass P0
+    {
+        FillMode = SOLID;
+        CullMode = CCW;
+        VertexShader = compile vs_3_0 ShadowVS();
+        PixelShader = compile ps_3_0 Pcf3x3PS();
+    }
+}
+
+technique VsmShadow
+{
+    pass P0
+    {
+        FillMode = SOLID;
+        CullMode = CCW;
+        VertexShader = compile vs_3_0 ShadowVS();
+        PixelShader = compile ps_3_0 VsmShadowPS();
     }
 }

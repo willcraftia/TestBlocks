@@ -130,6 +130,12 @@ namespace Willcraftia.Xna.Blocks.Models
             GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
         }
 
+        public override void Draw(ShadowMap shadowMap)
+        {
+            // SkySphere には影を投影しません。
+            Draw();
+        }
+
         #region ToString
 
         public override string ToString()

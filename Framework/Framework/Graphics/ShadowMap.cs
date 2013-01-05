@@ -46,9 +46,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public ShadowSettings ShadowSettings { get; private set; }
-
-        public ShadowMapSettings ShadowMapSettings { get; private set; }
+        public ShadowMapSettings Settings { get; private set; }
 
         public int SplitCount { get; private set; }
 
@@ -87,18 +85,18 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public ShadowMap(GraphicsDevice graphicsDevice, ShadowMapSettings shadowMapSettings, Effect blurEffect)
+        public ShadowMap(GraphicsDevice graphicsDevice, ShadowMapSettings settings, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-            if (shadowMapSettings == null) throw new ArgumentNullException("shadowMapSettings");
+            if (settings == null) throw new ArgumentNullException("settings");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
-            ShadowMapSettings = shadowMapSettings;
+            Settings = settings;
             
-            vsmSettings = shadowMapSettings.Vsm;
+            vsmSettings = settings.Vsm;
 
-            SplitCount = ShadowMapSettings.SplitCount;
+            SplitCount = Settings.SplitCount;
             inverseSplitCount = 1.0f / (float) SplitCount;
             splitDistances = new float[SplitCount + 1];
             safeSplitDistances = new float[SplitCount + 1];
@@ -111,7 +109,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             splitLightCameras = new LightCamera[SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)
-                splitLightCameras[i] = new LightCamera(ShadowMapSettings.Size);
+                splitLightCameras[i] = new LightCamera(Settings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
@@ -119,8 +117,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             splitRenderTargets = new RenderTarget2D[SplitCount];
             for (int i = 0; i < splitRenderTargets.Length; i++)
             {
-                splitRenderTargets[i] = new RenderTarget2D(GraphicsDevice, ShadowMapSettings.Size, ShadowMapSettings.Size,
-                    false, ShadowMapSettings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+                splitRenderTargets[i] = new RenderTarget2D(GraphicsDevice, Settings.Size, Settings.Size,
+                    false, Settings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
                 splitRenderTargets[i].Name = "ShadowMap" + i;
             }
 
@@ -130,7 +128,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 splitShadowCasters[i] = new Queue<ShadowCaster>();
 
             blurSpriteBatch = new SpriteBatch(GraphicsDevice);
-            blur = new GaussianBlur(blurEffect, blurSpriteBatch, ShadowMapSettings.Size, ShadowMapSettings.Size, SurfaceFormat.Vector2,
+            blur = new GaussianBlur(blurEffect, blurSpriteBatch, Settings.Size, Settings.Size, SurfaceFormat.Vector2,
                 vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
 
             Monitor = new ShadowMapMonitor(SplitCount);
@@ -288,7 +286,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var near = camera.Projection.NearPlaneDistance;
             var far = farPlaneDistance;
             var farNearRatio = far / near;
-            var splitLambda = ShadowMapSettings.SplitLambda;
+            var splitLambda = Settings.SplitLambda;
 
             for (int i = 0; i < splitDistances.Length; i++)
             {

@@ -54,13 +54,13 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
 };
 
 //-----------------------------------------------------------------------------
-// Classic specifiec
+// Classic specific
 
 float ShadowMapSize;
 float ShadowMapTexelSize;
 
 //-----------------------------------------------------------------------------
-// PCF specifiec
+// PCF specific
 
 float2 PcfOffsets[MAX_PCF_TAP_COUNT];
 

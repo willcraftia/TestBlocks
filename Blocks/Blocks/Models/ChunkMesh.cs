@@ -207,6 +207,40 @@ namespace Willcraftia.Xna.Blocks.Models
             DrawCore();
         }
 
+        public override void Draw(ShadowMap shadowMap)
+        {
+            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
+            if (Occluded) return;
+
+            var effect = region.ChunkEffect;
+
+            //----------------------------------------------------------------
+            // エフェクトへシャドウ マップを設定
+
+            effect.SplitDistances = shadowMap.SplitDistances;
+            effect.SplitLightViewProjections = shadowMap.SplitLightViewProjections;
+            effect.SplitShadowMaps = shadowMap.SplitShadowMaps;
+            effect.ShadowMapSize = shadowMap.Settings.Size;
+
+            //----------------------------------------------------------------
+            // シャドウ マップ対応テクニックを設定
+
+            effect.EnableShadowTechnique(shadowMap.Settings.Technique);
+
+            //----------------------------------------------------------------
+            // 変換行列
+
+            effect.World = world;
+            effect.Apply();
+
+            //----------------------------------------------------------------
+            // 描画
+
+            DrawCore();
+        }
+
         void DrawCore()
         {
             // チャンクに描画ロックを要求。

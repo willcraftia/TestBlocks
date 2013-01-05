@@ -393,7 +393,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // シーン
 
-            DrawScene();
+            if (shadowMapAvailable && !Settings.Shadow.Sssm.Enabled)
+            {
+                DrawScene(shadowMap);
+            }
+            else
+            {
+                DrawScene();
+            }
 
             //----------------------------------------------------------------
             // スクリーン スペース シャドウ マッピング
@@ -546,6 +553,86 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
 
                 opaque.Draw();
+
+                DebugDrawBoundingBox(opaque);
+            }
+
+            //----------------------------------------------------------------
+            // Translucent Objects
+
+            GraphicsDevice.BlendState = BlendState.AlphaBlend;
+
+            foreach (var translucent in translucentSceneObjects)
+            {
+                if (translucent.Occluded)
+                {
+                    Monitor.OccludedSceneObjectCount++;
+                    DebugDrawBoundingBox(translucent);
+                    continue;
+                }
+
+                // TODO
+                // 半透明に対してシャドウ マップは必要か？
+                translucent.Draw();
+
+                DebugDrawBoundingBox(translucent);
+            }
+
+            Monitor.OnEndDrawSceneRendering();
+
+            GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.OnEndDrawScene();
+        }
+
+        void DrawScene(ShadowMap shadowMap)
+        {
+            Monitor.OnBeginDrawScene();
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+            GraphicsDevice.SetRenderTarget(renderTarget);
+            GraphicsDevice.Clear(Color.White);
+
+            //================================================================
+            //
+            // OcclusionQuery
+            //
+
+            Monitor.OnBeginDrawSceneOcclusionQuery();
+
+            GraphicsDevice.BlendState = colorWriteDisable;
+
+            foreach (var opaque in opaqueSceneObjects)
+                opaque.UpdateOcclusion();
+
+            foreach (var translucent in translucentSceneObjects)
+                translucent.UpdateOcclusion();
+
+            Monitor.OnEndDrawSceneOcclusionQuery();
+
+            //================================================================
+            //
+            // Rendering
+            //
+
+            Monitor.OnBeginDrawSceneRendering();
+
+            //----------------------------------------------------------------
+            // Opaque Objects
+
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
+            foreach (var opaque in opaqueSceneObjects)
+            {
+                if (opaque.Occluded)
+                {
+                    Monitor.OccludedSceneObjectCount++;
+                    DebugDrawBoundingBox(opaque);
+                    continue;
+                }
+
+                opaque.Draw(shadowMap);
 
                 DebugDrawBoundingBox(opaque);
             }

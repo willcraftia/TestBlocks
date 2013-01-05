@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Graphics;
 
 #endregion
 
@@ -20,7 +21,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectParameter world;
 
-        EffectParameter viewProjection;
+        EffectParameter view;
+
+        EffectParameter projection;
 
         EffectParameter eyePosition;
 
@@ -48,12 +51,45 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectParameter specularMap;
 
+        //--------------------------------------------------------------------
+        // Shadow Maps
+
+        EffectParameter depthBias;
+
+        EffectParameter splitCount;
+
+        EffectParameter splitDistances;
+
+        EffectParameter splitLightViewProjections;
+
+        EffectParameter[] shadowMaps;
+
+        //--------------------------------------------------------------------
+        // Classic specific
+
+        EffectParameter shadowMapSize;
+
+        EffectParameter shadowMapTexelSize;
+
+        //--------------------------------------------------------------------
+        // PCF specific
+
+        EffectParameter pcfOffsetsParameter;
+
         //====================================================================
         // EffectTechnique
 
         EffectTechnique defaultTechnique;
 
         EffectTechnique wireframeTechnique;
+
+        EffectTechnique classicShadowTechnique;
+
+        EffectTechnique pcf2x2ShadowTechnique;
+
+        EffectTechnique pcf3x3ShadowTechnique;
+
+        EffectTechnique vsmShadowTechnique;
 
         //====================================================================
         // Cached pass
@@ -66,10 +102,16 @@ namespace Willcraftia.Xna.Blocks.Models
             set { world.SetValue(value); }
         }
 
-        public Matrix ViewProjection
+        public Matrix View
         {
-            get { return viewProjection.GetValueMatrix(); }
-            set { viewProjection.SetValue(value); }
+            get { return view.GetValueMatrix(); }
+            set { view.SetValue(value); }
+        }
+
+        public Matrix Projection
+        {
+            get { return projection.GetValueMatrix(); }
+            set { projection.SetValue(value); }
         }
 
         public Vector3 EyePosition
@@ -156,6 +198,68 @@ namespace Willcraftia.Xna.Blocks.Models
             set { backingEffect.CurrentTechnique = value; }
         }
 
+        public float DepthBias
+        {
+            get { return depthBias.GetValueSingle(); }
+            set { depthBias.SetValue(value); }
+        }
+
+        public int SplitCount
+        {
+            get { return splitCount.GetValueInt32(); }
+            set { splitCount.SetValue(value); }
+        }
+
+        public float[] SplitDistances
+        {
+            get { return splitDistances.GetValueSingleArray(ShadowMapSettings.MaxSplitCount); }
+            set { splitDistances.SetValue(value); }
+        }
+
+        public Matrix[] SplitLightViewProjections
+        {
+            get { return splitLightViewProjections.GetValueMatrixArray(ShadowMapSettings.MaxSplitCount); }
+            set { splitLightViewProjections.SetValue(value); }
+        }
+
+        Texture2D[] shadowMapBuffer = new Texture2D[ShadowMapSettings.MaxSplitCount];
+
+        public Texture2D[] SplitShadowMaps
+        {
+            get
+            {
+                for (int i = 0; i < ShadowMapSettings.MaxSplitCount; i++)
+                    shadowMapBuffer[i] = shadowMaps[i].GetValueTexture2D();
+                return shadowMapBuffer;
+            }
+            set
+            {
+                if (value == null) return;
+
+                for (int i = 0; i < value.Length; i++)
+                    shadowMaps[i].SetValue(value[i]);
+            }
+        }
+
+        //--------------------------------------------------------------------
+        // Classic & PCF specific
+
+        // PCF の場合、PCF テクニックを設定する前に必ず設定していなければならない。
+        public int ShadowMapSize
+        {
+            get { return shadowMapSize.GetValueInt32(); }
+            set
+            {
+                if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                shadowMapSize.SetValue(value);
+                shadowMapTexelSize.SetValue(1 / (float) value);
+            }
+        }
+
+        //
+        //--------------------------------------------------------------------
+
         public ChunkEffect(Effect backingEffect)
         {
             if (backingEffect == null) throw new ArgumentNullException("backingEffect");
@@ -174,19 +278,48 @@ namespace Willcraftia.Xna.Blocks.Models
         public void EnableDefaultTechnique()
         {
             backingEffect.CurrentTechnique = defaultTechnique;
-            currentPass = defaultTechnique.Passes[0];
+            currentPass = backingEffect.CurrentTechnique.Passes[0];
         }
 
         public void EnableWireframeTechnique()
         {
             backingEffect.CurrentTechnique = wireframeTechnique;
-            currentPass = wireframeTechnique.Passes[0];
+            currentPass = backingEffect.CurrentTechnique.Passes[0];
+        }
+
+        public void EnableShadowTechnique(ShadowMapTechniques shadowMapTechnique)
+        {
+            switch (shadowMapTechnique)
+            {
+                case ShadowMapTechniques.Classic:
+                    backingEffect.CurrentTechnique = classicShadowTechnique;
+                    break;
+                case ShadowMapTechniques.Pcf2x2:
+                    if (backingEffect.CurrentTechnique != pcf2x2ShadowTechnique)
+                    {
+                        backingEffect.CurrentTechnique = pcf2x2ShadowTechnique;
+                        InitializePcfKernel(2);
+                    }
+                    break;
+                case ShadowMapTechniques.Pcf3x3:
+                    if (backingEffect.CurrentTechnique != pcf3x3ShadowTechnique)
+                    {
+                        backingEffect.CurrentTechnique = pcf3x3ShadowTechnique;
+                        InitializePcfKernel(3);
+                    }
+                    break;
+                case ShadowMapTechniques.Vsm:
+                    backingEffect.CurrentTechnique = vsmShadowTechnique;
+                    break;
+            }
+            currentPass = backingEffect.CurrentTechnique.Passes[0];
         }
 
         void CacheEffectParameters()
         {
             world = backingEffect.Parameters["World"];
-            viewProjection = backingEffect.Parameters["ViewProjection"];
+            view = backingEffect.Parameters["View"];
+            projection = backingEffect.Parameters["Projection"];
 
             eyePosition = backingEffect.Parameters["EyePosition"];
 
@@ -204,6 +337,20 @@ namespace Willcraftia.Xna.Blocks.Models
             diffuseMap = backingEffect.Parameters["DiffuseMap"];
             emissiveMap = backingEffect.Parameters["EmissiveMap"];
             specularMap = backingEffect.Parameters["SpecularMap"];
+
+            depthBias = backingEffect.Parameters["DepthBias"];
+            splitCount = backingEffect.Parameters["SplitCount"];
+            splitDistances = backingEffect.Parameters["SplitDistances"];
+            splitLightViewProjections = backingEffect.Parameters["SplitLightViewProjections"];
+
+            shadowMaps = new EffectParameter[ShadowMapSettings.MaxSplitCount];
+            for (int i = 0; i < shadowMaps.Length; i++)
+                shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
+
+            shadowMapSize = backingEffect.Parameters["ShadowMapSize"];
+            shadowMapTexelSize = backingEffect.Parameters["ShadowMapTexelSize"];
+
+            pcfOffsetsParameter = backingEffect.Parameters["PcfOffsets"];
         }
 
         void CacheEffectTechniques()
@@ -211,7 +358,48 @@ namespace Willcraftia.Xna.Blocks.Models
             defaultTechnique = backingEffect.Techniques["Default"];
             wireframeTechnique = backingEffect.Techniques["Wireframe"];
 
+            classicShadowTechnique = backingEffect.Techniques["ClassicShadow"];
+            pcf2x2ShadowTechnique = backingEffect.Techniques["Pcf2x2Shadow"];
+            pcf3x3ShadowTechnique = backingEffect.Techniques["Pcf3x3Shadow"];
+            vsmShadowTechnique = backingEffect.Techniques["VsmShadow"];
+
             currentPass = defaultTechnique.Passes[0];
         }
+
+        //====================================================================
+        // PCF specific
+
+        void InitializePcfKernel(int kernelSize)
+        {
+            var texelSize = shadowMapTexelSize.GetValueSingle();
+
+            int start;
+            if (kernelSize % 2 == 0)
+            {
+                start = -(kernelSize / 2) + 1;
+            }
+            else
+            {
+                start = -(kernelSize - 1) / 2;
+            }
+            var end = start + kernelSize;
+
+            var tapCount = kernelSize * kernelSize;
+            var offsets = new Vector2[tapCount];
+
+            int i = 0;
+            for (int y = start; y < end; y++)
+            {
+                for (int x = start; x < end; x++)
+                {
+                    offsets[i++] = new Vector2(x, y) * texelSize;
+                }
+            }
+
+            pcfOffsetsParameter.SetValue(offsets);
+        }
+
+        //
+        //====================================================================
     }
 }

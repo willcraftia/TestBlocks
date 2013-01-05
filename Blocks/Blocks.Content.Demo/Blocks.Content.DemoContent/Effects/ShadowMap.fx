@@ -7,7 +7,7 @@ float4x4 LightViewProjection;
 struct VSOutput
 {
     float4 Position     : POSITION;
-    float Depth         : TEXCOORD0;
+    float4 Depth        : TEXCOORD0;
 };
 
 //=============================================================================
@@ -18,7 +18,7 @@ VSOutput VS(float4 position : POSITION)
     VSOutput output = (VSOutput) 0;
 
     output.Position = mul(position, mul(World, LightViewProjection));
-    output.Depth = output.Position.z / output.Position.w;
+    output.Depth = output.Position;
 
     return output;
 }
@@ -28,12 +28,14 @@ VSOutput VS(float4 position : POSITION)
 //-----------------------------------------------------------------------------
 float4 DefaultPS(VSOutput input) : COLOR0
 {
-    return float4(input.Depth, 0.0f, 0.0f, 0.0f);
+    float depth = input.Depth.z / input.Depth.w;
+    return float4(depth, 0.0f, 0.0f, 0.0f);
 }
 
 float4 VsmPS(VSOutput input) : COLOR0
 {
-    return float4(input.Depth, input.Depth * input.Depth, 0.0f, 0.0f);
+    float depth = input.Depth.z / input.Depth.w;
+    return float4(depth, depth * depth, 0.0f, 0.0f);
 }
 
 //=============================================================================
@@ -43,9 +45,9 @@ technique Default
 {
     pass P0
     {
-//        CullMode = CW;
+        CullMode = CW;
 //        CullMode = CCW;
-        CullMode = None;
+//        CullMode = None;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 DefaultPS();
     }
@@ -55,9 +57,9 @@ technique Vsm
 {
     pass P0
     {
-//        CullMode = CW;
+        CullMode = CW;
 //        CullMode = CCW;
-        CullMode = None;
+//        CullMode = None;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 VsmPS();
     }

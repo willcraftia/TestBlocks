@@ -180,7 +180,8 @@ namespace Willcraftia.Xna.Blocks.Models
             // カメラ設定
 
             chunkEffect.EyePosition = camera.View.Position;
-            chunkEffect.ViewProjection = camera.Frustum.Matrix;
+            chunkEffect.View = camera.View.Matrix;
+            chunkEffect.Projection = camera.Projection.Matrix;
 
             //----------------------------------------------------------------
             // ライティング
