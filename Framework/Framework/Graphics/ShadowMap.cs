@@ -197,7 +197,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                     splitShadowCasters[i].Enqueue(shadowCaster);
 
                     // AABB の頂点を包含座標として登録。
-                    splitLightCameras[i].AddLightVolumePoints(corners);
+                    // TODO:
+                    // これをやると領域が広くなりすぎてカメラが遠方に移動してしまい、
+                    // PSSM の恩恵が得られなくなる。
+                    //splitLightCameras[i].AddLightVolumePoints(corners);
 
                     Monitor[i].ShadowCasterCount++;
                     Monitor.TotalShadowCasterCount++;

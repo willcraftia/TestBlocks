@@ -16,10 +16,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
 
-        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Classic;
+        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Pcf3x3;
 
         public const float DefaultDepthBias = 0.0001f;
-        //public const float DefaultDepthBias = 0;
 
         public const int MinSplitCount = 1;
 

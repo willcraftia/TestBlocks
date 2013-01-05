@@ -33,7 +33,7 @@ float TestClassicShadowMap(
     float depth = lerp(t, b, f.y);
 
     // œZ‚ğ‰ñ”ğ‚µ‚ÄæZ‚Ö
-    // REFERENCE: depth < position.z / position.w - depthBias
+    // REFERENCE: position.z / position.w - depthBias <= depth
     return position.z <= position.w * (depth + depthBias);
 }
 
@@ -61,7 +61,7 @@ float TestPcf2x2ShadowMap(
     depth *= divide4;
 
     // œZ‚ğ‰ñ”ğ‚µ‚ÄæZ‚Ö
-    // REFERENCE: depth < position.z / position.w - depthBias
+    // REFERENCE: position.z / position.w - depthBias <= depth
     return position.z <= position.w * (depth + depthBias);
 }
 
@@ -83,7 +83,7 @@ float TestPcf3x3ShadowMap(
     depth *= divide9;
 
     // œZ‚ğ‰ñ”ğ‚µ‚ÄæZ‚Ö
-    // REFERENCE: depth < position.z / position.w - depthBias
+    // REFERENCE: position.z / position.w - depthBias <= depth
     return position.z <= position.w * (depth + depthBias);
 }
 
@@ -103,6 +103,7 @@ float TestVarianceShadowMap(
     float Ex = moments.x;
     float E_x2 = moments.y;
     float Vx = E_x2 - Ex * Ex;
+    Vx = min(1, max(0, Vx + 0.00001f));
     float t = position.z / position.w - depthBias;
     float tMinusM = t - Ex;
     float p = Vx / (Vx + tMinusM * tMinusM);

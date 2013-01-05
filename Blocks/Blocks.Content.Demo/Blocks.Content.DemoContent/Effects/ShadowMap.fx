@@ -45,6 +45,9 @@ technique Default
 {
     pass P0
     {
+        // TODO
+        // CW で描画しなければ、影が付くべきではない面に影が付く。
+        // しかし、CW ではライト ブリーディングのような現象が発生する。
         CullMode = CW;
 //        CullMode = CCW;
 //        CullMode = None;
