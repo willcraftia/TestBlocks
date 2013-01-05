@@ -219,10 +219,12 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // エフェクトへシャドウ マップを設定
 
+            effect.DepthBias = shadowMap.Settings.DepthBias;
+            effect.SplitCount = shadowMap.Settings.SplitCount;
+            effect.ShadowMapSize = shadowMap.Settings.Size;
             effect.SplitDistances = shadowMap.SplitDistances;
             effect.SplitLightViewProjections = shadowMap.SplitLightViewProjections;
             effect.SplitShadowMaps = shadowMap.SplitShadowMaps;
-            effect.ShadowMapSize = shadowMap.Settings.Size;
 
             //----------------------------------------------------------------
             // シャドウ マップ対応テクニックを設定

@@ -82,9 +82,21 @@ namespace Willcraftia.Xna.Framework.Graphics
             Matrix.CreateLookAt(ref lightPosition, ref target, ref up, out lightView);
 
             // REFERECE: http://msdn.microsoft.com/ja-jp/library/ee416324(VS.85).aspx
-            boxSize.X = Adjust(boxSize.X);
-            boxSize.Y = Adjust(boxSize.Y);
-            boxSize.Z = Adjust(boxSize.Z);
+
+            //float bound = boxSize.Z;
+            //float unitPerTexel = bound / shadowMapSize;
+
+            //boxSize.X /= unitPerTexel;
+            //boxSize.X = MathExtension.Floor(boxSize.X);
+            //boxSize.X *= unitPerTexel;
+
+            //boxSize.Y /= unitPerTexel;
+            //boxSize.Y = MathExtension.Floor(boxSize.Y);
+            //boxSize.Y *= unitPerTexel;
+
+            //boxSize.Z /= unitPerTexel;
+            //boxSize.Z = MathExtension.Floor(boxSize.Z);
+            //boxSize.Z *= unitPerTexel;
 
             Matrix lightProjection;
             Matrix.CreateOrthographic(boxSize.X, boxSize.Y, -boxSize.Z, boxSize.Z, out lightProjection);
@@ -93,26 +105,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // クリア。
             lightVolumePoints.Clear();
-        }
-
-        void Adjust(ref BoundingBox lightVolume)
-        {
-            lightVolume.Min.X = Adjust(lightVolume.Min.X);
-            lightVolume.Min.Y = Adjust(lightVolume.Min.Y);
-            lightVolume.Min.Z = Adjust(lightVolume.Min.Z);
-
-            lightVolume.Max.X = Adjust(lightVolume.Max.X);
-            lightVolume.Max.Y = Adjust(lightVolume.Max.Y);
-            lightVolume.Max.Z = Adjust(lightVolume.Max.Z);
-        }
-
-        float Adjust(float value)
-        {
-            var result = value;
-            result *= shadowMapSize;
-            result = MathExtension.Floor(result);
-            result *= shadowMapTexelSize;
-            return result;
         }
     }
 }

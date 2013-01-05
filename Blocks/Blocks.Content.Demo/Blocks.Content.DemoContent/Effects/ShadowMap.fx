@@ -45,11 +45,15 @@ technique Default
 {
     pass P0
     {
-        // TODO
-        // CW で描画しなければ、影が付くべきではない面に影が付く。
-        // しかし、CW ではライト ブリーディングのような現象が発生する。
-        CullMode = CW;
-//        CullMode = CCW;
+        // CW では異常にピーターパン現象が発生してしまうため、
+        // CCW にしている。
+        // CCW は深度バイアスを必要とするが、ピーターパン現象を消すよりも楽。
+        //
+        // http://msdn.microsoft.com/ja-jp/library/ee416324(VS.85).aspx
+        // 『背面と全面』参照。
+        //
+//        CullMode = CW;
+        CullMode = CCW;
 //        CullMode = None;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 DefaultPS();
@@ -60,8 +64,8 @@ technique Vsm
 {
     pass P0
     {
-        CullMode = CW;
-//        CullMode = CCW;
+//        CullMode = CW;
+        CullMode = CCW;
 //        CullMode = None;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 VsmPS();

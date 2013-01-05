@@ -14,11 +14,22 @@ namespace Willcraftia.Xna.Framework.Graphics
         //public const int DefaultSize = 1024;
         public const int DefaultSize = 2048;
 
-        public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
+        // メモ
+        //
+        // VSM が最も綺麗な影となるが、最前面以外の分割視錐台で深度テストが上手くいっていない。
+        // また、高い崖のような地形による投影において、ライト ブリーディングが激しい。
+        // なお、分割数 1 で VSM を行うと、カメラ近隣はほとんどが影なしと判定される。
+        //
+        // Pcf は、3x3 程度なら Classic とそれ程変わりがない。
+        //
 
-        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Pcf3x3;
+        public const SurfaceFormat DefaultFormat = SurfaceFormat.Vector2;
 
-        public const float DefaultDepthBias = 0.0001f;
+        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Vsm;
+
+        // シャドウ マップのサイズに従って適切な値が変わるので注意。
+        // シャドウ マップ サイズを小さくすると、より大きな深度バイアスが必要。
+        public const float DefaultDepthBias = 0.0005f;
 
         public const int MinSplitCount = 1;
 
