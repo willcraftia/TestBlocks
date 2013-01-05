@@ -42,6 +42,11 @@ namespace Willcraftia.Xna.Framework
         public const float AspectRatio16x9 = 16.0f / 9.0f;
 
         /// <summary>
+        /// アスペクト比のデフォルト。
+        /// </summary>
+        public const float DefaultAspectRatio = AspectRatio4x3;
+
+        /// <summary>
         /// 近くのビュー プレーンとの距離のデフォルト。
         /// </summary>
         public const float DefaultNearPlaneDistance = 0.1f;
@@ -59,7 +64,7 @@ namespace Willcraftia.Xna.Framework
         /// <summary>
         /// アスペクト比。
         /// </summary>
-        float aspectRatio = AspectRatio4x3;
+        float aspectRatio = DefaultAspectRatio;
 
         /// <summary>
         /// 近くのビュー プレーンとの距離。

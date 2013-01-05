@@ -136,11 +136,11 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (camera == null) throw new ArgumentNullException("camera");
 
-            // デフォルトでは視錐台を含む AABB で準備する。
+            // 視錐台を含む AABB をシーン領域のデフォルトとしておく。
             camera.Frustum.GetCorners(corners);
-            frustumBoundingBox = BoundingBox.CreateFromPoints(corners);
+            var sceneBoundingBox = BoundingBox.CreateFromPoints(corners);
 
-            PrepareSplitCameras(camera, ref frustumBoundingBox);
+            PrepareSplitCameras(camera, ref sceneBoundingBox);
         }
 
         public void PrepareSplitCameras(ICamera camera, ref BoundingBox sceneBoundingBox)
@@ -166,19 +166,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 Monitor[i].ShadowCasterCount = 0;
             }
-
-            // TODO: 必要？
-            //Matrix invertView;
-            //Matrix.Invert(ref camera.View.Matrix, out invertView);
-            //Vector3 position = camera.Position;
-            //var back = position + invertView.Backward * 10;
-            //var left = position + invertView.Left * 10;
-            //var right = position + invertView.Right * 10;
-            //var up = position + invertView.Up * 10;
-            //splitLightCameras[0].AddLightVolumePoint(ref back);
-            //splitLightCameras[0].AddLightVolumePoint(ref left);
-            //splitLightCameras[0].AddLightVolumePoint(ref right);
-            //splitLightCameras[0].AddLightVolumePoint(ref up);
 
             Monitor.TotalShadowCasterCount = 0;
         }

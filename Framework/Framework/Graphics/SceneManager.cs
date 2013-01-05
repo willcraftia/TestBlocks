@@ -82,6 +82,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ShadowMapEffect shadowMapEffect;
 
+        BasicCamera shadowCamera = new BasicCamera("Shadow");
+
         Pssm pssm;
 
         ShadowScene shadowScene;
@@ -199,6 +201,11 @@ namespace Willcraftia.Xna.Framework.Graphics
                 sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
                 if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
             }
+
+            //----------------------------------------------------------------
+            // シャドウ マッピング用カメラの登録
+
+            AddCamera(shadowCamera);
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -451,14 +458,32 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void DrawShadowMap()
         {
-            // PSSM の分割カメラを準備。
-            pssm.PrepareSplitCameras(activeCamera);
+            //----------------------------------------------------------------
+            // シャドウ マッピング用カメラの更新
 
-            // 投影オブジェクトを収集。
+            shadowCamera.View.Position = activeCamera.View.Position;
+            shadowCamera.View.Direction = activeCamera.View.Direction;
+            shadowCamera.View.Up = activeCamera.View.Up;
+            shadowCamera.Projection.Fov = activeCamera.Projection.Fov;
+            shadowCamera.Projection.AspectRatio = activeCamera.Projection.AspectRatio;
+            shadowCamera.Projection.NearPlaneDistance = Settings.Shadow.ShadowMap.NearPlaneDistance;
+            shadowCamera.Projection.FarPlaneDistance = Settings.Shadow.ShadowMap.FarPlaneDistance;
+            shadowCamera.Update();
+
+            //----------------------------------------------------------------
+            // 分割カメラを準備
+
+            pssm.PrepareSplitCameras(shadowCamera);
+
+            //----------------------------------------------------------------
+            // 投影オブジェクトを収集
+
             foreach (var shadowCaster in activeShadowCasters)
                 pssm.TryAddShadowCaster(shadowCaster);
 
-            // シャドウ マップを描画。
+            //----------------------------------------------------------------
+            // シャドウ マップを描画
+
             var lightDirection = activeDirectionalLight.Direction;
             pssm.Draw(shadowMapEffect, ref lightDirection);
 

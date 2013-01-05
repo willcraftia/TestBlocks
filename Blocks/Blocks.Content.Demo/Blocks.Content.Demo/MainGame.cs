@@ -232,6 +232,25 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             ResourceLoader.Register(FileResourceLoader.Instance);
 
             //================================================================
+            // Camera
+
+            var viewport = GraphicsDevice.Viewport;
+            viewInput.InitialMousePositionX = viewport.Width / 2;
+            viewInput.InitialMousePositionY = viewport.Height / 2;
+            viewInput.View = camera.View;
+            viewInput.MoveVelocity = moveVelocity;
+            viewInput.DashFactor = dashFactor;
+            viewInput.Yaw(MathHelper.Pi);
+
+            //camera.FreeView.Position = new Vector3(0, 16 * 18, 0);
+            camera.View.Position = new Vector3(0, 16 * 16, 0);
+            //camera.FreeView.Position = new Vector3(0, 16 * 3, 0);
+            //camera.FreeView.Position = new Vector3(0, 16 * 2, 0);
+            camera.Projection.FarPlaneDistance = farPlaneDistance;
+
+            camera.Update();
+
+            //================================================================
             // WorldManager
 
             worldManager = new WorldManager(Services, GraphicsDevice);
@@ -256,25 +275,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             worldManager.PartitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
             worldManager.PartitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
             worldManager.PartitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
-
-            //================================================================
-            // Camera
-
-            var viewport = GraphicsDevice.Viewport;
-            viewInput.InitialMousePositionX = viewport.Width / 2;
-            viewInput.InitialMousePositionY = viewport.Height / 2;
-            viewInput.View = camera.View;
-            viewInput.MoveVelocity = moveVelocity;
-            viewInput.DashFactor = dashFactor;
-            viewInput.Yaw(MathHelper.Pi);
-
-            //camera.FreeView.Position = new Vector3(0, 16 * 18, 0);
-            camera.View.Position = new Vector3(0, 16 * 16, 0);
-            //camera.FreeView.Position = new Vector3(0, 16 * 3, 0);
-            //camera.FreeView.Position = new Vector3(0, 16 * 2, 0);
-            camera.Projection.FarPlaneDistance = farPlaneDistance;
-
-            camera.Update();
+            worldManager.SceneManagerSettings.Shadow.ShadowMap.NearPlaneDistance = camera.Projection.NearPlaneDistance;
+            // TODO:
+            // SSSM ではフォグより手前にする必要あり。
+            // しかし、メッシュのエフェクトに直接影を書き込むなら、それは不要。
+            worldManager.SceneManagerSettings.Shadow.ShadowMap.FarPlaneDistance = camera.Projection.FarPlaneDistance - 64;
 
             //================================================================
             // Region

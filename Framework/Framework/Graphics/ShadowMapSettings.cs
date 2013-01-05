@@ -21,14 +21,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const float DefaultDepthBias = 0.0001f;
         //public const float DefaultDepthBias = 0;
 
-        public const float DefaultFov = MathHelper.PiOver4;
-
-        public const float DefaultAspectRatio = 1;
-
-        public const float DefaultNearPlaneDistance = 0.1f;
-
-        public const float DefaultFarPlaneDistance = 1000.0f;
-
         public const int MinSplitCount = 1;
 
         public const int MaxSplitCount = 7;
@@ -45,13 +37,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         float depthBias = DefaultDepthBias;
 
-        float fov = DefaultFov;
+        float nearPlaneDistance = PerspectiveFov.DefaultNearPlaneDistance;
 
-        float aspectRatio = DefaultAspectRatio;
-
-        float nearPlaneDistance = DefaultNearPlaneDistance;
-        
-        float farPlaneDistance = DefaultFarPlaneDistance;
+        float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
 
         int splitCount = DefaultSplitCount;
 
@@ -116,35 +104,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// シャドウ マップ描画で使用するライト カメラの y 方向の視野角 (ラジアン単位)。
-        /// </summary>
-        public float Fov
-        {
-            get { return fov; }
-            set
-            {
-                if (value < 0 || MathHelper.Pi < value) throw new ArgumentOutOfRangeException("value");
-
-                fov = value;
-            }
-        }
-
-        /// <summary>
-        /// シャドウ マップ描画で使用するライト カメラのアスペクト比。
-        /// </summary>
-        public float AspectRatio
-        {
-            get { return aspectRatio; }
-            set
-            {
-                if (value < 0) throw new ArgumentOutOfRangeException("value");
-
-                aspectRatio = value;
-            }
-        }
-
-        /// <summary>
-        /// シャドウ マップ描画で使用するライト カメラの、近くのビュー プレーンとの距離。
+        /// シャドウ マップ描画で使用するカメラの、近くのビュー プレーンとの距離。
         /// </summary>
         public float NearPlaneDistance
         {
@@ -158,7 +118,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         /// <summary>
-        /// シャドウ マップ描画で使用するライト カメラの、遠くのビュー プレーンとの距離。
+        /// シャドウ マップ描画で使用するカメラの、遠くのビュー プレーンとの距離。
         /// </summary>
         public float FarPlaneDistance
         {
