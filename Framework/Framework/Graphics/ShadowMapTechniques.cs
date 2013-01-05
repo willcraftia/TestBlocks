@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     public enum ShadowMapTechniques
     {
         /// <summary>
-        /// クラシックな検査。
+        /// クラシック。
         /// </summary>
         Classic,
 
@@ -19,8 +19,13 @@ namespace Willcraftia.Xna.Framework.Graphics
         Vsm,
 
         /// <summary>
-        /// PCF (Percentage Closer Filtering)。
+        /// PCF (Percentage Closer Filtering) 2x2 カーネル。
         /// </summary>
-        Pcf
+        Pcf2x2,
+
+        /// <summary>
+        /// PCF (Percentage Closer Filtering) 3x3 カーネル。
+        /// </summary>
+        Pcf3x3
     }
 }

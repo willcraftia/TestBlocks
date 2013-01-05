@@ -56,8 +56,7 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
 //-----------------------------------------------------------------------------
 // PCF specifiec
 
-float TapCount;
-float2 Offsets[MAX_PCF_TAP_COUNT];
+float2 PcfOffsets[MAX_PCF_TAP_COUNT];
 
 //=============================================================================
 // Structures
@@ -110,7 +109,11 @@ float4 ClassicPS(VSOutput input) : COLOR0
         {
             float4 lightingPosition = input.LightingPosition[i];
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
-            shadow = TestClassicShadowMap(ShadowMapSampler[i], shadowTexCoord, lightingPosition, DepthBias);
+            shadow = TestClassicShadowMap(
+                ShadowMapSampler[i],
+                shadowTexCoord,
+                lightingPosition,
+                DepthBias);
             splitIndex = i;
         }
     }
@@ -121,8 +124,7 @@ float4 ClassicPS(VSOutput input) : COLOR0
     return float4(r, g, b, 1);
 }
 
-/*
-float4 PcfPS(VSOutput input) : COLOR
+float4 Pcf2x2PS(VSOutput input) : COLOR
 {
     float distance = abs(input.ViewPosition.z);
 
@@ -134,13 +136,12 @@ float4 PcfPS(VSOutput input) : COLOR
         {
             float4 lightingPosition = input.LightingPosition[i];
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
-            shadow = TestPcfShadowMap(
+            shadow = TestPcf2x2ShadowMap(
                 ShadowMapSampler[i],
                 shadowTexCoord,
                 lightingPosition,
                 DepthBias,
-                TapCount,
-                Offsets);
+                PcfOffsets);
             splitIndex = i;
         }
     }
@@ -150,12 +151,33 @@ float4 PcfPS(VSOutput input) : COLOR
     float b = (splitIndex == 2) ? shadow : 0;
     return float4(r, g, b, 1);
 }
-*/
 
-// TODO
-float4 PcfPS(VSOutput input) : COLOR
+float4 Pcf3x3PS(VSOutput input) : COLOR
 {
-    return float4(1, 1, 1, 1);
+    float distance = abs(input.ViewPosition.z);
+
+    float splitIndex = -1;
+    float shadow = 1;
+    for (int i = 0; i < SplitCount; i++)
+    {
+        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        {
+            float4 lightingPosition = input.LightingPosition[i];
+            float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
+            shadow = TestPcf3x3ShadowMap(
+                ShadowMapSampler[i],
+                shadowTexCoord,
+                lightingPosition,
+                DepthBias,
+                PcfOffsets);
+            splitIndex = i;
+        }
+    }
+
+    float r = shadow;
+    float g = (splitIndex == 1) ? shadow : 0;
+    float b = (splitIndex == 2) ? shadow : 0;
+    return float4(r, g, b, 1);
 }
 
 float4 VsmPS(VSOutput input) : COLOR0
@@ -199,13 +221,23 @@ technique Classic
     }
 }
 
-technique Pcf
+technique Pcf2x2
 {
     pass P0
     {
         CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 PcfPS();
+        PixelShader = compile ps_3_0 Pcf2x2PS();
+    }
+}
+
+technique Pcf3x3
+{
+    pass P0
+    {
+        CullMode = CCW;
+        VertexShader = compile vs_3_0 VS();
+        PixelShader = compile ps_3_0 Pcf3x3PS();
     }
 }
 

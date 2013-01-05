@@ -41,6 +41,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             this.shadowSceneEffect = new ShadowSceneEffect(shadowSceneEffect);
             this.shadowSceneEffect.DepthBias = shadowSettings.ShadowMap.DepthBias;
             this.shadowSceneEffect.SplitCount = shadowSettings.ShadowMap.SplitCount;
+            this.shadowSceneEffect.ShadowMapSize = shadowSettings.ShadowMap.Size;
             this.shadowSceneEffect.Technique = shadowSettings.ShadowMap.Technique;
 
             //----------------------------------------------------------------

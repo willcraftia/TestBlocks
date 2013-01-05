@@ -39,9 +39,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         //--------------------------------------------------------------------
         // PCF specific
 
-        EffectParameter tapCountParameter;
-
-        EffectParameter offsetsParameter;
+        EffectParameter pcfOffsetsParameter;
 
         //====================================================================
         // EffectTechnique
@@ -50,7 +48,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectTechnique classicTechnique;
 
-        EffectTechnique pcfTechnique;
+        EffectTechnique pcf2x2Technique;
+
+        EffectTechnique pcf3x3Technique;
 
         EffectTechnique vsmTechnique;
 
@@ -124,9 +124,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         //--------------------------------------------------------------------
         // PCF specific
 
+        // PCF へテクニックを変更する前に必ず設定していなければならない。
         public int ShadowMapSize { get; set; }
-
-        public int PcfKernelSize { get; set; }
 
         //
         //--------------------------------------------------------------------
@@ -143,8 +142,13 @@ namespace Willcraftia.Xna.Framework.Graphics
                     case ShadowMapTechniques.Vsm:
                         backingEffect.CurrentTechnique = vsmTechnique;
                         break;
-                    case ShadowMapTechniques.Pcf:
-                        backingEffect.CurrentTechnique = pcfTechnique;
+                    case ShadowMapTechniques.Pcf2x2:
+                        backingEffect.CurrentTechnique = pcf2x2Technique;
+                        InitializePcfKernel(2);
+                        break;
+                    case ShadowMapTechniques.Pcf3x3:
+                        backingEffect.CurrentTechnique = pcf3x3Technique;
+                        InitializePcfKernel(3);
                         break;
                     default:
                         backingEffect.CurrentTechnique = classicTechnique;
@@ -174,11 +178,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < shadowMaps.Length; i++)
                 shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
 
-            tapCountParameter = backingEffect.Parameters["TapCount"];
-            offsetsParameter = backingEffect.Parameters["Offsets"];
+            pcfOffsetsParameter = backingEffect.Parameters["PcfOffsets"];
 
             classicTechnique = backingEffect.Techniques["Classic"];
-            pcfTechnique = backingEffect.Techniques["Pcf"];
+            pcf2x2Technique = backingEffect.Techniques["Pcf2x2"];
+            pcf3x3Technique = backingEffect.Techniques["Pcf3x3"];
             vsmTechnique = backingEffect.Techniques["Vsm"];
 
             Technique = DefaultShadowMapTechnique;
@@ -193,22 +197,22 @@ namespace Willcraftia.Xna.Framework.Graphics
         //====================================================================
         // PCF specific
 
-        public void InitializePcfKernel()
+        void InitializePcfKernel(int kernelSize)
         {
             var texelSize = 1.0f / (float) ShadowMapSize;
 
             int start;
-            if (PcfKernelSize % 2 == 0)
+            if (kernelSize % 2 == 0)
             {
-                start = -(PcfKernelSize / 2) + 1;
+                start = -(kernelSize / 2) + 1;
             }
             else
             {
-                start = -(PcfKernelSize - 1) / 2;
+                start = -(kernelSize - 1) / 2;
             }
-            var end = start + PcfKernelSize;
+            var end = start + kernelSize;
 
-            var tapCount = PcfKernelSize * PcfKernelSize;
+            var tapCount = kernelSize * kernelSize;
             var offsets = new Vector2[tapCount];
 
             int i = 0;
@@ -220,8 +224,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
             }
 
-            tapCountParameter.SetValue(tapCount);
-            offsetsParameter.SetValue(offsets);
+            pcfOffsetsParameter.SetValue(offsets);
         }
 
         //
