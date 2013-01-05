@@ -23,18 +23,6 @@ texture ShadowMap1;
 #if MAX_SPLIT_COUNT > 2
 texture ShadowMap2;
 #endif
-#if MAX_SPLIT_COUNT > 3
-texture ShadowMap3;
-#endif
-#if MAX_SPLIT_COUNT > 4
-texture ShadowMap4;
-#endif
-#if MAX_SPLIT_COUNT > 5
-texture ShadowMap5;
-#endif
-#if MAX_SPLIT_COUNT > 6
-texture ShadowMap6;
-#endif
 
 sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
 {
@@ -58,42 +46,6 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
     sampler_state
     {
         Texture = <ShadowMap2>;
-        MinFilter = Point;
-        MagFilter = Point;
-        MipFilter = None;
-    },
-#endif
-#if MAX_SPLIT_COUNT > 3
-    sampler_state
-    {
-        Texture = <ShadowMap3>;
-        MinFilter = Point;
-        MagFilter = Point;
-        MipFilter = None;
-    },
-#endif
-#if MAX_SPLIT_COUNT > 4
-    sampler_state
-    {
-        Texture = <ShadowMap4>;
-        MinFilter = Point;
-        MagFilter = Point;
-        MipFilter = None;
-    },
-#endif
-#if MAX_SPLIT_COUNT > 5
-    sampler_state
-    {
-        Texture = <ShadowMap5>;
-        MinFilter = Point;
-        MagFilter = Point;
-        MipFilter = None;
-    },
-#endif
-#if MAX_SPLIT_COUNT > 6
-    sampler_state
-    {
-        Texture = <ShadowMap6>;
         MinFilter = Point;
         MagFilter = Point;
         MipFilter = None;
@@ -169,7 +121,8 @@ float4 ClassicPS(VSOutput input) : COLOR0
     return float4(r, g, b, 1);
 }
 
-float4 TODO_PcfPS(VSOutput input) : COLOR
+/*
+float4 PcfPS(VSOutput input) : COLOR
 {
     float distance = abs(input.ViewPosition.z);
 
@@ -181,7 +134,13 @@ float4 TODO_PcfPS(VSOutput input) : COLOR
         {
             float4 lightingPosition = input.LightingPosition[i];
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
-            shadow = TestPcfShadowMap(ShadowMapSampler[i], shadowTexCoord, lightingPosition, DepthBias, TapCount, Offsets);
+            shadow = TestPcfShadowMap(
+                ShadowMapSampler[i],
+                shadowTexCoord,
+                lightingPosition,
+                DepthBias,
+                TapCount,
+                Offsets);
             splitIndex = i;
         }
     }
@@ -191,6 +150,7 @@ float4 TODO_PcfPS(VSOutput input) : COLOR
     float b = (splitIndex == 2) ? shadow : 0;
     return float4(r, g, b, 1);
 }
+*/
 
 // TODO
 float4 PcfPS(VSOutput input) : COLOR
@@ -202,7 +162,7 @@ float4 VsmPS(VSOutput input) : COLOR0
 {
     float distance = abs(input.ViewPosition.z);
 
-    float splitIndex = 0;
+    float splitIndex = -1;
     float shadow = 1;
 
     for (int i = 0; i < SplitCount; i++)
@@ -220,7 +180,6 @@ float4 VsmPS(VSOutput input) : COLOR0
         }
     }
 
-    splitIndex %= 3;
     float r = shadow;
     float g = (splitIndex == 1) ? shadow : 0;
     float b = (splitIndex == 2) ? shadow : 0;

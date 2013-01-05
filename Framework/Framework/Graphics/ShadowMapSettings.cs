@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int MinSplitCount = 1;
 
-        public const int MaxSplitCount = 7;
+        public const int MaxSplitCount = 3;
 
         public const int DefaultSplitCount = 1;
 

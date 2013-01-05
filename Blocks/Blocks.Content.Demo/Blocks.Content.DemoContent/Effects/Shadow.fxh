@@ -22,18 +22,9 @@ float TestClassicShadowMap(
 {
     float depth = tex2D(shadowMap, shadowTexCoord).x;
 
-    // optimaization by avoiding division and using multiplication
-    //
-    // depth < position.z / position.w - depthBias
-    //
-    if (position.w * (depth + depthBias) < position.z)
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
+    // œŽZ‚ð‰ñ”ð‚µ‚ÄæŽZ‚Ö
+    // REFERENCE: depth < position.z / position.w - depthBias
+    return position.z <= position.w * (depth + depthBias);
 }
 
 //-----------------------------------------------------------------------------
