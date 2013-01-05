@@ -84,7 +84,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BasicCamera shadowCamera = new BasicCamera("Shadow");
 
-        Pssm pssm;
+        ShadowMap shadowMap;
 
         ShadowScene shadowScene;
 
@@ -190,8 +190,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             shadowMapEffect = new ShadowMapEffect(moduleFactory.CreateShadowMapEffect());
             shadowMapEffect.Technique = shadowSettings.ShadowMap.Technique;
 
-            pssm = moduleFactory.CreatePssm(shadowSettings);
-            if (pssm != null) Monitor.Pssm = pssm.Monitor;
+            shadowMap = moduleFactory.CreateShadowMap(shadowSettings.ShadowMap);
+            if (shadowMap != null) Monitor.Pssm = shadowMap.Monitor;
 
             if (shadowSettings.Sssm.Enabled)
             {
@@ -426,7 +426,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (shadowScene != null)
             {
                 // TODO: Transculent は要らない？
-                shadowScene.Draw(activeCamera, pssm, opaqueSceneObjects);
+                shadowScene.Draw(activeCamera, shadowMap, opaqueSceneObjects);
 
                 if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowScene.RenderTarget);
 
@@ -473,25 +473,25 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 分割カメラを準備
 
-            pssm.PrepareSplitCameras(shadowCamera);
+            shadowMap.PrepareSplitCameras(shadowCamera);
 
             //----------------------------------------------------------------
             // 投影オブジェクトを収集
 
             foreach (var shadowCaster in activeShadowCasters)
-                pssm.TryAddShadowCaster(shadowCaster);
+                shadowMap.TryAddShadowCaster(shadowCaster);
 
             //----------------------------------------------------------------
             // シャドウ マップを描画
 
             var lightDirection = activeDirectionalLight.Direction;
-            pssm.Draw(shadowMapEffect, ref lightDirection);
+            shadowMap.Draw(shadowMapEffect, ref lightDirection);
 
             if (DebugMapDisplay.Available)
             {
                 for (int i = 0; i < Settings.Shadow.ShadowMap.SplitCount; i++)
                 {
-                    DebugMapDisplay.Instance.Add(pssm.GetShadowMap(i));
+                    DebugMapDisplay.Instance.Add(shadowMap.GetShadowMap(i));
                 }
             }
 

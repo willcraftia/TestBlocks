@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class PssmMonitor
+    public sealed class ShadowMapMonitor
     {
         #region Split
 
@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public int TotalShadowCasterCount { get; set; }
 
-        public PssmMonitor(int splitCount)
+        public ShadowMapMonitor(int splitCount)
         {
             SplitCount = splitCount;
 

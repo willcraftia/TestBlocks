@@ -58,9 +58,9 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public Pssm CreatePssm(ShadowSettings shadowSettings)
+        public ShadowMap CreateShadowMap(ShadowMapSettings shadowMapSettings)
         {
-            return new Pssm(GraphicsDevice, shadowSettings, CreateGaussianBlurEffect());
+            return new ShadowMap(GraphicsDevice, shadowMapSettings, CreateGaussianBlurEffect());
         }
 
         // I/F

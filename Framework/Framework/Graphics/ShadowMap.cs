@@ -9,10 +9,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class Pssm
+    /// <summary>
+    /// シャドウ マップを生成および管理するクラスです。
+    /// このクラスは、PSSM (parallel split shadow maps) によりシャドウ マップを生成します。
+    /// PSSM によるシャドウ マップの分割を必要としない場合には、分割数を 1 として利用します。
+    /// </summary>
+    public sealed class ShadowMap
     {
-        ShadowMapSettings shadowMapSettings;
-
         VsmSettings vsmSettings;
 
         Vector3[] corners = new Vector3[8];
@@ -44,6 +47,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public ShadowSettings ShadowSettings { get; private set; }
+
+        public ShadowMapSettings ShadowMapSettings { get; private set; }
 
         public int SplitCount { get; private set; }
 
@@ -78,23 +83,22 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #region Debug
 
-        public PssmMonitor Monitor;
+        public ShadowMapMonitor Monitor;
 
         #endregion
 
-        public Pssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings, Effect blurEffect)
+        public ShadowMap(GraphicsDevice graphicsDevice, ShadowMapSettings shadowMapSettings, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-            if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
+            if (shadowMapSettings == null) throw new ArgumentNullException("shadowMapSettings");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
-            ShadowSettings = shadowSettings;
-
-            shadowMapSettings = shadowSettings.ShadowMap;
+            ShadowMapSettings = shadowMapSettings;
+            
             vsmSettings = shadowMapSettings.Vsm;
 
-            SplitCount = shadowMapSettings.SplitCount;
+            SplitCount = ShadowMapSettings.SplitCount;
             inverseSplitCount = 1.0f / (float) SplitCount;
             splitDistances = new float[SplitCount + 1];
             safeSplitDistances = new float[SplitCount + 1];
@@ -107,7 +111,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             splitLightCameras = new LightCamera[SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)
-                splitLightCameras[i] = new LightCamera(shadowMapSettings.Size);
+                splitLightCameras[i] = new LightCamera(ShadowMapSettings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
@@ -115,8 +119,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             splitRenderTargets = new RenderTarget2D[SplitCount];
             for (int i = 0; i < splitRenderTargets.Length; i++)
             {
-                splitRenderTargets[i] = new RenderTarget2D(GraphicsDevice, shadowMapSettings.Size, shadowMapSettings.Size,
-                    false, shadowMapSettings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+                splitRenderTargets[i] = new RenderTarget2D(GraphicsDevice, ShadowMapSettings.Size, ShadowMapSettings.Size,
+                    false, ShadowMapSettings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
                 splitRenderTargets[i].Name = "ShadowMap" + i;
             }
 
@@ -126,10 +130,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                 splitShadowCasters[i] = new Queue<ShadowCaster>();
 
             blurSpriteBatch = new SpriteBatch(GraphicsDevice);
-            blur = new GaussianBlur(blurEffect, blurSpriteBatch, shadowMapSettings.Size, shadowMapSettings.Size, SurfaceFormat.Vector2,
+            blur = new GaussianBlur(blurEffect, blurSpriteBatch, ShadowMapSettings.Size, ShadowMapSettings.Size, SurfaceFormat.Vector2,
                 vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
 
-            Monitor = new PssmMonitor(SplitCount);
+            Monitor = new ShadowMapMonitor(SplitCount);
         }
 
         public void PrepareSplitCameras(ICamera camera)
@@ -284,7 +288,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var near = camera.Projection.NearPlaneDistance;
             var far = farPlaneDistance;
             var farNearRatio = far / near;
-            var splitLambda = shadowMapSettings.SplitLambda;
+            var splitLambda = ShadowMapSettings.SplitLambda;
 
             for (int i = 0; i < splitDistances.Length; i++)
             {

@@ -131,8 +131,8 @@
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
-    <Compile Include="Graphics\Pssm.cs" />
-    <Compile Include="Graphics\PssmMonitor.cs" />
+    <Compile Include="Graphics\ShadowMap.cs" />
+    <Compile Include="Graphics\ShadowMapMonitor.cs" />
     <Compile Include="Graphics\ShadowScene.cs" />
     <Compile Include="Graphics\ShadowSceneEffect.cs" />
     <Compile Include="Graphics\ShadowSceneMonitor.cs" />

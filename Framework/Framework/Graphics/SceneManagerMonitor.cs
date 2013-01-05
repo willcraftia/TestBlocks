@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return VisibleSceneObjectCount - OccludedSceneObjectCount; }
         }
 
-        public PssmMonitor Pssm { get; internal set; }
+        public ShadowMapMonitor Pssm { get; internal set; }
 
         public ShadowSceneMonitor ShadowScene { get; internal set; }
 

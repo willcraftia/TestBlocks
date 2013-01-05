@@ -18,7 +18,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Effect CreateSssmEffect();
 
-        Pssm CreatePssm(ShadowSettings shadowSettings);
+        ShadowMap CreateShadowMap(ShadowMapSettings shadowMapSettings);
 
         ShadowScene CreateShadowScene(ShadowSettings shadowSettings);
 

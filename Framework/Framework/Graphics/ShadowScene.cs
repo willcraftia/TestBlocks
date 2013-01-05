@@ -11,8 +11,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class ShadowScene
     {
-        ShadowSettings shadowSettings;
-
         RenderTarget2D renderTarget;
 
         ShadowSceneEffect shadowSceneEffect;
@@ -33,7 +31,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (shadowSceneEffect == null) throw new ArgumentNullException("shadowSceneEffect");
 
             GraphicsDevice = graphicsDevice;
-            this.shadowSettings = shadowSettings;
 
             //----------------------------------------------------------------
             // エフェクト
@@ -59,10 +56,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new ShadowSceneMonitor(this);
         }
 
-        public void Draw(ICamera camera, Pssm pssm, IEnumerable<SceneObject> sceneObjects)
+        public void Draw(ICamera camera, ShadowMap shadowMap, IEnumerable<SceneObject> sceneObjects)
         {
             if (camera == null) throw new ArgumentNullException("camera");
-            if (pssm == null) throw new ArgumentNullException("pssm");
+            if (shadowMap == null) throw new ArgumentNullException("shadowMap");
             if (sceneObjects == null) throw new ArgumentNullException("sceneObjects");
 
             Monitor.OnBeginDraw();
@@ -72,9 +69,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             shadowSceneEffect.View = camera.View.Matrix;
             shadowSceneEffect.Projection = camera.Projection.Matrix;
-            shadowSceneEffect.SplitDistances = pssm.SplitDistances;
-            shadowSceneEffect.SplitLightViewProjections = pssm.SplitLightViewProjections;
-            shadowSceneEffect.SplitShadowMaps = pssm.SplitShadowMaps;
+            shadowSceneEffect.SplitDistances = shadowMap.SplitDistances;
+            shadowSceneEffect.SplitLightViewProjections = shadowMap.SplitLightViewProjections;
+            shadowSceneEffect.SplitShadowMaps = shadowMap.SplitShadowMaps;
 
             //----------------------------------------------------------------
             // 描画
