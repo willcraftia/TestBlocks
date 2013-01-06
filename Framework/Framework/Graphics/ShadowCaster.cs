@@ -16,8 +16,5 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             CastShadow = true;
         }
-
-        // シャドウ マップ/シャドウ シーンへの描画。
-        public abstract void Draw(IEffectShadow effect);
     }
 }

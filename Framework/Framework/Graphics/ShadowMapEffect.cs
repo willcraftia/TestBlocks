@@ -8,14 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class ShadowMapEffect : IEffectShadow
+    public sealed class ShadowMapEffect : Effect, IEffectMatrices
     {
-        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
-
-        //====================================================================
-        // Real Effect
-
-        Effect backingEffect;
+        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Classic;
 
         //====================================================================
         // EffectParameter
@@ -27,16 +22,25 @@ namespace Willcraftia.Xna.Framework.Graphics
         //====================================================================
         // EffectTechnique
 
-        ShadowMapTechniques technique;
+        ShadowMapTechniques shadowMapTechnique;
 
         EffectTechnique defaultTechnique;
 
         EffectTechnique vsmTechnique;
 
-        //====================================================================
-        // Cached pass
+        // I/F
+        public Matrix Projection
+        {
+            get { return Matrix.Identity; }
+            set { }
+        }
 
-        EffectPass currentPass;
+        // I/F
+        public Matrix View
+        {
+            get { return Matrix.Identity; }
+            set { }
+        }
 
         // I/F
         public Matrix World
@@ -51,45 +55,35 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { lightViewProjection.SetValue(value); }
         }
 
-        public ShadowMapTechniques Technique
+        public ShadowMapTechniques ShadowMapTechnique
         {
-            get { return technique; }
+            get { return shadowMapTechnique; }
             set
             {
-                technique = value;
+                shadowMapTechnique = value;
 
-                switch (technique)
+                switch (shadowMapTechnique)
                 {
                     case ShadowMapTechniques.Vsm:
-                        backingEffect.CurrentTechnique = vsmTechnique;
+                        CurrentTechnique = vsmTechnique;
                         break;
                     default:
-                        backingEffect.CurrentTechnique = defaultTechnique;
+                        CurrentTechnique = defaultTechnique;
                         break;
                 }
-                
-                currentPass = backingEffect.CurrentTechnique.Passes[0];
             }
         }
 
-        public ShadowMapEffect(Effect backingEffect)
+        public ShadowMapEffect(Effect cloneSource)
+            : base(cloneSource)
         {
-            if (backingEffect == null) throw new ArgumentNullException("backingEffect");
+            world = Parameters["World"];
+            lightViewProjection = Parameters["LightViewProjection"];
 
-            this.backingEffect = backingEffect;
+            defaultTechnique = Techniques["Default"];
+            vsmTechnique = Techniques["Vsm"];
 
-            world = backingEffect.Parameters["World"];
-            lightViewProjection = backingEffect.Parameters["LightViewProjection"];
-
-            defaultTechnique = backingEffect.Techniques["Default"];
-            vsmTechnique = backingEffect.Techniques["Vsm"];
-
-            Technique = DefaultShadowMapTechnique;
-        }
-
-        public void Apply()
-        {
-            currentPass.Apply();
+            ShadowMapTechnique = DefaultShadowMapTechnique;
         }
     }
 }

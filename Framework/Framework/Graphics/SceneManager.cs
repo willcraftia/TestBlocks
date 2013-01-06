@@ -82,8 +82,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingSphere frustumSphere;
 
-        ShadowMapEffect shadowMapEffect;
-
         BasicCamera shadowCamera = new BasicCamera("Shadow");
 
         ShadowMap shadowMap;
@@ -191,19 +189,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             var shadowSettings = Settings.Shadow;
 
-            shadowMapEffect = new ShadowMapEffect(moduleFactory.CreateShadowMapEffect());
-            shadowMapEffect.Technique = shadowSettings.ShadowMap.Technique;
-
-            shadowMap = moduleFactory.CreateShadowMap(shadowSettings.ShadowMap);
-            if (shadowMap != null) Monitor.Pssm = shadowMap.Monitor;
-
-            if (shadowSettings.Sssm.Enabled)
+            if (shadowSettings.Enabled)
             {
-                shadowScene = moduleFactory.CreateShadowScene(shadowSettings);
-                if (shadowScene != null) Monitor.ShadowScene = shadowScene.Monitor;
+                shadowMap = moduleFactory.CreateShadowMap(shadowSettings.ShadowMap);
+                if (shadowMap != null) Monitor.Pssm = shadowMap.Monitor;
 
-                sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
-                if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
+                if (shadowMap != null && shadowSettings.Sssm.Enabled)
+                {
+                    shadowScene = moduleFactory.CreateShadowScene(shadowSettings);
+                    if (shadowScene != null) Monitor.ShadowScene = shadowScene.Monitor;
+
+                    sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
+                    if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
+                }
             }
 
             //----------------------------------------------------------------
@@ -389,26 +387,25 @@ namespace Willcraftia.Xna.Framework.Graphics
             // シャドウ マップ
 
             shadowMapAvailable = false;
-            if (shadowMapEffect != null && Settings.Shadow.Enabled &&
-                activeShadowCasters.Count != 0 &&
+            if (shadowMap != null && activeShadowCasters.Count != 0 &&
                 activeDirectionalLight != null && activeDirectionalLight.Enabled)
             {
                 DrawShadowMap();
+                shadowMapAvailable = true;
             }
 
             //----------------------------------------------------------------
             // シャドウ シーン
 
-            RenderTarget2D shadowScene = null;
-            if (shadowMapAvailable && Settings.Shadow.Sssm.Enabled)
+            if (shadowScene != null && shadowMapAvailable)
             {
-                shadowScene = DrawShadowScene();
+                DrawShadowScene();
             }
 
             //----------------------------------------------------------------
             // シーン
 
-            if (shadowMapAvailable && !Settings.Shadow.Sssm.Enabled)
+            if (shadowMapAvailable && shadowScene == null)
             {
                 DrawScene(shadowMap);
             }
@@ -420,10 +417,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // スクリーン スペース シャドウ マッピング
 
-            if (shadowScene != null && sssm != null)
+            if (sssm != null)
             {
                 sssm.ShadowColor = ShadowColor;
-                sssm.Filter(renderTarget, shadowScene, postProcessRenderTarget);
+                sssm.Filter(renderTarget, shadowScene.RenderTarget, postProcessRenderTarget);
 
                 SwapRenderTargets();
             }
@@ -460,19 +457,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             postProcessRenderTarget = temp;
         }
 
-        RenderTarget2D DrawShadowScene()
+        void DrawShadowScene()
         {
-            if (shadowScene != null)
-            {
-                // TODO: Transculent は要らない？
-                shadowScene.Draw(activeCamera, shadowMap, opaqueSceneObjects);
+            // TODO: Transculent は要らない？
+            shadowScene.Draw(activeCamera, shadowMap, opaqueSceneObjects);
 
-                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowScene.RenderTarget);
-
-                return shadowScene.RenderTarget;
-            }
-
-            return null;
+            if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowScene.RenderTarget);
         }
 
         bool IsVisibleObject(SceneObject sceneObject)
@@ -524,17 +514,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             // シャドウ マップを描画
 
             var lightDirection = activeDirectionalLight.Direction;
-            shadowMap.Draw(shadowMapEffect, ref lightDirection);
+            shadowMap.Draw(ref lightDirection);
 
             if (DebugMapDisplay.Available)
             {
-                for (int i = 0; i < Settings.Shadow.ShadowMap.SplitCount; i++)
+                for (int i = 0; i < shadowMap.SplitCount; i++)
                 {
                     DebugMapDisplay.Instance.Add(shadowMap.GetShadowMap(i));
                 }
             }
-
-            shadowMapAvailable = true;
         }
 
         void DrawScene()

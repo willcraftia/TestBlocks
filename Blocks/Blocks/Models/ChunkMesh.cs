@@ -11,7 +11,7 @@ using Willcraftia.Xna.Framework.Diagnostics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMesh : ShadowCaster, IShadowSceneSupport
+    public sealed class ChunkMesh : ShadowCaster
     {
         static readonly VectorI3 chunkSize = Chunk.Size;
 
@@ -186,43 +186,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 DrawCore();
             }
-        }
-
-        public override void Draw(IEffectShadow effect)
-        {
-            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
-
-            //----------------------------------------------------------------
-            // 変換行列
-
-            effect.World = world;
-            effect.Apply();
-
-            //----------------------------------------------------------------
-            // 描画
-
-            DrawCore();
-        }
-
-        // I/F
-        public void Draw(IEffectShadowScene effect)
-        {
-            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
-
-            //----------------------------------------------------------------
-            // 変換行列
-
-            effect.World = world;
-            effect.Apply();
-
-            //----------------------------------------------------------------
-            // 描画
-
-            DrawCore();
         }
 
         public override void Draw(ShadowMap shadowMap)

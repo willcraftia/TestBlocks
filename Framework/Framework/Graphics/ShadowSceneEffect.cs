@@ -8,14 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class ShadowSceneEffect : IEffectShadowScene
+    public sealed class ShadowSceneEffect : Effect, IEffectMatrices
     {
-        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Vsm;
-
-        //====================================================================
-        // Real Effect
-
-        Effect backingEffect;
+        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Classic;
 
         //====================================================================
         // EffectParameter
@@ -51,7 +46,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         //====================================================================
         // EffectTechnique
 
-        ShadowMapTechniques technique;
+        ShadowMapTechniques shadowMapTechnique;
 
         EffectTechnique classicTechnique;
 
@@ -61,28 +56,25 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectTechnique vsmTechnique;
 
-        //====================================================================
-        // Cached pass
-
-        EffectPass currentPass;
-
         // I/F
-        public Matrix World
+        public Matrix Projection
         {
-            get { return world.GetValueMatrix(); }
-            set { world.SetValue(value); }
+            get { return projection.GetValueMatrix(); }
+            set { projection.SetValue(value); }
         }
 
+        // I/F
         public Matrix View
         {
             get { return view.GetValueMatrix(); }
             set { view.SetValue(value); }
         }
 
-        public Matrix Projection
+        // I/F
+        public Matrix World
         {
-            get { return projection.GetValueMatrix(); }
-            set { projection.SetValue(value); }
+            get { return world.GetValueMatrix(); }
+            set { world.SetValue(value); }
         }
 
         public float DepthBias
@@ -147,71 +139,60 @@ namespace Willcraftia.Xna.Framework.Graphics
         //
         //--------------------------------------------------------------------
 
-        public ShadowMapTechniques Technique
+        public ShadowMapTechniques ShadowMapTechnique
         {
-            get { return technique; }
+            get { return shadowMapTechnique; }
             set
             {
-                technique = value;
+                shadowMapTechnique = value;
 
-                switch (technique)
+                switch (shadowMapTechnique)
                 {
                     case ShadowMapTechniques.Vsm:
-                        backingEffect.CurrentTechnique = vsmTechnique;
+                        CurrentTechnique = vsmTechnique;
                         break;
                     case ShadowMapTechniques.Pcf2x2:
-                        backingEffect.CurrentTechnique = pcf2x2Technique;
+                        CurrentTechnique = pcf2x2Technique;
                         InitializePcfKernel(2);
                         break;
                     case ShadowMapTechniques.Pcf3x3:
-                        backingEffect.CurrentTechnique = pcf3x3Technique;
+                        CurrentTechnique = pcf3x3Technique;
                         InitializePcfKernel(3);
                         break;
                     default:
-                        backingEffect.CurrentTechnique = classicTechnique;
+                        CurrentTechnique = classicTechnique;
                         break;
                 }
-
-                currentPass = backingEffect.CurrentTechnique.Passes[0];
             }
         }
 
-        public ShadowSceneEffect(Effect backingEffect)
+        public ShadowSceneEffect(Effect cloneSource)
+            : base(cloneSource)
         {
-            if (backingEffect == null) throw new ArgumentNullException("backingEffect");
+            world = Parameters["World"];
+            view = Parameters["View"];
+            projection = Parameters["Projection"];
 
-            this.backingEffect = backingEffect;
-
-            world = backingEffect.Parameters["World"];
-            view = backingEffect.Parameters["View"];
-            projection = backingEffect.Parameters["Projection"];
-
-            depthBias = backingEffect.Parameters["DepthBias"];
-            splitCount = backingEffect.Parameters["SplitCount"];
-            splitDistances = backingEffect.Parameters["SplitDistances"];
-            splitLightViewProjections = backingEffect.Parameters["SplitLightViewProjections"];
+            depthBias = Parameters["DepthBias"];
+            splitCount = Parameters["SplitCount"];
+            splitDistances = Parameters["SplitDistances"];
+            splitLightViewProjections = Parameters["SplitLightViewProjections"];
 
             shadowMaps = new EffectParameter[ShadowMapSettings.MaxSplitCount];
             for (int i = 0; i < shadowMaps.Length; i++)
-                shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
+                shadowMaps[i] = Parameters["ShadowMap" + i];
 
-            shadowMapSize = backingEffect.Parameters["ShadowMapSize"];
-            shadowMapTexelSize = backingEffect.Parameters["ShadowMapTexelSize"];
+            shadowMapSize = Parameters["ShadowMapSize"];
+            shadowMapTexelSize = Parameters["ShadowMapTexelSize"];
 
-            pcfOffsetsParameter = backingEffect.Parameters["PcfOffsets"];
+            pcfOffsetsParameter = Parameters["PcfOffsets"];
 
-            classicTechnique = backingEffect.Techniques["Classic"];
-            pcf2x2Technique = backingEffect.Techniques["Pcf2x2"];
-            pcf3x3Technique = backingEffect.Techniques["Pcf3x3"];
-            vsmTechnique = backingEffect.Techniques["Vsm"];
+            classicTechnique = Techniques["Classic"];
+            pcf2x2Technique = Techniques["Pcf2x2"];
+            pcf3x3Technique = Techniques["Pcf3x3"];
+            vsmTechnique = Techniques["Vsm"];
 
-            Technique = DefaultShadowMapTechnique;
-        }
-
-        // I/F
-        public void Apply()
-        {
-            currentPass.Apply();
+            ShadowMapTechnique = DefaultShadowMapTechnique;
         }
 
         //====================================================================

@@ -10,8 +10,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public interface ISceneModuleFactory
     {
-        Effect CreateShadowMapEffect();
-
         ShadowMap CreateShadowMap(ShadowMapSettings shadowMapSettings);
 
         ShadowScene CreateShadowScene(ShadowSettings shadowSettings);

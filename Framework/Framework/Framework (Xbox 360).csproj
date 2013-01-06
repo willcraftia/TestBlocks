@@ -163,14 +163,8 @@
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\ICamera.cs" />
-    <Compile Include="Graphics\IEffectPssm.cs" />
-    <Compile Include="Graphics\IEffectShadow.cs" />
-    <Compile Include="Graphics\IEffectShadowScene.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
-    <Compile Include="Graphics\IShadowSceneSupport.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\SceneManager.cs" />

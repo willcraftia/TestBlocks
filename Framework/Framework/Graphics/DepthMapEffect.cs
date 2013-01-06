@@ -43,15 +43,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             world = Parameters["World"];
             view = Parameters["View"];
             projection = Parameters["Projection"];
-
-            AssertParameterNotNull(world);
-            AssertParameterNotNull(view);
-            AssertParameterNotNull(projection);
-        }
-
-        void AssertParameterNotNull(EffectParameter parameter)
-        {
-            if (parameter == null) throw new ArgumentException("Parameter not found.");
         }
     }
 }

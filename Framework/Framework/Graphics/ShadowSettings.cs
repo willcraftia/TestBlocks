@@ -30,7 +30,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         public ShadowMapSettings ShadowMap { get; private set; }
 
         /// <summary>
-        /// Sssm 設定を取得します。
+        /// スクリーン スペース シャドウ マッピング設定を取得します。
         /// </summary>
         public SssmSettings Sssm { get; private set; }
 

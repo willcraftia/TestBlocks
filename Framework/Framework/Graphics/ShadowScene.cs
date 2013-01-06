@@ -39,7 +39,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             this.shadowSceneEffect.DepthBias = shadowSettings.ShadowMap.DepthBias;
             this.shadowSceneEffect.SplitCount = shadowSettings.ShadowMap.SplitCount;
             this.shadowSceneEffect.ShadowMapSize = shadowSettings.ShadowMap.Size;
-            this.shadowSceneEffect.Technique = shadowSettings.ShadowMap.Technique;
+            this.shadowSceneEffect.ShadowMapTechnique = shadowSettings.ShadowMap.Technique;
 
             //----------------------------------------------------------------
             // レンダ ターゲット
@@ -83,10 +83,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
             foreach (var sceneObject in sceneObjects)
-            {
-                var support = sceneObject as IShadowSceneSupport;
-                if (support != null) support.Draw(shadowSceneEffect);
-            }
+                sceneObject.Draw(shadowSceneEffect);
 
             GraphicsDevice.SetRenderTarget(null);
 

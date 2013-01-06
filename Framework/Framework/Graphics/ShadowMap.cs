@@ -38,7 +38,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Queue<ShadowCaster>[] splitShadowCasters;
 
-        SpriteBatch blurSpriteBatch;
+        ShadowMapEffect shadowMapEffect;
+
+        SpriteBatch spriteBatch;
 
         GaussianBlur blur;
 
@@ -85,14 +87,20 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public ShadowMap(GraphicsDevice graphicsDevice, ShadowMapSettings settings, Effect blurEffect)
+        public ShadowMap(GraphicsDevice graphicsDevice, ShadowMapSettings settings,
+            SpriteBatch spriteBatch, Effect shadowMapEffect, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (settings == null) throw new ArgumentNullException("settings");
+            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
+            if (shadowMapEffect == null) throw new ArgumentNullException("shadowMapEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
             Settings = settings;
+            this.spriteBatch = spriteBatch;
+            this.shadowMapEffect = new ShadowMapEffect(shadowMapEffect);
+            this.shadowMapEffect.ShadowMapTechnique = settings.Technique;
             
             vsmSettings = settings.Vsm;
 
@@ -127,8 +135,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < splitShadowCasters.Length; i++)
                 splitShadowCasters[i] = new Queue<ShadowCaster>();
 
-            blurSpriteBatch = new SpriteBatch(GraphicsDevice);
-            blur = new GaussianBlur(blurEffect, blurSpriteBatch, Settings.Size, Settings.Size, SurfaceFormat.Vector2,
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            blur = new GaussianBlur(blurEffect, spriteBatch, Settings.Size, Settings.Size, SurfaceFormat.Vector2,
                 vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
 
             Monitor = new ShadowMapMonitor(SplitCount);
@@ -211,7 +219,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         // シャドウ マップを描画。
-        public void Draw(ShadowMapEffect effect, ref Vector3 lightDirection)
+        public void Draw(ref Vector3 lightDirection)
         {
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
@@ -231,7 +239,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 //------------------------------------------------------------
                 // エフェクト
 
-                effect.LightViewProjection = splitLightCameras[i].LightViewProjection;
+                shadowMapEffect.LightViewProjection = splitLightCameras[i].LightViewProjection;
 
                 //------------------------------------------------------------
                 // 描画
@@ -242,10 +250,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                 while (0 < shadowCasters.Count)
                 {
                     var shadowCaster = shadowCasters.Dequeue();
-                    shadowCaster.Draw(effect);
+                    shadowCaster.Draw(shadowMapEffect);
                 }
 
-                if (effect.Technique == ShadowMapTechniques.Vsm && vsmSettings.Blur.Enabled)
+                if (shadowMapEffect.ShadowMapTechnique == ShadowMapTechniques.Vsm && vsmSettings.Blur.Enabled)
                     blur.Filter(renderTarget);
 
                 GraphicsDevice.SetRenderTarget(null);

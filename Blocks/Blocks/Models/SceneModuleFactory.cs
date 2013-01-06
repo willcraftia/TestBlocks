@@ -35,16 +35,12 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public Effect CreateShadowMapEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/ShadowMap");
-            return assetManager.Load<Effect>(resource);
-        }
-
-        // I/F
         public ShadowMap CreateShadowMap(ShadowMapSettings shadowMapSettings)
         {
-            return new ShadowMap(GraphicsDevice, shadowMapSettings, CreateGaussianBlurEffect());
+            var shadowMapEffectResource = resourceManager.Load("content:Effects/ShadowMap");
+            var shadowMapEffect = assetManager.Load<Effect>(shadowMapEffectResource);
+
+            return new ShadowMap(GraphicsDevice, shadowMapSettings, spriteBatch, shadowMapEffect, CreateGaussianBlurEffect());
         }
 
         // I/F
