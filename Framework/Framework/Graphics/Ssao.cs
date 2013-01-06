@@ -15,10 +15,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         sealed class SsaoMapEffect
         {
-            EffectParameter viewportSize;
-
-            EffectParameter textureSize;
-
             EffectParameter totalStrength;
             
             EffectParameter strength;
@@ -34,18 +30,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             EffectParameter normalDepthMap;
             
             public Effect Effect { get; private set; }
-
-            public Vector2 ViewportSize
-            {
-                get { return viewportSize.GetValueVector2(); }
-                set { viewportSize.SetValue(value); }
-            }
-
-            public Vector2 TextureSize
-            {
-                get { return textureSize.GetValueVector2(); }
-                set { textureSize.SetValue(value); }
-            }
 
             public float TotalStrength
             {
@@ -93,15 +77,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 Effect = effect;
 
-                viewportSize = effect.Parameters["ViewportSize"];
-                textureSize = effect.Parameters["TextureSize"];
-
                 totalStrength = effect.Parameters["TotalStrength"];
                 strength = effect.Parameters["Strength"];
                 randomOffset = effect.Parameters["RandomOffset"];
                 falloff = effect.Parameters["Falloff"];
                 radius = effect.Parameters["Radius"];
-
                 randomNormalMap = effect.Parameters["RandomNormalMap"];
                 normalDepthMap = effect.Parameters["NormalDepthMap"];
             }
@@ -290,7 +270,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D blurRenderTarget;
 
-        Quad quad;
+        FullscreenQuad fullscreenQuad;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -365,7 +345,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // SsaoMap.fx は ps_3_0 を使うため、SpriteBatch を利用できない。
             // そこで、Quad を用いて SpriteBatch 風に SsaoMap.fx を利用する。
 
-            quad = new Quad(GraphicsDevice);
+            fullscreenQuad = new FullscreenQuad(GraphicsDevice);
         }
 
         public void DrawSsaoMap(ICamera viewerCamera, IEnumerable<SceneObject> sceneObjects)
@@ -423,19 +403,22 @@ namespace Willcraftia.Xna.Framework.Graphics
             // SSAO マップを描画
             //
 
+            //----------------------------------------------------------------
+            // エフェクト
+
+            ssaoMapEffect.NormalDepthMap = NormalDepthMap;
+
+            //----------------------------------------------------------------
+            // 描画
+
             GraphicsDevice.SetRenderTarget(SsaoMap);
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
             GraphicsDevice.Clear(Color.White);
 
-            var viewport = GraphicsDevice.Viewport;
-            ssaoMapEffect.ViewportSize = new Vector2(viewport.Width, viewport.Height);
-            ssaoMapEffect.TextureSize = new Vector2(SsaoMap.Width, SsaoMap.Height);
-            ssaoMapEffect.NormalDepthMap = NormalDepthMap;
             ssaoMapEffect.Effect.CurrentTechnique.Passes[0].Apply();
-
-            quad.Draw(Vector2.One * -1, Vector2.One);
+            fullscreenQuad.Draw();
 
             GraphicsDevice.SetRenderTarget(null);
 

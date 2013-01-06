@@ -16,10 +16,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultStrength = 1;
 
-        //public const float DefaultFalloff = 0.00001f;
-        public const float DefaultFalloff = 0.0001f;
+        public const float DefaultFalloff = 0.00001f;
 
-        public const float DefaultRadius = 0.1f;
+        public const float DefaultRadius = 1;
 
         bool enabled = DefaultEnabled;
 

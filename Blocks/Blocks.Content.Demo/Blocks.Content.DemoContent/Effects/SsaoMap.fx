@@ -3,9 +3,6 @@
 // ïœêîêÈåæ
 //
 //-----------------------------------------------------------------------------
-float2 ViewportSize;
-float2 TextureSize;
-
 float TotalStrength = 1.00;
 float Strength = 1.0;
 float RandomOffset = 18.0;
@@ -105,16 +102,6 @@ sampler RandomNormalMapSampler = sampler_state
 //-----------------------------------------------------------------------------
 void VS(inout float4 position : POSITION0, inout float2 texCoord : TEXCOORD0)
 {
-//    position.xy -= float2(1.0, -1.0) / ViewportSize;
-
-/*
-    position.xy -= 0.5;
-    position.xy /= ViewportSize;
-    position.xy *= float2(2, -2);
-    position.xy -= float2(1, -1);
-
-    texCoord /= TextureSize;
-*/
 }
 
 //=============================================================================
