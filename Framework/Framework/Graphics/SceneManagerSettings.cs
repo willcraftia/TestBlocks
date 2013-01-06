@@ -15,10 +15,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public DofSettings Dof { get; private set; }
 
+        public EdgeSettings Edge { get; private set; }
+
         public SceneManagerSettings()
         {
             Shadow = new ShadowSettings();
             Dof = new DofSettings();
+            Edge = new EdgeSettings();
         }
     }
 }

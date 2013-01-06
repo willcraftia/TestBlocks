@@ -160,12 +160,15 @@
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\Dof.cs" />
     <Compile Include="Graphics\DofSettings.cs" />
+    <Compile Include="Graphics\Edge.cs" />
+    <Compile Include="Graphics\EdgeSettings.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\LightCamera.cs" />
+    <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />

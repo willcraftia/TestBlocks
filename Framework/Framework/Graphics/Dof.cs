@@ -11,9 +11,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Dof : IDisposable
     {
-        #region DofEffectAdapter
+        #region DofEffect
 
-        sealed class DofEffectAdapter
+        sealed class DofEffect
         {
             EffectParameter focusDistance;
 
@@ -73,9 +73,9 @@ namespace Willcraftia.Xna.Framework.Graphics
                 set { bluredSceneMap.SetValue(value); }
             }
 
-            public DofEffectAdapter(Effect effect)
+            public DofEffect(Effect effect)
             {
-                this.Effect = effect;
+                Effect = effect;
 
                 focusDistance = effect.Parameters["FocusDistance"];
                 focusRange = effect.Parameters["FocusRange"];
@@ -95,7 +95,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        BasicCamera internalCamera = new BasicCamera("Dof");
+        BasicCamera internalCamera = new BasicCamera("DofInternal");
 
         Vector3[] frustumCorners = new Vector3[8];
 
@@ -103,7 +103,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         DepthMapEffect depthMapEffect;
 
-        DofEffectAdapter dofEffectAdapter;
+        DofEffect dofEffect;
 
         SpriteBatch spriteBatch;
 
@@ -135,7 +135,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // エフェクト
 
             this.depthMapEffect = new DepthMapEffect(depthMapEffect);
-            dofEffectAdapter = new DofEffectAdapter(dofEffect);
+            this.dofEffect = new DofEffect(dofEffect);
 
             //----------------------------------------------------------------
             // レンダ ターゲット
@@ -146,21 +146,18 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // 深度マップ
             DepthMap = new RenderTarget2D(GraphicsDevice, width, height,
-                false, settings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+                false, SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
 
             // ブラー済みシーン マップ
             BluredSceneMap = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
             //----------------------------------------------------------------
-            // ブラー機能
+            // ブラー
 
             blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Color,
                 settings.Blur.Radius, settings.Blur.Amount);
         }
-
-        // TODO
-        // シーン マネージャで全ての描画対象を収集しておく。
 
         public void DrawDepth(ICamera viewerCamera, IEnumerable<SceneObject> sceneObjects)
         {
@@ -168,7 +165,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (sceneObjects == null) throw new ArgumentNullException("sceneObjects");
 
             //----------------------------------------------------------------
-            // 深度マップ用カメラの準備
+            // 内部カメラの準備
 
             internalCamera.View.Position = viewerCamera.View.Position;
             internalCamera.View.Direction = viewerCamera.View.Direction;
@@ -183,7 +180,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             frustumSphere = BoundingSphere.CreateFromPoints(frustumCorners);
 
             //----------------------------------------------------------------
-            // 深度マップ用エフェクトの準備
+            // エフェクト
 
             depthMapEffect.View = internalCamera.View.Matrix;
             depthMapEffect.Projection = internalCamera.Projection.Matrix;
@@ -213,7 +210,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (result == null) throw new ArgumentNullException("result");
 
             //================================================================
-            // シーンにブラーをかける
+            // シーンにブラーを適用
 
             blur.Filter(sceneMap, BluredSceneMap);
 
@@ -221,15 +218,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             // シーンとブラー済みシーンを深度マップに基いて合成
 
             //----------------------------------------------------------------
-            // エフェクト設定
+            // エフェクト
 
             var distance = internalCamera.Projection.FarPlaneDistance - internalCamera.Projection.NearPlaneDistance;
-            dofEffectAdapter.NearPlaneDistance = internalCamera.Projection.NearPlaneDistance;
-            dofEffectAdapter.FarPlaneDistance = internalCamera.Projection.FarPlaneDistance / distance;
-            dofEffectAdapter.FocusDistance = internalCamera.FocusDistance;
-            dofEffectAdapter.FocusRange = internalCamera.FocusRange;
-            dofEffectAdapter.DepthMap = DepthMap;
-            dofEffectAdapter.BluredSceneMap = BluredSceneMap;
+            dofEffect.NearPlaneDistance = internalCamera.Projection.NearPlaneDistance;
+            dofEffect.FarPlaneDistance = internalCamera.Projection.FarPlaneDistance / distance;
+            dofEffect.FocusDistance = internalCamera.FocusDistance;
+            dofEffect.FocusRange = internalCamera.FocusRange;
+            dofEffect.DepthMap = DepthMap;
+            dofEffect.BluredSceneMap = BluredSceneMap;
 
             //----------------------------------------------------------------
             // 描画
@@ -238,7 +235,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             GraphicsDevice.SetRenderTarget(result);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, dofEffectAdapter.Effect);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, dofEffect.Effect);
             spriteBatch.Draw(sceneMap, result.Bounds, Color.White);
             spriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);

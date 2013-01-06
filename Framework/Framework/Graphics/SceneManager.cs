@@ -92,6 +92,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Dof dof;
 
+        Edge edge;
+
         bool shadowMapAvailable;
 
         RenderTarget2D renderTarget;
@@ -175,6 +177,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice = graphicsDevice;
             this.moduleFactory = moduleFactory;
 
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+
             Monitor = new SceneManagerMonitor(this);
         }
 
@@ -191,16 +195,26 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (shadowSettings.Enabled)
             {
-                shadowMap = moduleFactory.CreateShadowMap(shadowSettings.ShadowMap);
-                if (shadowMap != null) Monitor.Pssm = shadowMap.Monitor;
+                // シャドウ マップ モジュール
+                var shadowMapEffect = moduleFactory.CreateShadowMapEffect();
+                var blurEffect = moduleFactory.CreateGaussianBlurEffect();
+                
+                shadowMap = new ShadowMap(GraphicsDevice, shadowSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
+                Monitor.ShadowMap = shadowMap.Monitor;
 
-                if (shadowMap != null && shadowSettings.Sssm.Enabled)
+                if (shadowSettings.Sssm.Enabled)
                 {
-                    shadowScene = moduleFactory.CreateShadowScene(shadowSettings);
-                    if (shadowScene != null) Monitor.ShadowScene = shadowScene.Monitor;
+                    // シャドウ シーン モジュール
+                    var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
+                    
+                    shadowScene = new ShadowScene(GraphicsDevice, shadowSettings, shadowSceneEffect);
+                    Monitor.ShadowScene = shadowScene.Monitor;
 
-                    sssm = moduleFactory.CreateSssm(shadowSettings.Sssm);
-                    if (sssm != null) Monitor.ScreenSpaceShadow = sssm.Monitor;
+                    // スクリーン スペース シャドウ マッピング モジュール
+                    var sssmEffect = moduleFactory.CreateSssmEffect();
+
+                    sssm = new Sssm(GraphicsDevice, shadowSettings.Sssm, spriteBatch, sssmEffect, blurEffect);
+                    Monitor.ScreenSpaceShadow = sssm.Monitor;
                 }
             }
 
@@ -228,21 +242,33 @@ namespace Willcraftia.Xna.Framework.Graphics
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
 
             //----------------------------------------------------------------
-            // シーン描画のためのスプライト バッチ
-
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            //----------------------------------------------------------------
             // 被写界深度
 
             if (settings.Dof.Enabled)
-                dof = moduleFactory.CreateDof(settings.Dof);
+            {
+                var depthMapEffect = moduleFactory.CreateDepthMapEffect();
+                var dofEffect = moduleFactory.CreateDofEffect();
+                var blurEffect = moduleFactory.CreateGaussianBlurEffect();
+
+                dof = new Dof(GraphicsDevice, settings.Dof, spriteBatch, depthMapEffect, dofEffect, blurEffect);
+            }
+
+            //----------------------------------------------------------------
+            // エッジ強調
+
+            if (settings.Edge.Enabled)
+            {
+                var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
+                var edgeEffect = moduleFactory.CreateEdgeEffect();
+
+                edge = new Edge(GraphicsDevice, settings.Edge, spriteBatch, normalDepthMapEffect, edgeEffect);
+            }
 
 #if DEBUG || TRACE
-            debugBoundingBoxEffect = moduleFactory.CreateDebugBoundingBoxEffect();
+            debugBoundingBoxEffect = new BasicEffect(GraphicsDevice);
             debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
             debugBoundingBoxEffect.VertexColorEnabled = true;
-            debugBoundingBoxDrawer = moduleFactory.CreateDebugBoundingBoxDrawer();
+            debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
 #endif
         }
 
@@ -421,6 +447,20 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 sssm.ShadowColor = ShadowColor;
                 sssm.Filter(renderTarget, shadowScene.RenderTarget, postProcessRenderTarget);
+
+                SwapRenderTargets();
+            }
+
+            //----------------------------------------------------------------
+            // エッジ強調
+
+            if (edge != null)
+            {
+                edge.DrawNormalDepth(activeCamera, visibleSceneObjects);
+                edge.Filter(renderTarget, postProcessRenderTarget);
+
+                if (DebugMapDisplay.Available)
+                    DebugMapDisplay.Instance.Add(edge.NormalDepthMap);
 
                 SwapRenderTargets();
             }

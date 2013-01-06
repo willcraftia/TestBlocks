@@ -495,7 +495,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(sceneManagerMonitor.VisibleSceneObjectCount).Append("/");
             sb.AppendNumber(sceneManagerMonitor.TotalSceneObjectCount).AppendLine();
             
-            var pssmMonitor = sceneManagerMonitor.Pssm;
+            var pssmMonitor = sceneManagerMonitor.ShadowMap;
             if (pssmMonitor != null)
             {
                 sb.Append("ShadowCaster: ");

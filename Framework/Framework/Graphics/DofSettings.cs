@@ -13,13 +13,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultMapScale = 0.5f;
 
-        public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
-
         bool enabled = DefaultEnabled;
 
         float mapScale = DefaultMapScale;
-
-        SurfaceFormat format = DefaultFormat;
 
         float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
 
@@ -52,14 +48,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 mapScale = value;
             }
-        }
-
-        /// <summary>
-        /// 深度マップの SurfaceFormat。
-        /// </summary>
-        public SurfaceFormat Format
-        {
-            get { return format; }
         }
 
         /// <summary>

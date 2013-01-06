@@ -49,7 +49,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
-            sceneModuleFactory = new SceneModuleFactory(GraphicsDevice, resourceManager, assetManager);
+            sceneModuleFactory = new SceneModuleFactory(resourceManager, assetManager);
             SceneManager = new SceneManager(GraphicsDevice, sceneModuleFactory);
             RegionManager = new RegionManager(serviceProvider, SceneManager);
             PartitionManager = new ChunkPartitionManager(RegionManager);

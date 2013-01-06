@@ -10,20 +10,20 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public interface ISceneModuleFactory
     {
-        ShadowMap CreateShadowMap(ShadowMapSettings shadowMapSettings);
+        Effect CreateShadowMapEffect();
 
-        ShadowScene CreateShadowScene(ShadowSettings shadowSettings);
+        Effect CreateShadowSceneEffect();
 
-        Sssm CreateSssm(SssmSettings sssmSettings);
+        Effect CreateSssmEffect();
 
-        Dof CreateDof(DofSettings dofSettings);
+        Effect CreateDepthMapEffect();
 
-        #region Debug
+        Effect CreateDofEffect();
 
-        BasicEffect CreateDebugBoundingBoxEffect();
+        Effect CreateGaussianBlurEffect();
 
-        BoundingBoxDrawer CreateDebugBoundingBoxDrawer();
+        Effect CreateNormalDepthMapEffect();
 
-        #endregion
+        Effect CreateEdgeEffect();
     }
 }
