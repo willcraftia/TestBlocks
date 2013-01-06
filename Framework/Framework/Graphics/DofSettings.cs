@@ -9,9 +9,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class DofSettings
     {
-        public const bool DefaultEnabled = false;
+        public const bool DefaultEnabled = true;
 
-        public const float DefaultMapScale = 0.25f;
+        public const float DefaultMapScale = 0.5f;
 
         public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
 
@@ -80,7 +80,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Blur = new BlurSettings
             {
-                Enabled = true
+                Enabled = true,
+                Amount = 2
             };
         }
     }

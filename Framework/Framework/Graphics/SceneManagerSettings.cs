@@ -13,9 +13,12 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         public ShadowSettings Shadow { get; private set; }
 
+        public DofSettings Dof { get; private set; }
+
         public SceneManagerSettings()
         {
             Shadow = new ShadowSettings();
+            Dof = new DofSettings();
         }
     }
 }

@@ -17,6 +17,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingFrustum Frustum { get; }
 
+        float FocusDistance { get; }
+
+        float FocusRange { get; }
+
         void Update();
     }
 }

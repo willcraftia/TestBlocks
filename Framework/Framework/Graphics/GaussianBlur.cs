@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class GaussianBlur
+    public sealed class GaussianBlur : IDisposable
     {
 #if SHADER_3_0
         public const int MaxRadius = 7;
@@ -159,5 +159,34 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             return offsets;
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~GaussianBlur()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                backingRenderTarget.Dispose();
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }

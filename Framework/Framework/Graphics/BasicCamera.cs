@@ -9,6 +9,16 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class BasicCamera : ICamera
     {
+        /// <summary>
+        /// デフォルトの焦点距離。
+        /// </summary>
+        public const float DefaultFocusDistance = 3.0f;
+
+        /// <summary>
+        /// デフォルトの焦点範囲。
+        /// </summary>
+        public const float DefaultFocusRange = 100.0f;
+
         public string Name { get; private set; }
 
         public View View { get; private set; }
@@ -16,6 +26,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         public PerspectiveFov Projection { get; private set; }
 
         public BoundingFrustum Frustum { get; private set; }
+
+        public float FocusDistance { get; set; }
+
+        public float FocusRange { get; set; }
 
         public BasicCamera(string name)
         {
@@ -26,6 +40,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             View = new View();
             Projection = new PerspectiveFov();
             Frustum = new BoundingFrustum(Matrix.Identity);
+
+            FocusDistance = DefaultFocusDistance;
+            FocusRange = DefaultFocusRange;
         }
 
         public void Update()

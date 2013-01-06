@@ -50,6 +50,16 @@
       <Importer>FontDescriptionImporter</Importer>
       <Processor>FontDescriptionProcessor</Processor>
     </Compile>
+    <Compile Include="Effects\DepthMap.fx">
+      <Name>DepthMap</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\Dof.fx">
+      <Name>Dof</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
     <None Include="Effects\Shadow.fxh">
       <Name>Shadow</Name>
     </None>
@@ -95,8 +105,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Effects\PssmShadowScene.fx">
-      <Name>PssmShadowScene</Name>
+    <Compile Include="Effects\ShadowScene.fx">
+      <Name>ShadowScene</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>

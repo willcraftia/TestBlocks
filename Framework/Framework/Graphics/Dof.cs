@@ -9,45 +9,91 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class Dof
+    public sealed class Dof : IDisposable
     {
-        sealed class DepthMapEffect : Effect, IEffectMatrices
+        #region DofEffectAdapter
+
+        sealed class DofEffectAdapter
         {
-            EffectParameter projection;
+            EffectParameter focusDistance;
 
-            EffectParameter view;
+            EffectParameter focusRange;
 
-            EffectParameter world;
+            EffectParameter nearPlaneDistance;
 
-            // I/F
-            public Matrix Projection
+            EffectParameter farPlaneDistance;
+
+            EffectParameter sceneMap;
+
+            EffectParameter depthMap;
+            
+            EffectParameter bluredSceneMap;
+
+            public Effect Effect { get; private set; }
+
+            public float FocusDistance
             {
-                get { return projection.GetValueMatrix(); }
-                set { projection.SetValue(value); }
+                get { return focusDistance.GetValueSingle(); }
+                set { focusDistance.SetValue(value); }
             }
 
-            // I/F
-            public Matrix View
+            public float FocusRange
             {
-                get { return view.GetValueMatrix(); }
-                set { view.SetValue(value); }
+                get { return focusRange.GetValueSingle(); }
+                set { focusRange.SetValue(value); }
             }
 
-            // I/F
-            public Matrix World
+            public float NearPlaneDistance
             {
-                get { return world.GetValueMatrix(); }
-                set { world.SetValue(value); }
+                get { return nearPlaneDistance.GetValueSingle(); }
+                set { nearPlaneDistance.SetValue(value); }
             }
 
-            public DepthMapEffect(Effect cloneSource)
-                : base(cloneSource)
+            public float FarPlaneDistance
             {
-                world = Parameters["World"];
-                view = Parameters["View"];
-                projection = Parameters["Projection"];
+                get { return farPlaneDistance.GetValueSingle(); }
+                set { farPlaneDistance.SetValue(value); }
+            }
+
+            public Texture2D SceneMap
+            {
+                get { return sceneMap.GetValueTexture2D(); }
+                set { sceneMap.SetValue(value); }
+            }
+
+            public Texture2D DepthMap
+            {
+                get { return depthMap.GetValueTexture2D(); }
+                set { depthMap.SetValue(value); }
+            }
+
+            public Texture2D BluredSceneMap
+            {
+                get { return bluredSceneMap.GetValueTexture2D(); }
+                set { bluredSceneMap.SetValue(value); }
+            }
+
+            public DofEffectAdapter(Effect effect)
+            {
+                this.Effect = effect;
+
+                focusDistance = effect.Parameters["FocusDistance"];
+                focusRange = effect.Parameters["FocusRange"];
+                nearPlaneDistance = effect.Parameters["NearPlaneDistance"];
+                farPlaneDistance = effect.Parameters["FarPlaneDistance"];
+
+                sceneMap = effect.Parameters["SceneMap"];
+                depthMap = effect.Parameters["DepthMap"];
+                bluredSceneMap = effect.Parameters["BluredSceneMap"];
+            }
+
+            public void Apply()
+            {
+                Effect.CurrentTechnique.Passes[0].Apply();
             }
         }
+
+        #endregion
 
         BasicCamera depthCamera = new BasicCamera("Depth");
 
@@ -57,38 +103,60 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         DepthMapEffect depthMapEffect;
 
-        RenderTarget2D depthMapRenderTarget;
+        DofEffectAdapter dofEffectAdapter;
 
-        RenderTarget2D blurRenderTarget;
+        SpriteBatch spriteBatch;
+
+        GaussianBlur blur;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public DofSettings Settings { get; private set; }
 
-        public Dof(GraphicsDevice graphicsDevice, DofSettings settings, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
+        public RenderTarget2D DepthMap { get; private set; }
+
+        public RenderTarget2D BluredSceneMap { get; private set; }
+
+        public Dof(GraphicsDevice graphicsDevice, DofSettings settings,
+            SpriteBatch spriteBatch, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (settings == null) throw new ArgumentNullException("settings");
+            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (depthMapEffect == null) throw new ArgumentNullException("depthMapEffect");
             if (dofEffect == null) throw new ArgumentNullException("dofEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
             Settings = settings;
+            this.spriteBatch = spriteBatch;
 
             //----------------------------------------------------------------
             // エフェクト
 
             this.depthMapEffect = new DepthMapEffect(depthMapEffect);
+            dofEffectAdapter = new DofEffectAdapter(dofEffect);
 
             //----------------------------------------------------------------
             // レンダ ターゲット
 
             var pp = GraphicsDevice.PresentationParameters;
-            var width = (int) (pp.BackBufferWidth * Settings.MapScale);
-            var height = (int) (pp.BackBufferHeight * Settings.MapScale);
-            depthMapRenderTarget = new RenderTarget2D(GraphicsDevice, width, height,
-                false, Settings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+            var width = (int) (pp.BackBufferWidth * settings.MapScale);
+            var height = (int) (pp.BackBufferHeight * settings.MapScale);
+
+            // 深度マップ
+            DepthMap = new RenderTarget2D(GraphicsDevice, width, height,
+                false, settings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+
+            // ブラー済みシーン マップ
+            BluredSceneMap = new RenderTarget2D(GraphicsDevice, width, height,
+                false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+
+            //----------------------------------------------------------------
+            // ブラー機能
+
+            blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Color,
+                settings.Blur.Radius, settings.Blur.Amount);
         }
 
         // TODO
@@ -125,7 +193,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            GraphicsDevice.SetRenderTarget(depthMapRenderTarget);
+            GraphicsDevice.SetRenderTarget(DepthMap);
 
             foreach (var sceneObject in sceneObjects)
             {
@@ -137,8 +205,38 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.SetRenderTarget(null);
         }
 
-        public void Filter(RenderTarget2D source, RenderTarget2D destination)
+        public void Filter(ICamera viewerCamera, RenderTarget2D sceneMap, RenderTarget2D result)
         {
+            //================================================================
+            // シーンにブラーをかける
+
+            blur.Filter(sceneMap, BluredSceneMap);
+
+            //================================================================
+            // シーンとブラー済みシーンを深度マップに基いて合成
+
+            //----------------------------------------------------------------
+            // エフェクト設定
+
+            var distance = viewerCamera.Projection.FarPlaneDistance - viewerCamera.Projection.NearPlaneDistance;
+            dofEffectAdapter.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
+            dofEffectAdapter.FarPlaneDistance = viewerCamera.Projection.FarPlaneDistance / distance;
+            dofEffectAdapter.FocusDistance = viewerCamera.FocusDistance;
+            dofEffectAdapter.FocusRange = viewerCamera.FocusRange;
+            dofEffectAdapter.DepthMap = DepthMap;
+            dofEffectAdapter.BluredSceneMap = BluredSceneMap;
+
+            //----------------------------------------------------------------
+            // 描画
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.None;
+            GraphicsDevice.BlendState = BlendState.Opaque;
+
+            GraphicsDevice.SetRenderTarget(result);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, dofEffectAdapter.Effect);
+            spriteBatch.Draw(sceneMap, result.Bounds, Color.White);
+            spriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         bool IsVisibleObject(SceneObject sceneObject)
@@ -152,5 +250,37 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 視錐台と AABB で判定。
             return sceneObject.BoundingBox.Intersects(depthCamera.Frustum);
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~Dof()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                depthMapEffect.Dispose();
+                DepthMap.Dispose();
+                BluredSceneMap.Dispose();
+                blur.Dispose();
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }

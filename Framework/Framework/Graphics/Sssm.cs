@@ -13,8 +13,6 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class Sssm
     {
-        SssmSettings sssmSettings;
-
         SpriteBatch spriteBatch;
 
         Effect sssmEffect;
@@ -31,6 +29,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
+        public SssmSettings Settings { get; private set; }
+
         public SssmMonitor Monitor { get; private set; }
 
         public Vector3 ShadowColor
@@ -45,21 +45,19 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public Sssm(GraphicsDevice graphicsDevice, SssmSettings sssmSettings, Effect sssmEffect, Effect blurEffect)
+        public Sssm(GraphicsDevice graphicsDevice, SssmSettings sssmSettings,
+            SpriteBatch spriteBatch, Effect sssmEffect, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (sssmSettings == null) throw new ArgumentNullException("sssmSettings");
+            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (sssmEffect == null) throw new ArgumentNullException("sssmEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
-            this.sssmSettings = sssmSettings;
+            Settings = sssmSettings;
+            this.spriteBatch = spriteBatch;
             this.sssmEffect = sssmEffect;
-
-            //----------------------------------------------------------------
-            // スプライト バッチ
-
-            spriteBatch = new SpriteBatch(GraphicsDevice);
 
             //----------------------------------------------------------------
             // エフェクト
@@ -89,7 +87,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Monitor.OnBeginFilter();
 
-            if (sssmSettings.Blur.Enabled) blur.Filter(shadowScene);
+            if (Settings.Blur.Enabled) blur.Filter(shadowScene);
 
             //----------------------------------------------------------------
             // エフェクト

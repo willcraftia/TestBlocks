@@ -118,6 +118,7 @@
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
+    <Compile Include="Graphics\DepthMapEffect.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\Dof.cs" />
     <Compile Include="Graphics\DofSettings.cs" />

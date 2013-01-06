@@ -10,19 +10,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public interface ISceneModuleFactory
     {
-        Effect CreateGaussianBlurEffect();
-
         Effect CreateShadowMapEffect();
-
-        Effect CreateShadowSceneEffect();
-
-        Effect CreateSssmEffect();
 
         ShadowMap CreateShadowMap(ShadowMapSettings shadowMapSettings);
 
         ShadowScene CreateShadowScene(ShadowSettings shadowSettings);
 
         Sssm CreateSssm(SssmSettings sssmSettings);
+
+        Dof CreateDof(DofSettings dofSettings);
 
         #region Debug
 

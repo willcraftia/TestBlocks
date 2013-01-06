@@ -70,6 +70,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Queue<SceneObject> workingSceneObjects = new Queue<SceneObject>(InitialSceneObjectCapacity);
 
+        List<SceneObject> visibleSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
+
         List<SceneObject> opaqueSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
 
         List<SceneObject> translucentSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
@@ -89,6 +91,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         ShadowScene shadowScene;
 
         Sssm sssm;
+
+        Dof dof;
 
         bool shadowMapAvailable;
 
@@ -230,6 +234,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            //----------------------------------------------------------------
+            // 被写界深度
+
+            if (settings.Dof.Enabled)
+                dof = moduleFactory.CreateDof(settings.Dof);
+
 #if DEBUG || TRACE
             debugBoundingBoxEffect = moduleFactory.CreateDebugBoundingBoxEffect();
             debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
@@ -318,6 +328,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             frustumSphere = BoundingSphere.CreateFromPoints(frustumCorners);
 
             // 収集リストを初期化。
+            visibleSceneObjects.Clear();
             opaqueSceneObjects.Clear();
             translucentSceneObjects.Clear();
             activeShadowCasters.Clear();
@@ -349,6 +360,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 if (IsVisibleObject(sceneObject))
                 {
+                    visibleSceneObjects.Add(sceneObject);
+
                     if (sceneObject.Translucent)
                     {
                         translucentSceneObjects.Add(sceneObject);
@@ -368,6 +381,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // 視点からの距離でソート。
             DistanceComparer.Instance.EyePosition = activeCamera.View.Position;
+            visibleSceneObjects.Sort(DistanceComparer.Instance);
             opaqueSceneObjects.Sort(DistanceComparer.Instance);
             translucentSceneObjects.Sort(DistanceComparer.Instance);
 
@@ -406,10 +420,27 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // スクリーン スペース シャドウ マッピング
 
-            if (shadowScene != null && sssm != null && Settings.Shadow.Sssm.Enabled)
+            if (shadowScene != null && sssm != null)
             {
                 sssm.ShadowColor = ShadowColor;
                 sssm.Filter(renderTarget, shadowScene, postProcessRenderTarget);
+
+                SwapRenderTargets();
+            }
+
+            //----------------------------------------------------------------
+            // 被写界深度
+
+            if (dof != null)
+            {
+                dof.DrawDepth(activeCamera, visibleSceneObjects);
+                dof.Filter(activeCamera, renderTarget, postProcessRenderTarget);
+
+                if (DebugMapDisplay.Available)
+                {
+                    DebugMapDisplay.Instance.Add(dof.DepthMap);
+                    DebugMapDisplay.Instance.Add(dof.BluredSceneMap);
+                }
 
                 SwapRenderTargets();
             }

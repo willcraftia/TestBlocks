@@ -17,6 +17,8 @@ namespace Willcraftia.Xna.Blocks.Models
         
         AssetManager assetManager;
 
+        SpriteBatch spriteBatch;
+
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public SceneModuleFactory(GraphicsDevice graphicsDevice, ResourceManager resourceManager, AssetManager assetManager)
@@ -28,32 +30,14 @@ namespace Willcraftia.Xna.Blocks.Models
             GraphicsDevice = graphicsDevice;
             this.resourceManager = resourceManager;
             this.assetManager = assetManager;
-        }
 
-        // I/F
-        public Effect CreateGaussianBlurEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/GaussianBlur");
-            return assetManager.Load<Effect>(resource);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         // I/F
         public Effect CreateShadowMapEffect()
         {
             var resource = resourceManager.Load("content:Effects/ShadowMap");
-            return assetManager.Load<Effect>(resource);
-        }
-
-        // I/F
-        public Effect CreateShadowSceneEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/PssmShadowScene");
-            return assetManager.Load<Effect>(resource);
-        }
-
-        public Effect CreateSssmEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/Sssm");
             return assetManager.Load<Effect>(resource);
         }
 
@@ -66,13 +50,31 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public ShadowScene CreateShadowScene(ShadowSettings shadowSettings)
         {
-            return new ShadowScene(GraphicsDevice, shadowSettings, CreateShadowSceneEffect());
+            var effectResource = resourceManager.Load("content:Effects/ShadowScene");
+            var effect = assetManager.Load<Effect>(effectResource);
+
+            return new ShadowScene(GraphicsDevice, shadowSettings, effect);
         }
 
         // I/F
         public Sssm CreateSssm(SssmSettings sssmSettings)
         {
-            return new Sssm(GraphicsDevice, sssmSettings, CreateSssmEffect(), CreateGaussianBlurEffect());
+            var sssmEffectResource = resourceManager.Load("content:Effects/Sssm");
+            var sssmEffect = assetManager.Load<Effect>(sssmEffectResource);
+
+            return new Sssm(GraphicsDevice, sssmSettings, spriteBatch, sssmEffect, CreateGaussianBlurEffect());
+        }
+
+        // I/F
+        public Dof CreateDof(DofSettings dofSettings)
+        {
+            var depthMapEffectResource = resourceManager.Load("content:Effects/DepthMap");
+            var depthMapEffect = assetManager.Load<Effect>(depthMapEffectResource);
+
+            var dofEffectResource = resourceManager.Load("content:Effects/Dof");
+            var dofEffect = assetManager.Load<Effect>(dofEffectResource);
+
+            return new Dof(GraphicsDevice, dofSettings, spriteBatch, depthMapEffect, dofEffect, CreateGaussianBlurEffect());
         }
 
         // I/F
@@ -85,6 +87,12 @@ namespace Willcraftia.Xna.Blocks.Models
         public BoundingBoxDrawer CreateDebugBoundingBoxDrawer()
         {
             return new BoundingBoxDrawer(GraphicsDevice);
+        }
+
+        Effect CreateGaussianBlurEffect()
+        {
+            var resource = resourceManager.Load("content:Effects/GaussianBlur");
+            return assetManager.Load<Effect>(resource);
         }
     }
 }
