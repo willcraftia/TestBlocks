@@ -21,8 +21,6 @@ sampler SceneMapSampler : register(s0) = sampler_state
     MinFilter = Linear;
     MagFilter = Linear;
     MipFilter = None;
-    AddressU = Clamp;
-    AddressV = Clamp;
 };
 
 texture NormalDepthMap;
@@ -45,24 +43,24 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
 {
     float4 color = tex2D(SceneMapSampler, texCoord);
 
-    float4 n = tex2D(NormalDepthMapSampler, texCoord);
-    float4 n1 = tex2D(NormalDepthMapSampler, texCoord + float2(-1, -1) * EdgeOffset);
-    float4 n2 = tex2D(NormalDepthMapSampler, texCoord + float2( 1,  1) * EdgeOffset);
-    float4 n3 = tex2D(NormalDepthMapSampler, texCoord + float2(-1,  1) * EdgeOffset);
-    float4 n4 = tex2D(NormalDepthMapSampler, texCoord + float2( 1, -1) * EdgeOffset);
+    float4 s = tex2D(NormalDepthMapSampler, texCoord);
+    float4 s1 = tex2D(NormalDepthMapSampler, texCoord + float2(-1, -1) * EdgeOffset);
+    float4 s2 = tex2D(NormalDepthMapSampler, texCoord + float2( 1,  1) * EdgeOffset);
+    float4 s3 = tex2D(NormalDepthMapSampler, texCoord + float2(-1,  1) * EdgeOffset);
+    float4 s4 = tex2D(NormalDepthMapSampler, texCoord + float2( 1, -1) * EdgeOffset);
 
-    float4 deltaDiagonal = abs(n1 - n2) + abs(n3 - n4);
+    float4 deltaSample = abs(s1 - s2) + abs(s3 - s4);
 
-    float deltaNormal = dot(deltaDiagonal.xyz, 1);
-    float deltaDepth = deltaDiagonal.w;
-
+    float deltaNormal = dot(deltaSample.xyz, 1);
     deltaNormal = saturate((deltaNormal - NormalThreshold) * NormalSensitivity);
+
+    float deltaDepth = deltaSample.w;
     deltaDepth = saturate((deltaDepth - DepthThreshold) * DepthSensitivity);
 
-    float edgeAmount = saturate(deltaNormal + deltaDepth) * EdgeIntensity;
-    edgeAmount *= (1 + log(n.w));
+    float amount = saturate(deltaNormal + deltaDepth);
+    amount *= saturate(-log(s.w) * EdgeIntensity);
 
-    color.rgb = lerp(color.rgb, color.rgb * EdgeColor, edgeAmount);
+    color.rgb = lerp(color.rgb, color.rgb * EdgeColor, amount);
 
     return color;
 }

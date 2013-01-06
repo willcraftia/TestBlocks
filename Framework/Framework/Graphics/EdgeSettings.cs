@@ -11,11 +11,11 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         public const bool DefaultEnabled = true;
 
-        public const float DefaultMapScale = 0.5f;
+        public const float DefaultMapScale = 1;
 
         public const float DefaultEdgeWidth = 1;
 
-        public const float DefaultEdgeIntensity = 1;
+        public const float DefaultEdgeIntensity = 20;
 
         public const float DefaultNormalThreshold = 0.1f;
 
@@ -23,7 +23,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultNormalSensitivity = 1;
 
-        public const float DefaultDepthSensitivity = 10;
+        public const float DefaultDepthSensitivity = 1000;
 
         bool enabled = DefaultEnabled;
 
@@ -44,7 +44,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         Vector3 edgeColor = Vector3.Zero;
 
         // TODO
-        float farPlaneDistance = 100;
+        float farPlaneDistance = 128;
 
         /// <summary>
         /// エッジ強調が有効か否かを示す値を取得または設定します。
@@ -88,7 +88,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return edgeIntensity; }
             set
             {
-                if (value < 0 || 1 < value) throw new ArgumentOutOfRangeException("value");
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
 
                 edgeIntensity = value;
             }
