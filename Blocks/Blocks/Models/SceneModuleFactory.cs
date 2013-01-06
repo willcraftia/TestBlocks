@@ -27,59 +27,81 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public Effect CreateShadowMapEffect()
+        public Effect CreateGaussianBlurEffect()
         {
-            var resource = resourceManager.Load("content:Effects/ShadowMap");
-            return assetManager.Load<Effect>(resource);
-        }
-
-        // I/F
-        public Effect CreateShadowSceneEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/ShadowScene");
-            return assetManager.Load<Effect>(resource);
-        }
-
-        // I/F
-        public Effect CreateSssmEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/Sssm");
-            return assetManager.Load<Effect>(resource);
+            return LoadAsset<Effect>("content:Effects/GaussianBlur");
         }
 
         // I/F
         public Effect CreateDepthMapEffect()
         {
-            var resource = resourceManager.Load("content:Effects/DepthMap");
-            return assetManager.Load<Effect>(resource);
-        }
-
-        // I/F
-        public Effect CreateDofEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/Dof");
-            return assetManager.Load<Effect>(resource);
-        }
-
-        // I/F
-        public Effect CreateGaussianBlurEffect()
-        {
-            var resource = resourceManager.Load("content:Effects/GaussianBlur");
-            return assetManager.Load<Effect>(resource);
+            return LoadAsset<Effect>("content:Effects/DepthMap");
         }
 
         // I/F
         public Effect CreateNormalDepthMapEffect()
         {
-            var resource = resourceManager.Load("content:Effects/NormalDepthMap");
-            return assetManager.Load<Effect>(resource);
+            return LoadAsset<Effect>("content:Effects/NormalDepthMap");
+        }
+
+        // I/F
+        public Effect CreateShadowMapEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/ShadowMap");
+        }
+
+        // I/F
+        public Effect CreateShadowSceneEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/ShadowScene");
+        }
+
+        // I/F
+        public Effect CreateSssmEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Sssm");
+        }
+
+        // I/F
+        public Effect CreateDofEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Dof");
         }
 
         // I/F
         public Effect CreateEdgeEffect()
         {
-            var resource = resourceManager.Load("content:Effects/Edge");
-            return assetManager.Load<Effect>(resource);
+            return LoadAsset<Effect>("content:Effects/Edge");
+        }
+
+        // I/F
+        public Effect CreateSsaoMapEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/SsaoMap");
+        }
+
+        // I/F
+        public Effect CreateSsaoMapBlurEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/SsaoMapBlur");
+        }
+
+        // I/F
+        public Effect CreateSsaoEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Ssao");
+        }
+
+        // I/F
+        public Texture2D CreateRandomNormalMap()
+        {
+            return LoadAsset<Texture2D>("content:Textures/RandomNormal");
+        }
+
+        T LoadAsset<T>(string uri)
+        {
+            var resource = resourceManager.Load(uri);
+            return assetManager.Load<T>(resource);
         }
     }
 }

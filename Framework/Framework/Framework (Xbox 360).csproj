@@ -170,6 +170,7 @@
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
+    <Compile Include="Graphics\Quad.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
     <Compile Include="Graphics\SceneManagerSettings.cs" />
@@ -185,6 +186,8 @@
     <Compile Include="Graphics\ShadowSceneMonitor.cs" />
     <Compile Include="Graphics\ShadowSettings.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
+    <Compile Include="Graphics\Ssao.cs" />
+    <Compile Include="Graphics\SsaoSettings.cs" />
     <Compile Include="Graphics\Sssm.cs" />
     <Compile Include="Graphics\SssmMonitor.cs" />
     <Compile Include="Graphics\SssmSettings.cs" />

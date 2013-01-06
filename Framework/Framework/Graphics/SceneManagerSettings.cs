@@ -13,15 +13,27 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         public ShadowSettings Shadow { get; private set; }
 
+        /// <summary>
+        /// 被写界深度設定。
+        /// </summary>
         public DofSettings Dof { get; private set; }
 
+        /// <summary>
+        /// エッジ強調設定。
+        /// </summary>
         public EdgeSettings Edge { get; private set; }
+
+        /// <summary>
+        /// スクリーン スペース アンビエント オクルージョン設定。
+        /// </summary>
+        public SsaoSettings Ssao { get; private set; }
 
         public SceneManagerSettings()
         {
             Shadow = new ShadowSettings();
             Dof = new DofSettings();
             Edge = new EdgeSettings();
+            Ssao = new SsaoSettings();
         }
     }
 }

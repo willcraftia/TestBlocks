@@ -231,9 +231,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            GraphicsDevice.BlendState = BlendState.Opaque;
-
             GraphicsDevice.SetRenderTarget(result);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, dofEffect.Effect);
             spriteBatch.Draw(sceneMap, result.Bounds, Color.White);

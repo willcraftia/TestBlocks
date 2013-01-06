@@ -10,20 +10,43 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public interface ISceneModuleFactory
     {
+        //====================================================================
+        // 汎用
+
+        Effect CreateGaussianBlurEffect();
+
+        Effect CreateDepthMapEffect();
+
+        Effect CreateNormalDepthMapEffect();
+
+        //====================================================================
+        // シャドウ マッピング
+
         Effect CreateShadowMapEffect();
 
         Effect CreateShadowSceneEffect();
 
         Effect CreateSssmEffect();
 
-        Effect CreateDepthMapEffect();
+        //====================================================================
+        // 被写界深度
 
         Effect CreateDofEffect();
 
-        Effect CreateGaussianBlurEffect();
-
-        Effect CreateNormalDepthMapEffect();
+        //====================================================================
+        // エッジ強調
 
         Effect CreateEdgeEffect();
+
+        //====================================================================
+        // スクリーン スペース アンビエント オクルージョン
+
+        Effect CreateSsaoMapEffect();
+
+        Effect CreateSsaoMapBlurEffect();
+
+        Effect CreateSsaoEffect();
+
+        Texture2D CreateRandomNormalMap();
     }
 }

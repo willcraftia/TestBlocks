@@ -127,6 +127,7 @@
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
+    <Compile Include="Graphics\Quad.cs" />
     <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
@@ -141,6 +142,8 @@
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
     <Compile Include="Graphics\SceneManagerSettings.cs" />
+    <Compile Include="Graphics\Ssao.cs" />
+    <Compile Include="Graphics\SsaoSettings.cs" />
     <Compile Include="Graphics\Sssm.cs" />
     <Compile Include="Graphics\SssmMonitor.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />

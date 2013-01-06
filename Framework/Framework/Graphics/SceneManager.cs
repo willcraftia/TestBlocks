@@ -94,6 +94,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Edge edge;
 
+        Ssao ssao;
+
         bool shadowMapAvailable;
 
         RenderTarget2D renderTarget;
@@ -262,6 +264,21 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var edgeEffect = moduleFactory.CreateEdgeEffect();
 
                 edge = new Edge(GraphicsDevice, settings.Edge, spriteBatch, normalDepthMapEffect, edgeEffect);
+            }
+
+            //----------------------------------------------------------------
+            // スクリーン スペース アンビエント オクルージョン
+
+            if (settings.Ssao.Enabled)
+            {
+                var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
+                var ssaoMapEffect = moduleFactory.CreateSsaoMapEffect();
+                var ssaoMapBlurEffect = moduleFactory.CreateSsaoMapBlurEffect();
+                var ssaoEffect = moduleFactory.CreateSsaoEffect();
+                var randomNormalMap = moduleFactory.CreateRandomNormalMap();
+
+                ssao = new Ssao(GraphicsDevice, settings.Ssao, spriteBatch,
+                    normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
             }
 
 #if DEBUG || TRACE
@@ -447,6 +464,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 sssm.ShadowColor = ShadowColor;
                 sssm.Filter(renderTarget, shadowScene.RenderTarget, postProcessRenderTarget);
+
+                SwapRenderTargets();
+            }
+
+            //----------------------------------------------------------------
+            // スクリーン スペース アンビエント オクルージョン
+
+            if (ssao != null)
+            {
+                ssao.DrawSsaoMap(activeCamera, visibleSceneObjects);
+                ssao.Filter(renderTarget, postProcessRenderTarget);
+
+                if (DebugMapDisplay.Available)
+                {
+                    DebugMapDisplay.Instance.Add(ssao.NormalDepthMap);
+                    DebugMapDisplay.Instance.Add(ssao.SsaoMap);
+                }
 
                 SwapRenderTargets();
             }

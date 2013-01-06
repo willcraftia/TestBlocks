@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class DofSettings
     {
-        public const bool DefaultEnabled = true;
+        public const bool DefaultEnabled = false;
 
         public const float DefaultMapScale = 0.5f;
 
