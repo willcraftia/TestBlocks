@@ -18,13 +18,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultFalloff = 0.00001f;
 
-        public const float DefaultRadius = 1;
+        public const float DefaultRadius = 2;
 
         bool enabled = DefaultEnabled;
 
         float mapScale = DefaultMapScale;
 
-        float farPlaneDistance = 16;
+        float farPlaneDistance = 64;
 
         float totalStrength = DefaultTotalStrength;
         

@@ -17,7 +17,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// デフォルトの焦点範囲。
         /// </summary>
-        public const float DefaultFocusRange = 100.0f;
+        public const float DefaultFocusRange = 192.0f;
 
         public string Name { get; private set; }
 

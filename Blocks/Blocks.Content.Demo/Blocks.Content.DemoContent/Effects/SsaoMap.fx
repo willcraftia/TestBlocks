@@ -9,7 +9,7 @@ float RandomOffset = 18;
 float Falloff = 0.00001f;
 float Radius = 1;
 
-#define SAMPLE_COUNT 8
+#define SAMPLE_COUNT 10
 float invSamples = 1 / (float) SAMPLE_COUNT;
 
 #if SAMPLE_COUNT == 8
