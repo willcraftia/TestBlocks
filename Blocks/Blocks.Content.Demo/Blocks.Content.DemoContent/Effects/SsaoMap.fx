@@ -9,10 +9,10 @@ float RandomOffset = 18;
 float Falloff = 0.00001f;
 float Radius = 1;
 
-#define SAMPLES 8
-float invSamples = 1 / (float) SAMPLES;
+#define SAMPLE_COUNT 8
+float invSamples = 1 / (float) SAMPLE_COUNT;
 
-#if SAMPLES == 8
+#if SAMPLE_COUNT == 8
 const float3 SampleSphere[8] =
 {
     float3(0.24710192, 0.6445882, 0.033550154),
@@ -24,7 +24,7 @@ const float3 SampleSphere[8] =
     float3(-0.058801126, 0.7347013, -0.25399926),
     float3(-0.24799341, -0.022052078, -0.13399573)
 };
-#elif SAMPLES == 10
+#elif SAMPLE_COUNT == 10
 const float3 SampleSphere[10] =
 {
     float3(-0.010735935, 0.01647018, 0.0062425877),
@@ -92,7 +92,7 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
 
     if (depth < 0.999999f)
     {
-        for (int i = 0; i < SAMPLES; i++)
+        for (int i = 0; i < SAMPLE_COUNT; i++)
         {
             float3 ray = adjustedRadius * reflect(SampleSphere[i], randomNormal);
             float2 occluderTexCoord = texCoord + sign(dot(ray, normal)) * ray * float2(1, -1);
@@ -106,9 +106,11 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
             float deltaNormal = 1 - dotNormals * dotNormals;
             occlusion += step(Falloff, deltaDepth) * deltaNormal * (1 - smoothstep(Falloff, Strength, deltaDepth));
         }
+
+        occlusion *= invSamples;
     }
 
-    float ao = 1 - TotalStrength * occlusion * invSamples;
+    float ao = 1 - TotalStrength * occlusion;
     return float4(ao, 0, 0, 0);
 }
 
