@@ -177,6 +177,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (settings == null) throw new ArgumentNullException("settings");
             if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
+            if (normalDepthMapEffect == null) throw new ArgumentNullException("normalDepthMapEffect");
+            if (edgeEffect == null) throw new ArgumentNullException("edgeEffect");
 
             GraphicsDevice = graphicsDevice;
             Settings = settings;
