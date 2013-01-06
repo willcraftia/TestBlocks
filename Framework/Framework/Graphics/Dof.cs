@@ -95,7 +95,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        BasicCamera depthCamera = new BasicCamera("Depth");
+        BasicCamera internalCamera = new BasicCamera("Dof");
 
         Vector3[] frustumCorners = new Vector3[8];
 
@@ -170,23 +170,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 深度マップ用カメラの準備
 
-            depthCamera.View.Position = viewerCamera.View.Position;
-            depthCamera.View.Direction = viewerCamera.View.Direction;
-            depthCamera.View.Up = viewerCamera.View.Up;
-            depthCamera.Projection.Fov = viewerCamera.Projection.Fov;
-            depthCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
-            // TODO: スカイ スフィアの分だけ暫定的に大きめにとっている
-            depthCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance + 10;
-            depthCamera.Update();
+            internalCamera.View.Position = viewerCamera.View.Position;
+            internalCamera.View.Direction = viewerCamera.View.Direction;
+            internalCamera.View.Up = viewerCamera.View.Up;
+            internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
+            internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
+            internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
+            internalCamera.Projection.FarPlaneDistance = viewerCamera.Projection.FarPlaneDistance;
+            internalCamera.Update();
 
-            depthCamera.Frustum.GetCorners(frustumCorners);
+            internalCamera.Frustum.GetCorners(frustumCorners);
             frustumSphere = BoundingSphere.CreateFromPoints(frustumCorners);
 
             //----------------------------------------------------------------
             // 深度マップ用エフェクトの準備
 
-            depthMapEffect.View = depthCamera.View.Matrix;
-            depthMapEffect.Projection = depthCamera.Projection.Matrix;
+            depthMapEffect.View = internalCamera.View.Matrix;
+            depthMapEffect.Projection = internalCamera.Projection.Matrix;
 
             //----------------------------------------------------------------
             // 描画
@@ -195,6 +195,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.BlendState = BlendState.Opaque;
 
             GraphicsDevice.SetRenderTarget(DepthMap);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
             foreach (var sceneObject in sceneObjects)
             {
@@ -206,8 +207,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.SetRenderTarget(null);
         }
 
-        public void Filter(ICamera viewerCamera, RenderTarget2D sceneMap, RenderTarget2D result)
+        public void Filter(RenderTarget2D sceneMap, RenderTarget2D result)
         {
+            if (sceneMap == null) throw new ArgumentNullException("sceneMap");
+            if (result == null) throw new ArgumentNullException("result");
+
             //================================================================
             // シーンにブラーをかける
 
@@ -219,11 +223,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト設定
 
-            var distance = viewerCamera.Projection.FarPlaneDistance - viewerCamera.Projection.NearPlaneDistance;
-            dofEffectAdapter.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
-            dofEffectAdapter.FarPlaneDistance = viewerCamera.Projection.FarPlaneDistance / distance;
-            dofEffectAdapter.FocusDistance = viewerCamera.FocusDistance;
-            dofEffectAdapter.FocusRange = viewerCamera.FocusRange;
+            var distance = internalCamera.Projection.FarPlaneDistance - internalCamera.Projection.NearPlaneDistance;
+            dofEffectAdapter.NearPlaneDistance = internalCamera.Projection.NearPlaneDistance;
+            dofEffectAdapter.FarPlaneDistance = internalCamera.Projection.FarPlaneDistance / distance;
+            dofEffectAdapter.FocusDistance = internalCamera.FocusDistance;
+            dofEffectAdapter.FocusRange = internalCamera.FocusRange;
             dofEffectAdapter.DepthMap = DepthMap;
             dofEffectAdapter.BluredSceneMap = BluredSceneMap;
 
@@ -249,7 +253,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (!sceneObject.BoundingSphere.Intersects(frustumSphere)) return false;
 
             // 視錐台と AABB で判定。
-            return sceneObject.BoundingBox.Intersects(depthCamera.Frustum);
+            return sceneObject.BoundingBox.Intersects(internalCamera.Frustum);
         }
 
         #region IDisposable

@@ -431,7 +431,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (dof != null)
             {
                 dof.DrawDepth(activeCamera, visibleSceneObjects);
-                dof.Filter(activeCamera, renderTarget, postProcessRenderTarget);
+                dof.Filter(renderTarget, postProcessRenderTarget);
 
                 if (DebugMapDisplay.Available)
                 {
