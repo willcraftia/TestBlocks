@@ -406,6 +406,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
+            ssaoMapEffect.RandomOffset = viewerCamera.View.Position.LengthSquared();
             ssaoMapEffect.NormalDepthMap = NormalDepthMap;
 
             //----------------------------------------------------------------
