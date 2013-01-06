@@ -90,9 +90,9 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
     float occlusion = 0;
     float adjustedRadius = Radius * (1 - depth);
 
-    for (int i = 0; i < SAMPLES; i++)
+    if (depth < 0.999999f)
     {
-        if (depth < 0.999999f)
+        for (int i = 0; i < SAMPLES; i++)
         {
             float3 ray = adjustedRadius * reflect(SampleSphere[i], randomNormal);
             float2 occluderTexCoord = texCoord + sign(dot(ray, normal)) * ray * float2(1, -1);

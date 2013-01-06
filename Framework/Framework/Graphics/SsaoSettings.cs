@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         public const bool DefaultEnabled = true;
 
-        public const float DefaultMapScale = 0.5f;
+        public const float DefaultMapScale = 1;
 
         public const float DefaultTotalStrength = 1;
 
@@ -24,7 +24,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         float mapScale = DefaultMapScale;
 
-        float farPlaneDistance = 64;
+        float farPlaneDistance = 16;
 
         float totalStrength = DefaultTotalStrength;
         

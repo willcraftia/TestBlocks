@@ -422,13 +422,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            //GraphicsDevice.SetRenderTarget(SsaoMap);
-            //GraphicsDevice.Clear(Color.White);
-            //spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, null, null, ssaoMapEffect.Effect);
-            //spriteBatch.Draw(NormalDepthMap, SsaoMap.Bounds, Color.White);
-            //spriteBatch.End();
-            //GraphicsDevice.SetRenderTarget(null);
-
             //================================================================
             //
             // SSAO マップへブラーを適用
