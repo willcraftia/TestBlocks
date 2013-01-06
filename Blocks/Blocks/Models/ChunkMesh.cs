@@ -170,6 +170,24 @@ namespace Willcraftia.Xna.Blocks.Models
             DrawCore();
         }
 
+        public override void Draw(Effect effect)
+        {
+            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+                return;
+            if (Occluded) return;
+
+            var effectMatrices = effect as IEffectMatrices;
+            if (effectMatrices != null) effectMatrices.World = world;
+
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                DrawCore();
+            }
+        }
+
         public override void Draw(IEffectShadow effect)
         {
             // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？

@@ -319,6 +319,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // 収集リストを初期化。
             opaqueSceneObjects.Clear();
+            translucentSceneObjects.Clear();
             activeShadowCasters.Clear();
 
             // カウンタをリセット。

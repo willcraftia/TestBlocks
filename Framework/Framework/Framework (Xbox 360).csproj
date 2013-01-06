@@ -157,6 +157,8 @@
     <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Graphics\Dof.cs" />
+    <Compile Include="Graphics\DofSettings.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\ICamera.cs" />

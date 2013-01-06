@@ -119,6 +119,8 @@
     <Compile Include="Graphics\BasicCamera.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
+    <Compile Include="Graphics\Dof.cs" />
+    <Compile Include="Graphics\DofSettings.cs" />
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\IEffectPssm.cs" />
     <Compile Include="Graphics\IEffectShadow.cs" />

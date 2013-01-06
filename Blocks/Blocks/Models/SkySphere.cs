@@ -28,6 +28,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool sunVisible = true;
 
+        Vector3[] frustumCorners = new Vector3[8];
+
+        // ワールド行列は Update メソッドで更新。
+        Matrix world;
+
         // I/F
         public IResource Resource { get; set; }
 
@@ -58,21 +63,38 @@ namespace Willcraftia.Xna.Blocks.Models
             sphereMesh = new SphereMesh(GraphicsDevice);
         }
 
-        Vector3[] frustumCorners = new Vector3[8];
-
         public void Update(ICamera camera)
         {
             if (camera == null) throw new ArgumentNullException("camera");
+
+            //----------------------------------------------------------------
+            // 原点の更新
+
+            Position = camera.View.Position;
+
+            //----------------------------------------------------------------
+            // BoundingSphere/BoundingBox の更新
 
             // 視錐台の頂点で最も遠い場所を半径にする。
             // インデックス 4 から 7 の頂点のどれでも良い。
             camera.Frustum.GetCorners(frustumCorners);
             var far = Vector3.Distance(Vector3.Zero, frustumCorners[4]);
 
-            Position = camera.View.Position;
             BoundingSphere.Center = Position;
             BoundingSphere.Radius = far;
             BoundingBox.CreateFromSphere(ref BoundingSphere, out BoundingBox);
+
+            //----------------------------------------------------------------
+            // ワールド行列の更新
+
+            Matrix translation;
+            Matrix.CreateTranslation(ref Position, out translation);
+
+            // 元となる球メッシュは半径 0.5f であるため二倍しておく。
+            Matrix scale;
+            Matrix.CreateScale(BoundingSphere.Radius * 2, out scale);
+
+            Matrix.Multiply(ref scale, ref translation, out world);
         }
 
         public override void Draw()
@@ -104,16 +126,6 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix.CreatePerspectiveFieldOfView(
                 projection.Fov, projection.AspectRatio, projection.NearPlaneDistance, specificFar, out specificProjection);
 
-            Matrix translation;
-            Matrix.CreateTranslation(ref Position, out translation);
-
-            // 元となる球メッシュは半径 0.5f であるため二倍しておく。
-            Matrix scale;
-            Matrix.CreateScale(BoundingSphere.Radius * 2, out scale);
-
-            Matrix world;
-            Matrix.Multiply(ref scale, ref translation, out world);
-
             Matrix worldView;
             Matrix.Multiply(ref world, ref camera.View.Matrix, out worldView);
             Matrix worldViewProjection;
@@ -128,6 +140,32 @@ namespace Willcraftia.Xna.Blocks.Models
             Effect.Apply();
 
             GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
+        }
+
+        public override void Draw(Effect effect)
+        {
+            // 半径はカメラの FarPlaneDistance を越えるため、結局は描画されないはず。
+
+            //----------------------------------------------------------------
+            // 頂点バッファ
+
+            GraphicsDevice.SetVertexBuffer(sphereMesh.VertexBuffer);
+            GraphicsDevice.Indices = sphereMesh.IndexBuffer;
+
+            //----------------------------------------------------------------
+            // エフェクト
+
+            var effectMatrices = effect as IEffectMatrices;
+            if (effectMatrices != null) effectMatrices.World = world;
+
+            //----------------------------------------------------------------
+            // 描画
+
+            foreach (var pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
+            }
         }
 
         public override void Draw(ShadowMap shadowMap)
