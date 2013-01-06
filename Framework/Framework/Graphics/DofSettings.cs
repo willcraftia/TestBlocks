@@ -78,11 +78,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public DofSettings()
         {
-            Blur = new BlurSettings
-            {
-                Enabled = true,
-                Amount = 2
-            };
+            Blur = new BlurSettings();
         }
     }
 }

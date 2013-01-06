@@ -29,6 +29,14 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         /// <summary>
+        /// ブラーを適用するか否かを示す値を取得または設定します。
+        /// </summary>
+        /// <value>
+        /// true (ブラーを適用する場合)、false (それ以外の場合)。
+        /// </value>
+        public bool BlurEnabled { get; set; }
+
+        /// <summary>
         /// ブラー設定を取得します。
         /// </summary>
         public BlurSettings Blur { get; private set; }
@@ -50,7 +58,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         public SssmSettings()
         {
             Blur = new BlurSettings();
-            Blur.Enabled = true;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// このクラスは、PSSM (parallel split shadow maps) によりシャドウ マップを生成します。
     /// PSSM によるシャドウ マップの分割を必要としない場合には、分割数を 1 として利用します。
     /// </summary>
-    public sealed class ShadowMap
+    public sealed class ShadowMap : IDisposable
     {
         VsmSettings vsmSettings;
 
@@ -135,9 +135,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < splitShadowCasters.Length; i++)
                 splitShadowCasters[i] = new Queue<ShadowCaster>();
 
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            blur = new GaussianBlur(blurEffect, spriteBatch, Settings.Size, Settings.Size, SurfaceFormat.Vector2,
-                vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
+            if (settings.Technique == ShadowMapTechniques.Vsm)
+            {
+                blur = new GaussianBlur(blurEffect, spriteBatch, Settings.Size, Settings.Size, SurfaceFormat.Vector2,
+                    vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
+            }
 
             Monitor = new ShadowMapMonitor(SplitCount);
         }
@@ -253,7 +255,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     shadowCaster.Draw(shadowMapEffect);
                 }
 
-                if (shadowMapEffect.ShadowMapTechnique == ShadowMapTechniques.Vsm && vsmSettings.Blur.Enabled)
+                if (shadowMapEffect.ShadowMapTechnique == ShadowMapTechniques.Vsm && blur != null)
                     blur.Filter(renderTarget);
 
                 GraphicsDevice.SetRenderTarget(null);
@@ -318,5 +320,38 @@ namespace Willcraftia.Xna.Framework.Graphics
             splitDistances[0] = near;
             splitDistances[splitDistances.Length - 1] = farPlaneDistance;
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~ShadowMap()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                shadowMapEffect.Dispose();
+                if (blur != null) blur.Dispose();
+
+                foreach (var splitRenderTarget in splitRenderTargets)
+                    splitRenderTarget.Dispose();
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }

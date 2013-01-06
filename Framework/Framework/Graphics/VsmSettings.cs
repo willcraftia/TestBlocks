@@ -15,10 +15,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public VsmSettings()
         {
-            Blur = new BlurSettings
-            {
-                Enabled = true
-            };
+            Blur = new BlurSettings();
         }
     }
 }

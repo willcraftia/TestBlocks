@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// <summary>
     /// スクリーン スペース シャドウ マッピング (Screen Space Shadow Mapping) を行うためのクラスです。
     /// </summary>
-    public sealed class Sssm
+    public sealed class Sssm : IDisposable
     {
         SpriteBatch spriteBatch;
 
@@ -69,13 +69,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // ブラー
 
-            var pp = GraphicsDevice.PresentationParameters;
-            var width = (int) (pp.BackBufferWidth * sssmSettings.MapScale);
-            var height = (int) (pp.BackBufferHeight * sssmSettings.MapScale);
+            if (Settings.BlurEnabled)
+            {
+                var pp = GraphicsDevice.PresentationParameters;
+                var width = (int) (pp.BackBufferWidth * sssmSettings.MapScale);
+                var height = (int) (pp.BackBufferHeight * sssmSettings.MapScale);
 
-            var blurSettings = sssmSettings.Blur;
-            blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Vector2,
-                blurSettings.Radius, blurSettings.Amount);
+                var blurSettings = sssmSettings.Blur;
+                blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Vector2,
+                    blurSettings.Radius, blurSettings.Amount);
+            }
 
             //----------------------------------------------------------------
             // モニタ
@@ -87,7 +90,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Monitor.OnBeginFilter();
 
-            if (Settings.Blur.Enabled) blur.Filter(shadowScene);
+            if (blur != null) blur.Filter(shadowScene);
 
             //----------------------------------------------------------------
             // エフェクト
@@ -110,5 +113,34 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             Monitor.OnEndFilter();
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~Sssm()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                if (blur != null) blur.Dispose();
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }
