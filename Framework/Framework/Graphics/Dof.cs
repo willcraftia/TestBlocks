@@ -175,7 +175,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             depthCamera.View.Up = viewerCamera.View.Up;
             depthCamera.Projection.Fov = viewerCamera.Projection.Fov;
             depthCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
-            depthCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
+            // TODO: スカイ スフィアの分だけ暫定的に大きめにとっている
+            depthCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance + 10;
             depthCamera.Update();
 
             depthCamera.Frustum.GetCorners(frustumCorners);
