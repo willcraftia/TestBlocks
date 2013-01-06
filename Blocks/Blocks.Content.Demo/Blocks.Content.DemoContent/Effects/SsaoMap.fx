@@ -107,10 +107,10 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
             occlusion += step(Falloff, deltaDepth) * deltaNormal * (1 - smoothstep(Falloff, Strength, deltaDepth));
         }
 
-        occlusion *= invSamples;
+        occlusion *= invSamples * TotalStrength;
     }
 
-    float ao = 1 - TotalStrength * occlusion;
+    float ao = 1 - occlusion;
     return float4(ao, 0, 0, 0);
 }
 
