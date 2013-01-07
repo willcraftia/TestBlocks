@@ -379,7 +379,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix.CreateTranslation(ref position, out world);
 
             //----------------------------------------------------------------
-            // Opaque
+            // 不透明メッシュ
 
             if (interMesh.Opaque.VertexCount == 0 || interMesh.Opaque.IndexCount == 0)
             {
@@ -412,7 +412,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             //----------------------------------------------------------------
-            // Translucent
+            // 半透明メッシュ
 
             if (interMesh.Translucent.VertexCount == 0 || interMesh.Translucent.IndexCount == 0)
             {

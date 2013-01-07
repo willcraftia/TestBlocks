@@ -57,17 +57,17 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         /// <summary>
+        /// シーン マネージャが描画対象と判定した場合に、
+        /// UpdateOcclusion および各 Draw メソッドの呼び出し前に、そのフレームで一度だけ呼び出されます。
+        /// </summary>
+        public virtual void PreDraw() { }
+
+        /// <summary>
         /// オクルージョン クエリを用いる場合、サブクラスでオーバライドし、
         /// オクルージョン クエリを適切に更新するように実装します。
         /// このメソッドは、各 Draw メソッドの前に呼び出されます。
         /// </summary>
         public virtual void UpdateOcclusion() { }
-
-        /// <summary>
-        /// シーン マネージャが描画対象と判定した場合に、
-        /// 各 Draw メソッドの呼び出し前に、そのフレームで一度だけ呼び出されます。
-        /// </summary>
-        public virtual void PreDraw() { }
 
         /// <summary>
         /// 自身が管理するエフェクトを用いて描画します。

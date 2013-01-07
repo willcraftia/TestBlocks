@@ -67,6 +67,12 @@ namespace Willcraftia.Xna.Blocks.Models
             AssetManager = assetManager;
             ChunkEffect = chunkEffect;
 
+            // タイル カタログのテクスチャをチャンク エフェクトへ設定。
+            chunkEffect.TileMap = TileCatalog.TileMap;
+            chunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
+            chunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
+            chunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
+
             chunkManager = new ChunkManager(this);
 
             if (Monitor == null) Monitor = new RegionMonitor();

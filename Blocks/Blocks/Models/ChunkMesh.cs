@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
@@ -96,11 +97,17 @@ namespace Willcraftia.Xna.Blocks.Models
             occlusionQuery = new OcclusionQuery(GraphicsDevice);
         }
 
+        public override void PreDraw()
+        {
+            // ワールド行列を更新。
+            Matrix world;
+            Matrix.CreateTranslation(ref Position, out world);
+
+            base.PreDraw();
+        }
+
         public override void UpdateOcclusion()
         {
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
-
             Occluded = false;
 
             if (occlusionQueryActive)
@@ -112,22 +119,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             occlusionQuery.Begin();
 
+            //----------------------------------------------------------------
+            // エフェクト
+
             var effect = region.ChunkEffect;
-
-            //----------------------------------------------------------------
-            // タイル カタログのテクスチャ
-
-            var tileCatalog = region.TileCatalog;
-            effect.TileMap = tileCatalog.TileMap;
-            effect.DiffuseMap = tileCatalog.DiffuseColorMap;
-            effect.EmissiveMap = tileCatalog.EmissiveColorMap;
-            effect.SpecularMap = tileCatalog.SpecularColorMap;
-
-            //----------------------------------------------------------------
-            // 変換行列
-
-            Matrix world;
-            Matrix.CreateTranslation(ref Position, out world);
             effect.World = world;
             effect.Apply();
 
@@ -142,25 +137,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public override void Draw()
         {
-            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
             if (Occluded) return;
 
+            //----------------------------------------------------------------
+            // エフェクト
+
             var effect = region.ChunkEffect;
-
-            //----------------------------------------------------------------
-            // タイル カタログのテクスチャ
-
-            var tileCatalog = region.TileCatalog;
-            effect.TileMap = tileCatalog.TileMap;
-            effect.DiffuseMap = tileCatalog.DiffuseColorMap;
-            effect.EmissiveMap = tileCatalog.EmissiveColorMap;
-            effect.SpecularMap = tileCatalog.SpecularColorMap;
-
-            //----------------------------------------------------------------
-            // 変換行列
-
             effect.World = world;
             effect.Apply();
 
@@ -172,9 +154,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public override void Draw(Effect effect)
         {
-            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
             if (Occluded) return;
 
             var effectMatrices = effect as IEffectMatrices;
@@ -190,9 +169,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public override void Draw(ShadowMap shadowMap)
         {
-            // TODO: そもそもこの状態で Draw が呼ばれることが問題なのでは？
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-                return;
             if (Occluded) return;
 
             var effect = region.ChunkEffect;
@@ -228,6 +204,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             // チャンクに描画ロックを要求。
             if (Chunk != null && !Chunk.EnterDraw()) return;
+
+            // 非同期なメッシュ更新により描画不要になっていないかを検査。
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+            {
+                // 描画をせずに描画ロックを開放して終了。
+                Chunk.ExitDraw();
+                return;
+            }
 
             GraphicsDevice.SetVertexBuffer(vertexBuffer);
             GraphicsDevice.Indices = indexBuffer;
