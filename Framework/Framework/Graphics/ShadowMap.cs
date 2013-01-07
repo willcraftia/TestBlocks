@@ -43,6 +43,184 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region Settings
+
+        public sealed class Settings
+        {
+            //public const int DefaultSize = 512;
+            //public const int DefaultSize = 1024;
+            public const int DefaultSize = 2048;
+
+            // メモ
+            //
+            // VSM が最も綺麗な影となるが、最前面以外の分割視錐台で深度テストが上手くいっていない。
+            // また、高い崖のような地形による投影において、ライト ブリーディングが激しい。
+            // なお、分割数 1 で VSM を行うと、カメラ近隣はほとんどが影なしと判定される。
+            //
+            // Pcf は、3x3 程度なら Classic とそれ程変わりがない。
+            //
+            // 最も無難な設定が Classic であり、ライト ブリーディングを解決できるならば VSM。
+            //
+
+            public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
+
+            public const ShadowMap.Techniques DefaultTechnique = ShadowMap.Techniques.Classic;
+
+            // シャドウ マップのサイズに従って適切な値が変わるので注意。
+            // シャドウ マップ サイズを小さくすると、より大きな深度バイアスが必要。
+            public const float DefaultDepthBias = 0.0005f;
+
+            public const int MinSplitCount = 1;
+
+            public const int MaxSplitCount = 3;
+
+            public const int DefaultSplitCount = 3;
+
+            public const float DefaultSplitLambda = 0.5f;
+
+            ShadowMap.Techniques technique = DefaultTechnique;
+
+            int size = DefaultSize;
+
+            SurfaceFormat format = DefaultFormat;
+
+            float depthBias = DefaultDepthBias;
+
+            float nearPlaneDistance = PerspectiveFov.DefaultNearPlaneDistance;
+
+            float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
+
+            int splitCount = DefaultSplitCount;
+
+            float splitLambda = DefaultSplitLambda;
+
+            /// <summary>
+            /// シャドウ マップ生成方法の種類を取得または設定します。
+            /// </summary>
+            public ShadowMap.Techniques Technique
+            {
+                get { return technique; }
+                set
+                {
+                    technique = value;
+
+                    switch (technique)
+                    {
+                        case ShadowMap.Techniques.Vsm:
+                            format = SurfaceFormat.Vector2;
+                            break;
+                        default:
+                            format = SurfaceFormat.Single;
+                            break;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// シャドウ マップのサイズを取得または設定します。
+            /// </summary>
+            public int Size
+            {
+                get { return size; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    size = value;
+                }
+            }
+
+            /// <summary>
+            /// シャドウ マップの SurfaceFormat を取得または設定します。
+            /// </summary>
+            public SurfaceFormat Format
+            {
+                get { return format; }
+            }
+
+            /// <summary>
+            /// シャドウ マップの深度バイアスを取得または設定します。
+            /// </summary>
+            public float DepthBias
+            {
+                get { return depthBias; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    depthBias = value;
+                }
+            }
+
+            /// <summary>
+            /// シャドウ マップ描画で使用するカメラの NearPlaneDistance を取得または設定します。
+            /// </summary>
+            public float NearPlaneDistance
+            {
+                get { return nearPlaneDistance; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    nearPlaneDistance = value;
+                }
+            }
+
+            /// <summary>
+            /// シャドウ マップ描画で使用するカメラの FarPlaneDistance を取得または設定します。
+            /// </summary>
+            public float FarPlaneDistance
+            {
+                get { return farPlaneDistance; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    farPlaneDistance = value;
+                }
+            }
+
+            /// <summary>
+            /// シャドウ マップ分割数を取得または設定します。
+            /// </summary>
+            public int SplitCount
+            {
+                get { return splitCount; }
+                set
+                {
+                    if (value < MinSplitCount || MaxSplitCount < value) throw new ArgumentOutOfRangeException("value");
+
+                    splitCount = value;
+                }
+            }
+
+            /// <summary>
+            /// シャドウ マップ分割ラムダ値を取得または設定します。
+            /// </summary>
+            public float SplitLambda
+            {
+                get { return splitLambda; }
+                set
+                {
+                    if (value < 0 || 1 < value) throw new ArgumentOutOfRangeException("value");
+
+                    splitLambda = value;
+                }
+            }
+
+            /// <summary>
+            /// 分散シャドウ マップのブラー設定を取得します。
+            /// </summary>
+            public BlurSettings VsmBlur { get; private set; }
+
+            public Settings()
+            {
+                VsmBlur = new BlurSettings();
+            }
+        }
+
+        #endregion
+
         #region ShadowMapEffect
 
         sealed class ShadowMapEffect : Effect, IEffectMatrices
@@ -167,8 +345,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const Techniques DefaultShadowMapTechnique = Techniques.Classic;
 
-        VsmSettings vsmSettings;
-
         Vector3[] corners = new Vector3[8];
 
         float inverseSplitCount;
@@ -199,7 +375,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
-        public ShadowMapSettings Settings { get; private set; }
+        Settings settings;
+
+        public Techniques Technique { get; private set; }
+
+        public int Size { get; private set; }
+
+        public float DepthBias { get; private set; }
 
         public int SplitCount { get; private set; }
 
@@ -234,7 +416,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public ShadowMapMonitor Monitor;
 
-        public ShadowMap(GraphicsDevice graphicsDevice, ShadowMapSettings settings,
+        public ShadowMap(GraphicsDevice graphicsDevice, Settings settings,
             SpriteBatch spriteBatch, Effect shadowMapEffect, Effect blurEffect)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -244,15 +426,17 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
             GraphicsDevice = graphicsDevice;
-            Settings = settings;
+            this.settings = settings;
             this.spriteBatch = spriteBatch;
             this.shadowMapEffect = new ShadowMapEffect(shadowMapEffect);
             this.shadowMapEffect.ShadowMapTechnique = settings.Technique;
-            
-            vsmSettings = settings.Vsm;
 
-            SplitCount = Settings.SplitCount;
-            inverseSplitCount = 1.0f / (float) SplitCount;
+            Technique = settings.Technique;
+            Size = settings.Size;
+            DepthBias = settings.DepthBias;
+            SplitCount = settings.SplitCount;
+            inverseSplitCount = 1 / (float) SplitCount;
+
             splitDistances = new float[SplitCount + 1];
             safeSplitDistances = new float[SplitCount + 1];
             safeSplitLightViewProjections = new Matrix[SplitCount];
@@ -264,7 +448,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             splitLightCameras = new LightCamera[SplitCount];
             for (int i = 0; i < splitLightCameras.Length; i++)
-                splitLightCameras[i] = new LightCamera(Settings.Size);
+                splitLightCameras[i] = new LightCamera(settings.Size);
 
             // TODO: パラメータ見直し or 外部設定化。
             var pp = GraphicsDevice.PresentationParameters;
@@ -272,8 +456,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             splitRenderTargets = new RenderTarget2D[SplitCount];
             for (int i = 0; i < splitRenderTargets.Length; i++)
             {
-                splitRenderTargets[i] = new RenderTarget2D(GraphicsDevice, Settings.Size, Settings.Size,
-                    false, Settings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+                splitRenderTargets[i] = new RenderTarget2D(GraphicsDevice, settings.Size, settings.Size,
+                    false, settings.Format, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
                 splitRenderTargets[i].Name = "ShadowMap" + i;
             }
 
@@ -284,8 +468,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (settings.Technique == Techniques.Vsm)
             {
-                blur = new Blur(blurEffect, spriteBatch, Settings.Size, Settings.Size, SurfaceFormat.Vector2,
-                    vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
+                blur = new Blur(blurEffect, spriteBatch, settings.Size, settings.Size, SurfaceFormat.Vector2,
+                    settings.VsmBlur.Radius, settings.VsmBlur.Amount);
             }
 
             Monitor = new ShadowMapMonitor(SplitCount);
@@ -446,7 +630,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var near = camera.Projection.NearPlaneDistance;
             var far = farPlaneDistance;
             var farNearRatio = far / near;
-            var splitLambda = Settings.SplitLambda;
+            var splitLambda = settings.SplitLambda;
 
             for (int i = 0; i < splitDistances.Length; i++)
             {

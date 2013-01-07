@@ -141,23 +141,23 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             public float[] SplitDistances
             {
-                get { return splitDistances.GetValueSingleArray(ShadowMapSettings.MaxSplitCount); }
+                get { return splitDistances.GetValueSingleArray(ShadowMap.Settings.MaxSplitCount); }
                 set { splitDistances.SetValue(value); }
             }
 
             public Matrix[] SplitLightViewProjections
             {
-                get { return splitLightViewProjections.GetValueMatrixArray(ShadowMapSettings.MaxSplitCount); }
+                get { return splitLightViewProjections.GetValueMatrixArray(ShadowMap.Settings.MaxSplitCount); }
                 set { splitLightViewProjections.SetValue(value); }
             }
 
-            Texture2D[] shadowMapBuffer = new Texture2D[ShadowMapSettings.MaxSplitCount];
+            Texture2D[] shadowMapBuffer = new Texture2D[ShadowMap.Settings.MaxSplitCount];
 
             public Texture2D[] SplitShadowMaps
             {
                 get
                 {
-                    for (int i = 0; i < ShadowMapSettings.MaxSplitCount; i++)
+                    for (int i = 0; i < ShadowMap.Settings.MaxSplitCount; i++)
                         shadowMapBuffer[i] = shadowMaps[i].GetValueTexture2D();
                     return shadowMapBuffer;
                 }
@@ -228,7 +228,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 splitDistances = Parameters["SplitDistances"];
                 splitLightViewProjections = Parameters["SplitLightViewProjections"];
 
-                shadowMaps = new EffectParameter[ShadowMapSettings.MaxSplitCount];
+                shadowMaps = new EffectParameter[ShadowMap.Settings.MaxSplitCount];
                 for (int i = 0; i < shadowMaps.Length; i++)
                     shadowMaps[i] = Parameters["ShadowMap" + i];
 
@@ -335,13 +335,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D shadowSceneMap;
 
-        ShadowMapSettings shadowMapSettings;
+        ShadowMap.Settings shadowMapSettings;
 
         Settings sssmSettings;
 
         public SssmMonitor Monitor { get; private set; }
 
-        public Sssm(SpriteBatch spriteBatch, ShadowMapSettings shadowMapSettings, Settings sssmSettings,
+        public Sssm(SpriteBatch spriteBatch, ShadowMap.Settings shadowMapSettings, Settings sssmSettings,
             Effect shadowSceneEffect, Effect sssmEffect, Effect blurEffect)
             : base(spriteBatch)
         {
