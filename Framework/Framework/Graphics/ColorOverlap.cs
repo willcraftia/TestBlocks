@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
+    /// <summary>
+    /// シーンへ色をブレンドするポスト プロセッサです。
+    /// </summary>
     public sealed class ColorOverlap : PostProcessor, IDisposable
     {
         GraphicsDevice graphicsDevice;
@@ -18,6 +21,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Color color = Color.Black * 0.5f;
 
+        /// <summary>
+        /// シーンへブレンドする色を取得または設定します。
+        /// 乗算済みアルファの色を設定する必要があります。
+        /// </summary>
         public Color Color
         {
             get { return color; }
