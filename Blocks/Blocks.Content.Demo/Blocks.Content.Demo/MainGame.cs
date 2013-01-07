@@ -242,10 +242,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             viewInput.DashFactor = dashFactor;
             viewInput.Yaw(MathHelper.Pi);
 
-            //camera.FreeView.Position = new Vector3(0, 16 * 18, 0);
+            //camera.View.Position = new Vector3(0, 16 * 18, 0);
             camera.View.Position = new Vector3(0, 16 * 16, 0);
-            //camera.FreeView.Position = new Vector3(0, 16 * 3, 0);
-            //camera.FreeView.Position = new Vector3(0, 16 * 2, 0);
+            //camera.View.Position = new Vector3(0, 16 * 3, 0);
+            //camera.View.Position = new Vector3(0, 16 * 2, 0);
+            camera.Projection.AspectRatio = viewport.AspectRatio;
             camera.Projection.FarPlaneDistance = farPlaneDistance;
 
             camera.Update();

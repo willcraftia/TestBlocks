@@ -48,5 +48,12 @@ namespace Willcraftia.Xna.Framework.Graphics
         Effect CreateSsaoEffect();
 
         Texture2D CreateRandomNormalMap();
+
+        //====================================================================
+        // レンズ フレア
+
+        Texture2D CreateLensFlareGlowSprite();
+
+        Texture2D[] CreateLensFlareFlareSprites();
     }
 }

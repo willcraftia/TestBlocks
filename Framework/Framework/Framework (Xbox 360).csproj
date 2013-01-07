@@ -168,6 +168,7 @@
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
+    <Compile Include="Graphics\LensFlare.cs" />
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />

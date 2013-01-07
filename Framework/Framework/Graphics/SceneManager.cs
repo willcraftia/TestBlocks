@@ -96,6 +96,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Ssao ssao;
 
+        LensFlare lensFlare;
+
         bool shadowMapAvailable;
 
         RenderTarget2D renderTarget;
@@ -200,7 +202,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 // シャドウ マップ モジュール
                 var shadowMapEffect = moduleFactory.CreateShadowMapEffect();
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
-                
+
                 shadowMap = new ShadowMap(GraphicsDevice, shadowSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
                 Monitor.ShadowMap = shadowMap.Monitor;
 
@@ -208,7 +210,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 {
                     // シャドウ シーン モジュール
                     var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
-                    
+
                     shadowScene = new ShadowScene(GraphicsDevice, shadowSettings, shadowSceneEffect);
                     Monitor.ShadowScene = shadowScene.Monitor;
 
@@ -279,6 +281,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 ssao = new Ssao(GraphicsDevice, settings.Ssao, spriteBatch,
                     normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
+            }
+
+            //----------------------------------------------------------------
+            // レンズ フレア
+
+            {
+                var glowSpite = moduleFactory.CreateLensFlareGlowSprite();
+                var flareSprites = moduleFactory.CreateLensFlareFlareSprites();
+                lensFlare = new LensFlare(GraphicsDevice, spriteBatch, glowSpite, flareSprites);
             }
 
 #if DEBUG || TRACE
@@ -610,15 +621,21 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             //================================================================
             //
-            // OcclusionQuery
+            // オクルージョン クエリ
             //
 
             Monitor.OnBeginDrawSceneOcclusionQuery();
 
             GraphicsDevice.BlendState = colorWriteDisable;
 
+            //----------------------------------------------------------------
+            // 不透明オブジェクト
+
             foreach (var opaque in opaqueSceneObjects)
                 opaque.UpdateOcclusion();
+
+            //----------------------------------------------------------------
+            // 半透明オブジェクト
 
             foreach (var translucent in translucentSceneObjects)
                 translucent.UpdateOcclusion();
@@ -627,13 +644,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             //================================================================
             //
-            // Rendering
+            // 描画
             //
 
             Monitor.OnBeginDrawSceneRendering();
 
             //----------------------------------------------------------------
-            // Opaque Objects
+            // 不透明オブジェクト
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
@@ -652,7 +669,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
-            // Translucent Objects
+            // 半透明オブジェクト
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
@@ -671,6 +688,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 DebugDrawBoundingBox(translucent);
             }
+
+            //----------------------------------------------------------------
+            // レンズ フレア
+
+            lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
 
             Monitor.OnEndDrawSceneRendering();
 
@@ -690,7 +712,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             //================================================================
             //
-            // OcclusionQuery
+            // オクルージョン クエリ
             //
 
             Monitor.OnBeginDrawSceneOcclusionQuery();
@@ -707,13 +729,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             //================================================================
             //
-            // Rendering
+            // 描画
             //
 
             Monitor.OnBeginDrawSceneRendering();
 
             //----------------------------------------------------------------
-            // Opaque Objects
+            // 不透明オブジェクト
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
@@ -732,7 +754,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
-            // Translucent Objects
+            // 半透明オブジェクト
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
@@ -751,6 +773,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 DebugDrawBoundingBox(translucent);
             }
+
+            //----------------------------------------------------------------
+            // レンズ フレア
+
+            lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
 
             Monitor.OnEndDrawSceneRendering();
 

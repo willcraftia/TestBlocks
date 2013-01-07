@@ -144,8 +144,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public override void Draw(Effect effect)
         {
-            // 半径はカメラの FarPlaneDistance を越えるため、結局は描画されないはず。
-
             //----------------------------------------------------------------
             // 頂点バッファ
 

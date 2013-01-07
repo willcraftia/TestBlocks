@@ -127,6 +127,7 @@
     <Compile Include="Graphics\FullscreenQuad.cs" />
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
+    <Compile Include="Graphics\LensFlare.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
