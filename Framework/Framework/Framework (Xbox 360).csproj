@@ -181,9 +181,7 @@
     <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\ShadowMap.cs" />
-    <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
-    <Compile Include="Graphics\ShadowSceneEffect.cs" />
     <Compile Include="Graphics\ShadowSettings.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Ssao.cs" />
