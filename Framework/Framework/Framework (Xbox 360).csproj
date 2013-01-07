@@ -155,6 +155,7 @@
     <Compile Include="Diagnostics\TraceAppender.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
     <Compile Include="Graphics\Bloom.cs" />
+    <Compile Include="Graphics\Blur.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\ColorOverlap.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
@@ -164,7 +165,6 @@
     <Compile Include="Graphics\Edge.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\FullscreenQuad.cs" />
-    <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\ICamera.cs" />
     <Compile Include="Graphics\IPostProcessorContext.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
