@@ -13,7 +13,7 @@ namespace Willcraftia.Xna.Blocks.Models
         //====================================================================
         // Real Effect
 
-        Effect backingEffect;
+        Effect effect;
 
         //====================================================================
         // EffectParameter
@@ -76,42 +76,26 @@ namespace Willcraftia.Xna.Blocks.Models
             set { sunVisible.SetValue(value ? 1 : 0); }
         }
 
-        public SkySphereEffect(Effect backingEffect)
+        public SkySphereEffect(Effect effect)
         {
-            if (backingEffect == null) throw new ArgumentNullException("backingEffect");
+            if (effect == null) throw new ArgumentNullException("effect");
 
-            this.backingEffect = backingEffect;
+            this.effect = effect;
 
-            CacheEffectParameters();
-            CacheEffectTechniques();
-        }
+            worldViewProjection = effect.Parameters["WorldViewProjection"];
+            skyColor = effect.Parameters["SkyColor"];
+            sunDirection = effect.Parameters["SunDirection"];
+            sunDiffuseColor = effect.Parameters["SunDiffuseColor"];
+            sunThreshold = effect.Parameters["SunThreshold"];
+            sunVisible = effect.Parameters["SunVisible"];
+            defaultTechnique = effect.Techniques["Default"];
 
-        public void EnableDefaultTechnique()
-        {
-            backingEffect.CurrentTechnique = defaultTechnique;
-            currentPass = defaultTechnique.Passes[0];
+            currentPass = effect.CurrentTechnique.Passes[0];
         }
 
         public void Apply()
         {
             currentPass.Apply();
-        }
-        
-        void CacheEffectParameters()
-        {
-            worldViewProjection = backingEffect.Parameters["WorldViewProjection"];
-
-            skyColor = backingEffect.Parameters["SkyColor"];
-
-            sunDirection = backingEffect.Parameters["SunDirection"];
-            sunDiffuseColor = backingEffect.Parameters["SunDiffuseColor"];
-            sunThreshold = backingEffect.Parameters["SunThreshold"];
-            sunVisible = backingEffect.Parameters["SunVisible"];
-        }
-
-        void CacheEffectTechniques()
-        {
-            defaultTechnique = backingEffect.Techniques["Default"];
         }
     }
 }

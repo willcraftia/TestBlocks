@@ -63,9 +63,9 @@ namespace Willcraftia.Xna.Blocks.Models
             sphereMesh = new SphereMesh(GraphicsDevice);
         }
 
-        public void Update(ICamera camera)
+        public void Update()
         {
-            if (camera == null) throw new ArgumentNullException("camera");
+            var camera = Context.ActiveCamera;
 
             //----------------------------------------------------------------
             // 原点の更新
@@ -136,7 +136,6 @@ namespace Willcraftia.Xna.Blocks.Models
             GraphicsDevice.SetVertexBuffer(sphereMesh.VertexBuffer);
             GraphicsDevice.Indices = sphereMesh.IndexBuffer;
 
-            Effect.EnableDefaultTechnique();
             Effect.Apply();
 
             GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
