@@ -53,9 +53,6 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager = new SceneManager(GraphicsDevice, sceneModuleFactory);
             RegionManager = new RegionManager(serviceProvider, SceneManager);
             PartitionManager = new ChunkPartitionManager(RegionManager);
-
-            defaultRasterizerState.CullMode = CullMode.CullCounterClockwiseFace;
-            defaultRasterizerState.FillMode = FillMode.Solid;
         }
 
         public void Initialize()
@@ -145,12 +142,9 @@ namespace Willcraftia.Xna.Blocks.Models
             RegionManager.Update(gameTime);
         }
 
-        RasterizerState defaultRasterizerState = new RasterizerState();
-
         public void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1, 0);
-            GraphicsDevice.RasterizerState = defaultRasterizerState;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -163,6 +157,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // SceneManager
 
+            SceneManager.BackgroundColor = SceneSettings.SkyColor;
             SceneManager.Draw();
         }
     }

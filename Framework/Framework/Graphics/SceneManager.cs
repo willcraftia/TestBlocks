@@ -169,6 +169,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
+        public Vector3 BackgroundColor { get; set; }
+
         public int ShadowMapSize { get; set; }
 
         public Vector3 ShadowColor { get; set; }
@@ -617,7 +619,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             GraphicsDevice.SetRenderTarget(renderTarget);
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(new Color(BackgroundColor));
 
             //================================================================
             //
@@ -708,7 +710,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
             GraphicsDevice.SetRenderTarget(renderTarget);
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(new Color(BackgroundColor));
 
             //================================================================
             //
