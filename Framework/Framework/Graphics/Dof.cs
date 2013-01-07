@@ -106,31 +106,23 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         DofEffect dofEffect;
 
-        SpriteBatch spriteBatch;
-
         GaussianBlur blur;
 
         RenderTarget2D depthMap;
 
         RenderTarget2D bluredSceneMap;
 
-        public GraphicsDevice GraphicsDevice { get; private set; }
+        DofSettings settings;
 
-        public DofSettings Settings { get; private set; }
-
-        public Dof(GraphicsDevice graphicsDevice, DofSettings settings,
-            SpriteBatch spriteBatch, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
+        public Dof(SpriteBatch spriteBatch, DofSettings settings, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
+            : base(spriteBatch)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (settings == null) throw new ArgumentNullException("settings");
-            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (depthMapEffect == null) throw new ArgumentNullException("depthMapEffect");
             if (dofEffect == null) throw new ArgumentNullException("dofEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
-            GraphicsDevice = graphicsDevice;
-            Settings = settings;
-            this.spriteBatch = spriteBatch;
+            this.settings = settings;
 
             //----------------------------------------------------------------
             // エフェクト
@@ -242,9 +234,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 描画
 
             GraphicsDevice.SetRenderTarget(destination);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, dofEffect.Effect);
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, dofEffect.Effect);
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }
 

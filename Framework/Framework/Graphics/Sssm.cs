@@ -15,8 +15,6 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class Sssm : PostProcessor, IDisposable
     {
-        SpriteBatch spriteBatch;
-
         ShadowSceneEffect shadowSceneEffect;
 
         Effect sssmEffect;
@@ -31,25 +29,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D shadowSceneMap;
 
-        public GraphicsDevice GraphicsDevice { get; private set; }
-
         public ShadowSettings Settings { get; private set; }
 
         public SssmMonitor Monitor { get; private set; }
 
-        public Sssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings,
-            SpriteBatch spriteBatch, Effect shadowSceneEffect, Effect sssmEffect, Effect blurEffect)
+        public Sssm(SpriteBatch spriteBatch, ShadowSettings shadowSettings, Effect shadowSceneEffect, Effect sssmEffect, Effect blurEffect)
+            : base(spriteBatch)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
-            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (shadowSceneEffect == null) throw new ArgumentNullException("shadowSceneEffect");
             if (sssmEffect == null) throw new ArgumentNullException("sssmEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
-            GraphicsDevice = graphicsDevice;
             Settings = shadowSettings;
-            this.spriteBatch = spriteBatch;
             this.sssmEffect = sssmEffect;
 
             //================================================================
@@ -165,11 +157,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(destination);
 
-            var samplerState = destination.GetPreferredSamplerState();
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, sssmEffect);
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, sssmEffect);
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);
 

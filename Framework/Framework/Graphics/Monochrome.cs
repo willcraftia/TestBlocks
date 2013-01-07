@@ -53,10 +53,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return new Vector2(-0.1f, 0.1f); }
         }
 
-        GraphicsDevice graphicsDevice;
-
-        SpriteBatch spriteBatch;
-
         MonochromeEffect monochromeEffect;
 
         Vector2 cbCr = Grayscale;
@@ -67,14 +63,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { cbCr = value; }
         }
 
-        public Monochrome(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Effect monochromeEffect)
+        public Monochrome(SpriteBatch spriteBatch, Effect monochromeEffect)
+            : base(spriteBatch)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
-
-            this.graphicsDevice = graphicsDevice;
-            this.spriteBatch = spriteBatch;
-
             this.monochromeEffect = new MonochromeEffect(monochromeEffect);
         }
 
@@ -83,11 +74,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             monochromeEffect.Cb = cbCr.X;
             monochromeEffect.Cr = cbCr.Y;
 
-            graphicsDevice.SetRenderTarget(destination);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, monochromeEffect.Effect);
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.End();
-            graphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.SetRenderTarget(destination);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, monochromeEffect.Effect);
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
         }
     }
 }

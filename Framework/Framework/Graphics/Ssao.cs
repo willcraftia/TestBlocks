@@ -253,8 +253,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        SpriteBatch spriteBatch;
-
         NormalDepthMapEffect normalDepthMapEffect;
 
         SsaoMapEffect ssaoMapEffect;
@@ -277,26 +275,21 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D ssaoMap;
 
-        public GraphicsDevice GraphicsDevice { get; private set; }
+        SsaoSettings settings;
 
-        public SsaoSettings Settings { get; private set; }
-
-        public Ssao(GraphicsDevice graphicsDevice, SsaoSettings settings, SpriteBatch spriteBatch,
+        public Ssao(SpriteBatch spriteBatch, SsaoSettings settings,
             Effect normalDepthMapEffect, Effect ssaoMapEffect, Effect ssaoMapBlurEffect, Effect ssaoEffect,
             Texture2D randomNormalMap)
+            : base(spriteBatch)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (settings == null) throw new ArgumentNullException("settings");
-            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (normalDepthMapEffect == null) throw new ArgumentNullException("normalDepthMapEffect");
             if (ssaoMapEffect == null) throw new ArgumentNullException("ssaoMapEffect");
             if (ssaoMapBlurEffect == null) throw new ArgumentNullException("ssaoMapBlurEffect");
             if (ssaoEffect == null) throw new ArgumentNullException("ssaoEffect");
             if (randomNormalMap == null) throw new ArgumentNullException("randomNormalMap");
 
-            GraphicsDevice = graphicsDevice;
-            Settings = settings;
-            this.spriteBatch = spriteBatch;
+            this.settings = settings;
 
             var pp = GraphicsDevice.PresentationParameters;
             var width = (int) (pp.BackBufferWidth * settings.MapScale);
@@ -452,9 +445,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             ssaoMapBlurEffect.EnableHorizontalBlurTechnique();
 
             GraphicsDevice.SetRenderTarget(blurRenderTarget);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
-            spriteBatch.Draw(ssaoMap, blurRenderTarget.Bounds, Color.White);
-            spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
+            SpriteBatch.Draw(ssaoMap, blurRenderTarget.Bounds, Color.White);
+            SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
             //----------------------------------------------------------------
@@ -463,9 +456,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             ssaoMapBlurEffect.EnableVerticalBlurTechnique();
 
             GraphicsDevice.SetRenderTarget(ssaoMap);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
-            spriteBatch.Draw(blurRenderTarget, ssaoMap.Bounds, Color.White);
-            spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
+            SpriteBatch.Draw(blurRenderTarget, ssaoMap.Bounds, Color.White);
+            SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }
 
@@ -480,9 +473,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 描画
 
             GraphicsDevice.SetRenderTarget(destination);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoEffect.Effect);
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoEffect.Effect);
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }
 

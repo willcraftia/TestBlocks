@@ -273,7 +273,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
                     var sssmEffect = moduleFactory.CreateSssmEffect();
 
-                    sssm = new Sssm(GraphicsDevice, shadowSettings, spriteBatch, shadowSceneEffect, sssmEffect, blurEffect);
+                    sssm = new Sssm(spriteBatch, shadowSettings, shadowSceneEffect, sssmEffect, blurEffect);
                     Monitor.Sssm = sssm.Monitor;
                 }
             }
@@ -317,7 +317,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var ssaoEffect = moduleFactory.CreateSsaoEffect();
                 var randomNormalMap = moduleFactory.CreateRandomNormalMap();
 
-                ssao = new Ssao(GraphicsDevice, settings.Ssao, spriteBatch,
+                ssao = new Ssao(spriteBatch, settings.Ssao,
                     normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
             }
 
@@ -329,7 +329,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
                 var edgeEffect = moduleFactory.CreateEdgeEffect();
 
-                edge = new Edge(GraphicsDevice, settings.Edge, spriteBatch, normalDepthMapEffect, edgeEffect);
+                edge = new Edge(spriteBatch, settings.Edge, normalDepthMapEffect, edgeEffect);
             }
 
             //----------------------------------------------------------------
@@ -341,8 +341,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var bloomEffect = moduleFactory.CreateBloomEffect();
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
-                bloom = new Bloom(GraphicsDevice, settings.Bloom, spriteBatch,
-                    bloomExtractEffect, bloomEffect, blurEffect);
+                bloom = new Bloom(spriteBatch, settings.Bloom, bloomExtractEffect, bloomEffect, blurEffect);
             }
 
             //----------------------------------------------------------------
@@ -354,7 +353,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var dofEffect = moduleFactory.CreateDofEffect();
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
-                dof = new Dof(GraphicsDevice, settings.Dof, spriteBatch, depthMapEffect, dofEffect, blurEffect);
+                dof = new Dof(spriteBatch, settings.Dof, depthMapEffect, dofEffect, blurEffect);
             }
 
             //----------------------------------------------------------------
@@ -362,7 +361,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (settings.ColorOverlapEnabled)
             {
-                colorOverlap = new ColorOverlap(GraphicsDevice, spriteBatch);
+                colorOverlap = new ColorOverlap(spriteBatch);
             }
 
             //----------------------------------------------------------------
@@ -372,7 +371,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 var monochromeEffect = moduleFactory.CreateMonochromeEffect();
 
-                monochrome = new Monochrome(GraphicsDevice, spriteBatch, monochromeEffect);
+                monochrome = new Monochrome(spriteBatch, monochromeEffect);
             }
 
             //----------------------------------------------------------------

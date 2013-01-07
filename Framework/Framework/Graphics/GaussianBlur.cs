@@ -29,9 +29,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectTechnique verticalBlurTechnique;
 
-        public Effect Effect { get; private set; }
+        Effect effect;
 
-        public SpriteBatch SpriteBatch { get; private set; }
+        SpriteBatch spriteBatch;
+
+        GraphicsDevice graphicsDevice;
 
         public int Width { get; private set; }
 
@@ -42,8 +44,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         public int Radius { get; private set; }
 
         public float Amount { get; private set; }
-
-        public GraphicsDevice GraphicsDevice { get; private set; }
 
         public GaussianBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format)
             : this(effect, spriteBatch, width, height, format, DefaultRadius, DefaultAmount)
@@ -59,19 +59,19 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (radius < MinAmount || MaxRadius < radius) throw new ArgumentOutOfRangeException("value");
             if (amount < MinAmount) throw new ArgumentOutOfRangeException("value");
 
-            Effect = effect;
-            SpriteBatch = spriteBatch;
+            this.effect = effect;
+            this.spriteBatch = spriteBatch;
             Width = width;
             Height = height;
             Radius = radius;
             Amount = amount;
 
-            GraphicsDevice = effect.GraphicsDevice;
+            graphicsDevice = effect.GraphicsDevice;
 
             InitializeEffectParameters();
             CacheEffectTechniques();
 
-            backingRenderTarget = new RenderTarget2D(GraphicsDevice, width, height, false, format,
+            backingRenderTarget = new RenderTarget2D(graphicsDevice, width, height, false, format,
                 DepthFormat.None, 0, RenderTargetUsage.PlatformContents);
         }
 
@@ -88,26 +88,26 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void Draw(EffectTechnique technique, Texture2D source, RenderTarget2D destination)
         {
-            Effect.CurrentTechnique = technique;
+            effect.CurrentTechnique = technique;
 
             var samplerState = destination.GetPreferredSamplerState();
 
-            GraphicsDevice.SetRenderTarget(destination);
-            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, Effect);
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
-            SpriteBatch.End();
-            GraphicsDevice.SetRenderTarget(null);
+            graphicsDevice.SetRenderTarget(destination);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, effect);
+            spriteBatch.Draw(source, destination.Bounds, Color.White);
+            spriteBatch.End();
+            graphicsDevice.SetRenderTarget(null);
         }
 
         void CacheEffectTechniques()
         {
-            horizontalBlurTechnique = Effect.Techniques["HorizontalBlur"];
-            verticalBlurTechnique = Effect.Techniques["VerticalBlur"];
+            horizontalBlurTechnique = effect.Techniques["HorizontalBlur"];
+            verticalBlurTechnique = effect.Techniques["VerticalBlur"];
         }
 
         void InitializeEffectParameters()
         {
-            Effect.Parameters["KernelSize"].SetValue(Radius * 2 + 1);
+            effect.Parameters["KernelSize"].SetValue(Radius * 2 + 1);
             PopulateWeights();
             PopulateOffsetsH();
             PopulateOffsetsV();
@@ -133,17 +133,17 @@ namespace Willcraftia.Xna.Framework.Graphics
                 weights[i] /= totalWeight;
             }
 
-            Effect.Parameters["Weights"].SetValue(weights);
+            effect.Parameters["Weights"].SetValue(weights);
         }
 
         void PopulateOffsetsH()
         {
-            Effect.Parameters["OffsetsH"].SetValue(CalculateOffsets(1.0f / (float) Width, 0));
+            effect.Parameters["OffsetsH"].SetValue(CalculateOffsets(1.0f / (float) Width, 0));
         }
 
         void PopulateOffsetsV()
         {
-            Effect.Parameters["OffsetsV"].SetValue(CalculateOffsets(0, 1.0f / (float) Height));
+            effect.Parameters["OffsetsV"].SetValue(CalculateOffsets(0, 1.0f / (float) Height));
         }
 
         Vector2[] CalculateOffsets(float dx, float dy)

@@ -44,6 +44,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             ColorWriteChannels = ColorWriteChannels.None
         };
 
+        GraphicsDevice graphicsDevice;
+
         SpriteBatch spriteBatch;
 
         Texture2D glowSprite;
@@ -80,8 +82,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         bool lightBehindCamera;
 
-        public GraphicsDevice GraphicsDevice { get; private set; }
-
         public LensFlare(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Texture2D glowSprite, Texture2D[] flareSprites)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -89,7 +89,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (glowSprite == null) throw new ArgumentNullException("glowSprite");
             if (flareSprites == null) throw new ArgumentNullException("flareSprites");
 
-            GraphicsDevice = graphicsDevice;
+            this.graphicsDevice = graphicsDevice;
             this.spriteBatch = spriteBatch;
             this.glowSprite = glowSprite;
 
@@ -112,7 +112,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             queryVertices[2].Position = new Vector3(-querySize / 2,  querySize / 2, -1);
             queryVertices[3].Position = new Vector3( querySize / 2,  querySize / 2, -1);
 
-            occlusionQuery = new OcclusionQuery(GraphicsDevice);
+            occlusionQuery = new OcclusionQuery(graphicsDevice);
         }
 
         public void Draw(ICamera viewerCamera, Vector3 lightDirection)
@@ -122,7 +122,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var infiniteView = viewerCamera.View.Matrix;
             infiniteView.Translation = Vector3.Zero;
 
-            var viewport = GraphicsDevice.Viewport;
+            var viewport = graphicsDevice.Viewport;
             var projectedPosition = viewport.Project(-lightDirection, viewerCamera.Projection.Matrix, infiniteView, Matrix.Identity);
 
             if (projectedPosition.Z < 0 || 1 < projectedPosition.Z)
@@ -154,18 +154,18 @@ namespace Willcraftia.Xna.Framework.Graphics
                 occlusionAlpha = Math.Min(occlusionQuery.PixelCount / queryArea, 1);
             }
 
-            var viewport = GraphicsDevice.Viewport;
+            var viewport = graphicsDevice.Viewport;
 
             basicEffect.World = Matrix.CreateTranslation(lightPosition.X, lightPosition.Y, 0);
             basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
             basicEffect.CurrentTechnique.Passes[0].Apply();
 
-            GraphicsDevice.BlendState = ColorWriteDisable;
-            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            graphicsDevice.BlendState = ColorWriteDisable;
+            graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
             occlusionQuery.Begin();
 
-            GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, queryVertices, 0, 2);
+            graphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleStrip, queryVertices, 0, 2);
 
             occlusionQuery.End();
 
@@ -189,7 +189,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (lightBehindCamera || occlusionAlpha <= 0) return;
 
-            var viewport = GraphicsDevice.Viewport;
+            var viewport = graphicsDevice.Viewport;
 
             var screenCenter = new Vector2(viewport.Width, viewport.Height) / 2;
 
@@ -215,8 +215,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void RestoreRenderStates()
         {
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            graphicsDevice.BlendState = BlendState.Opaque;
+            graphicsDevice.DepthStencilState = DepthStencilState.Default;
         }
 
         #region IDisposable

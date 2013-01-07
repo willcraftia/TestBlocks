@@ -94,11 +94,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        GraphicsDevice graphicsDevice;
-
         BloomSettings settings;
-
-        SpriteBatch spriteBatch;
 
         BloomExtractEffect bloomExtractEffect;
 
@@ -108,19 +104,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D bloomExtractMap;
 
-        public Bloom(GraphicsDevice graphicsDevice, BloomSettings settings, SpriteBatch spriteBatch,
-            Effect bloomExtractEffect, Effect bloomEffect, Effect blurEffect)
+        public Bloom(SpriteBatch spriteBatch, BloomSettings settings, Effect bloomExtractEffect, Effect bloomEffect, Effect blurEffect)
+            : base(spriteBatch)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (settings == null) throw new ArgumentNullException("settings");
-            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (bloomExtractEffect == null) throw new ArgumentNullException("bloomExtractEffect");
             if (bloomEffect == null) throw new ArgumentNullException("bloomEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
-            this.graphicsDevice = graphicsDevice;
             this.settings = settings;
-            this.spriteBatch = spriteBatch;
 
             //----------------------------------------------------------------
             // エフェクト
@@ -137,12 +129,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // レンダ ターゲット
 
-            var pp = graphicsDevice.PresentationParameters;
+            var pp = GraphicsDevice.PresentationParameters;
             var width = (int) (pp.BackBufferWidth * settings.MapScale);
             var height = (int) (pp.BackBufferHeight * settings.MapScale);
 
-            bloomExtractMap = new RenderTarget2D(graphicsDevice, width, height,
-                false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+            bloomExtractMap = new RenderTarget2D(GraphicsDevice, width, height,
+                false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
             //----------------------------------------------------------------
             // ブラー
@@ -156,11 +148,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // ブルーム エクストラクト マップ
 
-            graphicsDevice.SetRenderTarget(bloomExtractMap);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, bloomExtractEffect.Effect);
-            spriteBatch.Draw(source, bloomExtractMap.Bounds, Color.White);
-            spriteBatch.End();
-            graphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.SetRenderTarget(bloomExtractMap);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, bloomExtractEffect.Effect);
+            SpriteBatch.Draw(source, bloomExtractMap.Bounds, Color.White);
+            SpriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
 
             //----------------------------------------------------------------
             // ブルーム エクストラクト マップへブラーを適用
@@ -172,11 +164,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             bloomEffect.BloomExtractMap = bloomExtractMap;
 
-            graphicsDevice.SetRenderTarget(destination);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, bloomEffect.Effect);
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.End();
-            graphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.SetRenderTarget(destination);
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, bloomEffect.Effect);
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         #region IDisposable

@@ -154,8 +154,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        SpriteBatch spriteBatch;
-
         NormalDepthMapEffect normalDepthMapEffect;
 
         EdgeEffect edgeEffect;
@@ -168,22 +166,16 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D normalDepthMap;
 
-        public GraphicsDevice GraphicsDevice { get; private set; }
+        EdgeSettings settings;
 
-        public EdgeSettings Settings { get; private set; }
-
-        public Edge(GraphicsDevice graphicsDevice, EdgeSettings settings, SpriteBatch spriteBatch,
-            Effect normalDepthMapEffect, Effect edgeEffect)
+        public Edge(SpriteBatch spriteBatch, EdgeSettings settings, Effect normalDepthMapEffect, Effect edgeEffect)
+            : base(spriteBatch)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (settings == null) throw new ArgumentNullException("settings");
-            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (normalDepthMapEffect == null) throw new ArgumentNullException("normalDepthMapEffect");
             if (edgeEffect == null) throw new ArgumentNullException("edgeEffect");
 
-            GraphicsDevice = graphicsDevice;
-            Settings = settings;
-            this.spriteBatch = spriteBatch;
+            this.settings = settings;
 
             var pp = GraphicsDevice.PresentationParameters;
             var width = (int) (pp.BackBufferWidth * settings.MapScale);
@@ -237,7 +229,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
             internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
-            internalCamera.Projection.FarPlaneDistance = Settings.FarPlaneDistance;
+            internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
             internalCamera.Update();
 
             internalCamera.Frustum.GetCorners(frustumCorners);
@@ -279,9 +271,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 描画
 
             GraphicsDevice.SetRenderTarget(destination);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, edgeEffect.Effect);
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.End();
+            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, edgeEffect.Effect);
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }
 

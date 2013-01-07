@@ -13,10 +13,6 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class ColorOverlap : PostProcessor, IDisposable
     {
-        GraphicsDevice graphicsDevice;
-
-        SpriteBatch spriteBatch;
-
         Texture2D fillTexture;
 
         Color color = Color.Black * 0.5f;
@@ -31,25 +27,20 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { color = value; }
         }
 
-        public ColorOverlap(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+        public ColorOverlap(SpriteBatch spriteBatch)
+            : base(spriteBatch)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
-            if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
-
-            this.graphicsDevice = graphicsDevice;
-            this.spriteBatch = spriteBatch;
-
-            fillTexture = Texture2DHelper.CreateFillTexture(graphicsDevice);
+            fillTexture = Texture2DHelper.CreateFillTexture(GraphicsDevice);
         }
 
         public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
-            graphicsDevice.SetRenderTarget(destination);
-            spriteBatch.Begin();
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.Draw(fillTexture, destination.Bounds, Color);
-            spriteBatch.End();
-            graphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.SetRenderTarget(destination);
+            SpriteBatch.Begin();
+            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.Draw(fillTexture, destination.Bounds, Color);
+            SpriteBatch.End();
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         #region IDisposable
