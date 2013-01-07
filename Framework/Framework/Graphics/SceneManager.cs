@@ -136,6 +136,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Dof dof;
 
+        ColorOverlap colorOverlap;
+
         LensFlare lensFlare;
 
         bool shadowMapAvailable;
@@ -351,6 +353,14 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
                 dof = new Dof(GraphicsDevice, settings.Dof, spriteBatch, depthMapEffect, dofEffect, blurEffect);
+            }
+
+            //----------------------------------------------------------------
+            // カラー オーバラップ
+
+            if (settings.ColorOverlapEnabled)
+            {
+                colorOverlap = new ColorOverlap(GraphicsDevice, spriteBatch);
             }
 
             //----------------------------------------------------------------
@@ -580,6 +590,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (dof != null)
             {
                 dof.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
+                SwapRenderTargets();
+            }
+
+            //----------------------------------------------------------------
+            // カラー オーバラップ
+
+            if (colorOverlap != null)
+            {
+                colorOverlap.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
                 SwapRenderTargets();
             }
 

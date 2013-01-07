@@ -120,6 +120,7 @@
     <Compile Include="Graphics\Bloom.cs" />
     <Compile Include="Graphics\BloomSettings.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
+    <Compile Include="Graphics\ColorOverlap.cs" />
     <Compile Include="Graphics\DepthMapEffect.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
     <Compile Include="Graphics\Dof.cs" />
