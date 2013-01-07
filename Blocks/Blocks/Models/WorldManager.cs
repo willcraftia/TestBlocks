@@ -31,7 +31,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SceneManager SceneManager { get; private set; }
 
-        public SceneManagerSettings SceneManagerSettings { get; private set; }
+        public SceneManager.Settings SceneManagerSettings { get; private set; }
 
         public RegionManager RegionManager { get; private set; }
 
@@ -70,7 +70,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // シーン マネージャ設定
 
             // TODO: リソースから取得する。
-            SceneManagerSettings = new SceneManagerSettings();
+            SceneManagerSettings = new SceneManager.Settings();
 
             //----------------------------------------------------------------
             // シーン マネージャ

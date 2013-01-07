@@ -177,7 +177,6 @@
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
-    <Compile Include="Graphics\SceneManagerSettings.cs" />
     <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\ShadowMap.cs" />

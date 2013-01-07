@@ -13,6 +13,149 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class SceneManager : ISceneObjectContext
     {
+        #region Settings
+
+        public sealed class Settings
+        {
+            public const bool DefaultShadowEnabled = true;
+
+            public const bool DefaultSssmEnabled = false;
+
+            public const bool DefaultSsaoEnabled = true;
+
+            public const bool DefaultEdgeEnabled = false;
+
+            public const bool DefaultBloomEnabled = false;
+
+            public const bool DefaultDofEnabled = true;
+
+            public const bool DefaultColorOverlapEnabled = false;
+
+            public const bool DefaultMonochromeEnabled = false;
+
+            /// <summary>
+            /// シャドウ処理が有効かどうかを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (シャドウ処理が有効)、false (それ以外の場合)。
+            /// </value>
+            public bool ShadowEnabled { get; set; }
+
+            /// <summary>
+            /// シャドウ マップ設定を取得します。
+            /// </summary>
+            public ShadowMap.Settings ShadowMap { get; private set; }
+
+            /// <summary>
+            /// スクリーン スペース シャドウ マッピングが有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (スクリーン スペース シャドウ マッピングが有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool SssmEnabled { get; set; }
+
+            /// <summary>
+            /// スクリーン スペース シャドウ マッピング設定を取得します。
+            /// </summary>
+            public Sssm.Settings Sssm { get; private set; }
+
+            /// <summary>
+            /// スクリーン スペース アンビエント オクルージョンが有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (スクリーン スペース アンビエント オクルージョンが有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool SsaoEnabled { get; set; }
+
+            /// <summary>
+            /// スクリーン スペース アンビエント オクルージョン設定を取得します。
+            /// </summary>
+            public Ssao.Settings Ssao { get; private set; }
+
+            /// <summary>
+            /// エッジ強調が有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (エッジ強調が有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool EdgeEnabled { get; set; }
+
+            /// <summary>
+            /// エッジ強調設定を取得します。
+            /// </summary>
+            public Edge.Settings Edge { get; private set; }
+
+            /// <summary>
+            /// ブルームが有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (ブルームが有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool BloomEnabled { get; set; }
+
+            /// <summary>
+            /// ブルーム設定を取得します。
+            /// </summary>
+            public Bloom.Settings Bloom { get; private set; }
+
+            /// <summary>
+            /// 被写界深度が有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (被写界深度が有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool DofEnabled { get; set; }
+
+            /// <summary>
+            /// 被写界深度設定を取得します。
+            /// </summary>
+            public Dof.Settings Dof { get; private set; }
+
+            /// <summary>
+            /// カラー オーバラップが有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (カラー オーバラップが有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool ColorOverlapEnabled { get; set; }
+
+            /// <summary>
+            /// モノクロームが有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (モノクロームが有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool MonochromeEnabled { get; set; }
+
+            public Settings()
+            {
+                ShadowEnabled = DefaultShadowEnabled;
+
+                ShadowMap = new ShadowMap.Settings();
+
+                SssmEnabled = DefaultSssmEnabled;
+                Sssm = new Sssm.Settings();
+
+                SsaoEnabled = DefaultSsaoEnabled;
+                Ssao = new Ssao.Settings();
+
+                EdgeEnabled = DefaultEdgeEnabled;
+                Edge = new Edge.Settings();
+
+                BloomEnabled = DefaultBloomEnabled;
+                Bloom = new Bloom.Settings();
+
+                DofEnabled = DefaultDofEnabled;
+                Dof = new Dof.Settings();
+
+                ColorOverlapEnabled = DefaultColorOverlapEnabled;
+
+                MonochromeEnabled = DefaultMonochromeEnabled;
+            }
+        }
+
+        #endregion
+
         #region DistanceComparer
 
         sealed class DistanceComparer : IComparer<SceneObject>
@@ -152,6 +295,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         PostProcessorContext postProcessorContext;
 
+        Settings settings;
+
         public SceneManagerMonitor Monitor { get; private set; }
 
         #region Debug
@@ -182,8 +327,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
-
-        public SceneManagerSettings Settings { get; private set; }
 
         public string ActiveCameraName
         {
@@ -247,31 +390,31 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new SceneManagerMonitor(this);
         }
 
-        public void Initialize(SceneManagerSettings settings)
+        public void Initialize(Settings settings)
         {
             if (settings == null) throw new ArgumentNullException("settings");
 
-            Settings = settings;
+            this.settings = settings;
 
             //----------------------------------------------------------------
             // シャドウ モジュール
 
-            if (Settings.ShadowEnabled)
+            if (settings.ShadowEnabled)
             {
                 // シャドウ マップ モジュール
                 var shadowMapEffect = moduleFactory.CreateShadowMapEffect();
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
-                shadowMap = new ShadowMap(GraphicsDevice, Settings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
+                shadowMap = new ShadowMap(GraphicsDevice, settings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
                 Monitor.ShadowMap = shadowMap.Monitor;
 
-                if (Settings.SssmEnabled)
+                if (settings.SssmEnabled)
                 {
                     // スクリーン スペース シャドウ マッピング モジュール
                     var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
                     var sssmEffect = moduleFactory.CreateSssmEffect();
 
-                    sssm = new Sssm(spriteBatch, Settings.ShadowMap, Settings.Sssm, shadowSceneEffect, sssmEffect, blurEffect);
+                    sssm = new Sssm(spriteBatch, settings.ShadowMap, settings.Sssm, shadowSceneEffect, sssmEffect, blurEffect);
                     Monitor.Sssm = sssm.Monitor;
                 }
             }
@@ -689,8 +832,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             shadowCamera.View.Up = activeCamera.View.Up;
             shadowCamera.Projection.Fov = activeCamera.Projection.Fov;
             shadowCamera.Projection.AspectRatio = activeCamera.Projection.AspectRatio;
-            shadowCamera.Projection.NearPlaneDistance = Settings.ShadowMap.NearPlaneDistance;
-            shadowCamera.Projection.FarPlaneDistance = Settings.ShadowMap.FarPlaneDistance;
+            shadowCamera.Projection.NearPlaneDistance = settings.ShadowMap.NearPlaneDistance;
+            shadowCamera.Projection.FarPlaneDistance = settings.ShadowMap.FarPlaneDistance;
             shadowCamera.Update();
 
             //----------------------------------------------------------------

@@ -141,7 +141,6 @@
     <Compile Include="Graphics\ShadowMap.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
-    <Compile Include="Graphics\SceneManagerSettings.cs" />
     <Compile Include="Graphics\Ssao.cs" />
     <Compile Include="Graphics\Sssm.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
