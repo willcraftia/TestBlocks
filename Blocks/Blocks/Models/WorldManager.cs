@@ -58,6 +58,15 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Initialize()
         {
             //----------------------------------------------------------------
+            // SceneSettings
+
+            // TODO: ワールド設定としてどうするか再検討。
+            // いずれにせよ、SceneSettings はワールド設定と一対一。
+
+            var sceneSettingsResource = resourceManager.Load("title:Resources/SceneSettings.json");
+            SceneSettings = assetManager.Load<SceneSettings>(sceneSettingsResource);
+
+            //----------------------------------------------------------------
             // SceneManager
 
             // TODO: リソースから取得する。
@@ -65,11 +74,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // TODO: 暫定的に外部でカメラを設定する。
             SceneManager.Initialize(SceneManagerSettings);
+            // 太陽と月を登録。
+            SceneManager.AddDirectionalLight(SceneSettings.Sunlight);
+            SceneManager.AddDirectionalLight(SceneSettings.Moonlight);
 
             //----------------------------------------------------------------
             // RegionManager
 
-            RegionManager.Initialize();
+            RegionManager.Initialize(SceneSettings);
 
             //----------------------------------------------------------------
             // PartitionManager
@@ -81,21 +93,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public Region Load(string worldUri)
         {
             //----------------------------------------------------------------
-            // SceneSettings
-
-            // TODO: ワールド設定としてどうするか再検討。
-
-            var sceneSettingsResource = resourceManager.Load("title:Resources/SceneSettings.json");
-            SceneSettings = assetManager.Load<SceneSettings>(sceneSettingsResource);
-
-            // 太陽と月を登録。
-            SceneManager.AddDirectionalLight(SceneSettings.Sunlight);
-            SceneManager.AddDirectionalLight(SceneSettings.Moonlight);
-
-            //----------------------------------------------------------------
             // RegionManager
-
-            RegionManager.SetSceneSettings(SceneSettings);
 
             // TODO
             return RegionManager.LoadRegion("title:Resources/DefaultRegion.json");
