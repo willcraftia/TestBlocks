@@ -182,9 +182,7 @@
     <Compile Include="Graphics\ShadowMapMonitor.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />
-    <Compile Include="Graphics\ShadowScene.cs" />
     <Compile Include="Graphics\ShadowSceneEffect.cs" />
-    <Compile Include="Graphics\ShadowSceneMonitor.cs" />
     <Compile Include="Graphics\ShadowSettings.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Ssao.cs" />

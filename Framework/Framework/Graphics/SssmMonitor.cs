@@ -8,6 +8,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class SssmMonitor
     {
+        public event EventHandler BeginDraw = delegate { };
+
+        public event EventHandler EndDraw = delegate { };
+
         public event EventHandler BeginFilter = delegate { };
 
         public event EventHandler EndFilter = delegate { };
@@ -19,6 +23,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (sssm == null) throw new ArgumentNullException("sssm");
 
             this.sssm = sssm;
+        }
+
+        internal void OnBeginDraw()
+        {
+            BeginDraw(sssm, EventArgs.Empty);
+        }
+
+        internal void OnEndDraw()
+        {
+            EndDraw(sssm, EventArgs.Empty);
         }
 
         internal void OnBeginFilter()

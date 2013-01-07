@@ -88,8 +88,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ShadowMap shadowMap;
 
-        ShadowScene shadowScene;
-
         Sssm sssm;
 
         Dof dof;
@@ -225,17 +223,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 if (shadowSettings.Sssm.Enabled)
                 {
-                    // シャドウ シーン モジュール
-                    var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
-
-                    shadowScene = new ShadowScene(GraphicsDevice, shadowSettings, shadowSceneEffect);
-                    Monitor.ShadowScene = shadowScene.Monitor;
-
                     // スクリーン スペース シャドウ マッピング モジュール
+                    var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
                     var sssmEffect = moduleFactory.CreateSssmEffect();
 
-                    sssm = new Sssm(GraphicsDevice, shadowSettings.Sssm, spriteBatch, sssmEffect, blurEffect);
-                    Monitor.ScreenSpaceShadow = sssm.Monitor;
+                    sssm = new Sssm(GraphicsDevice, shadowSettings, spriteBatch, shadowSceneEffect, sssmEffect, blurEffect);
+                    Monitor.Sssm = sssm.Monitor;
                 }
             }
 
@@ -474,17 +467,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
-            // シャドウ シーン
-
-            if (shadowScene != null && shadowMapAvailable)
-            {
-                DrawShadowScene();
-            }
-
-            //----------------------------------------------------------------
             // シーン
 
-            if (shadowMapAvailable && shadowScene == null)
+            if (shadowMapAvailable && sssm == null)
             {
                 DrawScene(shadowMap);
             }
@@ -499,7 +484,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (sssm != null)
             {
                 sssm.ShadowColor = ShadowColor;
-                sssm.Filter(renderTarget, shadowScene.RenderTarget, postProcessRenderTarget);
+                sssm.Draw(activeCamera, shadowMap, visibleSceneObjects);
+                sssm.Filter(renderTarget, postProcessRenderTarget);
+
+                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(sssm.ShadowSceneMap);
 
                 SwapRenderTargets();
             }
@@ -565,14 +553,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             var temp = renderTarget;
             renderTarget = postProcessRenderTarget;
             postProcessRenderTarget = temp;
-        }
-
-        void DrawShadowScene()
-        {
-            // TODO: Transculent は要らない？
-            shadowScene.Draw(activeCamera, shadowMap, opaqueSceneObjects);
-
-            if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowScene.RenderTarget);
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

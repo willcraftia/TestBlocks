@@ -35,9 +35,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public ShadowMapMonitor ShadowMap { get; internal set; }
 
-        public ShadowSceneMonitor ShadowScene { get; internal set; }
-
-        public SssmMonitor ScreenSpaceShadow { get; internal set; }
+        public SssmMonitor Sssm { get; internal set; }
 
         public SceneManagerMonitor(SceneManager sceneManager)
         {
