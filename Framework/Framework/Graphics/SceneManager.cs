@@ -37,6 +37,44 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region PostProcessorContext
+
+        sealed class PostProcessorContext : IPostProcessorContext
+        {
+            SceneManager sceneManager;
+
+            // I/F
+            public ICamera ActiveCamera
+            {
+                get { return sceneManager.activeCamera; }
+            }
+
+            // I/F
+            public ShadowMap ShadowMap
+            {
+                get { return sceneManager.shadowMap; }
+            }
+
+            // I/F
+            public Vector3 ShadowColor
+            {
+                get { return sceneManager.ShadowColor; }
+            }
+
+            // I/F
+            public IEnumerable<SceneObject> VisibleSceneObjects
+            {
+                get { return sceneManager.visibleSceneObjects; }
+            }
+
+            public PostProcessorContext(SceneManager sceneManager)
+            {
+                this.sceneManager = sceneManager;
+            }
+        }
+
+        #endregion
+
         public const int InitialSceneObjectCapacity = 1000;
 
         public const int InitialCameraCapacity = 10;
@@ -105,6 +143,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         RenderTarget2D postProcessRenderTarget;
 
         SpriteBatch spriteBatch;
+
+        PostProcessorContext postProcessorContext;
 
         public SceneManagerMonitor Monitor { get; private set; }
 
@@ -248,6 +288,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             var multiSampleCount = pp.MultiSampleCount;
             renderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
+
+            //----------------------------------------------------------------
+            // ポストプロセッサ コンテキスト
+
+            postProcessorContext = new PostProcessorContext(this);
 
             //----------------------------------------------------------------
             // シーンへのポスト プロセスのためのレンダ ターゲット
@@ -483,11 +528,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (sssm != null)
             {
-                sssm.ShadowColor = ShadowColor;
-                sssm.Draw(activeCamera, shadowMap, visibleSceneObjects);
-                sssm.Filter(renderTarget, postProcessRenderTarget);
+                sssm.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
+                //sssm.ShadowColor = ShadowColor;
+                //sssm.Draw(activeCamera, shadowMap, visibleSceneObjects);
+                //sssm.Filter(renderTarget, postProcessRenderTarget);
 
-                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(sssm.ShadowSceneMap);
+                //if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(sssm.ShadowSceneMap);
 
                 SwapRenderTargets();
             }

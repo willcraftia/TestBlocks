@@ -8,9 +8,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class SssmMonitor
     {
-        public event EventHandler BeginDraw = delegate { };
+        public event EventHandler BeginProcess = delegate { };
 
-        public event EventHandler EndDraw = delegate { };
+        public event EventHandler EndProcess = delegate { };
+
+        public event EventHandler BeginDrawShadowScene = delegate { };
+
+        public event EventHandler EndDrawShadowScene = delegate { };
 
         public event EventHandler BeginFilter = delegate { };
 
@@ -25,14 +29,24 @@ namespace Willcraftia.Xna.Framework.Graphics
             this.sssm = sssm;
         }
 
-        internal void OnBeginDraw()
+        internal void OnBeginProcess()
         {
-            BeginDraw(sssm, EventArgs.Empty);
+            BeginProcess(sssm, EventArgs.Empty);
         }
 
-        internal void OnEndDraw()
+        internal void OnEndProcess()
         {
-            EndDraw(sssm, EventArgs.Empty);
+            EndProcess(sssm, EventArgs.Empty);
+        }
+
+        internal void OnBeginDrawShadowScene()
+        {
+            BeginDrawShadowScene(sssm, EventArgs.Empty);
+        }
+
+        internal void OnEndDrawShadowScene()
+        {
+            EndDrawShadowScene(sssm, EventArgs.Empty);
         }
 
         internal void OnBeginFilter()

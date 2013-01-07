@@ -166,11 +166,13 @@
     <Compile Include="Graphics\FullscreenQuad.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\ICamera.cs" />
+    <Compile Include="Graphics\IPostProcessorContext.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\LensFlare.cs" />
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
+    <Compile Include="Graphics\PostProcessor.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />

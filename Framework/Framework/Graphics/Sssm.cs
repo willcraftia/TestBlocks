@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
@@ -12,7 +13,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// <summary>
     /// スクリーン スペース シャドウ マッピング (Screen Space Shadow Mapping) を行うためのクラスです。
     /// </summary>
-    public sealed class Sssm : IDisposable
+    public sealed class Sssm : PostProcessor, IDisposable
     {
         SpriteBatch spriteBatch;
 
@@ -28,27 +29,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         GaussianBlur blur;
 
-        Vector3 shadowColor = Vector3.Zero;
+        RenderTarget2D shadowSceneMap;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public ShadowSettings Settings { get; private set; }
 
-        public RenderTarget2D ShadowSceneMap { get; private set; }
-
         public SssmMonitor Monitor { get; private set; }
-
-        public Vector3 ShadowColor
-        {
-            get { return shadowColor; }
-            set
-            {
-                if (shadowColor == value) return;
-
-                shadowColor = value;
-                shadowColorParameter.SetValue(shadowColor);
-            }
-        }
 
         public Sssm(GraphicsDevice graphicsDevice, ShadowSettings shadowSettings,
             SpriteBatch spriteBatch, Effect shadowSceneEffect, Effect sssmEffect, Effect blurEffect)
@@ -86,7 +73,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var height = (int) (pp.BackBufferHeight * sssmSettings.MapScale);
 
             // メモ: ブラーをかける場合があるので RenderTargetUsage.PreserveContents で作成。
-            ShadowSceneMap = new RenderTarget2D(GraphicsDevice, width, height,
+            shadowSceneMap = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Color, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
             //================================================================
@@ -115,13 +102,25 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new SssmMonitor(this);
         }
 
-        public void Draw(ICamera camera, ShadowMap shadowMap, IEnumerable<SceneObject> sceneObjects)
+        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
-            if (camera == null) throw new ArgumentNullException("camera");
-            if (shadowMap == null) throw new ArgumentNullException("shadowMap");
-            if (sceneObjects == null) throw new ArgumentNullException("sceneObjects");
+            Monitor.OnBeginProcess();
 
-            Monitor.OnBeginDraw();
+            DrawShadowScene(context);
+            Filter(context, source, destination);
+
+            if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowSceneMap);
+
+            Monitor.OnEndProcess();
+        }
+
+        void DrawShadowScene(IPostProcessorContext context)
+        {
+            Monitor.OnBeginDrawShadowScene();
+
+            var camera = context.ActiveCamera;
+            var shadowMap = context.ShadowMap;
+            var visibleSceneObjects = context.VisibleSceneObjects;
 
             //----------------------------------------------------------------
             // エフェクト
@@ -138,38 +137,38 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            GraphicsDevice.SetRenderTarget(ShadowSceneMap);
+            GraphicsDevice.SetRenderTarget(shadowSceneMap);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-            foreach (var sceneObject in sceneObjects)
+            foreach (var sceneObject in visibleSceneObjects)
                 sceneObject.Draw(shadowSceneEffect);
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndDraw();
+            Monitor.OnEndDrawShadowScene();
         }
 
-        public void Filter(RenderTarget2D sceneMap, RenderTarget2D result)
+        void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
             Monitor.OnBeginFilter();
 
-            if (blur != null) blur.Filter(ShadowSceneMap);
+            if (blur != null) blur.Filter(shadowSceneMap);
 
             //----------------------------------------------------------------
             // エフェクト
 
-            shadowColorParameter.SetValue(shadowColor);
-            shadowSceneMapParameter.SetValue(ShadowSceneMap);
+            shadowColorParameter.SetValue(context.ShadowColor);
+            shadowSceneMapParameter.SetValue(shadowSceneMap);
 
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.SetRenderTarget(result);
+            GraphicsDevice.SetRenderTarget(destination);
 
-            var samplerState = result.GetPreferredSamplerState();
+            var samplerState = destination.GetPreferredSamplerState();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, sssmEffect);
-            spriteBatch.Draw(sceneMap, result.Bounds, Color.White);
+            spriteBatch.Draw(source, destination.Bounds, Color.White);
             spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);
@@ -198,6 +197,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (disposing)
             {
+                shadowSceneEffect.Dispose();
+                shadowSceneMap.Dispose();
                 if (blur != null) blur.Dispose();
             }
 
