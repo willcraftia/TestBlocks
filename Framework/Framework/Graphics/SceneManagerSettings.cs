@@ -8,6 +8,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class SceneManagerSettings
     {
+        public const bool DefaultShadowEnabled = true;
+
         public const bool DefaultSsaoEnabled = true;
 
         public const bool DefaultEdgeEnabled = false;
@@ -21,7 +23,15 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const bool DefaultMonochromeEnabled = false;
 
         /// <summary>
-        /// 影設定を取得します。
+        /// シャドウ処理が有効かどうかを示す値を取得または設定します。
+        /// </summary>
+        /// <value>
+        /// true (シャドウ処理が有効)、false (それ以外の場合)。
+        /// </value>
+        public bool ShadowEnabled { get; set; }
+
+        /// <summary>
+        /// シャドウ設定を取得します。
         /// </summary>
         public ShadowSettings Shadow { get; private set; }
 
@@ -95,6 +105,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public SceneManagerSettings()
         {
+            ShadowEnabled = DefaultShadowEnabled;
             Shadow = new ShadowSettings();
 
             SsaoEnabled = DefaultSsaoEnabled;

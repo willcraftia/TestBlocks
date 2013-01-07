@@ -256,10 +256,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // シャドウ モジュール
 
-            var shadowSettings = Settings.Shadow;
-
-            if (shadowSettings.Enabled)
+            if (Settings.ShadowEnabled)
             {
+                var shadowSettings = Settings.Shadow;
+
                 // シャドウ マップ モジュール
                 var shadowMapEffect = moduleFactory.CreateShadowMapEffect();
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
@@ -267,7 +267,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 shadowMap = new ShadowMap(GraphicsDevice, shadowSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
                 Monitor.ShadowMap = shadowMap.Monitor;
 
-                if (shadowSettings.Sssm.Enabled)
+                if (shadowSettings.SssmEnabled)
                 {
                     // スクリーン スペース シャドウ マッピング モジュール
                     var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();

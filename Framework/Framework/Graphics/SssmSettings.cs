@@ -8,25 +8,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class SssmSettings
     {
-        public const bool DefaultEnabled = false;
-
         public const float DefaultMapScale = 0.25f;
 
-        bool enabled = DefaultEnabled;
-
         float mapScale = DefaultMapScale;
-
-        /// <summary>
-        /// スクリーン スペース シャドウ マッピングが有効か否かを示す値を取得または設定します。
-        /// </summary>
-        /// <value>
-        /// true (スクリーン スペース シャドウ マッピングが有効な場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
 
         /// <summary>
         /// ブラーを適用するか否かを示す値を取得または設定します。
