@@ -529,12 +529,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (sssm != null)
             {
                 sssm.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                //sssm.ShadowColor = ShadowColor;
-                //sssm.Draw(activeCamera, shadowMap, visibleSceneObjects);
-                //sssm.Filter(renderTarget, postProcessRenderTarget);
-
-                //if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(sssm.ShadowSceneMap);
-
                 SwapRenderTargets();
             }
 
@@ -543,15 +537,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (ssao != null)
             {
-                ssao.DrawSsaoMap(activeCamera, visibleSceneObjects);
-                ssao.Filter(renderTarget, postProcessRenderTarget);
-
-                if (DebugMapDisplay.Available)
-                {
-                    DebugMapDisplay.Instance.Add(ssao.NormalDepthMap);
-                    DebugMapDisplay.Instance.Add(ssao.SsaoMap);
-                }
-
+                ssao.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
                 SwapRenderTargets();
             }
 
@@ -560,12 +546,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (edge != null)
             {
-                edge.DrawNormalDepth(activeCamera, visibleSceneObjects);
-                edge.Filter(renderTarget, postProcessRenderTarget);
-
-                if (DebugMapDisplay.Available)
-                    DebugMapDisplay.Instance.Add(edge.NormalDepthMap);
-
+                edge.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
                 SwapRenderTargets();
             }
 
@@ -574,15 +555,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (dof != null)
             {
-                dof.DrawDepth(activeCamera, visibleSceneObjects);
-                dof.Filter(renderTarget, postProcessRenderTarget);
-
-                if (DebugMapDisplay.Available)
-                {
-                    DebugMapDisplay.Instance.Add(dof.DepthMap);
-                    DebugMapDisplay.Instance.Add(dof.BluredSceneMap);
-                }
-
+                dof.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
                 SwapRenderTargets();
             }
 

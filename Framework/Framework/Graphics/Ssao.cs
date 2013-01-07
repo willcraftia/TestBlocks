@@ -4,12 +4,13 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class Ssao : IDisposable
+    public sealed class Ssao : PostProcessor, IDisposable
     {
         #region SsaoMapEffect
 
@@ -262,7 +263,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         SsaoEffect ssaoEffect;
 
-        BasicCamera internalCamera = new BasicCamera("EdgeInternal");
+        BasicCamera internalCamera = new BasicCamera("SsaoInternal");
 
         Vector3[] frustumCorners = new Vector3[8];
 
@@ -272,13 +273,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         FullscreenQuad fullscreenQuad;
 
+        RenderTarget2D normalDepthMap;
+
+        RenderTarget2D ssaoMap;
+
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public SsaoSettings Settings { get; private set; }
-
-        public RenderTarget2D NormalDepthMap { get; private set; }
-
-        public RenderTarget2D SsaoMap { get; private set; }
 
         public Ssao(GraphicsDevice graphicsDevice, SsaoSettings settings, SpriteBatch spriteBatch,
             Effect normalDepthMapEffect, Effect ssaoMapEffect, Effect ssaoMapBlurEffect, Effect ssaoEffect,
@@ -330,11 +331,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             // レンダ ターゲット
 
             // 法線深度マップ
-            NormalDepthMap = new RenderTarget2D(GraphicsDevice, width, height,
+            normalDepthMap = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Vector4, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
 
             // SSAO マップ
-            SsaoMap = new RenderTarget2D(GraphicsDevice, width, height,
+            ssaoMap = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
             // SSAO マップのブラー用
@@ -348,10 +349,22 @@ namespace Willcraftia.Xna.Framework.Graphics
             fullscreenQuad = new FullscreenQuad(GraphicsDevice);
         }
 
-        public void DrawSsaoMap(ICamera viewerCamera, IEnumerable<SceneObject> sceneObjects)
+        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
-            if (viewerCamera == null) throw new ArgumentNullException("viewerCamera");
-            if (sceneObjects == null) throw new ArgumentNullException("sceneObjects");
+            DrawSsaoMap(context);
+            Filter(context, source, destination);
+
+            if (DebugMapDisplay.Available)
+            {
+                DebugMapDisplay.Instance.Add(normalDepthMap);
+                DebugMapDisplay.Instance.Add(ssaoMap);
+            }
+        }
+
+        void DrawSsaoMap(IPostProcessorContext context)
+        {
+            var viewerCamera = context.ActiveCamera;
+            var visibleSceneObjects = context.VisibleSceneObjects;
 
             //================================================================
             //
@@ -386,10 +399,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            GraphicsDevice.SetRenderTarget(NormalDepthMap);
+            GraphicsDevice.SetRenderTarget(normalDepthMap);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-            foreach (var sceneObject in sceneObjects)
+            foreach (var sceneObject in visibleSceneObjects)
             {
                 // 専用カメラの視錐台に含まれるもののみを描画。
                 if (IsVisibleObject(sceneObject))
@@ -407,12 +420,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             // エフェクト
 
             ssaoMapEffect.RandomOffset = viewerCamera.View.Position.LengthSquared();
-            ssaoMapEffect.NormalDepthMap = NormalDepthMap;
+            ssaoMapEffect.NormalDepthMap = normalDepthMap;
 
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.SetRenderTarget(SsaoMap);
+            GraphicsDevice.SetRenderTarget(ssaoMap);
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
             GraphicsDevice.BlendState = BlendState.Opaque;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
@@ -431,7 +444,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
-            ssaoMapBlurEffect.NormalDepthMap = NormalDepthMap;
+            ssaoMapBlurEffect.NormalDepthMap = normalDepthMap;
 
             //----------------------------------------------------------------
             // HorizontalBlur テクニックで描画
@@ -440,7 +453,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(blurRenderTarget);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
-            spriteBatch.Draw(SsaoMap, blurRenderTarget.Bounds, Color.White);
+            spriteBatch.Draw(ssaoMap, blurRenderTarget.Bounds, Color.White);
             spriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
@@ -449,29 +462,26 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             ssaoMapBlurEffect.EnableVerticalBlurTechnique();
 
-            GraphicsDevice.SetRenderTarget(SsaoMap);
+            GraphicsDevice.SetRenderTarget(ssaoMap);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
-            spriteBatch.Draw(blurRenderTarget, SsaoMap.Bounds, Color.White);
+            spriteBatch.Draw(blurRenderTarget, ssaoMap.Bounds, Color.White);
             spriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }
 
-        public void Filter(RenderTarget2D sceneMap, RenderTarget2D result)
+        void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
-            if (sceneMap == null) throw new ArgumentNullException("sceneMap");
-            if (result == null) throw new ArgumentNullException("result");
-
             //----------------------------------------------------------------
             // エフェクト
 
-            ssaoEffect.SsaoMap = SsaoMap;
+            ssaoEffect.SsaoMap = ssaoMap;
 
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.SetRenderTarget(result);
+            GraphicsDevice.SetRenderTarget(destination);
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoEffect.Effect);
-            spriteBatch.Draw(sceneMap, result.Bounds, Color.White);
+            spriteBatch.Draw(source, destination.Bounds, Color.White);
             spriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
         }
@@ -510,8 +520,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (disposing)
             {
                 normalDepthMapEffect.Dispose();
-                NormalDepthMap.Dispose();
-                SsaoMap.Dispose();
+                normalDepthMap.Dispose();
+                ssaoMap.Dispose();
                 blurRenderTarget.Dispose();
             }
 
