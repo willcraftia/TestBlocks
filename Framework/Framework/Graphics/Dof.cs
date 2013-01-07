@@ -151,6 +151,22 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         DofSettings settings;
 
+        float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
+
+        /// <summary>
+        /// 深度マップ描画で使用するカメラの FarPlaneDistance を取得または設定します。
+        /// </summary>
+        public float FarPlaneDistance
+        {
+            get { return farPlaneDistance; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                farPlaneDistance = value;
+            }
+        }
+
         public DofMonitor Monitor { get; private set; }
 
         public Dof(SpriteBatch spriteBatch, DofSettings settings, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
@@ -228,7 +244,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
             internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
-            internalCamera.Projection.FarPlaneDistance = viewerCamera.Projection.FarPlaneDistance;
+            //internalCamera.Projection.FarPlaneDistance = viewerCamera.Projection.FarPlaneDistance;
+            internalCamera.Projection.FarPlaneDistance = farPlaneDistance;
             internalCamera.Update();
 
             internalCamera.Frustum.GetCorners(frustumCorners);

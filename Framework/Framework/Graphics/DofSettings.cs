@@ -13,8 +13,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         float mapScale = DefaultMapScale;
 
-        float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
-
         /// <summary>
         /// ブラー設定を取得します。
         /// </summary>
@@ -31,20 +29,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (value <= 0) throw new ArgumentOutOfRangeException("value");
 
                 mapScale = value;
-            }
-        }
-
-        /// <summary>
-        /// 深度マップ描画で使用するカメラの、遠くのビュー プレーンとの距離。
-        /// </summary>
-        public float FarPlaneDistance
-        {
-            get { return farPlaneDistance; }
-            set
-            {
-                if (value < 0) throw new ArgumentOutOfRangeException("value");
-
-                farPlaneDistance = value;
             }
         }
 

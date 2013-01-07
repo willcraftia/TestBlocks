@@ -103,6 +103,16 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        public const float DefaultThreshold = 0.25f;
+
+        public const float DefaultBloomIntensity = 1.25f;
+
+        public const float DefaultBaseIntensity = 1;
+
+        public const float DefaultBloomSaturation = 1;
+
+        public const float DefaultBaseSaturation = 1;
+
         BloomSettings settings;
 
         BloomExtractEffect bloomExtractEffect;
@@ -112,6 +122,71 @@ namespace Willcraftia.Xna.Framework.Graphics
         GaussianBlur blur;
 
         RenderTarget2D bloomExtractMap;
+
+        float threshold = DefaultThreshold;
+
+        float bloomIntensity = DefaultBloomIntensity;
+
+        float baseIntensity = DefaultBaseIntensity;
+
+        float bloomSaturation = DefaultBloomSaturation;
+
+        float baseSaturation = DefaultBaseSaturation;
+
+        public float Threshold
+        {
+            get { return threshold; }
+            set
+            {
+                if (value < 0 || 1 < value) throw new ArgumentOutOfRangeException("value");
+
+                threshold = value;
+            }
+        }
+
+        public float BloomIntensity
+        {
+            get { return bloomIntensity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                bloomIntensity = value;
+            }
+        }
+
+        public float BaseIntensity
+        {
+            get { return baseIntensity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                baseIntensity = value;
+            }
+        }
+
+        public float BloomSaturation
+        {
+            get { return bloomSaturation; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                bloomSaturation = value;
+            }
+        }
+
+        public float BaseSaturation
+        {
+            get { return baseSaturation; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                baseSaturation = value;
+            }
+        }
 
         public BloomMonitor Monitor { get; private set; }
 
@@ -129,13 +204,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // エフェクト
 
             this.bloomExtractEffect = new BloomExtractEffect(bloomExtractEffect);
-            this.bloomExtractEffect.Threshold = settings.Threshold;
-            
             this.bloomEffect = new BloomEffect(bloomEffect);
-            this.bloomEffect.BloomIntensity = settings.BloomIntensity;
-            this.bloomEffect.BaseIntensity = settings.BaseIntensity;
-            this.bloomEffect.BloomSaturation = settings.BloomSaturation;
-            this.bloomEffect.BaseSaturation = settings.BaseSaturation;
 
             //----------------------------------------------------------------
             // レンダ ターゲット
@@ -166,6 +235,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // ブルーム エクストラクト マップ
 
+            bloomExtractEffect.Threshold = Threshold;
+
             GraphicsDevice.SetRenderTarget(bloomExtractMap);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, bloomExtractEffect.Effect);
             SpriteBatch.Draw(source, bloomExtractMap.Bounds, Color.White);
@@ -180,6 +251,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // ブルーム
 
+            bloomEffect.BloomIntensity = BloomIntensity;
+            bloomEffect.BaseIntensity = BaseIntensity;
+            bloomEffect.BloomSaturation = BloomSaturation;
+            bloomEffect.BaseSaturation = BaseSaturation;
             bloomEffect.BloomExtractMap = bloomExtractMap;
 
             GraphicsDevice.SetRenderTarget(destination);

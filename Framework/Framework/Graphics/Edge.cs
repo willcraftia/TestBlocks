@@ -191,6 +191,18 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        public const float DefaultEdgeWidth = 1;
+
+        public const float DefaultEdgeIntensity = 20;
+
+        public const float DefaultNormalThreshold = 0.1f;
+
+        public const float DefaultDepthThreshold = 0;
+
+        public const float DefaultNormalSensitivity = 1;
+
+        public const float DefaultDepthSensitivity = 1000;
+
         NormalDepthMapEffect normalDepthMapEffect;
 
         EdgeEffect edgeEffect;
@@ -204,6 +216,109 @@ namespace Willcraftia.Xna.Framework.Graphics
         RenderTarget2D normalDepthMap;
 
         EdgeSettings settings;
+
+        float edgeWidth = DefaultEdgeWidth;
+
+        float edgeIntensity = DefaultEdgeIntensity;
+
+        float normalThreshold = DefaultNormalThreshold;
+
+        float depthThreshold = DefaultDepthThreshold;
+
+        float normalSensitivity = DefaultNormalSensitivity;
+
+        float depthSensitivity = DefaultDepthSensitivity;
+
+        Vector3 edgeColor = Vector3.Zero;
+
+        // TODO
+        float farPlaneDistance = 128;
+
+        public float EdgeWidth
+        {
+            get { return edgeWidth; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                edgeWidth = value;
+            }
+        }
+
+        public float EdgeIntensity
+        {
+            get { return edgeIntensity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                edgeIntensity = value;
+            }
+        }
+
+        public float NormalThreshold
+        {
+            get { return normalThreshold; }
+            set
+            {
+                if (value < 0 || 1 < value) throw new ArgumentOutOfRangeException("value");
+
+                normalThreshold = value;
+            }
+        }
+
+        public float DepthThreshold
+        {
+            get { return depthThreshold; }
+            set
+            {
+                if (value < 0 || 1 < value) throw new ArgumentOutOfRangeException("value");
+
+                depthThreshold = value;
+            }
+        }
+
+        public float NormalSensitivity
+        {
+            get { return normalSensitivity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                normalSensitivity = value;
+            }
+        }
+
+        public float DepthSensitivity
+        {
+            get { return depthSensitivity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                depthSensitivity = value;
+            }
+        }
+
+        public Vector3 EdgeColor
+        {
+            get { return edgeColor; }
+            set { edgeColor = value; }
+        }
+
+        /// <summary>
+        /// 法線深度マップ描画で使用するカメラの、遠くのビュー プレーンとの距離。
+        /// </summary>
+        public float FarPlaneDistance
+        {
+            get { return farPlaneDistance; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                farPlaneDistance = value;
+            }
+        }
 
         public EdgeMonitor Monitor { get; private set; }
 
@@ -228,13 +343,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // エッジ強調
             this.edgeEffect = new EdgeEffect(edgeEffect);
-            this.edgeEffect.EdgeWidth = settings.EdgeWidth;
-            this.edgeEffect.EdgeIntensity = settings.EdgeIntensity;
-            this.edgeEffect.NormalThreshold = settings.NormalThreshold;
-            this.edgeEffect.DepthThreshold = settings.DepthThreshold;
-            this.edgeEffect.NormalSensitivity = settings.NormalSensitivity;
-            this.edgeEffect.DepthSensitivity = settings.DepthSensitivity;
-            this.edgeEffect.EdgeColor = settings.EdgeColor;
             this.edgeEffect.MapWidth = width;
             this.edgeEffect.MapHeight = height;
 
@@ -278,7 +386,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
             internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
-            internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
+            internalCamera.Projection.FarPlaneDistance = FarPlaneDistance;
             internalCamera.Update();
 
             internalCamera.Frustum.GetCorners(frustumCorners);
@@ -318,6 +426,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
+            edgeEffect.EdgeWidth = EdgeWidth;
+            edgeEffect.EdgeIntensity = EdgeIntensity;
+            edgeEffect.NormalThreshold = NormalThreshold;
+            edgeEffect.DepthThreshold = DepthThreshold;
+            edgeEffect.NormalSensitivity = NormalSensitivity;
+            edgeEffect.DepthSensitivity = DepthSensitivity;
+            edgeEffect.EdgeColor = EdgeColor;
             edgeEffect.NormalDepthMap = normalDepthMap;
 
             //----------------------------------------------------------------
