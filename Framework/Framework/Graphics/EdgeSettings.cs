@@ -9,8 +9,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class EdgeSettings
     {
-        public const bool DefaultEnabled = false;
-
         public const float DefaultMapScale = 1;
 
         public const float DefaultEdgeWidth = 1;
@@ -24,8 +22,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const float DefaultNormalSensitivity = 1;
 
         public const float DefaultDepthSensitivity = 1000;
-
-        bool enabled = DefaultEnabled;
 
         float mapScale = DefaultMapScale;
 
@@ -45,18 +41,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         // TODO
         float farPlaneDistance = 128;
-
-        /// <summary>
-        /// エッジ強調が有効か否かを示す値を取得または設定します。
-        /// </summary>
-        /// <value>
-        /// true (エッジ強調が有効な場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
 
         /// <summary>
         /// 実スクリーンに対する法線深度マップのスケールを取得または設定します。

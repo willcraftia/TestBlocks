@@ -307,7 +307,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // スクリーン スペース アンビエント オクルージョン
 
-            if (settings.Ssao.Enabled)
+            if (settings.SsaoEnabled)
             {
                 var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
                 var ssaoMapEffect = moduleFactory.CreateSsaoMapEffect();
@@ -322,7 +322,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エッジ強調
 
-            if (settings.Edge.Enabled)
+            if (settings.EdgeEnabled)
             {
                 var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
                 var edgeEffect = moduleFactory.CreateEdgeEffect();
@@ -333,7 +333,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // ブルーム
 
-            if (settings.Bloom.Enabled)
+            if (settings.BloomEnabled)
             {
                 var bloomExtractEffect = moduleFactory.CreateBloomExtractEffect();
                 var bloomEffect = moduleFactory.CreateBloomEffect();
@@ -346,7 +346,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 被写界深度
 
-            if (settings.Dof.Enabled)
+            if (settings.DofEnabled)
             {
                 var depthMapEffect = moduleFactory.CreateDepthMapEffect();
                 var dofEffect = moduleFactory.CreateDofEffect();

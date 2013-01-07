@@ -8,8 +8,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class BloomSettings
     {
-        public const bool DefaultEnabled = false;
-
         public const float DefaultMapScale = 0.25f;
 
         public const float DefaultThreshold = 0.25f;
@@ -22,8 +20,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultBaseSaturation = 1;
 
-        bool enabled = DefaultEnabled;
-
         float mapScale = DefaultMapScale;
 
         float threshold = DefaultThreshold;
@@ -35,12 +31,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         float bloomSaturation = DefaultBloomSaturation;
 
         float baseSaturation = DefaultBaseSaturation;
-
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
 
         public float MapScale
         {

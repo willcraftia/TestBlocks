@@ -8,8 +8,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class SsaoSettings
     {
-        public const bool DefaultEnabled = true;
-
         public const float DefaultMapScale = 1;
 
         public const float DefaultTotalStrength = 1;
@@ -19,8 +17,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const float DefaultFalloff = 0.00001f;
 
         public const float DefaultRadius = 2;
-
-        bool enabled = DefaultEnabled;
 
         float mapScale = DefaultMapScale;
 
@@ -33,18 +29,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         float falloff = DefaultFalloff;
         
         float radius = DefaultRadius;
-
-        /// <summary>
-        /// スクリーン スペース アンビエント オクルージョンが有効か否かを示す値を取得または設定します。
-        /// </summary>
-        /// <value>
-        /// true (スクリーン スペース アンビエント オクルージョンが有効な場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Enabled
-        {
-            get { return enabled; }
-            set { enabled = value; }
-        }
 
         /// <summary>
         /// ブラー設定を取得します。
