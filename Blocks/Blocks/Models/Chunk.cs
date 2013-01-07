@@ -284,7 +284,6 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var flag = side.ToFlags();
 
-                // TODO: 起動してすぐに終了すると発生しやすい。
                 Debug.Assert((activeNeighbors & flag) == flag);
 
                 activeNeighbors ^= flag;
@@ -342,7 +341,6 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Array.Clear(blockIndices, 0, blockIndices.Length);
             
-            activeNeighbors = CubicSide.Flags.None;
             neighborsReferencedOnUpdate = CubicSide.Flags.None;
 
             MeshDirty = true;
