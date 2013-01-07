@@ -287,28 +287,28 @@ namespace Willcraftia.Xna.Blocks.Models
             currentPass = backingEffect.CurrentTechnique.Passes[0];
         }
 
-        public void EnableShadowTechnique(ShadowMapTechniques shadowMapTechnique)
+        public void EnableShadowTechnique(ShadowMap.Techniques shadowMapTechnique)
         {
             switch (shadowMapTechnique)
             {
-                case ShadowMapTechniques.Classic:
+                case ShadowMap.Techniques.Classic:
                     backingEffect.CurrentTechnique = classicShadowTechnique;
                     break;
-                case ShadowMapTechniques.Pcf2x2:
+                case ShadowMap.Techniques.Pcf2x2:
                     if (backingEffect.CurrentTechnique != pcf2x2ShadowTechnique)
                     {
                         backingEffect.CurrentTechnique = pcf2x2ShadowTechnique;
                         InitializePcfKernel(2);
                     }
                     break;
-                case ShadowMapTechniques.Pcf3x3:
+                case ShadowMap.Techniques.Pcf3x3:
                     if (backingEffect.CurrentTechnique != pcf3x3ShadowTechnique)
                     {
                         backingEffect.CurrentTechnique = pcf3x3ShadowTechnique;
                         InitializePcfKernel(3);
                     }
                     break;
-                case ShadowMapTechniques.Vsm:
+                case ShadowMap.Techniques.Vsm:
                     backingEffect.CurrentTechnique = vsmShadowTechnique;
                     break;
             }

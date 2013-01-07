@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class ShadowSceneEffect : Effect, IEffectMatrices
     {
-        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Classic;
+        public const ShadowMap.Techniques DefaultShadowMapTechnique = ShadowMap.Techniques.Classic;
 
         //====================================================================
         // EffectParameter
@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         //====================================================================
         // EffectTechnique
 
-        ShadowMapTechniques shadowMapTechnique;
+        ShadowMap.Techniques shadowMapTechnique;
 
         EffectTechnique classicTechnique;
 
@@ -139,7 +139,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         //
         //--------------------------------------------------------------------
 
-        public ShadowMapTechniques ShadowMapTechnique
+        public ShadowMap.Techniques ShadowMapTechnique
         {
             get { return shadowMapTechnique; }
             set
@@ -148,14 +148,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 switch (shadowMapTechnique)
                 {
-                    case ShadowMapTechniques.Vsm:
+                    case ShadowMap.Techniques.Vsm:
                         CurrentTechnique = vsmTechnique;
                         break;
-                    case ShadowMapTechniques.Pcf2x2:
+                    case ShadowMap.Techniques.Pcf2x2:
                         CurrentTechnique = pcf2x2Technique;
                         InitializePcfKernel(2);
                         break;
-                    case ShadowMapTechniques.Pcf3x3:
+                    case ShadowMap.Techniques.Pcf3x3:
                         CurrentTechnique = pcf3x3Technique;
                         InitializePcfKernel(3);
                         break;

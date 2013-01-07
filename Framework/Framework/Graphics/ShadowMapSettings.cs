@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
 
-        public const ShadowMapTechniques DefaultTechnique = ShadowMapTechniques.Classic;
+        public const ShadowMap.Techniques DefaultTechnique = ShadowMap.Techniques.Classic;
 
         // シャドウ マップのサイズに従って適切な値が変わるので注意。
         // シャドウ マップ サイズを小さくすると、より大きな深度バイアスが必要。
@@ -41,7 +41,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultSplitLambda = 0.5f;
 
-        ShadowMapTechniques technique = DefaultTechnique;
+        ShadowMap.Techniques technique = DefaultTechnique;
 
         int size = DefaultSize;
 
@@ -60,7 +60,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// シャドウ マップ生成方法の種類。
         /// </summary>
-        public ShadowMapTechniques Technique
+        public ShadowMap.Techniques Technique
         {
             get { return technique; }
             set
@@ -69,7 +69,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 switch (technique)
                 {
-                    case ShadowMapTechniques.Vsm:
+                    case ShadowMap.Techniques.Vsm:
                         format = SurfaceFormat.Vector2;
                         break;
                     default:

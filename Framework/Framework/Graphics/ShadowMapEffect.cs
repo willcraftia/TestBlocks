@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class ShadowMapEffect : Effect, IEffectMatrices
     {
-        public const ShadowMapTechniques DefaultShadowMapTechnique = ShadowMapTechniques.Classic;
+        public const ShadowMap.Techniques DefaultShadowMapTechnique = ShadowMap.Techniques.Classic;
 
         //====================================================================
         // EffectParameter
@@ -22,7 +22,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         //====================================================================
         // EffectTechnique
 
-        ShadowMapTechniques shadowMapTechnique;
+        ShadowMap.Techniques shadowMapTechnique;
 
         EffectTechnique defaultTechnique;
 
@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { lightViewProjection.SetValue(value); }
         }
 
-        public ShadowMapTechniques ShadowMapTechnique
+        public ShadowMap.Techniques ShadowMapTechnique
         {
             get { return shadowMapTechnique; }
             set
@@ -64,7 +64,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 switch (shadowMapTechnique)
                 {
-                    case ShadowMapTechniques.Vsm:
+                    case ShadowMap.Techniques.Vsm:
                         CurrentTechnique = vsmTechnique;
                         break;
                     default:

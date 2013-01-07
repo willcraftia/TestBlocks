@@ -16,6 +16,33 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class ShadowMap : IDisposable
     {
+        #region Techniques
+
+        public enum Techniques
+        {
+            /// <summary>
+            /// クラシック。
+            /// </summary>
+            Classic,
+
+            /// <summary>
+            /// VSM (Variant Shadow Mapping)。
+            /// </summary>
+            Vsm,
+
+            /// <summary>
+            /// PCF (Percentage Closer Filtering) 2x2 カーネル。
+            /// </summary>
+            Pcf2x2,
+
+            /// <summary>
+            /// PCF (Percentage Closer Filtering) 3x3 カーネル。
+            /// </summary>
+            Pcf3x3
+        }
+
+        #endregion
+
         #region ShadowMapMonitor
 
         public sealed class ShadowMapMonitor
@@ -172,7 +199,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < splitShadowCasters.Length; i++)
                 splitShadowCasters[i] = new Queue<ShadowCaster>();
 
-            if (settings.Technique == ShadowMapTechniques.Vsm)
+            if (settings.Technique == Techniques.Vsm)
             {
                 blur = new Blur(blurEffect, spriteBatch, Settings.Size, Settings.Size, SurfaceFormat.Vector2,
                     vsmSettings.Blur.Radius, vsmSettings.Blur.Amount);
@@ -292,7 +319,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     shadowCaster.Draw(shadowMapEffect);
                 }
 
-                if (shadowMapEffect.ShadowMapTechnique == ShadowMapTechniques.Vsm && blur != null)
+                if (shadowMapEffect.ShadowMapTechnique == Techniques.Vsm && blur != null)
                     blur.Filter(renderTarget);
 
                 GraphicsDevice.SetRenderTarget(null);
