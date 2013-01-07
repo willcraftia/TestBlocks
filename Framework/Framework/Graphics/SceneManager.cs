@@ -56,6 +56,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         List<SceneObject> sceneObjects = new List<SceneObject>(InitialSceneObjectCapacity);
 
+        SceneObject skySphere;
+
         Dictionary<string, ICamera> cameraMap = new Dictionary<string, ICamera>(InitialCameraCapacity);
 
         Dictionary<string, DirectionalLight> directionalLightMap = new Dictionary<string, DirectionalLight>(InitialDirectionalLightCapacity);
@@ -170,6 +172,19 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         public Vector3 BackgroundColor { get; set; }
+
+        public SceneObject SkySphere
+        {
+            get { return skySphere; }
+            set
+            {
+                if (skySphere != null) skySphere.Context = null;
+
+                skySphere = value;
+
+                if (skySphere != null) skySphere.Context = this;
+            }
+        }
 
         public int ShadowMapSize { get; set; }
 
@@ -695,6 +710,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             // レンズ フレア
 
             lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+
+            //----------------------------------------------------------------
+            // スカイ スフィア
+
+            if (SkySphere != null && SkySphere.Visible) SkySphere.Draw();
 
             Monitor.OnEndDrawSceneRendering();
 

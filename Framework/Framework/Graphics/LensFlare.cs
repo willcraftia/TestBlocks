@@ -119,16 +119,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             this.lightDirection = lightDirection;
 
-            UpdateOcclusion(viewerCamera);
-
-            DrawGlow();
-            DrawFlares();
-
-            RestoreRenderStates();
-        }
-
-        public void UpdateOcclusion(ICamera viewerCamera)
-        {
             var infiniteView = viewerCamera.View.Matrix;
             infiniteView.Translation = Vector3.Zero;
 
@@ -144,6 +134,18 @@ namespace Willcraftia.Xna.Framework.Graphics
             lightPosition = new Vector2(projectedPosition.X, projectedPosition.Y);
             lightBehindCamera = false;
 
+            UpdateOcclusion();
+
+            DrawGlow();
+            DrawFlares();
+
+            RestoreRenderStates();
+        }
+
+        public void UpdateOcclusion()
+        {
+            if (lightBehindCamera) return;
+
             if (occlusionQueryActive)
             {
                 if (!occlusionQuery.IsComplete) return;
@@ -152,13 +154,14 @@ namespace Willcraftia.Xna.Framework.Graphics
                 occlusionAlpha = Math.Min(occlusionQuery.PixelCount / queryArea, 1);
             }
 
-            GraphicsDevice.BlendState = ColorWriteDisable;
-            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            var viewport = GraphicsDevice.Viewport;
 
             basicEffect.World = Matrix.CreateTranslation(lightPosition.X, lightPosition.Y, 0);
             basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, viewport.Width, viewport.Height, 0, 0, 1);
-
             basicEffect.CurrentTechnique.Passes[0].Apply();
+
+            GraphicsDevice.BlendState = ColorWriteDisable;
+            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
             occlusionQuery.Begin();
 
