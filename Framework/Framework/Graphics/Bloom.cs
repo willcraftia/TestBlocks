@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class Bloom : PostProcessor
+    public sealed class Bloom : PostProcessor, IDisposable
     {
         #region BloomExtractEffect
 
@@ -178,5 +178,35 @@ namespace Willcraftia.Xna.Framework.Graphics
             spriteBatch.End();
             graphicsDevice.SetRenderTarget(null);
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~Bloom()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                bloomExtractMap.Dispose();
+                blur.Dispose();
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }
