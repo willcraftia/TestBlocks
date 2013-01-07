@@ -138,6 +138,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ColorOverlap colorOverlap;
 
+        Monochrome monochrome;
+
         LensFlare lensFlare;
 
         bool shadowMapAvailable;
@@ -361,6 +363,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (settings.ColorOverlapEnabled)
             {
                 colorOverlap = new ColorOverlap(GraphicsDevice, spriteBatch);
+            }
+
+            //----------------------------------------------------------------
+            // モノクローム
+
+            if (settings.MonochromeEnabled)
+            {
+                var monochromeEffect = moduleFactory.CreateMonochromeEffect();
+
+                monochrome = new Monochrome(GraphicsDevice, spriteBatch, monochromeEffect);
             }
 
             //----------------------------------------------------------------
@@ -599,6 +611,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (colorOverlap != null)
             {
                 colorOverlap.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
+                SwapRenderTargets();
+            }
+
+            //----------------------------------------------------------------
+            // モノクローム
+
+            if (monochrome != null)
+            {
+                monochrome.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
                 SwapRenderTargets();
             }
 

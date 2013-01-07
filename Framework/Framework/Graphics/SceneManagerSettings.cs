@@ -18,6 +18,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const bool DefaultColorOverlapEnabled = false;
 
+        public const bool DefaultMonochromeEnabled = false;
+
         /// <summary>
         /// 影設定を取得します。
         /// </summary>
@@ -83,6 +85,14 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </value>
         public bool ColorOverlapEnabled { get; set; }
 
+        /// <summary>
+        /// モノクロームが有効か否かを示す値を取得または設定します。
+        /// </summary>
+        /// <value>
+        /// true (モノクロームが有効な場合)、false (それ以外の場合)。
+        /// </value>
+        public bool MonochromeEnabled { get; set; }
+
         public SceneManagerSettings()
         {
             Shadow = new ShadowSettings();
@@ -100,6 +110,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             Dof = new DofSettings();
 
             ColorOverlapEnabled = DefaultColorOverlapEnabled;
+            
+            MonochromeEnabled = DefaultMonochromeEnabled;
         }
     }
 }

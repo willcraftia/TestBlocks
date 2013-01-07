@@ -132,6 +132,7 @@
     <Compile Include="Graphics\IPostProcessorContext.cs" />
     <Compile Include="Graphics\ISceneModuleFactory.cs" />
     <Compile Include="Graphics\LensFlare.cs" />
+    <Compile Include="Graphics\Monochrome.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\PostProcessor.cs" />
     <Compile Include="Graphics\SceneObject.cs" />

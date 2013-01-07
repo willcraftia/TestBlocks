@@ -57,6 +57,11 @@ namespace Willcraftia.Xna.Framework.Graphics
         Effect CreateDofEffect();
 
         //====================================================================
+        // モノクローム
+
+        Effect CreateMonochromeEffect();
+
+        //====================================================================
         // レンズ フレア
 
         Texture2D CreateLensFlareGlowSprite();

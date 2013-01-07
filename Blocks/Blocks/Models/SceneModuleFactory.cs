@@ -111,6 +111,12 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
+        public Effect CreateMonochromeEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Monochrome");
+        }
+
+        // I/F
         public Texture2D CreateLensFlareGlowSprite()
         {
             return LoadAsset<Texture2D>("content:Textures/LensFlare/Glow");
