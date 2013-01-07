@@ -335,19 +335,24 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D shadowSceneMap;
 
-        ShadowSettings settings;
+        ShadowMapSettings shadowMapSettings;
+
+        Settings sssmSettings;
 
         public SssmMonitor Monitor { get; private set; }
 
-        public Sssm(SpriteBatch spriteBatch, ShadowSettings shadowSettings, Effect shadowSceneEffect, Effect sssmEffect, Effect blurEffect)
+        public Sssm(SpriteBatch spriteBatch, ShadowMapSettings shadowMapSettings, Settings sssmSettings,
+            Effect shadowSceneEffect, Effect sssmEffect, Effect blurEffect)
             : base(spriteBatch)
         {
-            if (shadowSettings == null) throw new ArgumentNullException("shadowSettings");
+            if (shadowMapSettings == null) throw new ArgumentNullException("shadowMapSettings");
+            if (sssmSettings == null) throw new ArgumentNullException("sssmSettings");
             if (shadowSceneEffect == null) throw new ArgumentNullException("shadowSceneEffect");
             if (sssmEffect == null) throw new ArgumentNullException("sssmEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
-            this.settings = shadowSettings;
+            this.shadowMapSettings = shadowMapSettings;
+            this.sssmSettings = sssmSettings;
             this.sssmEffect = sssmEffect;
 
             //================================================================
@@ -357,15 +362,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             // エフェクト
 
             this.shadowSceneEffect = new ShadowSceneEffect(shadowSceneEffect);
-            this.shadowSceneEffect.DepthBias = shadowSettings.ShadowMap.DepthBias;
-            this.shadowSceneEffect.SplitCount = shadowSettings.ShadowMap.SplitCount;
-            this.shadowSceneEffect.ShadowMapSize = shadowSettings.ShadowMap.Size;
-            this.shadowSceneEffect.ShadowMapTechnique = shadowSettings.ShadowMap.Technique;
+            this.shadowSceneEffect.DepthBias = shadowMapSettings.DepthBias;
+            this.shadowSceneEffect.SplitCount = shadowMapSettings.SplitCount;
+            this.shadowSceneEffect.ShadowMapSize = shadowMapSettings.Size;
+            this.shadowSceneEffect.ShadowMapTechnique = shadowMapSettings.Technique;
 
             //----------------------------------------------------------------
             // レンダ ターゲット
 
-            var sssmSettings = settings.Sssm;
             var pp = GraphicsDevice.PresentationParameters;
             var width = (int) (pp.BackBufferWidth * sssmSettings.MapScale);
             var height = (int) (pp.BackBufferHeight * sssmSettings.MapScale);

@@ -258,22 +258,20 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (Settings.ShadowEnabled)
             {
-                var shadowSettings = Settings.Shadow;
-
                 // シャドウ マップ モジュール
                 var shadowMapEffect = moduleFactory.CreateShadowMapEffect();
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
-                shadowMap = new ShadowMap(GraphicsDevice, shadowSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
+                shadowMap = new ShadowMap(GraphicsDevice, Settings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
                 Monitor.ShadowMap = shadowMap.Monitor;
 
-                if (shadowSettings.SssmEnabled)
+                if (Settings.SssmEnabled)
                 {
                     // スクリーン スペース シャドウ マッピング モジュール
                     var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
                     var sssmEffect = moduleFactory.CreateSssmEffect();
 
-                    sssm = new Sssm(spriteBatch, shadowSettings, shadowSceneEffect, sssmEffect, blurEffect);
+                    sssm = new Sssm(spriteBatch, Settings.ShadowMap, Settings.Sssm, shadowSceneEffect, sssmEffect, blurEffect);
                     Monitor.Sssm = sssm.Monitor;
                 }
             }
@@ -691,8 +689,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             shadowCamera.View.Up = activeCamera.View.Up;
             shadowCamera.Projection.Fov = activeCamera.Projection.Fov;
             shadowCamera.Projection.AspectRatio = activeCamera.Projection.AspectRatio;
-            shadowCamera.Projection.NearPlaneDistance = Settings.Shadow.ShadowMap.NearPlaneDistance;
-            shadowCamera.Projection.FarPlaneDistance = Settings.Shadow.ShadowMap.FarPlaneDistance;
+            shadowCamera.Projection.NearPlaneDistance = Settings.ShadowMap.NearPlaneDistance;
+            shadowCamera.Projection.FarPlaneDistance = Settings.ShadowMap.FarPlaneDistance;
             shadowCamera.Update();
 
             //----------------------------------------------------------------

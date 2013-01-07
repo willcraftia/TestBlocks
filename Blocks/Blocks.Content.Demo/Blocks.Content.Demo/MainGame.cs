@@ -350,11 +350,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             #endregion
 
-            worldManager.SceneManagerSettings.Shadow.ShadowMap.NearPlaneDistance = camera.Projection.NearPlaneDistance;
+            worldManager.SceneManagerSettings.ShadowMap.NearPlaneDistance = camera.Projection.NearPlaneDistance;
             // TODO:
             // SSSM ではフォグより手前にする必要あり。
             // しかし、メッシュのエフェクトに直接影を書き込むなら、それは不要。
-            worldManager.SceneManagerSettings.Shadow.ShadowMap.FarPlaneDistance = camera.Projection.FarPlaneDistance - 64;
+            worldManager.SceneManagerSettings.ShadowMap.FarPlaneDistance = camera.Projection.FarPlaneDistance - 64;
 
             //================================================================
             // Region

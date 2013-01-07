@@ -145,7 +145,6 @@
     <Compile Include="Graphics\Ssao.cs" />
     <Compile Include="Graphics\Sssm.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
-    <Compile Include="Graphics\ShadowSettings.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\TextureExtension.cs" />
     <Compile Include="Graphics\LightCamera.cs" />
