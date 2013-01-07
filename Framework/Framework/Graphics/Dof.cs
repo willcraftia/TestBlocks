@@ -96,6 +96,43 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region DofMonitor
+
+        public sealed class DofMonitor : PostProcessorMonitor
+        {
+            public event EventHandler BeingDrawDepth = delegate { };
+
+            public event EventHandler EndDrawDepth = delegate { };
+
+            public event EventHandler BeginFilter = delegate { };
+
+            public event EventHandler EndFilter = delegate { };
+
+            internal DofMonitor(Dof dof) : base(dof) { }
+
+            internal void OnBeingDrawDepth()
+            {
+                BeingDrawDepth(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnEndDrawDepth()
+            {
+                EndDrawDepth(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnBeginFilter()
+            {
+                BeginFilter(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnEndFilter()
+            {
+                EndFilter(PostProcessor, EventArgs.Empty);
+            }
+        }
+
+        #endregion
+
         BasicCamera internalCamera = new BasicCamera("DofInternal");
 
         Vector3[] frustumCorners = new Vector3[8];
@@ -113,6 +150,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         RenderTarget2D bluredSceneMap;
 
         DofSettings settings;
+
+        public DofMonitor Monitor { get; private set; }
 
         public Dof(SpriteBatch spriteBatch, DofSettings settings, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
             : base(spriteBatch)
@@ -150,10 +189,17 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Color,
                 settings.Blur.Radius, settings.Blur.Amount);
+
+            //----------------------------------------------------------------
+            // モニタ
+
+            Monitor = new DofMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
+            Monitor.OnBeginProcess();
+
             DrawDepth(context);
             Filter(context, source, destination);
 
@@ -162,10 +208,14 @@ namespace Willcraftia.Xna.Framework.Graphics
                 DebugMapDisplay.Instance.Add(depthMap);
                 DebugMapDisplay.Instance.Add(bluredSceneMap);
             }
+
+            Monitor.OnEndProcess();
         }
 
         void DrawDepth(IPostProcessorContext context)
         {
+            Monitor.OnBeingDrawDepth();
+
             var viewerCamera = context.ActiveCamera;
             var visibleSceneObjects = context.VisibleSceneObjects;
 
@@ -207,10 +257,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.OnEndDrawDepth();
         }
 
         void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
+            Monitor.OnBeginFilter();
+
             //================================================================
             // シーンにブラーを適用
 
@@ -238,6 +292,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.Draw(source, destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.OnEndFilter();
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

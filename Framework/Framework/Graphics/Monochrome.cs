@@ -43,6 +43,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region MonochromeMonitor
+
+        public sealed class MonochromeMonitor : PostProcessorMonitor
+        {
+            internal MonochromeMonitor(Monochrome monochrome) : base(monochrome) { }
+        }
+
+        #endregion
+
         public static Vector2 Grayscale
         {
             get { return new Vector2(0.0f, 0.0f); }
@@ -63,14 +72,19 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { cbCr = value; }
         }
 
+        public MonochromeMonitor Monitor { get; private set; }
+
         public Monochrome(SpriteBatch spriteBatch, Effect monochromeEffect)
             : base(spriteBatch)
         {
             this.monochromeEffect = new MonochromeEffect(monochromeEffect);
+            Monitor = new MonochromeMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
+            Monitor.OnBeginProcess();
+
             monochromeEffect.Cb = cbCr.X;
             monochromeEffect.Cr = cbCr.Y;
 
@@ -79,6 +93,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.Draw(source, destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.OnEndProcess();
         }
     }
 }

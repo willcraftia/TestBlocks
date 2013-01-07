@@ -94,6 +94,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region BloomMonitor
+
+        public sealed class BloomMonitor : PostProcessorMonitor
+        {
+            internal BloomMonitor(Bloom bloom) : base(bloom) { }
+        }
+
+        #endregion
+
         BloomSettings settings;
 
         BloomExtractEffect bloomExtractEffect;
@@ -103,6 +112,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         GaussianBlur blur;
 
         RenderTarget2D bloomExtractMap;
+
+        public BloomMonitor Monitor { get; private set; }
 
         public Bloom(SpriteBatch spriteBatch, BloomSettings settings, Effect bloomExtractEffect, Effect bloomEffect, Effect blurEffect)
             : base(spriteBatch)
@@ -141,10 +152,17 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             blur = new GaussianBlur(blurEffect, spriteBatch, width, height,
                 SurfaceFormat.Color, settings.Blur.Radius, settings.Blur.Amount);
+
+            //----------------------------------------------------------------
+            // モニタ
+
+            Monitor = new BloomMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
+            Monitor.OnBeginProcess();
+
             //----------------------------------------------------------------
             // ブルーム エクストラクト マップ
 
@@ -169,6 +187,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.Draw(source, destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.OnEndProcess();
         }
 
         #region IDisposable

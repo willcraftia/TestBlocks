@@ -22,22 +22,34 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         SceneManager sceneManager;
 
-        public int TotalSceneObjectCount { get; set; }
+        public int TotalSceneObjectCount { get; internal set; }
 
-        public int VisibleSceneObjectCount { get; set; }
+        public int VisibleSceneObjectCount { get; internal set; }
 
-        public int OccludedSceneObjectCount { get; set; }
+        public int OccludedSceneObjectCount { get; internal set; }
 
         public int RenderedSceneObjectCount
         {
             get { return VisibleSceneObjectCount - OccludedSceneObjectCount; }
         }
 
-        public ShadowMapMonitor ShadowMap { get; internal set; }
+        public ShadowMap.ShadowMapMonitor ShadowMap { get; internal set; }
 
-        public SssmMonitor Sssm { get; internal set; }
+        public Sssm.SssmMonitor Sssm { get; internal set; }
 
-        public SceneManagerMonitor(SceneManager sceneManager)
+        public Ssao.SsaoMonitor Ssao { get; internal set; }
+
+        public Edge.EdgeMonitor Edge { get; internal set; }
+
+        public Bloom.BloomMonitor Bloom { get; internal set; }
+
+        public Dof.DofMonitor Dof { get; internal set; }
+
+        public ColorOverlap.ColorOverlapMonitor ColorOverlap { get; internal set; }
+
+        public Monochrome.MonochromeMonitor Monochrome { get; internal set; }
+
+        internal SceneManagerMonitor(SceneManager sceneManager)
         {
             if (sceneManager == null) throw new ArgumentNullException("sceneManager");
 

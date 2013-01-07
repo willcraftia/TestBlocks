@@ -253,6 +253,43 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region SsaoMonitor
+
+        public sealed class SsaoMonitor : PostProcessorMonitor
+        {
+            public event EventHandler BeingDrawSsaoMap = delegate { };
+
+            public event EventHandler EndDrawSsaoMap = delegate { };
+
+            public event EventHandler BeginFilter = delegate { };
+
+            public event EventHandler EndFilter = delegate { };
+
+            internal SsaoMonitor(Ssao ssao) : base(ssao) { }
+
+            internal void OnBeingDrawSsaoMap()
+            {
+                BeingDrawSsaoMap(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnEndDrawSsaoMap()
+            {
+                EndDrawSsaoMap(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnBeginFilter()
+            {
+                BeginFilter(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnEndFilter()
+            {
+                EndFilter(PostProcessor, EventArgs.Empty);
+            }
+        }
+
+        #endregion
+
         NormalDepthMapEffect normalDepthMapEffect;
 
         SsaoMapEffect ssaoMapEffect;
@@ -276,6 +313,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         RenderTarget2D ssaoMap;
 
         SsaoSettings settings;
+
+        public SsaoMonitor Monitor { get; private set; }
 
         public Ssao(SpriteBatch spriteBatch, SsaoSettings settings,
             Effect normalDepthMapEffect, Effect ssaoMapEffect, Effect ssaoMapBlurEffect, Effect ssaoEffect,
@@ -340,10 +379,17 @@ namespace Willcraftia.Xna.Framework.Graphics
             // そこで、Quad を用いて SpriteBatch 風に SsaoMap.fx を利用する。
 
             fullscreenQuad = new FullscreenQuad(GraphicsDevice);
+
+            //----------------------------------------------------------------
+            // モニタ
+
+            Monitor = new SsaoMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
+            Monitor.OnBeginProcess();
+
             DrawSsaoMap(context);
             Filter(context, source, destination);
 
@@ -352,10 +398,14 @@ namespace Willcraftia.Xna.Framework.Graphics
                 DebugMapDisplay.Instance.Add(normalDepthMap);
                 DebugMapDisplay.Instance.Add(ssaoMap);
             }
+
+            Monitor.OnEndProcess();
         }
 
         void DrawSsaoMap(IPostProcessorContext context)
         {
+            Monitor.OnBeingDrawSsaoMap();
+
             var viewerCamera = context.ActiveCamera;
             var visibleSceneObjects = context.VisibleSceneObjects;
 
@@ -460,10 +510,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.Draw(blurRenderTarget, ssaoMap.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.OnEndDrawSsaoMap();
         }
 
         void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
         {
+            Monitor.OnBeginFilter();
+
             //----------------------------------------------------------------
             // エフェクト
 
@@ -477,6 +531,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.Draw(source, destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.OnEndFilter();
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

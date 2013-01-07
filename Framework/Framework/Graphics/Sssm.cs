@@ -15,6 +15,43 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class Sssm : PostProcessor, IDisposable
     {
+        #region SssmMonitor
+
+        public sealed class SssmMonitor : PostProcessorMonitor
+        {
+            public event EventHandler BeginDrawShadowScene = delegate { };
+
+            public event EventHandler EndDrawShadowScene = delegate { };
+
+            public event EventHandler BeginFilter = delegate { };
+
+            public event EventHandler EndFilter = delegate { };
+
+            internal SssmMonitor(Sssm sssm) : base(sssm) { }
+
+            internal void OnBeginDrawShadowScene()
+            {
+                BeginDrawShadowScene(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnEndDrawShadowScene()
+            {
+                EndDrawShadowScene(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnBeginFilter()
+            {
+                BeginFilter(PostProcessor, EventArgs.Empty);
+            }
+
+            internal void OnEndFilter()
+            {
+                EndFilter(PostProcessor, EventArgs.Empty);
+            }
+        }
+
+        #endregion
+
         ShadowSceneEffect shadowSceneEffect;
 
         Effect sssmEffect;

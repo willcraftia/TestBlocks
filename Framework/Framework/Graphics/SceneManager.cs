@@ -319,6 +319,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 ssao = new Ssao(spriteBatch, settings.Ssao,
                     normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
+                Monitor.Ssao = ssao.Monitor;
             }
 
             //----------------------------------------------------------------
@@ -330,6 +331,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var edgeEffect = moduleFactory.CreateEdgeEffect();
 
                 edge = new Edge(spriteBatch, settings.Edge, normalDepthMapEffect, edgeEffect);
+                Monitor.Edge = edge.Monitor;
             }
 
             //----------------------------------------------------------------
@@ -342,6 +344,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
                 bloom = new Bloom(spriteBatch, settings.Bloom, bloomExtractEffect, bloomEffect, blurEffect);
+                Monitor.Bloom = bloom.Monitor;
             }
 
             //----------------------------------------------------------------
@@ -354,6 +357,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
                 dof = new Dof(spriteBatch, settings.Dof, depthMapEffect, dofEffect, blurEffect);
+                Monitor.Dof = dof.Monitor;
             }
 
             //----------------------------------------------------------------
@@ -362,6 +366,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (settings.ColorOverlapEnabled)
             {
                 colorOverlap = new ColorOverlap(spriteBatch);
+                Monitor.ColorOverlap = colorOverlap.Monitor;
             }
 
             //----------------------------------------------------------------
@@ -372,6 +377,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var monochromeEffect = moduleFactory.CreateMonochromeEffect();
 
                 monochrome = new Monochrome(spriteBatch, monochromeEffect);
+                Monitor.Monochrome = monochrome.Monitor;
             }
 
             //----------------------------------------------------------------

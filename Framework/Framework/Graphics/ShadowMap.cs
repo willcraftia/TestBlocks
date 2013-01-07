@@ -16,6 +16,47 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class ShadowMap : IDisposable
     {
+        #region ShadowMapMonitor
+
+        public sealed class ShadowMapMonitor
+        {
+            #region Split
+
+            public sealed class Split
+            {
+                public int ShadowCasterCount { get; set; }
+
+                internal Split() { }
+            }
+
+            #endregion
+
+            Split[] split;
+
+            public int SplitCount { get; private set; }
+
+            public Split this[int index]
+            {
+                get
+                {
+                    if (index < 0 || split.Length <= index) throw new ArgumentOutOfRangeException("index");
+                    return split[index];
+                }
+            }
+
+            public int TotalShadowCasterCount { get; internal set; }
+
+            internal ShadowMapMonitor(int splitCount)
+            {
+                SplitCount = splitCount;
+
+                split = new Split[SplitCount];
+                for (int i = 0; i < split.Length; i++) split[i] = new Split();
+            }
+        }
+
+        #endregion
+
         VsmSettings vsmSettings;
 
         Vector3[] corners = new Vector3[8];
@@ -81,11 +122,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        #region Debug
-
         public ShadowMapMonitor Monitor;
-
-        #endregion
 
         public ShadowMap(GraphicsDevice graphicsDevice, ShadowMapSettings settings,
             SpriteBatch spriteBatch, Effect shadowMapEffect, Effect blurEffect)

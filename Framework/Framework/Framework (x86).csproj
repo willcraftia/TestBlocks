@@ -142,7 +142,6 @@
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\ShadowMap.cs" />
-    <Compile Include="Graphics\ShadowMapMonitor.cs" />
     <Compile Include="Graphics\ShadowSceneEffect.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneManagerMonitor.cs" />
@@ -150,7 +149,6 @@
     <Compile Include="Graphics\Ssao.cs" />
     <Compile Include="Graphics\SsaoSettings.cs" />
     <Compile Include="Graphics\Sssm.cs" />
-    <Compile Include="Graphics\SssmMonitor.cs" />
     <Compile Include="Graphics\ShadowMapEffect.cs" />
     <Compile Include="Graphics\ShadowMapSettings.cs" />
     <Compile Include="Graphics\ShadowMapTechniques.cs" />
