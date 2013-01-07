@@ -12,6 +12,31 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Edge : PostProcessor, IDisposable
     {
+        #region Settings
+
+        public sealed class Settings
+        {
+            public const float DefaultMapScale = 1;
+
+            float mapScale = DefaultMapScale;
+
+            /// <summary>
+            /// 実スクリーンに対する法線深度マップのスケールを取得または設定します。
+            /// </summary>
+            public float MapScale
+            {
+                get { return mapScale; }
+                set
+                {
+                    if (value <= 0) throw new ArgumentOutOfRangeException("value");
+
+                    mapScale = value;
+                }
+            }
+        }
+
+        #endregion
+
         #region EdgeDetectionEffect
 
         sealed class EdgeEffect
@@ -215,7 +240,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D normalDepthMap;
 
-        EdgeSettings settings;
+        Settings settings;
 
         float edgeWidth = DefaultEdgeWidth;
 
@@ -322,7 +347,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public EdgeMonitor Monitor { get; private set; }
 
-        public Edge(SpriteBatch spriteBatch, EdgeSettings settings, Effect normalDepthMapEffect, Effect edgeEffect)
+        public Edge(SpriteBatch spriteBatch, Settings settings, Effect normalDepthMapEffect, Effect edgeEffect)
             : base(spriteBatch)
         {
             if (settings == null) throw new ArgumentNullException("settings");

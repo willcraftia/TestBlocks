@@ -15,6 +15,49 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class Sssm : PostProcessor, IDisposable
     {
+        #region Settings
+
+        public sealed class Settings
+        {
+            public const float DefaultMapScale = 0.25f;
+
+            float mapScale = DefaultMapScale;
+
+            /// <summary>
+            /// ブラーを適用するか否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (ブラーを適用する場合)、false (それ以外の場合)。
+            /// </value>
+            public bool BlurEnabled { get; set; }
+
+            /// <summary>
+            /// ブラー設定を取得します。
+            /// </summary>
+            public BlurSettings Blur { get; private set; }
+
+            /// <summary>
+            /// 実スクリーンに対するシャドウ シーンのスケールを取得または設定します。
+            /// </summary>
+            public float MapScale
+            {
+                get { return mapScale; }
+                set
+                {
+                    if (value <= 0) throw new ArgumentOutOfRangeException("value");
+
+                    mapScale = value;
+                }
+            }
+
+            public Settings()
+            {
+                Blur = new BlurSettings();
+            }
+        }
+
+        #endregion
+
         #region SssmMonitor
 
         public sealed class SssmMonitor : PostProcessorMonitor
@@ -66,7 +109,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D shadowSceneMap;
 
-        public ShadowSettings Settings { get; private set; }
+        ShadowSettings settings;
 
         public SssmMonitor Monitor { get; private set; }
 
@@ -78,7 +121,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (sssmEffect == null) throw new ArgumentNullException("sssmEffect");
             if (blurEffect == null) throw new ArgumentNullException("blurEffect");
 
-            Settings = shadowSettings;
+            this.settings = shadowSettings;
             this.sssmEffect = sssmEffect;
 
             //================================================================
@@ -96,7 +139,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // レンダ ターゲット
 
-            var sssmSettings = Settings.Sssm;
+            var sssmSettings = settings.Sssm;
             var pp = GraphicsDevice.PresentationParameters;
             var width = (int) (pp.BackBufferWidth * sssmSettings.MapScale);
             var height = (int) (pp.BackBufferHeight * sssmSettings.MapScale);

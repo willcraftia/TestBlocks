@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// スクリーン スペース アンビエント オクルージョン設定を取得します。
         /// </summary>
-        public SsaoSettings Ssao { get; private set; }
+        public Ssao.Settings Ssao { get; private set; }
 
         /// <summary>
         /// エッジ強調が有効か否かを示す値を取得または設定します。
@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// エッジ強調設定を取得します。
         /// </summary>
-        public EdgeSettings Edge { get; private set; }
+        public Edge.Settings Edge { get; private set; }
 
         /// <summary>
         /// ブルームが有効か否かを示す値を取得または設定します。
@@ -72,7 +72,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// ブルーム設定を取得します。
         /// </summary>
-        public BloomSettings Bloom { get; private set; }
+        public Bloom.Settings Bloom { get; private set; }
 
         /// <summary>
         /// 被写界深度が有効か否かを示す値を取得または設定します。
@@ -85,7 +85,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// 被写界深度設定を取得します。
         /// </summary>
-        public DofSettings Dof { get; private set; }
+        public Dof.Settings Dof { get; private set; }
 
         /// <summary>
         /// カラー オーバラップが有効か否かを示す値を取得または設定します。
@@ -109,16 +109,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             Shadow = new ShadowSettings();
 
             SsaoEnabled = DefaultSsaoEnabled;
-            Ssao = new SsaoSettings();
+            Ssao = new Ssao.Settings();
 
             EdgeEnabled = DefaultEdgeEnabled;
-            Edge = new EdgeSettings();
+            Edge = new Edge.Settings();
 
             BloomEnabled = DefaultBloomEnabled;
-            Bloom = new BloomSettings();
+            Bloom = new Bloom.Settings();
 
             DofEnabled = DefaultDofEnabled;
-            Dof = new DofSettings();
+            Dof = new Dof.Settings();
 
             ColorOverlapEnabled = DefaultColorOverlapEnabled;
             

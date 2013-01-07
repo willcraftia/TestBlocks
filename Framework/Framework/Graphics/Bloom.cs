@@ -10,6 +10,39 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Bloom : PostProcessor, IDisposable
     {
+        #region Settings
+
+        public sealed class Settings
+        {
+            public const float DefaultMapScale = 0.25f;
+
+            float mapScale = DefaultMapScale;
+
+            public float MapScale
+            {
+                get { return mapScale; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    mapScale = value;
+                }
+            }
+
+            public BlurSettings Blur { get; private set; }
+
+            public Settings()
+            {
+                Blur = new BlurSettings
+                {
+                    Radius = 1,
+                    Amount = 4
+                };
+            }
+        }
+
+        #endregion
+
         #region BloomExtractEffect
 
         sealed class BloomExtractEffect
@@ -113,7 +146,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultBaseSaturation = 1;
 
-        BloomSettings settings;
+        Settings settings;
 
         BloomExtractEffect bloomExtractEffect;
 
@@ -190,7 +223,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public BloomMonitor Monitor { get; private set; }
 
-        public Bloom(SpriteBatch spriteBatch, BloomSettings settings, Effect bloomExtractEffect, Effect bloomEffect, Effect blurEffect)
+        public Bloom(SpriteBatch spriteBatch, Settings settings, Effect bloomExtractEffect, Effect bloomEffect, Effect blurEffect)
             : base(spriteBatch)
         {
             if (settings == null) throw new ArgumentNullException("settings");

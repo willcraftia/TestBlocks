@@ -12,6 +12,41 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Dof : PostProcessor, IDisposable
     {
+        #region Settings
+
+        public sealed class Settings
+        {
+            public const float DefaultMapScale = 0.5f;
+
+            float mapScale = DefaultMapScale;
+
+            /// <summary>
+            /// ブラー設定を取得します。
+            /// </summary>
+            public BlurSettings Blur { get; private set; }
+
+            /// <summary>
+            /// 実スクリーンに対する深度マップのスケールを取得または設定します。
+            /// </summary>
+            public float MapScale
+            {
+                get { return mapScale; }
+                set
+                {
+                    if (value <= 0) throw new ArgumentOutOfRangeException("value");
+
+                    mapScale = value;
+                }
+            }
+
+            public Settings()
+            {
+                Blur = new BlurSettings();
+            }
+        }
+
+        #endregion
+
         #region DofEffect
 
         sealed class DofEffect
@@ -149,7 +184,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D bluredSceneMap;
 
-        DofSettings settings;
+        Settings settings;
 
         float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
 
@@ -169,7 +204,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public DofMonitor Monitor { get; private set; }
 
-        public Dof(SpriteBatch spriteBatch, DofSettings settings, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
+        public Dof(SpriteBatch spriteBatch, Settings settings, Effect depthMapEffect, Effect dofEffect, Effect blurEffect)
             : base(spriteBatch)
         {
             if (settings == null) throw new ArgumentNullException("settings");
