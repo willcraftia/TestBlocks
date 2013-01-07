@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
@@ -23,10 +24,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         SphereMesh sphereMesh;
 
+        bool sunVisible = true;
+
         // 0.999f 以上くらいでほどほどの太陽の大きさとなる。
         float sunThreshold = 0.999f;
-
-        bool sunVisible = true;
 
         Vector3[] frustumCorners = new Vector3[8];
 
@@ -99,6 +100,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public override void Draw()
         {
+            Debug.Assert(SceneSettings != null);
+
             // 空の色。
             Effect.SkyColor = SceneSettings.SkyColor;
 

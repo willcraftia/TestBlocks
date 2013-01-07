@@ -105,6 +105,7 @@
     <Compile Include="Content\NoiseLoader.cs" />
     <Compile Include="Content\RegionLoader.cs" />
     <Compile Include="Content\SceneSettingsLoader.cs" />
+    <Compile Include="Content\SkySphereLoader.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
     <Compile Include="Content\TileLoader.cs" />
     <Compile Include="Landscape\ChunkPartition.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />
     <Compile Include="Serialization\SkyColorDefinition.cs" />
+    <Compile Include="Serialization\SkySphereDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
   </ItemGroup>

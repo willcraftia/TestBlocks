@@ -58,7 +58,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Initialize()
         {
             //----------------------------------------------------------------
-            // SceneSettings
+            // シーン設定
 
             // TODO: ワールド設定としてどうするか再検討。
             // いずれにせよ、SceneSettings はワールド設定と一対一。
@@ -67,24 +67,27 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneSettings = assetManager.Load<SceneSettings>(sceneSettingsResource);
 
             //----------------------------------------------------------------
-            // SceneManager
+            // シーン マネージャ設定
 
             // TODO: リソースから取得する。
             SceneManagerSettings = new SceneManagerSettings();
 
-            // TODO: 暫定的に外部でカメラを設定する。
+            //----------------------------------------------------------------
+            // シーン マネージャ
+
             SceneManager.Initialize(SceneManagerSettings);
-            // 太陽と月を登録。
+
+            // 太陽と月をディレクショナル ライトとして登録。
             SceneManager.AddDirectionalLight(SceneSettings.Sunlight);
             SceneManager.AddDirectionalLight(SceneSettings.Moonlight);
 
             //----------------------------------------------------------------
-            // RegionManager
+            // リージョン マネージャ
 
             RegionManager.Initialize(SceneSettings);
 
             //----------------------------------------------------------------
-            // PartitionManager
+            // パーティション マネージャ
 
             PartitionManager.Initialize(partitionMinActiveRange, partitionMaxActiveRange);
         }
@@ -92,9 +95,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // TODO: 戻り値を Region にしない。
         public Region Load(string worldUri)
         {
-            //----------------------------------------------------------------
-            // RegionManager
-
             // TODO
             return RegionManager.LoadRegion("title:Resources/DefaultRegion.json");
         }
@@ -110,12 +110,12 @@ namespace Willcraftia.Xna.Blocks.Models
             var cameraPosition = camera.View.Position;
 
             //----------------------------------------------------------------
-            // PartitionManager
+            // パーティション マネージャ
 
             PartitionManager.Update(ref cameraPosition);
 
             //----------------------------------------------------------------
-            // SceneSettings
+            // シーン設定
 
             SceneSettings.Update(gameTime);
 
@@ -135,7 +135,7 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.ShadowColor = SceneSettings.ShadowColor;
 
             //----------------------------------------------------------------
-            // RegionManager
+            // リージョン マネージャ
 
             RegionManager.Update(gameTime);
         }
@@ -147,13 +147,13 @@ namespace Willcraftia.Xna.Blocks.Models
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             //----------------------------------------------------------------
-            // RegionManager
+            // リージョン マネージャ
 
             // チャンク エフェクトを更新。
             RegionManager.UpdateChunkEffect();
 
             //----------------------------------------------------------------
-            // SceneManager
+            // シーン マネージャ
 
             SceneManager.BackgroundColor = SceneSettings.SkyColor;
             SceneManager.Draw();

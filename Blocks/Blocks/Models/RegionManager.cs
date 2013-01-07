@@ -56,6 +56,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
+            assetManager.RegisterLoader(typeof(SkySphere), new SkySphereLoader(resourceManager, GraphicsDevice));
 
             Monitor = new RegionManagerMonitor(this);
         }
@@ -66,12 +67,18 @@ namespace Willcraftia.Xna.Blocks.Models
 
             SceneSettings = sceneSettings;
 
-            skySphere = new SkySphere(GraphicsDevice);
-            var effectResource = resourceManager.Load("content:Effects/SkySphere");
-            skySphere.Effect = new SkySphereEffect(assetManager.Load<Effect>(effectResource));
+            //----------------------------------------------------------------
+            // スカイ スフィア
+
+            var skySphereResource = resourceManager.Load("title:Resources/DefaultSkySphere.json");
+            skySphere = assetManager.Load<SkySphere>(skySphereResource);
             skySphere.SceneSettings = SceneSettings;
+
             // シーン マネージャへ登録
             sceneManager.SkySphere = skySphere;
+
+            //----------------------------------------------------------------
+            // チャンク エフェクト
 
             var chunkEffectResource = resourceManager.Load("content:Effects/Chunk");
             chunkEffect = new ChunkEffect(assetManager.Load<Effect>(chunkEffectResource));

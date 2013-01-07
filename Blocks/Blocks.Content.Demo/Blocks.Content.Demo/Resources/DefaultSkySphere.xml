@@ -1,0 +1,4 @@
+﻿<SkySphereDefinition>
+	<SunVisible>true</SunVisible>
+	<SunThreshold>0.999</SunThreshold>
+</SkySphereDefinition>
