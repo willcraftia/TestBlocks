@@ -502,6 +502,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             Monitor.TotalSceneObjectCount = workingSceneObjects.Count;
 
+            Monitor.OnBeingClassifySceneObjects();
+
             // 可視オブジェクトの収集と種類による分類。
             while (workingSceneObjects.Count != 0)
             {
@@ -536,6 +538,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (shouldPreDraw) sceneObject.PreDraw();
             }
 
+            Monitor.OnEndClassifySceneObjects();
+
             // 視点からの距離でソート。
             DistanceComparer.Instance.EyePosition = activeCamera.View.Position;
             visibleSceneObjects.Sort(DistanceComparer.Instance);
@@ -564,6 +568,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 DrawScene();
             }
+
+            //----------------------------------------------------------------
+            // ポスト プロセス
+
+            PostProcess();
+
+            //----------------------------------------------------------------
+            // レンダ ターゲットの反映
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
+            spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
+        }
+
+        void PostProcess()
+        {
+            Monitor.OnBeginPostProcess();
 
             //----------------------------------------------------------------
             // スクリーン スペース シャドウ マッピング
@@ -628,12 +649,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 SwapRenderTargets();
             }
 
-            //----------------------------------------------------------------
-            // レンダ ターゲットの反映
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
-            spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
-            spriteBatch.End();
+            Monitor.OnEndPostProcess();
         }
 
         void SwapRenderTargets()
@@ -665,6 +681,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void DrawShadowMap()
         {
+            Monitor.OnBeingDrawShadowMap();
+
             //----------------------------------------------------------------
             // シャドウ マッピング用カメラの更新
 
@@ -701,6 +719,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                     DebugMapDisplay.Instance.Add(shadowMap.GetShadowMap(i));
                 }
             }
+
+            Monitor.OnEndDrawShadowMap();
         }
 
         void DrawScene()

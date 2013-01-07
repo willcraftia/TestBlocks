@@ -64,11 +64,19 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         TimeRulerMarker regionUpdateMarker;
 
-        TimeRulerMarker sceneManagerDrawSceneMarker;
+        TimeRulerMarker classifySceneObjectsMarker;
 
-        TimeRulerMarker sceneManagerDrawSceneOcclusionQueryMarker;
+        TimeRulerMarker drawShadowMapMarker;
 
-        TimeRulerMarker sceneManagerDrawSceneRenderingMarker;
+        TimeRulerMarker drawSceneMarker;
+
+        TimeRulerMarker drawSceneOcclusionQueryMarker;
+
+        TimeRulerMarker drawSceneRenderingMarker;
+
+        TimeRulerMarker ssaoProcessMarker;
+
+        TimeRulerMarker dofProcessMarker;
 
         string helpMessage =
             "[F1] Help\r\n" +
@@ -122,12 +130,19 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         protected override void Initialize()
         {
+            #region Logging
+
             //================================================================
             // Logging
+
             logger.Info("Initialize");
 
             EnvironmentLog.Info();
             GraphicsAdapterLog.Info();
+
+            #endregion
+
+            #region FpsCounter
 
             //================================================================
             // FpsCounter
@@ -139,6 +154,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //fpsCounter.Enabled = false;
             //fpsCounter.Visible = false;
             Components.Add(fpsCounter);
+
+            #endregion
+
+            #region TimeRuler
 
             //================================================================
             // TimeRuler
@@ -189,20 +208,44 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             drawMarker.BarIndex = 2;
             drawMarker.Color = Color.White;
 
-            sceneManagerDrawSceneMarker = timeRuler.CreateMarker();
-            sceneManagerDrawSceneMarker.Name = "SceneManagerDrawScene";
-            sceneManagerDrawSceneMarker.BarIndex = 3;
-            sceneManagerDrawSceneMarker.Color = Color.Cyan;
+            classifySceneObjectsMarker = timeRuler.CreateMarker();
+            classifySceneObjectsMarker.Name = "DrawShadowMapMarker";
+            classifySceneObjectsMarker.BarIndex = 3;
+            classifySceneObjectsMarker.Color = Color.Cyan;
 
-            sceneManagerDrawSceneOcclusionQueryMarker = timeRuler.CreateMarker();
-            sceneManagerDrawSceneOcclusionQueryMarker.Name = "SceneManagerDrawSceneOcclusionQuery";
-            sceneManagerDrawSceneOcclusionQueryMarker.BarIndex = 3;
-            sceneManagerDrawSceneOcclusionQueryMarker.Color = Color.LawnGreen;
+            drawShadowMapMarker = timeRuler.CreateMarker();
+            drawShadowMapMarker.Name = "DrawShadowMapMarker";
+            drawShadowMapMarker.BarIndex = 3;
+            drawShadowMapMarker.Color = Color.LawnGreen;
 
-            sceneManagerDrawSceneRenderingMarker = timeRuler.CreateMarker();
-            sceneManagerDrawSceneRenderingMarker.Name = "SceneManagerDrawSceneRendering";
-            sceneManagerDrawSceneRenderingMarker.BarIndex = 3;
-            sceneManagerDrawSceneRenderingMarker.Color = Color.Green;
+            drawSceneMarker = timeRuler.CreateMarker();
+            drawSceneMarker.Name = "DrawScene";
+            drawSceneMarker.BarIndex = 3;
+            drawSceneMarker.Color = Color.Green;
+
+            drawSceneOcclusionQueryMarker = timeRuler.CreateMarker();
+            drawSceneOcclusionQueryMarker.Name = "DrawSceneOcclusionQuery";
+            drawSceneOcclusionQueryMarker.BarIndex = 3;
+            drawSceneOcclusionQueryMarker.Color = Color.Yellow;
+
+            drawSceneRenderingMarker = timeRuler.CreateMarker();
+            drawSceneRenderingMarker.Name = "DrawSceneRendering";
+            drawSceneRenderingMarker.BarIndex = 3;
+            drawSceneRenderingMarker.Color = Color.Orange;
+
+            ssaoProcessMarker = timeRuler.CreateMarker();
+            ssaoProcessMarker.Name = "SsaoProcessMarker";
+            ssaoProcessMarker.BarIndex = 4;
+            ssaoProcessMarker.Color = Color.Cyan;
+
+            dofProcessMarker = timeRuler.CreateMarker();
+            dofProcessMarker.Name = "DofProcessMarker";
+            dofProcessMarker.BarIndex = 4;
+            dofProcessMarker.Color = Color.LawnGreen;
+
+            #endregion
+
+            #region DebugMapDisplay
 
             //================================================================
             // DebugMapDisplay
@@ -210,6 +253,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var debugMapDisplay = new DebugMapDisplay(this);
             debugMapDisplay.Visible = false;
             Components.Add(debugMapDisplay);
+
+            #endregion
 
             base.Initialize();
         }
@@ -260,12 +305,38 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // TODO: 暫定
             worldManager.SceneManager.AddCamera(camera);
             worldManager.SceneManager.ActiveCameraName = camera.Name;
-            worldManager.SceneManager.Monitor.BeginDrawScene += OnSceneManagerMonitorBeginDrawScene;
-            worldManager.SceneManager.Monitor.EndDrawScene += OnSceneManagerMonitorEndDrawScene;
-            worldManager.SceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnSceneManagerMonitorBeginDrawSceneOcclusionQuery;
-            worldManager.SceneManager.Monitor.EndDrawSceneOcclusionQuery += OnSceneManagerMonitorEndDrawSceneOcclusionQuery;
-            worldManager.SceneManager.Monitor.BeginDrawSceneRendering += OnSceneManagerMonitorBeginDrawSceneRendering;
-            worldManager.SceneManager.Monitor.EndDrawSceneRendering += Monitor_EndDrawSceneRendering;
+
+            #region Monitor
+
+            //----------------------------------------------------------------
+            // シーン マネージャ
+
+            worldManager.SceneManager.Monitor.BeginClassifySceneObjects += OnBeginClassifySceneObjects;
+            worldManager.SceneManager.Monitor.EndClassifySceneObjects += OnEndClassifySceneObjects;
+            worldManager.SceneManager.Monitor.BeginDrawShadowMap += OnBeginDrawShadowMap;
+            worldManager.SceneManager.Monitor.EndDrawShadowMap += OnEndDrawShadowMap;
+            worldManager.SceneManager.Monitor.BeginDrawScene += OnBeginDrawScene;
+            worldManager.SceneManager.Monitor.EndDrawScene += OnEndDrawScene;
+            worldManager.SceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnBeginDrawSceneOcclusionQuery;
+            worldManager.SceneManager.Monitor.EndDrawSceneOcclusionQuery += OnEndDrawSceneOcclusionQuery;
+            worldManager.SceneManager.Monitor.BeginDrawSceneRendering += OnBeginDrawSceneRendering;
+            worldManager.SceneManager.Monitor.EndDrawSceneRendering += OnEndDrawSceneRendering;
+
+            //----------------------------------------------------------------
+            // スクリーン スペース アンビエント オクルージョン
+
+            worldManager.SceneManager.Monitor.Ssao.BeginProcess += OnSsaoBeginProcess;
+            worldManager.SceneManager.Monitor.Ssao.EndProcess += OnSsaoEndProcess;
+
+            //----------------------------------------------------------------
+            // 被写界深度
+
+            worldManager.SceneManager.Monitor.Dof.BeginProcess += OnDofBeginProcess;
+            worldManager.SceneManager.Monitor.Dof.EndProcess += OnDofEndProcess;
+
+            //----------------------------------------------------------------
+            // パーティション マネージャ
+
             worldManager.PartitionManager.Monitor.BeginUpdate += OnPartitionManagerMonitorBeginUpdate;
             worldManager.PartitionManager.Monitor.EndUpdate += OnPartitionManagerMonitorEndUpdate;
             worldManager.PartitionManager.Monitor.BeginCheckPassivationCompleted += OnPartitionManagerMonitorBeginCheckPassivationCompleted;
@@ -276,6 +347,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             worldManager.PartitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
             worldManager.PartitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
             worldManager.PartitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
+
+            #endregion
+
             worldManager.SceneManagerSettings.Shadow.ShadowMap.NearPlaneDistance = camera.Projection.NearPlaneDistance;
             // TODO:
             // SSSM ではフォグより手前にする必要あり。
@@ -305,6 +379,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         {
             worldManager.Unload();
 
+            #region TimeRuler
+
             timeRuler.ReleaseMarker(updateMarker);
             timeRuler.ReleaseMarker(partitionManagerUpdateMarker);
             timeRuler.ReleaseMarker(partitionManagerCheckPassivationCompletedMarker);
@@ -313,9 +389,14 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             timeRuler.ReleaseMarker(partitionManagerCheckActivationCompletedMarker);
             timeRuler.ReleaseMarker(regionUpdateMarker);
             timeRuler.ReleaseMarker(drawMarker);
-            timeRuler.ReleaseMarker(sceneManagerDrawSceneMarker);
-            timeRuler.ReleaseMarker(sceneManagerDrawSceneOcclusionQueryMarker);
-            timeRuler.ReleaseMarker(sceneManagerDrawSceneRenderingMarker);
+            timeRuler.ReleaseMarker(drawSceneMarker);
+            timeRuler.ReleaseMarker(drawShadowMapMarker);
+            timeRuler.ReleaseMarker(drawSceneOcclusionQueryMarker);
+            timeRuler.ReleaseMarker(drawSceneRenderingMarker);
+            timeRuler.ReleaseMarker(ssaoProcessMarker);
+            timeRuler.ReleaseMarker(dofProcessMarker);
+
+            #endregion
 
             spriteBatch.Dispose();
             fillTexture.Dispose();
@@ -584,6 +665,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             spriteBatch.End();
         }
 
+        #region Monitor Callback
+
         void OnPartitionManagerMonitorEndUpdate(object sender, EventArgs e)
         {
             partitionManagerUpdateMarker.End();
@@ -634,34 +717,76 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             partitionManagerActivatePartitionsMarker.End();
         }
 
-        void OnSceneManagerMonitorBeginDrawScene(object sender, EventArgs e)
+        void OnBeginClassifySceneObjects(object sender, EventArgs e)
         {
-            sceneManagerDrawSceneMarker.Begin();
+            classifySceneObjectsMarker.Begin();
         }
 
-        void OnSceneManagerMonitorEndDrawScene(object sender, EventArgs e)
+        void OnEndClassifySceneObjects(object sender, EventArgs e)
         {
-            sceneManagerDrawSceneMarker.End();
+            classifySceneObjectsMarker.End();
         }
 
-        void OnSceneManagerMonitorBeginDrawSceneOcclusionQuery(object sender, EventArgs e)
+        void OnBeginDrawShadowMap(object sender, EventArgs e)
         {
-            sceneManagerDrawSceneOcclusionQueryMarker.Begin();
+            drawShadowMapMarker.Begin();
         }
 
-        void OnSceneManagerMonitorEndDrawSceneOcclusionQuery(object sender, EventArgs e)
+        void OnEndDrawShadowMap(object sender, EventArgs e)
         {
-            sceneManagerDrawSceneOcclusionQueryMarker.End();
+            drawShadowMapMarker.End();
         }
 
-        void OnSceneManagerMonitorBeginDrawSceneRendering(object sender, EventArgs e)
+        void OnBeginDrawScene(object sender, EventArgs e)
         {
-            sceneManagerDrawSceneRenderingMarker.Begin();
+            drawSceneMarker.Begin();
         }
 
-        void Monitor_EndDrawSceneRendering(object sender, EventArgs e)
+        void OnEndDrawScene(object sender, EventArgs e)
         {
-            sceneManagerDrawSceneRenderingMarker.End();
+            drawSceneMarker.End();
         }
+
+        void OnBeginDrawSceneOcclusionQuery(object sender, EventArgs e)
+        {
+            drawSceneOcclusionQueryMarker.Begin();
+        }
+
+        void OnEndDrawSceneOcclusionQuery(object sender, EventArgs e)
+        {
+            drawSceneOcclusionQueryMarker.End();
+        }
+
+        void OnBeginDrawSceneRendering(object sender, EventArgs e)
+        {
+            drawSceneRenderingMarker.Begin();
+        }
+
+        void OnEndDrawSceneRendering(object sender, EventArgs e)
+        {
+            drawSceneRenderingMarker.End();
+        }
+
+        void OnSsaoBeginProcess(object sender, EventArgs e)
+        {
+            ssaoProcessMarker.Begin();
+        }
+
+        void OnSsaoEndProcess(object sender, EventArgs e)
+        {
+            ssaoProcessMarker.End();
+        }
+
+        void OnDofBeginProcess(object sender, EventArgs e)
+        {
+            dofProcessMarker.Begin();
+        }
+
+        void OnDofEndProcess(object sender, EventArgs e)
+        {
+            dofProcessMarker.End();
+        }
+
+        #endregion
     }
 }

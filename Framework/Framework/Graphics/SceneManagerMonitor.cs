@@ -8,6 +8,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class SceneManagerMonitor
     {
+        public event EventHandler BeginClassifySceneObjects = delegate { };
+
+        public event EventHandler EndClassifySceneObjects = delegate { };
+
+        public event EventHandler BeginDrawShadowMap = delegate { };
+
+        public event EventHandler EndDrawShadowMap = delegate { };
+
         public event EventHandler BeginDrawScene = delegate { };
 
         public event EventHandler EndDrawScene = delegate { };
@@ -19,6 +27,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         public event EventHandler BeginDrawSceneRendering = delegate { };
 
         public event EventHandler EndDrawSceneRendering = delegate { };
+
+        public event EventHandler BeginPostProcess = delegate { };
+
+        public event EventHandler EndPostProcess = delegate { };
 
         SceneManager sceneManager;
 
@@ -56,6 +68,26 @@ namespace Willcraftia.Xna.Framework.Graphics
             this.sceneManager = sceneManager;
         }
 
+        internal void OnBeingClassifySceneObjects()
+        {
+            BeginClassifySceneObjects(sceneManager, EventArgs.Empty);
+        }
+
+        internal void OnEndClassifySceneObjects()
+        {
+            EndClassifySceneObjects(sceneManager, EventArgs.Empty);
+        }
+
+        internal void OnBeingDrawShadowMap()
+        {
+            BeginDrawShadowMap(sceneManager, EventArgs.Empty);
+        }
+
+        internal void OnEndDrawShadowMap()
+        {
+            EndDrawShadowMap(sceneManager, EventArgs.Empty);
+        }
+
         internal void OnBeginDrawScene()
         {
             BeginDrawScene(sceneManager, EventArgs.Empty);
@@ -84,6 +116,16 @@ namespace Willcraftia.Xna.Framework.Graphics
         internal void OnEndDrawSceneRendering()
         {
             EndDrawSceneRendering(sceneManager, EventArgs.Empty);
+        }
+
+        internal void OnBeginPostProcess()
+        {
+            BeginPostProcess(sceneManager, EventArgs.Empty);
+        }
+
+        internal void OnEndPostProcess()
+        {
+            EndPostProcess(sceneManager, EventArgs.Empty);
         }
     }
 }
