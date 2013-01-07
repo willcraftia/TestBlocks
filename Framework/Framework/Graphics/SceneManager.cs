@@ -427,9 +427,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 var sceneObject = workingSceneObjects.Dequeue();
 
+                bool shouldPreDraw = false;
+
                 if (IsVisibleObject(sceneObject))
                 {
                     visibleSceneObjects.Add(sceneObject);
+                    shouldPreDraw = true;
 
                     if (sceneObject.Translucent)
                     {
@@ -445,7 +448,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 var shadowCaster = sceneObject as ShadowCaster;
                 if (shadowCaster != null && IsActiveShadowCaster(shadowCaster))
+                {
                     activeShadowCasters.Add(shadowCaster);
+                    shouldPreDraw = true;
+                }
+
+                if (shouldPreDraw) sceneObject.PreDraw();
             }
 
             // 視点からの距離でソート。

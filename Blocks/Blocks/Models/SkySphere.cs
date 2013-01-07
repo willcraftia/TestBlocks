@@ -31,7 +31,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3[] frustumCorners = new Vector3[8];
 
-        // ワールド行列は Update メソッドで更新。
+        // PreDraw メソッドで更新。
         Matrix world;
 
         // I/F
@@ -66,6 +66,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
+            // シーン マネージャの可視判定で BoundingSphere/BoundingBox が用いられるため、
+            // それよりも前に Update メソッドで状態を更新する必要がある。
+
             var camera = Context.ActiveCamera;
 
             //----------------------------------------------------------------
@@ -84,7 +87,10 @@ namespace Willcraftia.Xna.Blocks.Models
             BoundingSphere.Center = Position;
             BoundingSphere.Radius = far;
             BoundingBox.CreateFromSphere(ref BoundingSphere, out BoundingBox);
+        }
 
+        public override void PreDraw()
+        {
             //----------------------------------------------------------------
             // ワールド行列の更新
 
@@ -96,6 +102,8 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix.CreateScale(BoundingSphere.Radius * 2, out scale);
 
             Matrix.Multiply(ref scale, ref translation, out world);
+
+            base.PreDraw();
         }
 
         public override void Draw()
@@ -147,12 +155,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public override void Draw(Effect effect)
         {
             //----------------------------------------------------------------
-            // 頂点バッファ
-
-            GraphicsDevice.SetVertexBuffer(sphereMesh.VertexBuffer);
-            GraphicsDevice.Indices = sphereMesh.IndexBuffer;
-
-            //----------------------------------------------------------------
             // エフェクト
 
             var effectMatrices = effect as IEffectMatrices;
@@ -161,16 +163,12 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // 描画
 
-            foreach (var pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
-            }
+            sphereMesh.Draw(effect);
         }
 
         public override void Draw(ShadowMap shadowMap)
         {
-            // SkySphere には影を投影しません。
+            // スカイ スフィアには影を投影しません。
             Draw();
         }
 
