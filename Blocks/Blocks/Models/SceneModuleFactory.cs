@@ -63,18 +63,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public Effect CreateDofEffect()
-        {
-            return LoadAsset<Effect>("content:Effects/Dof");
-        }
-
-        // I/F
-        public Effect CreateEdgeEffect()
-        {
-            return LoadAsset<Effect>("content:Effects/Edge");
-        }
-
-        // I/F
         public Effect CreateSsaoMapEffect()
         {
             return LoadAsset<Effect>("content:Effects/SsaoMap");
@@ -96,6 +84,30 @@ namespace Willcraftia.Xna.Blocks.Models
         public Texture2D CreateRandomNormalMap()
         {
             return LoadAsset<Texture2D>("content:Textures/RandomNormal");
+        }
+
+        // I/F
+        public Effect CreateEdgeEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Edge");
+        }
+
+        // I/F
+        public Effect CreateBloomExtractEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/BloomExtract");
+        }
+
+        // I/F
+        public Effect CreateBloomEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Bloom");
+        }
+
+        // I/F
+        public Effect CreateDofEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Dof");
         }
 
         // I/F

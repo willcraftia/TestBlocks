@@ -28,12 +28,18 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         public SsaoSettings Ssao { get; private set; }
 
+        /// <summary>
+        /// ブルーム設定。
+        /// </summary>
+        public BloomSettings Bloom { get; private set; }
+
         public SceneManagerSettings()
         {
             Shadow = new ShadowSettings();
             Dof = new DofSettings();
             Edge = new EdgeSettings();
             Ssao = new SsaoSettings();
+            Bloom = new BloomSettings();
         }
     }
 }

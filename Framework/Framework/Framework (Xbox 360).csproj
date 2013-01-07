@@ -154,6 +154,8 @@
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
+    <Compile Include="Graphics\Bloom.cs" />
+    <Compile Include="Graphics\BloomSettings.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\DepthMapEffect.cs" />

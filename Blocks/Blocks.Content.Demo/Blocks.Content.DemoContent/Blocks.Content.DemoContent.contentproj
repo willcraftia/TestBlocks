@@ -42,6 +42,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Effects\Bloom.fx">
+      <Name>Bloom</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
+    <Compile Include="Effects\BloomExtract.fx">
+      <Name>BloomExtract</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+    </Compile>
     <None Include="Effects\Common.fxh">
       <Name>Common</Name>
     </None>

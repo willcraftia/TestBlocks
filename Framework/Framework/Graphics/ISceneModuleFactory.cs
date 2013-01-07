@@ -29,16 +29,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         Effect CreateSssmEffect();
 
         //====================================================================
-        // 被写界深度
-
-        Effect CreateDofEffect();
-
-        //====================================================================
-        // エッジ強調
-
-        Effect CreateEdgeEffect();
-
-        //====================================================================
         // スクリーン スペース アンビエント オクルージョン
 
         Effect CreateSsaoMapEffect();
@@ -48,6 +38,23 @@ namespace Willcraftia.Xna.Framework.Graphics
         Effect CreateSsaoEffect();
 
         Texture2D CreateRandomNormalMap();
+
+        //====================================================================
+        // エッジ強調
+
+        Effect CreateEdgeEffect();
+
+        //====================================================================
+        // ブルーム
+
+        Effect CreateBloomExtractEffect();
+
+        Effect CreateBloomEffect();
+
+        //====================================================================
+        // 被写界深度
+
+        Effect CreateDofEffect();
 
         //====================================================================
         // レンズ フレア

@@ -128,11 +128,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Sssm sssm;
 
-        Dof dof;
+        Ssao ssao;
 
         Edge edge;
 
-        Ssao ssao;
+        Bloom bloom;
+
+        Dof dof;
 
         LensFlare lensFlare;
 
@@ -301,15 +303,18 @@ namespace Willcraftia.Xna.Framework.Graphics
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
 
             //----------------------------------------------------------------
-            // 被写界深度
+            // スクリーン スペース アンビエント オクルージョン
 
-            if (settings.Dof.Enabled)
+            if (settings.Ssao.Enabled)
             {
-                var depthMapEffect = moduleFactory.CreateDepthMapEffect();
-                var dofEffect = moduleFactory.CreateDofEffect();
-                var blurEffect = moduleFactory.CreateGaussianBlurEffect();
+                var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
+                var ssaoMapEffect = moduleFactory.CreateSsaoMapEffect();
+                var ssaoMapBlurEffect = moduleFactory.CreateSsaoMapBlurEffect();
+                var ssaoEffect = moduleFactory.CreateSsaoEffect();
+                var randomNormalMap = moduleFactory.CreateRandomNormalMap();
 
-                dof = new Dof(GraphicsDevice, settings.Dof, spriteBatch, depthMapEffect, dofEffect, blurEffect);
+                ssao = new Ssao(GraphicsDevice, settings.Ssao, spriteBatch,
+                    normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
             }
 
             //----------------------------------------------------------------
@@ -324,18 +329,28 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
-            // スクリーン スペース アンビエント オクルージョン
+            // ブルーム
 
-            if (settings.Ssao.Enabled)
+            if (settings.Bloom.Enabled)
             {
-                var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
-                var ssaoMapEffect = moduleFactory.CreateSsaoMapEffect();
-                var ssaoMapBlurEffect = moduleFactory.CreateSsaoMapBlurEffect();
-                var ssaoEffect = moduleFactory.CreateSsaoEffect();
-                var randomNormalMap = moduleFactory.CreateRandomNormalMap();
+                var bloomExtractEffect = moduleFactory.CreateBloomExtractEffect();
+                var bloomEffect = moduleFactory.CreateBloomEffect();
+                var blurEffect = moduleFactory.CreateGaussianBlurEffect();
 
-                ssao = new Ssao(GraphicsDevice, settings.Ssao, spriteBatch,
-                    normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
+                bloom = new Bloom(GraphicsDevice, settings.Bloom, spriteBatch,
+                    bloomExtractEffect, bloomEffect, blurEffect);
+            }
+
+            //----------------------------------------------------------------
+            // 被写界深度
+
+            if (settings.Dof.Enabled)
+            {
+                var depthMapEffect = moduleFactory.CreateDepthMapEffect();
+                var dofEffect = moduleFactory.CreateDofEffect();
+                var blurEffect = moduleFactory.CreateGaussianBlurEffect();
+
+                dof = new Dof(GraphicsDevice, settings.Dof, spriteBatch, depthMapEffect, dofEffect, blurEffect);
             }
 
             //----------------------------------------------------------------
@@ -547,6 +562,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (edge != null)
             {
                 edge.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
+                SwapRenderTargets();
+            }
+
+            //----------------------------------------------------------------
+            // ブルーム
+
+            if (bloom != null)
+            {
+                bloom.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
                 SwapRenderTargets();
             }
 
