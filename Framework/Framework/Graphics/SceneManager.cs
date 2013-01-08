@@ -378,8 +378,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingSphere frustumSphere;
 
-        BasicCamera shadowCamera = new BasicCamera("Shadow");
-
         ShadowMap shadowMap;
 
         bool shadowMapAvailable;
@@ -520,11 +518,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 shadowMap = new ShadowMap(GraphicsDevice, settings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
                 Monitor.ShadowMap = shadowMap.Monitor;
             }
-
-            //----------------------------------------------------------------
-            // シャドウ マッピング用カメラの登録
-
-            Cameras.Add(shadowCamera);
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -772,21 +765,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.OnBeingDrawShadowMap();
 
             //----------------------------------------------------------------
-            // シャドウ マッピング用カメラの更新
+            // 準備
 
-            shadowCamera.View.Position = activeCamera.View.Position;
-            shadowCamera.View.Direction = activeCamera.View.Direction;
-            shadowCamera.View.Up = activeCamera.View.Up;
-            shadowCamera.Projection.Fov = activeCamera.Projection.Fov;
-            shadowCamera.Projection.AspectRatio = activeCamera.Projection.AspectRatio;
-            shadowCamera.Projection.NearPlaneDistance = settings.ShadowMap.NearPlaneDistance;
-            shadowCamera.Projection.FarPlaneDistance = settings.ShadowMap.FarPlaneDistance;
-            shadowCamera.Update();
-
-            //----------------------------------------------------------------
-            // 分割カメラを準備
-
-            shadowMap.PrepareSplitCameras(shadowCamera);
+            shadowMap.Prepare(activeCamera);
 
             //----------------------------------------------------------------
             // 投影オブジェクトを収集
@@ -799,14 +780,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             var lightDirection = activeDirectionalLight.Direction;
             shadowMap.Draw(ref lightDirection);
-
-            if (DebugMapDisplay.Available)
-            {
-                for (int i = 0; i < shadowMap.SplitCount; i++)
-                {
-                    DebugMapDisplay.Instance.Add(shadowMap.GetShadowMap(i));
-                }
-            }
 
             Monitor.OnEndDrawShadowMap();
         }

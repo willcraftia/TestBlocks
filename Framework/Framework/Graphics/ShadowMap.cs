@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
@@ -345,6 +346,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const Techniques DefaultShadowMapTechnique = Techniques.Classic;
 
+        BasicCamera internalCamera = new BasicCamera("ShadowMapInternal");
+
         Vector3[] corners = new Vector3[8];
 
         float inverseSplitCount;
@@ -373,9 +376,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingBox frustumBoundingBox;
 
-        public GraphicsDevice GraphicsDevice { get; private set; }
-
         Settings settings;
+
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
         public Techniques Technique { get; private set; }
 
@@ -475,34 +478,62 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new ShadowMapMonitor(SplitCount);
         }
 
-        public void PrepareSplitCameras(ICamera camera)
+        public void Prepare(ICamera viewerCamera)
         {
-            if (camera == null) throw new ArgumentNullException("camera");
+            if (viewerCamera == null) throw new ArgumentNullException("viewerCamera");
 
-            // 視錐台を含む AABB をシーン領域のデフォルトとしておく。
-            camera.Frustum.GetCorners(corners);
-            var sceneBoundingBox = BoundingBox.CreateFromPoints(corners);
+            internalCamera.View.Position = viewerCamera.View.Position;
+            internalCamera.View.Direction = viewerCamera.View.Direction;
+            internalCamera.View.Up = viewerCamera.View.Up;
+            internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
+            internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
+            internalCamera.Projection.NearPlaneDistance = settings.NearPlaneDistance;
+            internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
+            internalCamera.Update();
 
-            PrepareSplitCameras(camera, ref sceneBoundingBox);
+            PrepareSplitCameras();
         }
 
-        public void PrepareSplitCameras(ICamera camera, ref BoundingBox sceneBoundingBox)
+        public void Prepare(ICamera viewerCamera, ref BoundingBox sceneBoundingBox)
         {
-            if (camera == null) throw new ArgumentNullException("camera");
+            if (viewerCamera == null) throw new ArgumentNullException("viewerCamera");
 
-            camera.Frustum.GetCorners(corners);
+            internalCamera.View.Position = viewerCamera.View.Position;
+            internalCamera.View.Direction = viewerCamera.View.Direction;
+            internalCamera.View.Up = viewerCamera.View.Up;
+            internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
+            internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
+            internalCamera.Projection.NearPlaneDistance = settings.NearPlaneDistance;
+            internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
+            internalCamera.Update();
+
+            PrepareSplitCameras(ref sceneBoundingBox);
+        }
+
+        void PrepareSplitCameras()
+        {
+            // 視錐台を含む AABB をシーン領域のデフォルトとしておく。
+            internalCamera.Frustum.GetCorners(corners);
+            var sceneBoundingBox = BoundingBox.CreateFromPoints(corners);
+
+            PrepareSplitCameras(ref sceneBoundingBox);
+        }
+
+        void PrepareSplitCameras(ref BoundingBox sceneBoundingBox)
+        {
+            internalCamera.Frustum.GetCorners(corners);
             frustumBoundingBox = BoundingBox.CreateFromPoints(corners);
 
-            var far = CalculateFarPlaneDistance(camera, ref sceneBoundingBox);
-            CalculateSplitDistances(camera, far);
+            var far = CalculateFarPlaneDistance(internalCamera, ref sceneBoundingBox);
+            CalculateSplitDistances(internalCamera, far);
 
             for (int i = 0; i < SplitCount; i++)
             {
-                splitCameras[i].View.Position = camera.View.Position;
-                splitCameras[i].View.Direction = camera.View.Direction;
-                splitCameras[i].View.Up = camera.View.Up;
-                splitCameras[i].Projection.Fov = camera.Projection.Fov;
-                splitCameras[i].Projection.AspectRatio = camera.Projection.AspectRatio;
+                splitCameras[i].View.Position = internalCamera.View.Position;
+                splitCameras[i].View.Direction = internalCamera.View.Direction;
+                splitCameras[i].View.Up = internalCamera.View.Up;
+                splitCameras[i].Projection.Fov = internalCamera.Projection.Fov;
+                splitCameras[i].Projection.AspectRatio = internalCamera.Projection.AspectRatio;
                 splitCameras[i].Projection.NearPlaneDistance = splitDistances[i];
                 splitCameras[i].Projection.FarPlaneDistance = splitDistances[i + 1];
                 splitCameras[i].Update();
@@ -590,6 +621,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                     blur.Filter(renderTarget);
 
                 GraphicsDevice.SetRenderTarget(null);
+
+                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(renderTarget);
             }
         }
 
