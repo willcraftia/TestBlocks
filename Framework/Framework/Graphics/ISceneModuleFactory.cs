@@ -67,5 +67,17 @@ namespace Willcraftia.Xna.Framework.Graphics
         Texture2D CreateLensFlareGlowSprite();
 
         Texture2D[] CreateLensFlareFlareSprites();
+
+        //====================================================================
+        // 降雪
+
+        Effect CreateSnowEffect();
+
+        Texture2D CreateSnowSprite();
+
+        //====================================================================
+        // パーティクル
+
+        Effect CreateParticleEffect();
     }
 }

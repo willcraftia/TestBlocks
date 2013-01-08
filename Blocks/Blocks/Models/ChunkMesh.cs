@@ -203,7 +203,7 @@ namespace Willcraftia.Xna.Blocks.Models
         void DrawCore()
         {
             // チャンクに描画ロックを要求。
-            if (Chunk != null && !Chunk.EnterDraw()) return;
+            if (Chunk == null || !Chunk.EnterDraw()) return;
 
             // 非同期なメッシュ更新により描画不要になっていないかを検査。
             if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)

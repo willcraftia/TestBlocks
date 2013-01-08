@@ -412,6 +412,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         LensFlare lensFlare;
 
+        Snow snow;
+
+        SnowParticleSystem snowParticleSystem;
+
         bool shadowMapAvailable;
 
         RenderTarget2D renderTarget;
@@ -657,6 +661,27 @@ namespace Willcraftia.Xna.Framework.Graphics
                 lensFlare = new LensFlare(GraphicsDevice, spriteBatch, glowSpite, flareSprites);
             }
 
+            //----------------------------------------------------------------
+            // 降雪
+
+            {
+                var snowEffect = moduleFactory.CreateSnowEffect();
+                var snowSprite = moduleFactory.CreateSnowSprite();
+
+                // TODO: 雪の数
+                snow = new Snow(snowEffect, snowSprite, 1000);
+            }
+
+            //----------------------------------------------------------------
+            // 降雪パーティクル
+
+            {
+                var particleEffect = moduleFactory.CreateParticleEffect();
+                var snowSprite = moduleFactory.CreateSnowSprite();
+
+                snowParticleSystem = new SnowParticleSystem(particleEffect, snowSprite);
+            }
+
 #if DEBUG || TRACE
             debugBoundingBoxEffect = new BasicEffect(GraphicsDevice);
             debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
@@ -734,8 +759,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public void Draw()
+        //
+        // TODO
+        //
+        static Random random = new Random();
+
+        public void Draw(GameTime gameTime)
         {
+            if (gameTime == null) throw new ArgumentNullException("gameTime");
             if (activeCamera == null) throw new InvalidOperationException("ActiveCamera is null.");
 
             // カメラ更新。
@@ -826,6 +857,25 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
+            // パーティクル更新
+
+            int snowBoundsX = 128 * 2;
+            int snowBoundsZ = 128 * 2;
+            int snowMinY = 32;
+            int snowMaxY = 64;
+
+            for (int i = 0; i < 20; i++)
+            {
+                int randomX = random.Next(snowBoundsX) - snowBoundsX / 2;
+                int randomY = random.Next(snowMaxY - snowMinY) + snowMinY;
+                int randomZ = random.Next(snowBoundsZ) - snowBoundsZ / 2;
+                Vector3 snowPosition = new Vector3(randomX, randomY, randomZ) + activeCamera.View.Position;
+                snowParticleSystem.AddParticle(snowPosition, Vector3.Zero);
+            }
+            
+            snowParticleSystem.Update(gameTime);
+
+            //----------------------------------------------------------------
             // シーン
 
             if (shadowMapAvailable && sssm == null)
@@ -841,6 +891,17 @@ namespace Willcraftia.Xna.Framework.Graphics
             // ポスト プロセス
 
             PostProcess();
+
+            //----------------------------------------------------------------
+            // 降雪
+
+            // TODO: ひとまずデバッグのために。
+            GraphicsDevice.SetRenderTarget(renderTarget);
+            
+            //snow.Draw(activeCamera);
+            snowParticleSystem.Draw(activeCamera);
+            
+            GraphicsDevice.SetRenderTarget(null);
 
             //----------------------------------------------------------------
             // レンダ ターゲットの反映
@@ -1073,7 +1134,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // レンズ フレア
 
+            // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
             lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+
+            //----------------------------------------------------------------
+            // 降雪
+
+            // TODO: ひとまずデバッグのために。
+
+            //snow.Draw(activeCamera);
+            //snowParticleSystem.Draw(activeCamera);
 
             //----------------------------------------------------------------
             // スカイ スフィア
@@ -1163,7 +1233,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // レンズ フレア
 
+            // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
             lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+
+            //----------------------------------------------------------------
+            // 降雪
+
+            // TODO: ひとまずデバッグのために。
+
+            //snow.Draw(activeCamera);
+            //snowParticleSystem.Draw(activeCamera);
 
             Monitor.OnEndDrawSceneRendering();
 

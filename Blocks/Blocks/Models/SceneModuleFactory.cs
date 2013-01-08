@@ -134,6 +134,24 @@ namespace Willcraftia.Xna.Blocks.Models
             return sprites;
         }
 
+        // I/F
+        public Effect CreateSnowEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Snow");
+        }
+
+        // I/F
+        public Texture2D CreateSnowSprite()
+        {
+            return LoadAsset<Texture2D>("content:Textures/Snow/Snow");
+        }
+
+        // I/F
+        public Effect CreateParticleEffect()
+        {
+            return LoadAsset<Effect>("content:Effects/Particle");
+        }
+
         T LoadAsset<T>(string uri)
         {
             var resource = resourceManager.Load(uri);

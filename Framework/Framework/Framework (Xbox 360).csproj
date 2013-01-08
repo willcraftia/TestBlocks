@@ -173,12 +173,17 @@
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\Monochrome.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
+    <Compile Include="Graphics\ParticleSettings.cs" />
+    <Compile Include="Graphics\ParticleSystem.cs" />
+    <Compile Include="Graphics\ParticleVertex.cs" />
     <Compile Include="Graphics\PostProcessor.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\ShadowMap.cs" />
+    <Compile Include="Graphics\Snow.cs" />
+    <Compile Include="Graphics\SnowParticleSystem.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Ssao.cs" />
     <Compile Include="Graphics\Sssm.cs" />
