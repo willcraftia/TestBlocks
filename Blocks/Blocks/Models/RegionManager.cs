@@ -36,6 +36,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkEffect chunkEffect;
 
+        ParticleSystem snowParticleSystem;
+
         public static bool Wireframe { get; set; }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
@@ -70,8 +72,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // スカイ スフィア
 
-            var skySphereResource = resourceManager.Load("title:Resources/DefaultSkySphere.json");
-            skySphere = assetManager.Load<SkySphere>(skySphereResource);
+            skySphere = LoadAsset<SkySphere>("title:Resources/DefaultSkySphere.json");
             skySphere.SceneSettings = SceneSettings;
 
             // シーン マネージャへ登録
@@ -80,8 +81,46 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク エフェクト
 
-            var chunkEffectResource = resourceManager.Load("content:Effects/Chunk");
-            chunkEffect = new ChunkEffect(assetManager.Load<Effect>(chunkEffectResource));
+            chunkEffect = new ChunkEffect(LoadAsset<Effect>("content:Effects/Chunk"));
+
+            //----------------------------------------------------------------
+            // 降雪パーティクル
+
+            {
+                var particleSettings = new ParticleSettings();
+                particleSettings.MaxParticles = 4000;
+                particleSettings.Duration = TimeSpan.FromSeconds(5);
+                particleSettings.DurationRandomness = 0;
+                particleSettings.MinHorizontalVelocity = 0;
+                particleSettings.MaxHorizontalVelocity = 0;
+                particleSettings.MinVerticalVelocity = -10;
+                particleSettings.MaxVerticalVelocity = -10;
+                //particleSettings.Gravity = Vector3.Down;
+                particleSettings.Gravity = new Vector3(-1, -1, 0);
+                particleSettings.EndVelocity = 1;
+                particleSettings.MinColor = Color.White;
+                particleSettings.MaxColor = Color.White;
+                particleSettings.MinRotateSpeed = 0;
+                particleSettings.MaxRotateSpeed = 0;
+                particleSettings.MinStartSize = 0.5f;
+                particleSettings.MaxStartSize = 0.5f;
+                particleSettings.MinEndSize = 0.2f;
+                particleSettings.MaxEndSize = 0.2f;
+                particleSettings.BlendState = BlendState.AlphaBlend;
+
+                var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
+                var snowSprite = LoadAsset<Texture2D>("content:Textures/Snow/Snow");
+
+                snowParticleSystem = new ParticleSystem(particleSettings, particleEffect, snowSprite);
+
+                sceneManager.ParticleSystems.Add(snowParticleSystem);
+            }
+        }
+
+        T LoadAsset<T>(string uri)
+        {
+            var resource = resourceManager.Load(uri);
+            return assetManager.Load<T>(resource);
         }
 
         //
@@ -160,16 +199,49 @@ namespace Willcraftia.Xna.Blocks.Models
             return false;
         }
 
+        //
+        // TODO
+        //
+        static Random random = new Random();
+
         public void Update(GameTime gameTime)
         {
             Monitor.OnBeginUpdate();
 
+            //----------------------------------------------------------------
+            // シーン設定
+
             SceneSettings.Update(gameTime);
 
-            // スカイ スフィアの更新（視点位置へ移動させるため）。
+            //----------------------------------------------------------------
+            // スカイ スフィアの更新（視点位置へ移動させるため）
+
             skySphere.Update();
 
+            //----------------------------------------------------------------
+            // リージョン
+
             foreach (var region in regions) region.Update();
+
+            //----------------------------------------------------------------
+            // 降雪パーティクル
+
+            // TODO
+            {
+                int snowBoundsX = 128 * 2;
+                int snowBoundsZ = 128 * 2;
+                int snowMinY = 32;
+                int snowMaxY = 64;
+
+                for (int i = 0; i < 20; i++)
+                {
+                    var randomX = random.Next(snowBoundsX) - snowBoundsX / 2;
+                    var randomY = random.Next(snowMaxY - snowMinY) + snowMinY;
+                    var randomZ = random.Next(snowBoundsZ) - snowBoundsZ / 2;
+                    var snowPosition = new Vector3(randomX, randomY, randomZ) + sceneManager.ActiveCamera.View.Position;
+                    snowParticleSystem.AddParticle(snowPosition, Vector3.Zero);
+                }
+            }
 
             Monitor.OnEndUpdate();
         }

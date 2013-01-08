@@ -355,6 +355,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int InitialShadowCasterCapacity = 1000;
 
+        public const int InitialParticleSystemCapacity = 10;
+
         static readonly BlendState colorWriteDisable = new BlendState
         {
             ColorWriteChannels = ColorWriteChannels.None
@@ -412,8 +414,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         LensFlare lensFlare;
 
-        ParticleSystem snowParticleSystem;
-
         bool shadowMapAvailable;
 
         RenderTarget2D renderTarget;
@@ -425,6 +425,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         PostProcessorContext postProcessorContext;
 
         Settings settings;
+
+        public ParticleSystemCollection ParticleSystems { get; private set; }
 
         public SceneManagerMonitor Monitor { get; private set; }
 
@@ -515,6 +517,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             this.moduleFactory = moduleFactory;
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            ParticleSystems = new ParticleSystemCollection(InitialParticleSystemCapacity);
 
             Monitor = new SceneManagerMonitor(this);
         }
@@ -659,37 +663,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 lensFlare = new LensFlare(GraphicsDevice, spriteBatch, glowSpite, flareSprites);
             }
 
-            //----------------------------------------------------------------
-            // 降雪パーティクル
-
-            {
-                var particleSettings = new ParticleSettings();
-                particleSettings.MaxParticles = 4000;
-                particleSettings.Duration = TimeSpan.FromSeconds(5);
-                particleSettings.DurationRandomness = 0;
-                particleSettings.MinHorizontalVelocity = 0;
-                particleSettings.MaxHorizontalVelocity = 0;
-                particleSettings.MinVerticalVelocity = -10;
-                particleSettings.MaxVerticalVelocity = -10;
-                //particleSettings.Gravity = Vector3.Down;
-                particleSettings.Gravity = new Vector3(-1, -1, 0);
-                particleSettings.EndVelocity = 1;
-                particleSettings.MinColor = Color.White;
-                particleSettings.MaxColor = Color.White;
-                particleSettings.MinRotateSpeed = 0;
-                particleSettings.MaxRotateSpeed = 0;
-                particleSettings.MinStartSize = 0.5f;
-                particleSettings.MaxStartSize = 0.5f;
-                particleSettings.MinEndSize = 0.2f;
-                particleSettings.MaxEndSize = 0.2f;
-                particleSettings.BlendState = BlendState.AlphaBlend;
-
-                var particleEffect = moduleFactory.CreateParticleEffect();
-                var snowSprite = moduleFactory.CreateSnowSprite();
-
-                snowParticleSystem = new ParticleSystem(particleSettings, particleEffect, snowSprite);
-            }
-
 #if DEBUG || TRACE
             debugBoundingBoxEffect = new BasicEffect(GraphicsDevice);
             debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
@@ -766,11 +739,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 sceneObjects.Clear();
             }
         }
-
-        //
-        // TODO
-        //
-        static Random random = new Random();
 
         public void Draw(GameTime gameTime)
         {
@@ -865,25 +833,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
-            // パーティクル更新
-
-            int snowBoundsX = 128 * 2;
-            int snowBoundsZ = 128 * 2;
-            int snowMinY = 32;
-            int snowMaxY = 64;
-
-            for (int i = 0; i < 20; i++)
-            {
-                int randomX = random.Next(snowBoundsX) - snowBoundsX / 2;
-                int randomY = random.Next(snowMaxY - snowMinY) + snowMinY;
-                int randomZ = random.Next(snowBoundsZ) - snowBoundsZ / 2;
-                Vector3 snowPosition = new Vector3(randomX, randomY, randomZ) + activeCamera.View.Position;
-                snowParticleSystem.AddParticle(snowPosition, Vector3.Zero);
-            }
-            
-            snowParticleSystem.Update(gameTime);
-
-            //----------------------------------------------------------------
             // シーン
 
             if (shadowMapAvailable && sssm == null)
@@ -896,16 +845,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
+            // パーティクル
+
+            if (0 < ParticleSystems.Count)
+                DrawParticles(gameTime);
+
+            //----------------------------------------------------------------
             // ポスト プロセス
 
             PostProcess();
-
-            //----------------------------------------------------------------
-            // 降雪パーティクル
-
-            GraphicsDevice.SetRenderTarget(renderTarget);
-            snowParticleSystem.Draw(activeCamera);
-            GraphicsDevice.SetRenderTarget(null);
 
             //----------------------------------------------------------------
             // レンダ ターゲットの反映
@@ -913,6 +861,19 @@ namespace Willcraftia.Xna.Framework.Graphics
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
+        }
+
+        void DrawParticles(GameTime gameTime)
+        {
+            GraphicsDevice.SetRenderTarget(renderTarget);
+
+            foreach (var particleSystem in ParticleSystems)
+            {
+                if (particleSystem.Enabled)
+                    particleSystem.Draw(gameTime, activeCamera);
+            }
+
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         void PostProcess()

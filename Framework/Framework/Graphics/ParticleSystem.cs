@@ -140,7 +140,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public bool Enabled { get; set; }
 
-        public bool Visible { get; set; }
+        public string Name { get; private set; }
 
         public ParticleSystem(ParticleSettings settings, Effect effect, Texture2D texture)
         {
@@ -149,9 +149,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (texture == null) throw new ArgumentNullException("texture");
 
             Enabled = true;
-            Visible = true;
 
             this.settings = settings;
+
+            //----------------------------------------------------------------
+            // システム名
+
+            Name = settings.Name;
 
             //----------------------------------------------------------------
             // エフェクト
@@ -199,10 +203,50 @@ namespace Willcraftia.Xna.Framework.Graphics
             indexBuffer.SetData(indices);
         }
 
-        public void Update(GameTime gameTime)
+        public void AddParticle(Vector3 position, Vector3 velocity)
+        {
+            var nextFreeParticle = firstFreeParticle + 1;
+
+            if (nextFreeParticle >= settings.MaxParticles)
+                nextFreeParticle = 0;
+
+            if (nextFreeParticle == firstRetiredParticle)
+                return;
+
+            velocity *= settings.EmitterVelocitySensitivity;
+
+            var horizontalVelocity = MathHelper.Lerp(
+                settings.MinHorizontalVelocity, settings.MaxHorizontalVelocity, (float) random.NextDouble());
+
+            var horizontalAngle = random.NextDouble() * MathHelper.TwoPi;
+
+            velocity.X += horizontalVelocity * (float) Math.Cos(horizontalAngle);
+            velocity.Z += horizontalVelocity * (float) Math.Sin(horizontalAngle);
+
+            velocity.Y += MathHelper.Lerp(
+                settings.MinVerticalVelocity, settings.MaxVerticalVelocity, (float) random.NextDouble());
+
+            var randomValues = new Color((byte) random.Next(255), (byte) random.Next(255), (byte) random.Next(255), (byte) random.Next(255));
+
+            for (int i = 0; i < 4; i++)
+            {
+                particles[firstFreeParticle * 4 + i].Position = position;
+                particles[firstFreeParticle * 4 + i].Velocity = velocity;
+                particles[firstFreeParticle * 4 + i].Random = randomValues;
+                particles[firstFreeParticle * 4 + i].Time = currentTime;
+            }
+
+            firstFreeParticle = nextFreeParticle;
+        }
+
+        public void Draw(GameTime gameTime, ICamera camera)
         {
             if (gameTime == null) throw new ArgumentNullException("gameTime");
+            if (camera == null) throw new ArgumentNullException("camera");
             if (!Enabled) return;
+
+            //------------------------------------------------------------
+            // パーティクルの状態更新
 
             currentTime += (float) gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -211,51 +255,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (firstActiveParticle == firstFreeParticle)
                 currentTime = 0;
-            
+
             if (firstRetiredParticle == firstActiveParticle)
                 drawCounter = 0;
-        }
 
-        void RetireActiveParticles()
-        {
-            var particleDuration = (float) settings.Duration.TotalSeconds;
-
-            while (firstActiveParticle != firstNewParticle)
-            {
-                var particleAge = currentTime - particles[firstActiveParticle * 4].Time;
-
-                if (particleAge < particleDuration)
-                    break;
-
-                particles[firstActiveParticle * 4].Time = drawCounter;
-
-                firstActiveParticle++;
-
-                if (firstActiveParticle >= settings.MaxParticles)
-                    firstActiveParticle = 0;
-            }
-        }
-
-        void FreeRetiredParticles()
-        {
-            while (firstRetiredParticle != firstActiveParticle)
-            {
-                var age = drawCounter - (int) particles[firstRetiredParticle * 4].Time;
-
-                if (age < 3)
-                    break;
-
-                firstRetiredParticle++;
-
-                if (firstRetiredParticle >= settings.MaxParticles)
-                    firstRetiredParticle = 0;
-            }
-        }
-
-        public void Draw(ICamera camera)
-        {
-            if (camera == null) throw new ArgumentNullException("camera");
-            if (!Visible) return;
+            //------------------------------------------------------------
+            // 描画処理の開始
 
             if (vertexBuffer.IsContentLost)
                 vertexBuffer.SetData(particles);
@@ -316,6 +321,42 @@ namespace Willcraftia.Xna.Framework.Graphics
             drawCounter++;
         }
 
+        void RetireActiveParticles()
+        {
+            var particleDuration = (float) settings.Duration.TotalSeconds;
+
+            while (firstActiveParticle != firstNewParticle)
+            {
+                var particleAge = currentTime - particles[firstActiveParticle * 4].Time;
+
+                if (particleAge < particleDuration)
+                    break;
+
+                particles[firstActiveParticle * 4].Time = drawCounter;
+
+                firstActiveParticle++;
+
+                if (firstActiveParticle >= settings.MaxParticles)
+                    firstActiveParticle = 0;
+            }
+        }
+
+        void FreeRetiredParticles()
+        {
+            while (firstRetiredParticle != firstActiveParticle)
+            {
+                var age = drawCounter - (int) particles[firstRetiredParticle * 4].Time;
+
+                if (age < 3)
+                    break;
+
+                firstRetiredParticle++;
+
+                if (firstRetiredParticle >= settings.MaxParticles)
+                    firstRetiredParticle = 0;
+            }
+        }
+
         void AddNewParticlesToVertexBuffer()
         {
             var stride = ParticleVertex.SizeInBytes;
@@ -342,42 +383,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             firstNewParticle = firstFreeParticle;
-        }
-
-        public void AddParticle(Vector3 position, Vector3 velocity)
-        {
-            var nextFreeParticle = firstFreeParticle + 1;
-
-            if (nextFreeParticle >= settings.MaxParticles)
-                nextFreeParticle = 0;
-
-            if (nextFreeParticle == firstRetiredParticle)
-                return;
-
-            velocity *= settings.EmitterVelocitySensitivity;
-
-            var horizontalVelocity = MathHelper.Lerp(
-                settings.MinHorizontalVelocity, settings.MaxHorizontalVelocity, (float) random.NextDouble());
-
-            var horizontalAngle = random.NextDouble() * MathHelper.TwoPi;
-
-            velocity.X += horizontalVelocity * (float) Math.Cos(horizontalAngle);
-            velocity.Z += horizontalVelocity * (float) Math.Sin(horizontalAngle);
-
-            velocity.Y += MathHelper.Lerp(
-                settings.MinVerticalVelocity, settings.MaxVerticalVelocity, (float) random.NextDouble());
-
-            var randomValues = new Color((byte) random.Next(255), (byte) random.Next(255), (byte) random.Next(255), (byte) random.Next(255));
-
-            for (int i = 0; i < 4; i++)
-            {
-                particles[firstFreeParticle * 4 + i].Position = position;
-                particles[firstFreeParticle * 4 + i].Velocity = velocity;
-                particles[firstFreeParticle * 4 + i].Random = randomValues;
-                particles[firstFreeParticle * 4 + i].Time = currentTime;
-            }
-
-            firstFreeParticle = nextFreeParticle;
         }
 
         #region IDisposable
