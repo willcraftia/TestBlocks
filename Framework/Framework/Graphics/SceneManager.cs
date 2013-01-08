@@ -412,9 +412,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         LensFlare lensFlare;
 
-        Snow snow;
-
-        SnowParticleSystem snowParticleSystem;
+        ParticleSystem snowParticleSystem;
 
         bool shadowMapAvailable;
 
@@ -662,24 +660,34 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //----------------------------------------------------------------
-            // 降雪
-
-            {
-                var snowEffect = moduleFactory.CreateSnowEffect();
-                var snowSprite = moduleFactory.CreateSnowSprite();
-
-                // TODO: 雪の数
-                snow = new Snow(snowEffect, snowSprite, 1000);
-            }
-
-            //----------------------------------------------------------------
             // 降雪パーティクル
 
             {
+                var particleSettings = new ParticleSettings();
+                particleSettings.MaxParticles = 4000;
+                particleSettings.Duration = TimeSpan.FromSeconds(5);
+                particleSettings.DurationRandomness = 0;
+                particleSettings.MinHorizontalVelocity = 0;
+                particleSettings.MaxHorizontalVelocity = 0;
+                particleSettings.MinVerticalVelocity = -10;
+                particleSettings.MaxVerticalVelocity = -10;
+                //particleSettings.Gravity = Vector3.Down;
+                particleSettings.Gravity = new Vector3(-1, -1, 0);
+                particleSettings.EndVelocity = 1;
+                particleSettings.MinColor = Color.White;
+                particleSettings.MaxColor = Color.White;
+                particleSettings.MinRotateSpeed = 0;
+                particleSettings.MaxRotateSpeed = 0;
+                particleSettings.MinStartSize = 0.5f;
+                particleSettings.MaxStartSize = 0.5f;
+                particleSettings.MinEndSize = 0.2f;
+                particleSettings.MaxEndSize = 0.2f;
+                particleSettings.BlendState = BlendState.AlphaBlend;
+
                 var particleEffect = moduleFactory.CreateParticleEffect();
                 var snowSprite = moduleFactory.CreateSnowSprite();
 
-                snowParticleSystem = new SnowParticleSystem(particleEffect, snowSprite);
+                snowParticleSystem = new ParticleSystem(particleSettings, particleEffect, snowSprite);
             }
 
 #if DEBUG || TRACE
@@ -893,14 +901,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             PostProcess();
 
             //----------------------------------------------------------------
-            // 降雪
+            // 降雪パーティクル
 
-            // TODO: ひとまずデバッグのために。
             GraphicsDevice.SetRenderTarget(renderTarget);
-            
-            //snow.Draw(activeCamera);
             snowParticleSystem.Draw(activeCamera);
-            
             GraphicsDevice.SetRenderTarget(null);
 
             //----------------------------------------------------------------
@@ -1138,14 +1142,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
 
             //----------------------------------------------------------------
-            // 降雪
-
-            // TODO: ひとまずデバッグのために。
-
-            //snow.Draw(activeCamera);
-            //snowParticleSystem.Draw(activeCamera);
-
-            //----------------------------------------------------------------
             // スカイ スフィア
 
             if (SkySphere != null && SkySphere.Visible) SkySphere.Draw();
@@ -1235,14 +1231,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
             lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
-
-            //----------------------------------------------------------------
-            // 降雪
-
-            // TODO: ひとまずデバッグのために。
-
-            //snow.Draw(activeCamera);
-            //snowParticleSystem.Draw(activeCamera);
 
             Monitor.OnEndDrawSceneRendering();
 

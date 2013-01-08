@@ -143,8 +143,6 @@
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\ShadowMap.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
-    <Compile Include="Graphics\Snow.cs" />
-    <Compile Include="Graphics\SnowParticleSystem.cs" />
     <Compile Include="Graphics\Ssao.cs" />
     <Compile Include="Graphics\Sssm.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />

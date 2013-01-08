@@ -12,7 +12,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// Settings クラスには、パーティクル システムの外観の制御に使用する
     /// 調整可能なオプションがすべて記述されています。
     /// </summary>
-    public class ParticleSettings
+    public sealed class ParticleSettings
     {
         // 一度に表示可能なパーティクルの最大数。
         public int MaxParticles = 100;
