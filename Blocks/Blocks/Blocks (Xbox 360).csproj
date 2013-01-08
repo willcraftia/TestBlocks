@@ -148,7 +148,6 @@
     <Compile Include="Models\RegionManager.cs" />
     <Compile Include="Models\RegionManagerMonitor.cs" />
     <Compile Include="Models\RegionMonitor.cs" />
-    <Compile Include="Models\SceneModuleFactory.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\SkyColor.cs" />

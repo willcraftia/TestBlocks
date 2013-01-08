@@ -78,7 +78,6 @@
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\RegionManagerMonitor.cs" />
-    <Compile Include="Models\SceneModuleFactory.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SkyColor.cs" />
     <Compile Include="Models\SkyColorTable.cs" />

@@ -27,8 +27,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         AssetManager assetManager;
 
-        SceneModuleFactory sceneModuleFactory;
-
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public SceneManager SceneManager { get; private set; }
@@ -40,6 +38,8 @@ namespace Willcraftia.Xna.Blocks.Models
         public ChunkPartitionManager PartitionManager { get; private set; }
 
         public SceneSettings SceneSettings { get; private set; }
+
+        public ShadowMap ShadowMap { get; private set; }
 
         public LensFlare LensFlare { get; private set; }
 
@@ -68,8 +68,7 @@ namespace Willcraftia.Xna.Blocks.Models
             spriteBatch = new SpriteBatch(graphicsDevice);
             assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
-            sceneModuleFactory = new SceneModuleFactory(resourceManager, assetManager);
-            SceneManager = new SceneManager(graphicsDevice, sceneModuleFactory);
+            SceneManager = new SceneManager(graphicsDevice);
             RegionManager = new RegionManager(serviceProvider, SceneManager);
             PartitionManager = new ChunkPartitionManager(RegionManager);
         }
@@ -99,6 +98,7 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
             SceneManager.DirectionalLights.Add(SceneSettings.Moonlight);
 
+            const bool shadowEnabled = true;
             const bool lensFlareEnabled = true;
             const bool sssmEnabled = false;
             const bool ssaoEnabled = true;
@@ -108,8 +108,18 @@ namespace Willcraftia.Xna.Blocks.Models
             const bool colorOverlapEnabled = false;
             const bool monochromeEnabled = false;
 
-            // レンズ フレア
+            // シャドウ マップ
+            if (shadowEnabled)
+            {
+                var shadowMapEffect = LoadAsset<Effect>("content:Effects/ShadowMap");
+                var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
+                ShadowMap = new ShadowMap(GraphicsDevice, SceneManagerSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
+
+                SceneManager.ShadowMap = ShadowMap;
+            }
+
+            // レンズ フレア
             if (lensFlareEnabled)
             {
                 var glowSpite = LoadAsset<Texture2D>("content:Textures/LensFlare/Glow");

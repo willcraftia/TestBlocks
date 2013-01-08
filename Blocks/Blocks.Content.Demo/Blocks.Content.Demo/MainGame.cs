@@ -577,16 +577,16 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(sceneManagerMonitor.VisibleSceneObjectCount).Append("/");
             sb.AppendNumber(sceneManagerMonitor.TotalSceneObjectCount).AppendLine();
             
-            var pssmMonitor = sceneManagerMonitor.ShadowMap;
-            if (pssmMonitor != null)
+            var shadowMapMonitor = worldManager.ShadowMap.Monitor;
+            if (shadowMapMonitor != null)
             {
                 sb.Append("ShadowCaster: ");
-                for (int i = 0; i < pssmMonitor.SplitCount; i++)
+                for (int i = 0; i < shadowMapMonitor.SplitCount; i++)
                 {
                     if (0 < i) sb.Append(":");
-                    sb.AppendNumber(pssmMonitor[i].ShadowCasterCount);
+                    sb.AppendNumber(shadowMapMonitor[i].ShadowCasterCount);
                 }
-                sb.Append("/").AppendNumber(pssmMonitor.TotalShadowCasterCount).AppendLine();
+                sb.Append("/").AppendNumber(shadowMapMonitor.TotalShadowCasterCount).AppendLine();
             }
 
             sb.Append("MoveVelocity: ");
