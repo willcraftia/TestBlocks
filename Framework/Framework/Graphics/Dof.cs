@@ -16,9 +16,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
+            public const bool DefaultEnabled = true;
+
             public const float DefaultMapScale = 0.5f;
 
             float mapScale = DefaultMapScale;
+
+            /// <summary>
+            /// 被写界深度が有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (被写界深度が有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool Enabled { get; set; }
 
             /// <summary>
             /// ブラー設定を取得します。
@@ -41,6 +51,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             public Settings()
             {
+                Enabled = DefaultEnabled;
                 Blur = new BlurSettings();
             }
         }

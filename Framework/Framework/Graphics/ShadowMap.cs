@@ -48,6 +48,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
+            public const bool DefaultEnabled = true;
+
             //public const int DefaultSize = 512;
             //public const int DefaultSize = 1024;
             public const int DefaultSize = 2048;
@@ -94,6 +96,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             int splitCount = DefaultSplitCount;
 
             float splitLambda = DefaultSplitLambda;
+
+            /// <summary>
+            /// シャドウ処理が有効かどうかを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (シャドウ処理が有効)、false (それ以外の場合)。
+            /// </value>
+            public bool Enabled { get; set; }
 
             /// <summary>
             /// シャドウ マップ生成方法の種類を取得または設定します。
@@ -216,6 +226,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             public Settings()
             {
+                Enabled = DefaultEnabled;
                 VsmBlur = new BlurSettings();
             }
         }

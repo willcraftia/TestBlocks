@@ -22,10 +22,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
     {
         static readonly Logger logger = new Logger(typeof(MainGame).Name);
 
-        const int partitionMinActiveRange = 13;
-
-        const int partitionMaxActiveRange = 15;
-
         GraphicsDeviceManager graphics;
 
         KeyboardState lastKeyboardState;
@@ -37,8 +33,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         float moveVelocity = 10;
         
         float dashFactor = 2;
-
-        float farPlaneDistance = (partitionMinActiveRange - 1) * 16;
 
         WorldManager worldManager;
 
@@ -292,7 +286,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //camera.View.Position = new Vector3(0, 16 * 3, 0);
             //camera.View.Position = new Vector3(0, 16 * 2, 0);
             camera.Projection.AspectRatio = viewport.AspectRatio;
-            camera.Projection.FarPlaneDistance = farPlaneDistance;
+            camera.Projection.FarPlaneDistance = (WorldManager.PartitionMinActiveRange - 1) * 16;
 
             camera.Update();
 
@@ -349,12 +343,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             worldManager.PartitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
 
             #endregion
-
-            worldManager.SceneManagerSettings.ShadowMap.NearPlaneDistance = camera.Projection.NearPlaneDistance;
-            // TODO:
-            // SSSM ではフォグより手前にする必要あり。
-            // しかし、メッシュのエフェクトに直接影を書き込むなら、それは不要。
-            worldManager.SceneManagerSettings.ShadowMap.FarPlaneDistance = camera.Projection.FarPlaneDistance - 64;
 
             //================================================================
             // Region
@@ -542,7 +530,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
 
             sb.Append("FarPlane: ");
-            sb.AppendNumber(farPlaneDistance).AppendLine();
+            sb.AppendNumber((WorldManager.PartitionMinActiveRange - 1) * 16).AppendLine();
 
             var partitionManagerMonitor = worldManager.PartitionManager.Monitor;
             sb.Append("Partition: ");

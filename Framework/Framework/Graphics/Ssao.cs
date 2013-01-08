@@ -16,9 +16,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
+            public const bool DefaultSsaoEnabled = true;
+
             public const float DefaultMapScale = 1;
 
             float mapScale = DefaultMapScale;
+
+            /// <summary>
+            /// スクリーン スペース アンビエント オクルージョンが有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (スクリーン スペース アンビエント オクルージョンが有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool SsaoEnabled { get; set; }
 
             /// <summary>
             /// ブラー設定を取得します。
@@ -41,6 +51,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             public Settings()
             {
+                SsaoEnabled = DefaultSsaoEnabled;
                 Blur = new BlurSettings();
             }
         }

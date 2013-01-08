@@ -14,9 +14,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
+            public const bool DefaultEnabled = false;
+
             public const float DefaultMapScale = 0.25f;
 
             float mapScale = DefaultMapScale;
+
+            /// <summary>
+            /// ブルームが有効か否かを示す値を取得または設定します。
+            /// </summary>
+            /// <value>
+            /// true (ブルームが有効な場合)、false (それ以外の場合)。
+            /// </value>
+            public bool Enabled { get; set; }
 
             public float MapScale
             {
@@ -33,6 +43,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             public Settings()
             {
+                Enabled = DefaultEnabled;
                 Blur = new BlurSettings
                 {
                     Radius = 1,

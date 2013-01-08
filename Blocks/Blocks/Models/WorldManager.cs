@@ -15,9 +15,9 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class WorldManager
     {
-        const int partitionMinActiveRange = 10;
-
-        const int partitionMaxActiveRange = 12;
+        // TODO
+        public const int PartitionMinActiveRange = 10;
+        public const int PartitionMaxActiveRange = 12;
 
         IServiceProvider serviceProvider;
 
@@ -98,23 +98,28 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
             SceneManager.DirectionalLights.Add(SceneSettings.Moonlight);
 
-            const bool shadowEnabled = true;
+            // TODO
+            var shadowMapSettings = new ShadowMap.Settings();
+            shadowMapSettings.FarPlaneDistance = (PartitionMinActiveRange - 1) * 16;
+            shadowMapSettings.FarPlaneDistance -= 64;
+
+            var sssmSettings = new Sssm.Settings();
+            var ssaoSettings = new Ssao.Settings();
+            var edgeSettings = new Edge.Settings();
+            var bloomSettings = new Bloom.Settings();
+            var dofSettings = new Dof.Settings();
+
             const bool lensFlareEnabled = true;
-            const bool sssmEnabled = false;
-            const bool ssaoEnabled = true;
-            const bool edgeEnabled = false;
-            const bool bloomEnabled = false;
-            const bool dofEnabled = true;
             const bool colorOverlapEnabled = false;
             const bool monochromeEnabled = false;
 
             // シャドウ マップ
-            if (shadowEnabled)
+            if (shadowMapSettings.Enabled)
             {
                 var shadowMapEffect = LoadAsset<Effect>("content:Effects/ShadowMap");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                ShadowMap = new ShadowMap(GraphicsDevice, SceneManagerSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
+                ShadowMap = new ShadowMap(GraphicsDevice, shadowMapSettings, spriteBatch, shadowMapEffect, blurEffect);
 
                 SceneManager.ShadowMap = ShadowMap;
             }
@@ -136,20 +141,20 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // スクリーン スペース シャドウ マッピング
-            if (sssmEnabled)
+            if (sssmSettings.Enabled)
             {
                 // スクリーン スペース シャドウ マッピング モジュール
                 var shadowSceneEffect = LoadAsset<Effect>("content:Effects/ShadowScene");
                 var sssmEffect = LoadAsset<Effect>("content:Effects/Sssm");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                Sssm = new Sssm(spriteBatch, SceneManagerSettings.ShadowMap, SceneManagerSettings.Sssm, shadowSceneEffect, sssmEffect, blurEffect);
+                Sssm = new Sssm(spriteBatch, shadowMapSettings, sssmSettings, shadowSceneEffect, sssmEffect, blurEffect);
 
                 SceneManager.PostProcessors.Add(Sssm);
             }
 
             // スクリーン スペース アンビエント オクルージョン
-            if (ssaoEnabled)
+            if (ssaoSettings.SsaoEnabled)
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var ssaoMapEffect = LoadAsset<Effect>("content:Effects/SsaoMap");
@@ -157,43 +162,43 @@ namespace Willcraftia.Xna.Blocks.Models
                 var ssaoEffect = LoadAsset<Effect>("content:Effects/Ssao");
                 var randomNormalMap = LoadAsset<Texture2D>("content:Textures/RandomNormal");
 
-                Ssao = new Ssao(spriteBatch, SceneManagerSettings.Ssao,
+                Ssao = new Ssao(spriteBatch, ssaoSettings,
                     normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
 
                 SceneManager.PostProcessors.Add(Ssao);
             }
 
             // エッジ強調
-            if (edgeEnabled)
+            if (edgeSettings.Enabled)
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var edgeEffect = LoadAsset<Effect>("content:Effects/Edge");
 
-                Edge = new Edge(spriteBatch, SceneManagerSettings.Edge, normalDepthMapEffect, edgeEffect);
+                Edge = new Edge(spriteBatch, edgeSettings, normalDepthMapEffect, edgeEffect);
 
                 SceneManager.PostProcessors.Add(Edge);
             }
 
             // ブルーム
-            if (bloomEnabled)
+            if (bloomSettings.Enabled)
             {
                 var bloomExtractEffect = LoadAsset<Effect>("content:Effects/BloomExtract");
                 var bloomEffect = LoadAsset<Effect>("content:Effects/Bloom");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                Bloom = new Bloom(spriteBatch, SceneManagerSettings.Bloom, bloomExtractEffect, bloomEffect, blurEffect);
+                Bloom = new Bloom(spriteBatch, bloomSettings, bloomExtractEffect, bloomEffect, blurEffect);
 
                 SceneManager.PostProcessors.Add(Bloom);
             }
 
             // 被写界深度
-            if (dofEnabled)
+            if (dofSettings.Enabled)
             {
                 var depthMapEffect = LoadAsset<Effect>("content:Effects/DepthMap");
                 var dofEffect = LoadAsset<Effect>("content:Effects/Dof");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                Dof = new Dof(spriteBatch, SceneManagerSettings.Dof, depthMapEffect, dofEffect, blurEffect);
+                Dof = new Dof(spriteBatch, dofSettings, depthMapEffect, dofEffect, blurEffect);
 
                 SceneManager.PostProcessors.Add(Dof);
             }
@@ -224,7 +229,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // パーティション マネージャ
 
-            PartitionManager.Initialize(partitionMinActiveRange, partitionMaxActiveRange);
+            PartitionManager.Initialize(PartitionMinActiveRange, PartitionMaxActiveRange);
         }
 
         // TODO: 戻り値を Region にしない。
@@ -277,10 +282,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1, 0);
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
             //----------------------------------------------------------------
             // リージョン マネージャ
 
