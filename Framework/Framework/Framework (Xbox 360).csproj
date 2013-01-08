@@ -179,6 +179,7 @@
     <Compile Include="Graphics\ParticleSystem.cs" />
     <Compile Include="Graphics\ParticleSystemCollection.cs" />
     <Compile Include="Graphics\PostProcessor.cs" />
+    <Compile Include="Graphics\PostProcessorCollection.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
     <Compile Include="Graphics\SceneObject.cs" />

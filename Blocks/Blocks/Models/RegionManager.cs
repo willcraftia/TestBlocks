@@ -117,12 +117,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        T LoadAsset<T>(string uri)
-        {
-            var resource = resourceManager.Load(uri);
-            return assetManager.Load<T>(resource);
-        }
-
         //
         // AssetManager の扱い
         //
@@ -301,6 +295,12 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Close()
         {
             foreach (var region in regions) region.Close();
+        }
+
+        T LoadAsset<T>(string uri)
+        {
+            var resource = resourceManager.Load(uri);
+            return assetManager.Load<T>(resource);
         }
     }
 }

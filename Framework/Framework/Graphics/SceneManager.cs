@@ -261,20 +261,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             public ShadowMap.ShadowMapMonitor ShadowMap { get; internal set; }
 
-            public Sssm.SssmMonitor Sssm { get; internal set; }
-
-            public Ssao.SsaoMonitor Ssao { get; internal set; }
-
-            public Edge.EdgeMonitor Edge { get; internal set; }
-
-            public Bloom.BloomMonitor Bloom { get; internal set; }
-
-            public Dof.DofMonitor Dof { get; internal set; }
-
-            public ColorOverlap.ColorOverlapMonitor ColorOverlap { get; internal set; }
-
-            public Monochrome.MonochromeMonitor Monochrome { get; internal set; }
-
             internal SceneManagerMonitor(SceneManager sceneManager)
             {
                 if (sceneManager == null) throw new ArgumentNullException("sceneManager");
@@ -357,6 +343,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int InitialParticleSystemCapacity = 10;
 
+        public const int InitialPostProcessorCapacity = 10;
+
         static readonly BlendState colorWriteDisable = new BlendState
         {
             ColorWriteChannels = ColorWriteChannels.None
@@ -394,20 +382,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ShadowMap shadowMap;
 
-        Sssm sssm;
-
-        Ssao ssao;
-
-        Edge edge;
-
-        Bloom bloom;
-
-        Dof dof;
-
-        ColorOverlap colorOverlap;
-
-        Monochrome monochrome;
-
         LensFlare lensFlare;
 
         bool shadowMapAvailable;
@@ -427,6 +401,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         public DirectionalLightCollection DirectionalLights { get; private set; }
 
         public ParticleSystemCollection ParticleSystems { get; private set; }
+
+        public PostProcessorCollection PostProcessors { get; private set; }
 
         public SceneManagerMonitor Monitor { get; private set; }
 
@@ -521,6 +497,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Cameras = new CameraCollection(InitialCameraCapacity);
             DirectionalLights = new DirectionalLightCollection(InitialDirectionalLightCapacity);
             ParticleSystems = new ParticleSystemCollection(InitialParticleSystemCapacity);
+            PostProcessors = new PostProcessorCollection(InitialPostProcessorCapacity);
 
             Monitor = new SceneManagerMonitor(this);
         }
@@ -542,16 +519,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 shadowMap = new ShadowMap(GraphicsDevice, settings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
                 Monitor.ShadowMap = shadowMap.Monitor;
-
-                if (settings.SssmEnabled)
-                {
-                    // スクリーン スペース シャドウ マッピング モジュール
-                    var shadowSceneEffect = moduleFactory.CreateShadowSceneEffect();
-                    var sssmEffect = moduleFactory.CreateSssmEffect();
-
-                    sssm = new Sssm(spriteBatch, settings.ShadowMap, settings.Sssm, shadowSceneEffect, sssmEffect, blurEffect);
-                    Monitor.Sssm = sssm.Monitor;
-                }
             }
 
             //----------------------------------------------------------------
@@ -581,80 +548,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             postProcessRenderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
-
-            //----------------------------------------------------------------
-            // スクリーン スペース アンビエント オクルージョン
-
-            if (settings.SsaoEnabled)
-            {
-                var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
-                var ssaoMapEffect = moduleFactory.CreateSsaoMapEffect();
-                var ssaoMapBlurEffect = moduleFactory.CreateSsaoMapBlurEffect();
-                var ssaoEffect = moduleFactory.CreateSsaoEffect();
-                var randomNormalMap = moduleFactory.CreateRandomNormalMap();
-
-                ssao = new Ssao(spriteBatch, settings.Ssao,
-                    normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
-                Monitor.Ssao = ssao.Monitor;
-            }
-
-            //----------------------------------------------------------------
-            // エッジ強調
-
-            if (settings.EdgeEnabled)
-            {
-                var normalDepthMapEffect = moduleFactory.CreateNormalDepthMapEffect();
-                var edgeEffect = moduleFactory.CreateEdgeEffect();
-
-                edge = new Edge(spriteBatch, settings.Edge, normalDepthMapEffect, edgeEffect);
-                Monitor.Edge = edge.Monitor;
-            }
-
-            //----------------------------------------------------------------
-            // ブルーム
-
-            if (settings.BloomEnabled)
-            {
-                var bloomExtractEffect = moduleFactory.CreateBloomExtractEffect();
-                var bloomEffect = moduleFactory.CreateBloomEffect();
-                var blurEffect = moduleFactory.CreateGaussianBlurEffect();
-
-                bloom = new Bloom(spriteBatch, settings.Bloom, bloomExtractEffect, bloomEffect, blurEffect);
-                Monitor.Bloom = bloom.Monitor;
-            }
-
-            //----------------------------------------------------------------
-            // 被写界深度
-
-            if (settings.DofEnabled)
-            {
-                var depthMapEffect = moduleFactory.CreateDepthMapEffect();
-                var dofEffect = moduleFactory.CreateDofEffect();
-                var blurEffect = moduleFactory.CreateGaussianBlurEffect();
-
-                dof = new Dof(spriteBatch, settings.Dof, depthMapEffect, dofEffect, blurEffect);
-                Monitor.Dof = dof.Monitor;
-            }
-
-            //----------------------------------------------------------------
-            // カラー オーバラップ
-
-            if (settings.ColorOverlapEnabled)
-            {
-                colorOverlap = new ColorOverlap(spriteBatch);
-                Monitor.ColorOverlap = colorOverlap.Monitor;
-            }
-
-            //----------------------------------------------------------------
-            // モノクローム
-
-            if (settings.MonochromeEnabled)
-            {
-                var monochromeEffect = moduleFactory.CreateMonochromeEffect();
-
-                monochrome = new Monochrome(spriteBatch, monochromeEffect);
-                Monitor.Monochrome = monochrome.Monitor;
-            }
 
             //----------------------------------------------------------------
             // レンズ フレア
@@ -799,7 +692,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // シーン
 
-            if (shadowMapAvailable && sssm == null)
+            if (shadowMapAvailable && !settings.SssmEnabled)
             {
                 DrawScene(shadowMap);
             }
@@ -844,67 +737,13 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Monitor.OnBeginPostProcess();
 
-            //----------------------------------------------------------------
-            // スクリーン スペース シャドウ マッピング
-
-            if (sssm != null)
+            foreach (var postProcessor in PostProcessors)
             {
-                sssm.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                SwapRenderTargets();
-            }
-
-            //----------------------------------------------------------------
-            // スクリーン スペース アンビエント オクルージョン
-
-            if (ssao != null)
-            {
-                ssao.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                SwapRenderTargets();
-            }
-
-            //----------------------------------------------------------------
-            // エッジ強調
-
-            if (edge != null)
-            {
-                edge.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                SwapRenderTargets();
-            }
-
-            //----------------------------------------------------------------
-            // ブルーム
-
-            if (bloom != null)
-            {
-                bloom.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                SwapRenderTargets();
-            }
-
-            //----------------------------------------------------------------
-            // 被写界深度
-
-            if (dof != null)
-            {
-                dof.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                SwapRenderTargets();
-            }
-
-            //----------------------------------------------------------------
-            // カラー オーバラップ
-
-            if (colorOverlap != null)
-            {
-                colorOverlap.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                SwapRenderTargets();
-            }
-
-            //----------------------------------------------------------------
-            // モノクローム
-
-            if (monochrome != null)
-            {
-                monochrome.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                SwapRenderTargets();
+                if (postProcessor.Enabled)
+                {
+                    postProcessor.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
+                    SwapRenderTargets();
+                }
             }
 
             Monitor.OnEndPostProcess();

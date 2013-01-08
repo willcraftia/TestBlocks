@@ -15,51 +15,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Effect CreateGaussianBlurEffect();
 
-        Effect CreateDepthMapEffect();
-
-        Effect CreateNormalDepthMapEffect();
-
         //====================================================================
         // シャドウ マッピング
 
         Effect CreateShadowMapEffect();
-
-        Effect CreateShadowSceneEffect();
-
-        Effect CreateSssmEffect();
-
-        //====================================================================
-        // スクリーン スペース アンビエント オクルージョン
-
-        Effect CreateSsaoMapEffect();
-
-        Effect CreateSsaoMapBlurEffect();
-
-        Effect CreateSsaoEffect();
-
-        Texture2D CreateRandomNormalMap();
-
-        //====================================================================
-        // エッジ強調
-
-        Effect CreateEdgeEffect();
-
-        //====================================================================
-        // ブルーム
-
-        Effect CreateBloomExtractEffect();
-
-        Effect CreateBloomEffect();
-
-        //====================================================================
-        // 被写界深度
-
-        Effect CreateDofEffect();
-
-        //====================================================================
-        // モノクローム
-
-        Effect CreateMonochromeEffect();
 
         //====================================================================
         // レンズ フレア
@@ -67,15 +26,5 @@ namespace Willcraftia.Xna.Framework.Graphics
         Texture2D CreateLensFlareGlowSprite();
 
         Texture2D[] CreateLensFlareFlareSprites();
-
-        //====================================================================
-        // パーティクル
-
-        Effect CreateParticleEffect();
-
-        //====================================================================
-        // 降雪パーティクル
-
-        Texture2D CreateSnowSprite();
     }
 }

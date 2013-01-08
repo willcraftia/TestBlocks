@@ -325,14 +325,14 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //----------------------------------------------------------------
             // スクリーン スペース アンビエント オクルージョン
 
-            worldManager.SceneManager.Monitor.Ssao.BeginProcess += OnSsaoBeginProcess;
-            worldManager.SceneManager.Monitor.Ssao.EndProcess += OnSsaoEndProcess;
+            worldManager.Ssao.Monitor.BeginProcess += OnSsaoBeginProcess;
+            worldManager.Ssao.Monitor.EndProcess += OnSsaoEndProcess;
 
             //----------------------------------------------------------------
             // 被写界深度
 
-            worldManager.SceneManager.Monitor.Dof.BeginProcess += OnDofBeginProcess;
-            worldManager.SceneManager.Monitor.Dof.EndProcess += OnDofEndProcess;
+            worldManager.Dof.Monitor.BeginProcess += OnDofBeginProcess;
+            worldManager.Dof.Monitor.EndProcess += OnDofEndProcess;
 
             //----------------------------------------------------------------
             // パーティション マネージャ

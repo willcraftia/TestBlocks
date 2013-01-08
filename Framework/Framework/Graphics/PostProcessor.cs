@@ -39,6 +39,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        public bool Enabled { get; set; }
+
         protected SpriteBatch SpriteBatch { get; private set; }
 
         protected GraphicsDevice GraphicsDevice { get; private set; }
@@ -46,6 +48,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         protected PostProcessor(SpriteBatch spriteBatch)
         {
             if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
+
+            Enabled = true;
 
             SpriteBatch = spriteBatch;
             GraphicsDevice = spriteBatch.GraphicsDevice;
