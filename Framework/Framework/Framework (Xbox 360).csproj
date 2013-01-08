@@ -175,7 +175,6 @@
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\ParticleSettings.cs" />
     <Compile Include="Graphics\ParticleSystem.cs" />
-    <Compile Include="Graphics\ParticleVertex.cs" />
     <Compile Include="Graphics\PostProcessor.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
