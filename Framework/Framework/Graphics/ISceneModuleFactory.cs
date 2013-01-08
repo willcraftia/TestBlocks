@@ -19,12 +19,5 @@ namespace Willcraftia.Xna.Framework.Graphics
         // シャドウ マッピング
 
         Effect CreateShadowMapEffect();
-
-        //====================================================================
-        // レンズ フレア
-
-        Texture2D CreateLensFlareGlowSprite();
-
-        Texture2D[] CreateLensFlareFlareSprites();
     }
 }

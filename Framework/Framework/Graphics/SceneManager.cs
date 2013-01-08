@@ -382,8 +382,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ShadowMap shadowMap;
 
-        LensFlare lensFlare;
-
         bool shadowMapAvailable;
 
         RenderTarget2D renderTarget;
@@ -401,6 +399,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         public DirectionalLightCollection DirectionalLights { get; private set; }
 
         public ParticleSystemCollection ParticleSystems { get; private set; }
+
+        public LensFlare LensFlare { get; set; }
 
         public PostProcessorCollection PostProcessors { get; private set; }
 
@@ -548,15 +548,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             postProcessRenderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
-
-            //----------------------------------------------------------------
-            // レンズ フレア
-
-            {
-                var glowSpite = moduleFactory.CreateLensFlareGlowSprite();
-                var flareSprites = moduleFactory.CreateLensFlareFlareSprites();
-                lensFlare = new LensFlare(GraphicsDevice, spriteBatch, glowSpite, flareSprites);
-            }
 
 #if DEBUG || TRACE
             debugBoundingBoxEffect = new BasicEffect(GraphicsDevice);
@@ -902,8 +893,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // レンズ フレア
 
-            // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
-            lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+            if (LensFlare != null && LensFlare.Enabled)
+            {
+                // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
+                LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+            }
 
             //----------------------------------------------------------------
             // スカイ スフィア
@@ -993,8 +987,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // レンズ フレア
 
-            // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
-            lensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+            if (LensFlare != null && LensFlare.Enabled)
+            {
+                // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
+                LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+            }
 
             Monitor.OnEndDrawSceneRendering();
 

@@ -82,12 +82,16 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         bool lightBehindCamera;
 
+        public bool Enabled { get; set; }
+
         public LensFlare(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Texture2D glowSprite, Texture2D[] flareSprites)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
             if (glowSprite == null) throw new ArgumentNullException("glowSprite");
             if (flareSprites == null) throw new ArgumentNullException("flareSprites");
+
+            Enabled = true;
 
             this.graphicsDevice = graphicsDevice;
             this.spriteBatch = spriteBatch;

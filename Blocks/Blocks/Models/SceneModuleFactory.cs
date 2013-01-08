@@ -38,24 +38,6 @@ namespace Willcraftia.Xna.Blocks.Models
             return LoadAsset<Effect>("content:Effects/ShadowMap");
         }
 
-        // I/F
-        public Texture2D CreateLensFlareGlowSprite()
-        {
-            return LoadAsset<Texture2D>("content:Textures/LensFlare/Glow");
-        }
-
-        // I/F
-        public Texture2D[] CreateLensFlareFlareSprites()
-        {
-            Texture2D[] sprites =
-            {
-                LoadAsset<Texture2D>("content:Textures/LensFlare/Flare1"),
-                LoadAsset<Texture2D>("content:Textures/LensFlare/Flare2"),
-                LoadAsset<Texture2D>("content:Textures/LensFlare/Flare3")
-            };
-            return sprites;
-        }
-
         T LoadAsset<T>(string uri)
         {
             var resource = resourceManager.Load(uri);

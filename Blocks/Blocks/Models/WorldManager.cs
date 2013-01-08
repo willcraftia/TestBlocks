@@ -41,6 +41,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SceneSettings SceneSettings { get; private set; }
 
+        public LensFlare LensFlare { get; private set; }
+
         public Sssm Sssm { get; private set; }
 
         public Ssao Ssao { get; private set; }
@@ -97,6 +99,7 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
             SceneManager.DirectionalLights.Add(SceneSettings.Moonlight);
 
+            const bool lensFlareEnabled = true;
             const bool sssmEnabled = false;
             const bool ssaoEnabled = true;
             const bool edgeEnabled = false;
@@ -104,6 +107,23 @@ namespace Willcraftia.Xna.Blocks.Models
             const bool dofEnabled = true;
             const bool colorOverlapEnabled = false;
             const bool monochromeEnabled = false;
+
+            // レンズ フレア
+
+            if (lensFlareEnabled)
+            {
+                var glowSpite = LoadAsset<Texture2D>("content:Textures/LensFlare/Glow");
+                Texture2D[] flareSprites =
+                {
+                    LoadAsset<Texture2D>("content:Textures/LensFlare/Flare1"),
+                    LoadAsset<Texture2D>("content:Textures/LensFlare/Flare2"),
+                    LoadAsset<Texture2D>("content:Textures/LensFlare/Flare3")
+                };
+
+                LensFlare = new LensFlare(GraphicsDevice, spriteBatch, glowSpite, flareSprites);
+
+                SceneManager.LensFlare = LensFlare;
+            }
 
             // スクリーン スペース シャドウ マッピング
             if (sssmEnabled)
