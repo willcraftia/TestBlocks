@@ -368,10 +368,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         SceneObject skySphere;
 
-        Dictionary<string, ICamera> cameraMap = new Dictionary<string, ICamera>(InitialCameraCapacity);
-
-        Dictionary<string, DirectionalLight> directionalLightMap = new Dictionary<string, DirectionalLight>(InitialDirectionalLightCapacity);
-
         string activeCameraName;
 
         ICamera activeCamera;
@@ -426,6 +422,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Settings settings;
 
+        public CameraCollection Cameras { get; private set; }
+
+        public DirectionalLightCollection DirectionalLights { get; private set; }
+
         public ParticleSystemCollection ParticleSystems { get; private set; }
 
         public SceneManagerMonitor Monitor { get; private set; }
@@ -464,13 +464,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return activeCameraName; }
             set
             {
-                if (value != null && !cameraMap.ContainsKey(value))
+                if (value != null && !Cameras.Contains(value))
                     throw new ArgumentException("Camera not found: " + value);
 
                 if (activeCameraName == value) return;
 
                 activeCameraName = value;
-                activeCamera = (activeCameraName != null) ? cameraMap[activeCameraName] : null;
+                activeCamera = (activeCameraName != null) ? Cameras[activeCameraName] : null;
             }
         }
 
@@ -479,13 +479,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return activeDirectionalLightName; }
             set
             {
-                if (value != null && !directionalLightMap.ContainsKey(value))
+                if (value != null && !DirectionalLights.Contains(value))
                     throw new ArgumentException("DirectionalLight not found: " + value);
 
                 if (activeDirectionalLightName == value) return;
 
                 activeDirectionalLightName = value;
-                activeDirectionalLight = (activeDirectionalLightName != null) ? directionalLightMap[activeDirectionalLightName] : null;
+                activeDirectionalLight = (activeDirectionalLightName != null) ? DirectionalLights[activeDirectionalLightName] : null;
             }
         }
 
@@ -518,6 +518,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            Cameras = new CameraCollection(InitialCameraCapacity);
+            DirectionalLights = new DirectionalLightCollection(InitialDirectionalLightCapacity);
             ParticleSystems = new ParticleSystemCollection(InitialParticleSystemCapacity);
 
             Monitor = new SceneManagerMonitor(this);
@@ -555,7 +557,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // シャドウ マッピング用カメラの登録
 
-            AddCamera(shadowCamera);
+            Cameras.Add(shadowCamera);
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -669,44 +671,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             debugBoundingBoxEffect.VertexColorEnabled = true;
             debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
 #endif
-        }
-
-        public void AddCamera(ICamera camera)
-        {
-            if (camera == null) throw new ArgumentNullException("camera");
-            
-            cameraMap[camera.Name] = camera;
-        }
-
-        public void RemoveCamera(string name)
-        {
-            if (name == null) throw new ArgumentNullException("name");
-            
-            cameraMap.Remove(name);
-        }
-
-        public void ClearCameras()
-        {
-            cameraMap.Clear();
-        }
-
-        public void AddDirectionalLight(DirectionalLight directionalLight)
-        {
-            if (directionalLight == null) throw new ArgumentNullException("directionalLight");
-
-            directionalLightMap[directionalLight.Name] = directionalLight;
-        }
-
-        public void RemoveDirectionalLight(string name)
-        {
-            if (name == null) throw new ArgumentNullException("name");
-
-            directionalLightMap.Remove(name);
-        }
-
-        public void ClearDirectionalLights()
-        {
-            directionalLightMap.Clear();
         }
 
         public void AddSceneObject(SceneObject sceneObject)

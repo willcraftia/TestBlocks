@@ -303,7 +303,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             worldManager.Initialize();
 
             // TODO: Žb’è
-            worldManager.SceneManager.AddCamera(camera);
+            worldManager.SceneManager.Cameras.Add(camera);
             worldManager.SceneManager.ActiveCameraName = camera.Name;
 
             #region Monitor

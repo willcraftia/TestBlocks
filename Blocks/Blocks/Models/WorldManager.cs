@@ -78,8 +78,8 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.Initialize(SceneManagerSettings);
 
             // 太陽と月をディレクショナル ライトとして登録。
-            SceneManager.AddDirectionalLight(SceneSettings.Sunlight);
-            SceneManager.AddDirectionalLight(SceneSettings.Moonlight);
+            SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
+            SceneManager.DirectionalLights.Add(SceneSettings.Moonlight);
 
             //----------------------------------------------------------------
             // リージョン マネージャ
