@@ -319,14 +319,20 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //----------------------------------------------------------------
             // スクリーン スペース アンビエント オクルージョン
 
-            worldManager.Ssao.Monitor.BeginProcess += OnSsaoBeginProcess;
-            worldManager.Ssao.Monitor.EndProcess += OnSsaoEndProcess;
+            if (worldManager.Ssao != null)
+            {
+                worldManager.Ssao.Monitor.BeginProcess += OnSsaoBeginProcess;
+                worldManager.Ssao.Monitor.EndProcess += OnSsaoEndProcess;
+            }
 
             //----------------------------------------------------------------
             // 被写界深度
 
-            worldManager.Dof.Monitor.BeginProcess += OnDofBeginProcess;
-            worldManager.Dof.Monitor.EndProcess += OnDofEndProcess;
+            if (worldManager.Dof != null)
+            {
+                worldManager.Dof.Monitor.BeginProcess += OnDofBeginProcess;
+                worldManager.Dof.Monitor.EndProcess += OnDofEndProcess;
+            }
 
             //----------------------------------------------------------------
             // パーティション マネージャ
@@ -564,10 +570,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("SceneObejcts: ").AppendNumber(sceneManagerMonitor.RenderedSceneObjectCount).Append("/");
             sb.AppendNumber(sceneManagerMonitor.VisibleSceneObjectCount).Append("/");
             sb.AppendNumber(sceneManagerMonitor.TotalSceneObjectCount).AppendLine();
-            
-            var shadowMapMonitor = worldManager.ShadowMap.Monitor;
-            if (shadowMapMonitor != null)
+
+            if (worldManager.ShadowMap != null)
             {
+                var shadowMapMonitor = worldManager.ShadowMap.Monitor;
                 sb.Append("ShadowCaster: ");
                 for (int i = 0; i < shadowMapMonitor.SplitCount; i++)
                 {
