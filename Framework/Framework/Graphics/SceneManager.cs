@@ -517,7 +517,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
             else
             {
-                DrawScene();
+                DrawScene(null);
             }
 
             //----------------------------------------------------------------
@@ -589,101 +589,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.OnEndDrawShadowMap();
         }
 
-        void DrawScene()
-        {
-            Monitor.OnBeginDrawScene();
-
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-
-            GraphicsDevice.SetRenderTarget(renderTarget);
-            GraphicsDevice.Clear(new Color(BackgroundColor));
-
-            //================================================================
-            //
-            // オクルージョン クエリ
-            //
-
-            Monitor.OnBeginDrawSceneOcclusionQuery();
-
-            GraphicsDevice.BlendState = colorWriteDisable;
-
-            //----------------------------------------------------------------
-            // 不透明オブジェクト
-
-            foreach (var opaque in opaqueSceneObjects)
-                opaque.UpdateOcclusion();
-
-            //----------------------------------------------------------------
-            // 半透明オブジェクト
-
-            foreach (var translucent in translucentSceneObjects)
-                translucent.UpdateOcclusion();
-
-            Monitor.OnEndDrawSceneOcclusionQuery();
-
-            //================================================================
-            //
-            // 描画
-            //
-
-            Monitor.OnBeginDrawSceneRendering();
-
-            //----------------------------------------------------------------
-            // 不透明オブジェクト
-
-            GraphicsDevice.BlendState = BlendState.Opaque;
-
-            foreach (var opaque in opaqueSceneObjects)
-            {
-                if (opaque.Occluded)
-                {
-                    Monitor.OccludedSceneObjectCount++;
-                    DebugDrawBoundingBox(opaque);
-                    continue;
-                }
-
-                opaque.Draw();
-
-                DebugDrawBoundingBox(opaque);
-            }
-
-            //----------------------------------------------------------------
-            // 半透明オブジェクト
-
-            GraphicsDevice.BlendState = BlendState.AlphaBlend;
-
-            foreach (var translucent in translucentSceneObjects)
-            {
-                if (translucent.Occluded)
-                {
-                    Monitor.OccludedSceneObjectCount++;
-                    DebugDrawBoundingBox(translucent);
-                    continue;
-                }
-
-                // TODO
-                // 半透明に対してシャドウ マップは必要か？
-                translucent.Draw();
-
-                DebugDrawBoundingBox(translucent);
-            }
-
-            //----------------------------------------------------------------
-            // スカイ スフィア
-
-            if (SkySphere != null && SkySphere.Visible)
-            {
-                SkySphere.PreDraw();
-                SkySphere.Draw();
-            }
-
-            Monitor.OnEndDrawSceneRendering();
-
-            GraphicsDevice.SetRenderTarget(null);
-
-            Monitor.OnEndDrawScene();
-        }
-
         void DrawScene(ShadowMap shadowMap)
         {
             Monitor.OnBeginDrawScene();
@@ -731,7 +636,14 @@ namespace Willcraftia.Xna.Framework.Graphics
                     continue;
                 }
 
-                opaque.Draw(shadowMap);
+                if (shadowMap != null)
+                {
+                    opaque.Draw(shadowMap);
+                }
+                else
+                {
+                    opaque.Draw();
+                }
 
                 DebugDrawBoundingBox(opaque);
             }
