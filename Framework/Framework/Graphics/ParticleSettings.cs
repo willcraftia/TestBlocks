@@ -115,6 +115,11 @@ namespace Willcraftia.Xna.Framework.Graphics
         public float MaxEndSize = 100;
 
         /// <summary>
+        /// テクスチャ。
+        /// </summary>
+        public Texture2D Texture = null;
+
+        /// <summary>
         /// アルファ ブレンディングの設定。
         /// </summary>
         public BlendState BlendState = BlendState.NonPremultiplied;

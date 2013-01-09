@@ -142,11 +142,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public string Name { get; private set; }
 
-        public ParticleSystem(ParticleSettings settings, Effect effect, Texture2D texture)
+        public ParticleSystem(ParticleSettings settings, Effect effect)
         {
             if (settings == null) throw new ArgumentNullException("settings");
             if (effect == null) throw new ArgumentNullException("effect");
-            if (texture == null) throw new ArgumentNullException("texture");
+            if (settings.Texture == null) throw new ArgumentException("Texture is null.");
 
             Enabled = true;
 
@@ -161,7 +161,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // エフェクト
 
             particleEffect = new ParticleEffect(effect);
-            particleEffect.Initialize(settings, texture);
+            particleEffect.Initialize(settings, settings.Texture);
 
             graphicsDevice = particleEffect.GraphicsDevice;
 

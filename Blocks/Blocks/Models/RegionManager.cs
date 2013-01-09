@@ -86,7 +86,11 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // 降雪パーティクル
 
+            // TODO
+            // これはバイオームで定義できるべきか？
             {
+                var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
+
                 var particleSettings = new ParticleSettings();
                 particleSettings.MaxParticles = 4000;
                 particleSettings.Duration = TimeSpan.FromSeconds(5);
@@ -106,12 +110,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 particleSettings.MaxStartSize = 0.5f;
                 particleSettings.MinEndSize = 0.2f;
                 particleSettings.MaxEndSize = 0.2f;
+                particleSettings.Texture = LoadAsset<Texture2D>("content:Textures/Snow/Snow");
                 particleSettings.BlendState = BlendState.AlphaBlend;
 
-                var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
-                var snowSprite = LoadAsset<Texture2D>("content:Textures/Snow/Snow");
-
-                snowParticleSystem = new ParticleSystem(particleSettings, particleEffect, snowSprite);
+                snowParticleSystem = new ParticleSystem(particleSettings, particleEffect);
 
                 sceneManager.ParticleSystems.Add(snowParticleSystem);
             }
