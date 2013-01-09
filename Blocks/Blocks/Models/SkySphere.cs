@@ -150,6 +150,10 @@ namespace Willcraftia.Xna.Blocks.Models
             Effect.Apply();
 
             GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
+
+            // スカイ スフィアはシェーダ内で CW で描画するため、念のためデフォルトへ戻しておく。
+            // しかし、なるべく各シェーダ内で CullMode を明示する。
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
         }
 
         public override void Draw(Effect effect)
