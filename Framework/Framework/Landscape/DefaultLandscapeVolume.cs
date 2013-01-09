@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace Willcraftia.Xna.Framework.Landscape
 {
-    internal sealed class DefaultLandscapeVolume : ILandscapeVolume
+    public sealed class DefaultLandscapeVolume : ILandscapeVolume
     {
         VectorI3 center;
 

@@ -19,21 +19,160 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     public abstract class PartitionManager : IDisposable
     {
-        public const int ClusterExtent = 8;
+        #region Settings
 
-        public const int InitialActivePartitionCapacity = 5000;
+        public sealed class Settings
+        {
+            Vector3 partitionSize;
 
-        public const int InitialActiveClusterPartitionCapacity = 50;
+            int partitionPoolMaxCapacity = 0;
 
-        public const int DefaultTaskQueueSlotCount = 50;
+            int clusterExtent = 8;
 
-        public const int DefaultActivationCapacity = 100;
+            int initialActivePartitionCapacity = 5000;
 
-        public const int DefaultPassivationCapacity = 1000;
+            int initialActiveClusterCapacity = 50;
 
-        public const int DefaultPassivationSearchCapacity = 200;
+            int initialActivationCapacity = 100;
 
-        public const int DefaultActivationSearchCapacity = 100;
+            int initialPassivationCapacity = 1000;
+
+            int activationSearchCapacity = 100;
+
+            int passivationSearchCapacity = 200;
+
+            int activationTaskQueueSlotCount = 50;
+
+            int passivationTaskQueueSlotCount = 50;
+
+            public Vector3 PartitionSize
+            {
+                get { return partitionSize; }
+                set
+                {
+                    if (value.X < 0 || value.Y < 0 || value.Z < 0)
+                        throw new ArgumentOutOfRangeException("value");
+
+                    partitionSize = value;
+                }
+            }
+
+            public int PartitionPoolMaxCapacity
+            {
+                get { return partitionPoolMaxCapacity; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    partitionPoolMaxCapacity = value;
+                }
+            }
+
+            public int ClusterExtent
+            {
+                get { return clusterExtent; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    clusterExtent = value;
+                }
+            }
+
+            public int InitialActivePartitionCapacity
+            {
+                get { return initialActivePartitionCapacity; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    initialActivePartitionCapacity = value;
+                }
+            }
+
+            public int InitialActiveClusterCapacity
+            {
+                get { return initialActiveClusterCapacity; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    initialActiveClusterCapacity = value;
+                }
+            }
+
+            public int InitialActivationCapacity
+            {
+                get { return initialActivationCapacity; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    initialActivationCapacity = value;
+                }
+            }
+
+            public int InitialPassivationCapacity
+            {
+                get { return initialPassivationCapacity; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    initialPassivationCapacity = value;
+                }
+            }
+
+            public int ActivationTaskQueueSlotCount
+            {
+                get { return activationTaskQueueSlotCount; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    activationTaskQueueSlotCount = value;
+                }
+            }
+
+            public int PassivationTaskQueueSlotCount
+            {
+                get { return passivationTaskQueueSlotCount; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    passivationTaskQueueSlotCount = value;
+                }
+            }
+
+            public ILandscapeVolume MinLandscapeVolume { get; set; }
+
+            public ILandscapeVolume MaxLandscapeVolume { get; set; }
+
+            public int ActivationSearchCapacity
+            {
+                get { return activationSearchCapacity; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    activationSearchCapacity = value;
+                }
+            }
+
+            public int PassivationSearchCapacity
+            {
+                get { return passivationSearchCapacity; }
+                set
+                {
+                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                    passivationSearchCapacity = value;
+                }
+            }
+        }
+
+        #endregion
 
         Vector3 partitionSize;
 
@@ -44,48 +183,36 @@ namespace Willcraftia.Xna.Framework.Landscape
         // 効率のためにキュー構造を採用。
         // 全件対象の処理が大半であり、リストでは削除のたびに配列コピーが発生して無駄。
 
-        // TODO
-        // 初期容量。
+        ClusteredPartitionQueue activePartitions;
 
-        ClusteredPartitionQueue activePartitions = new ClusteredPartitionQueue(
-            ClusterExtent,
-            InitialActiveClusterPartitionCapacity,
-            InitialActivePartitionCapacity);
+        PartitionQueue activatingPartitions;
 
-        PartitionQueue activatingPartitions = new PartitionQueue(DefaultActivationCapacity);
-
-        PartitionQueue passivatingPartitions = new PartitionQueue(DefaultPassivationCapacity);
+        PartitionQueue passivatingPartitions;
 
         // 同時アクティブ化許容量。
-        int activationCapacity = DefaultActivationCapacity;
+        int activationCapacity;
 
         // 同時非アクティブ化許容量。
-        int passivationCapacity = DefaultPassivationCapacity;
-
-        // 非アクティブ化可能パーティション検索の最大試行数。
-        int passivationSearchCapacity = DefaultPassivationSearchCapacity;
+        int passivationCapacity;
 
         // アクティブ化可能パーティション検索の最大試行数。
-        int activationSearchCapacity = DefaultActivationSearchCapacity;
+        int activationSearchCapacity;
+
+        // 非アクティブ化可能パーティション検索の最大試行数。
+        int passivationSearchCapacity;
 
         // アクティブ化可能パーティション検索の開始インデックス。
         int activationSearchOffset = 0;
 
-        TaskQueue activationTaskQueue = new TaskQueue
-        {
-            SlotCount = DefaultTaskQueueSlotCount
-        };
+        TaskQueue activationTaskQueue = new TaskQueue();
 
-        TaskQueue passivationTaskQueue = new TaskQueue
-        {
-            SlotCount = DefaultTaskQueueSlotCount
-        };
-
-        // 最大アクティブ領域。
-        ILandscapeVolume maxActiveBounds;
+        TaskQueue passivationTaskQueue = new TaskQueue();
 
         // 最小アクティブ領域。
-        ILandscapeVolume minActiveBounds;
+        ILandscapeVolume minLandscapeVolume;
+
+        // 最大アクティブ領域。
+        ILandscapeVolume maxLandscapeVolume;
 
         // 最小アクティブ領域に含まれる座標の配列。
         VectorI3[] minActivePointOffsets;
@@ -108,57 +235,44 @@ namespace Willcraftia.Xna.Framework.Landscape
             set { passivationTaskQueue.SlotCount = value; }
         }
 
-        public int PoolMaxCapacity
-        {
-            get { return partitionPool.MaxCapacity; }
-            set { partitionPool.MaxCapacity = value; }
-        }
-
-        // activatingPartitions のキュー内配列のサイズの拡大を抑制するための制限。
-        public int ActivationCapacity
-        {
-            get { return activationCapacity; }
-            set
-            {
-                if (value < 0) throw new ArgumentOutOfRangeException("value");
-                activationCapacity = value;
-            }
-        }
-
-        public int PassivationCapacity
-        {
-            get { return passivationCapacity; }
-            set
-            {
-                if (value < 0) throw new ArgumentOutOfRangeException("value");
-                passivationCapacity = value;
-            }
-        }
-
         public PartitionManagerMonitor Monitor { get; private set; }
 
-        public PartitionManager(Vector3 partitionSize)
+        public PartitionManager(Settings settings)
         {
-            this.partitionSize = partitionSize;
+            if (settings == null) throw new ArgumentNullException("settings");
+
+            partitionSize = settings.PartitionSize;
 
             inversePartitionSize.X = 1 / partitionSize.X;
             inversePartitionSize.Y = 1 / partitionSize.Y;
             inversePartitionSize.Z = 1 / partitionSize.Z;
 
             partitionPool = new Pool<Partition>(CreatePartition);
+            partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
+
+            activePartitions = new ClusteredPartitionQueue(
+                settings.ClusterExtent,
+                settings.InitialActiveClusterCapacity,
+                settings.InitialActivePartitionCapacity);
+
+            activationCapacity = settings.InitialActivationCapacity;
+            passivationCapacity = settings.InitialPassivationCapacity;
+
+            activatingPartitions = new PartitionQueue(activationCapacity);
+            passivatingPartitions = new PartitionQueue(passivationCapacity);
+
+            activationTaskQueue.SlotCount = settings.ActivationTaskQueueSlotCount;
+            passivationTaskQueue.SlotCount = settings.PassivationTaskQueueSlotCount;
+
+            // null の場合はデフォルト実装を与える。
+            minLandscapeVolume = settings.MinLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
+            minActivePointOffsets = minLandscapeVolume.GetPoints();
+            maxLandscapeVolume = settings.MaxLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
+
+            activationSearchCapacity = settings.ActivationSearchCapacity;
+            passivationSearchCapacity = settings.PassivationSearchCapacity;
 
             Monitor = new PartitionManagerMonitor(this);
-        }
-
-        public void Initialize(int minActiveRange, int maxActiveRange)
-        {
-            if (minActiveRange < 0) throw new ArgumentOutOfRangeException("minActiveRange");
-            if (maxActiveRange < 0 || maxActiveRange <= minActiveRange)
-                throw new ArgumentOutOfRangeException("maxActiveRange");
-
-            maxActiveBounds = new DefaultLandscapeVolume(VectorI3.Zero, maxActiveRange);
-            minActiveBounds = new DefaultLandscapeVolume(VectorI3.Zero, minActiveRange);
-            minActivePointOffsets = minActiveBounds.GetPoints();
         }
 
         public void Update(ref Vector3 eyeWorldPosition)
@@ -177,7 +291,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             eyePosition.Z = MathExtension.Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
 
             // アクティブ領域を現在の視点位置を中心に設定。
-            maxActiveBounds.Center = eyePosition;
+            maxLandscapeVolume.Center = eyePosition;
 
             if (!Closing)
             {
@@ -382,7 +496,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (partition.IsInLandscapeVolume(maxActiveBounds))
+                    if (partition.IsInLandscapeVolume(maxLandscapeVolume))
                     {
                         // アクティブ状態維持領域内ならばアクティブ リストへ戻す。
                         activePartitions.Enqueue(partition);

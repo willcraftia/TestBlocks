@@ -3,9 +3,11 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework.Landscape;
 using Willcraftia.Xna.Blocks.Landscape;
 using Willcraftia.Xna.Blocks.Content;
 
@@ -70,7 +72,6 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
             SceneManager = new SceneManager(graphicsDevice);
             RegionManager = new RegionManager(serviceProvider, SceneManager);
-            PartitionManager = new ChunkPartitionManager(RegionManager);
         }
 
         public void Initialize()
@@ -229,7 +230,16 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // パーティション マネージャ
 
-            PartitionManager.Initialize(PartitionMinActiveRange, PartitionMaxActiveRange);
+            // TODO
+            var partitionManagerSettings = new PartitionManager.Settings
+            {
+                PartitionSize = Chunk.Size.ToVector3(),
+                MinLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, PartitionMinActiveRange),
+                MaxLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, PartitionMaxActiveRange)
+            };
+
+            PartitionManager = new ChunkPartitionManager(partitionManagerSettings, RegionManager);
+            //PartitionManager.Initialize(PartitionMinActiveRange, PartitionMaxActiveRange);
         }
 
         // TODO: 戻り値を Region にしない。
