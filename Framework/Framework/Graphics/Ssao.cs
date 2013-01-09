@@ -16,24 +16,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
-            public const bool DefaultEnabled = true;
-
-            public const float DefaultMapScale = 1;
-
-            float mapScale = DefaultMapScale;
-
-            /// <summary>
-            /// スクリーン スペース アンビエント オクルージョンが有効か否かを示す値を取得または設定します。
-            /// </summary>
-            /// <value>
-            /// true (スクリーン スペース アンビエント オクルージョンが有効な場合)、false (それ以外の場合)。
-            /// </value>
-            public bool Enabled { get; set; }
-
-            /// <summary>
-            /// ブラー設定を取得します。
-            /// </summary>
-            public BlurSettings Blur { get; private set; }
+            // 精度の低下により見栄えが大きく劣化するため、1 が無難。
+            float mapScale = 1;
 
             /// <summary>
             /// 実スクリーンに対する法線深度マップのスケールを取得または設定します。
@@ -49,9 +33,13 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
             }
 
+            /// <summary>
+            /// ブラー設定を取得します。
+            /// </summary>
+            public BlurSettings Blur { get; private set; }
+
             public Settings()
             {
-                Enabled = DefaultEnabled;
                 Blur = new BlurSettings();
             }
         }

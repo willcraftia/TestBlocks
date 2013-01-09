@@ -1,6 +1,6 @@
 {
+  "ShadowMapEnabled": true,
   "ShadowMap": {
-    "Enabled": true,
     "Technique": 0,
     "Size": 2048,
     "DepthBias": 0.0005,
@@ -12,41 +12,44 @@
       "Amount": 1.0
     }
   },
+  "SssmEnabled": false,
   "Sssm": {
-    "Enabled": false,
+    "MapScale": 0.5,
     "BlurEnabled": true,
     "Blur": {
       "Radius": 1,
       "Amount": 1.0
-    },
-    "MapScale": 0.5
+    }
   },
+  "SsaoEnabled": true,
   "Ssao": {
-    "Enabled": true,
     "MapScale": 1.0,
     "Blur": {
       "Radius": 1,
       "Amount": 1.0
     }
   },
+  "EdgeEnabled": false,
   "Edge": {
-    "Enabled": false,
     "MapScale": 0.5
   },
+  "BloomEnabled": false,
   "Bloom": {
-    "Enabled": false,
     "MapScale": 0.25,
     "Blur": {
       "Radius": 1,
       "Amount": 4.0
     }
   },
+  "DofEnabled": true,
   "Dof": {
-    "Enabled": true,
     "MapScale": 0.5,
     "Blur": {
       "Radius": 1,
       "Amount": 1.0
     }
-  }
+  },
+  "ColorOverlapEnabled": false,
+  "MonochromeEnabled": false,
+  "LensFlareEnabled": true
 }

@@ -1,6 +1,6 @@
 ﻿<GraphicsSettingsDefinition>
+	<ShadowMapEnabled>true</ShadowMapEnabled>
 	<ShadowMap>
-		<Enabled>true</Enabled>
 		<Technique>Classic</Technique>
 		<Size>2048</Size>
 		<DepthBias>0.0005</DepthBias>
@@ -12,41 +12,44 @@
 			<Amount>1</Amount>
 		</VsmBlur>
 	</ShadowMap>
+	<SssmEnabled>false</SssmEnabled>
 	<Sssm>
-		<Enabled>false</Enabled>
+		<MapScale>0.5</MapScale>
 		<BlurEnabled>true</BlurEnabled>
 		<Blur>
 			<Radius>1</Radius>
 			<Amount>1</Amount>
 		</Blur>
-		<MapScale>0.5</MapScale>
 	</Sssm>
+	<SsaoEnabled>true</SsaoEnabled>
 	<Ssao>
-		<Enabled>true</Enabled>
 		<MapScale>1</MapScale>
 		<Blur>
 			<Radius>1</Radius>
 			<Amount>1</Amount>
 		</Blur>
 	</Ssao>
+	<EdgeEnabled>false</EdgeEnabled>
 	<Edge>
-		<Enabled>false</Enabled>
 		<MapScale>0.5</MapScale>
 	</Edge>
+	<BloomEnabled>false</BloomEnabled>
 	<Bloom>
-		<Enabled>false</Enabled>
 		<MapScale>0.25</MapScale>
 		<Blur>
 			<Radius>1</Radius>
 			<Amount>4</Amount>
 		</Blur>
 	</Bloom>
+	<DofEnabled>true</DofEnabled>
 	<Dof>
-		<Enabled>true</Enabled>
 		<MapScale>0.5</MapScale>
 		<Blur>
 			<Radius>1</Radius>
 			<Amount>1</Amount>
 		</Blur>
 	</Dof>
+	<ColorOverlapEnabled>false</ColorOverlapEnabled>
+	<MonochromeEnabled>false</MonochromeEnabled>
+	<LensFlareEnabled>true</LensFlareEnabled>
 </GraphicsSettingsDefinition>

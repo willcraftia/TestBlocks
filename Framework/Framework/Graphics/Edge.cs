@@ -16,19 +16,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
-            public const bool DefaultEnabled = false;
-
-            public const float DefaultMapScale = 1;
-
-            float mapScale = DefaultMapScale;
-
-            /// <summary>
-            /// エッジ強調が有効か否かを示す値を取得または設定します。
-            /// </summary>
-            /// <value>
-            /// true (エッジ強調が有効な場合)、false (それ以外の場合)。
-            /// </value>
-            public bool Enabled { get; set; }
+            // 精度を下げる程にエッジのギザギザが目立つようになるため、1 が無難。
+            float mapScale = 1;
 
             /// <summary>
             /// 実スクリーンに対する法線深度マップのスケールを取得または設定します。
@@ -42,11 +31,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                     mapScale = value;
                 }
-            }
-
-            public Settings()
-            {
-                Enabled = DefaultEnabled;
             }
         }
 

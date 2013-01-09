@@ -190,11 +190,6 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneSettings.Update(gameTime);
 
             //----------------------------------------------------------------
-            // スカイ スフィアの更新（視点位置へ移動させるため）
-
-            skySphere.Update();
-
-            //----------------------------------------------------------------
             // リージョン
 
             foreach (var region in regions) region.Update();

@@ -10,8 +10,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
 {
     public struct ShadowMapSettingsDefinition
     {
-        public bool Enabled;
-
         public ShadowMap.Techniques Technique;
 
         public int Size;

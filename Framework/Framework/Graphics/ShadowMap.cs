@@ -48,12 +48,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
-            public const bool DefaultEnabled = true;
-
-            //public const int DefaultSize = 512;
-            //public const int DefaultSize = 1024;
-            public const int DefaultSize = 2048;
-
             // メモ
             //
             // VSM が最も綺麗な影となるが、最前面以外の分割視錐台で深度テストが上手くいっていない。
@@ -65,43 +59,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             // 最も無難な設定が Classic であり、ライト ブリーディングを解決できるならば VSM。
             //
 
-            public const SurfaceFormat DefaultFormat = SurfaceFormat.Single;
-
-            public const ShadowMap.Techniques DefaultTechnique = ShadowMap.Techniques.Classic;
-
-            // シャドウ マップのサイズに従って適切な値が変わるので注意。
-            // シャドウ マップ サイズを小さくすると、より大きな深度バイアスが必要。
-            public const float DefaultDepthBias = 0.0005f;
-
             public const int MinSplitCount = 1;
 
             public const int MaxSplitCount = 3;
 
-            public const int DefaultSplitCount = 3;
+            int size = 2048;
 
-            public const float DefaultSplitLambda = 0.5f;
+            Techniques technique = Techniques.Classic;
 
-            ShadowMap.Techniques technique = DefaultTechnique;
+            SurfaceFormat format = SurfaceFormat.Single;
 
-            int size = DefaultSize;
-
-            SurfaceFormat format = DefaultFormat;
-
-            float depthBias = DefaultDepthBias;
+            float depthBias = 0.0005f;
 
             float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
 
-            int splitCount = DefaultSplitCount;
+            int splitCount = 3;
 
-            float splitLambda = DefaultSplitLambda;
-
-            /// <summary>
-            /// シャドウ処理が有効かどうかを示す値を取得または設定します。
-            /// </summary>
-            /// <value>
-            /// true (シャドウ処理が有効)、false (それ以外の場合)。
-            /// </value>
-            public bool Enabled { get; set; }
+            float splitLambda = 0.5f;
 
             /// <summary>
             /// シャドウ マップ生成方法の種類を取得または設定します。
@@ -140,7 +114,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             /// <summary>
-            /// シャドウ マップの SurfaceFormat を取得または設定します。
+            /// シャドウ マップの SurfaceFormat を取得します。
+            /// シャドウ マップの SurfaceFormat はシャドウ マップ生成方法により決定され、
+            /// Classic および Pcf の場合は SurfaceFormat.Single、
+            /// Vsm の場合は SurfaceFormat.Vector2 となります。
             /// </summary>
             public SurfaceFormat Format
             {
@@ -149,6 +126,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             /// <summary>
             /// シャドウ マップの深度バイアスを取得または設定します。
+            /// シャドウ マップのサイズにより深度の精度が変わるため、適切な値はサイズにより異なります。
+            /// より小さいサイズのシャドウ マップを用いる場合、より大きな深度バイアスが必要となります。
             /// </summary>
             public float DepthBias
             {
@@ -163,6 +142,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             /// <summary>
             /// シャドウ マップ描画で使用するカメラの FarPlaneDistance を取得または設定します。
+            /// 遠方に描画するオブジェクトに対して投影する必要はほとんどないため、
+            /// シーン描画で用いるカメラの FarPlaneDistance よりも短い距離となるように設定します。
             /// </summary>
             public float FarPlaneDistance
             {
@@ -191,6 +172,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             /// <summary>
             /// シャドウ マップ分割ラムダ値を取得または設定します。
+            /// 分割ラムダ値は、分割視錐台間での重なりの度合いを決定します。
             /// </summary>
             public float SplitLambda
             {
@@ -210,7 +192,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             public Settings()
             {
-                Enabled = DefaultEnabled;
                 VsmBlur = new BlurSettings();
             }
         }

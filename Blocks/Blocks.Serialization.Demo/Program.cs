@@ -860,9 +860,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var settings = new GraphicsSettingsDefinition
                 {
+                    ShadowMapEnabled = true,
                     ShadowMap = new ShadowMapSettingsDefinition
                     {
-                        Enabled = true,
                         Technique = ShadowMap.Techniques.Classic,
                         Size = 2048,
                         DepthBias = 0.0005f,
@@ -875,9 +875,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Amount = 1
                         }
                     },
+                    SssmEnabled = false,
                     Sssm = new SssmSettingsDefinition
                     {
-                        Enabled = false,
                         MapScale = 0.5f,
                         BlurEnabled = true,
                         Blur = new BlurSettingsDefinition
@@ -886,9 +886,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Amount = 1
                         }
                     },
+                    SsaoEnabled = true,
                     Ssao = new SsaoSettingsDefinition
                     {
-                        Enabled = true,
                         MapScale = 1,
                         Blur = new BlurSettingsDefinition
                         {
@@ -896,14 +896,14 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Amount = 1
                         }
                     },
+                    EdgeEnabled = false,
                     Edge = new EdgeSettingsDefinition
                     {
-                        Enabled = false,
                         MapScale = 0.5f,
                     },
+                    BloomEnabled = false,
                     Bloom = new BloomSettingsDefinition
                     {
-                        Enabled = false,
                         MapScale = 0.25f,
                         Blur = new BlurSettingsDefinition
                         {
@@ -911,16 +911,19 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Amount = 4
                         }
                     },
+                    DofEnabled = true,
                     Dof = new DofSettingsDefinition
                     {
-                        Enabled = true,
                         MapScale = 0.5f,
                         Blur = new BlurSettingsDefinition
                         {
                             Radius = 1,
                             Amount = 1
                         }
-                    }
+                    },
+                    ColorOverlapEnabled = false,
+                    MonochromeEnabled = false,
+                    LensFlareEnabled = true,
                 };
                 var jsonResource = SerializeToJson<GraphicsSettingsDefinition>("GraphicsSettings", settings);
                 var xmlResource = SerializeToXml<GraphicsSettingsDefinition>("GraphicsSettings", settings);

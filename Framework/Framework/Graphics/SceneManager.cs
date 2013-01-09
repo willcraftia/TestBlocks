@@ -710,7 +710,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // スカイ スフィア
 
-            if (SkySphere != null && SkySphere.Visible) SkySphere.Draw();
+            if (SkySphere != null && SkySphere.Visible)
+            {
+                SkySphere.PreDraw();
+                SkySphere.Draw();
+            }
 
             Monitor.OnEndDrawSceneRendering();
 
@@ -804,7 +808,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // スカイ スフィア
 
-            if (SkySphere != null && SkySphere.Visible) SkySphere.Draw();
+            if (SkySphere != null && SkySphere.Visible)
+            {
+                SkySphere.PreDraw();
+                SkySphere.Draw();
+            }
 
             Monitor.OnEndDrawSceneRendering();
 

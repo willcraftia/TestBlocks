@@ -146,7 +146,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             RestoreRenderStates();
         }
 
-        public void UpdateOcclusion()
+        void UpdateOcclusion()
         {
             if (lightBehindCamera) return;
 
@@ -176,7 +176,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             occlusionQueryActive = true;
         }
 
-        public void DrawGlow()
+        void DrawGlow()
         {
             if (lightBehindCamera || occlusionAlpha <= 0) return;
 
@@ -189,7 +189,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             spriteBatch.End();
         }
 
-        public void DrawFlares()
+        void DrawFlares()
         {
             if (lightBehindCamera || occlusionAlpha <= 0) return;
 

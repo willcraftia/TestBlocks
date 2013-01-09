@@ -105,12 +105,8 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
             SceneManager.DirectionalLights.Add(SceneSettings.Moonlight);
 
-            const bool lensFlareEnabled = true;
-            const bool colorOverlapEnabled = false;
-            const bool monochromeEnabled = false;
-
             // シャドウ マップ
-            if (GraphicsSettings.ShadowMap.Enabled)
+            if (GraphicsSettings.ShadowMapEnabled)
             {
                 var shadowMapEffect = LoadAsset<Effect>("content:Effects/ShadowMap");
                 var blurEffect = LoadAsset<Effect>("content:Effects/Blur");
@@ -121,7 +117,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // レンズ フレア
-            if (lensFlareEnabled)
+            if (GraphicsSettings.LensFlareEnabled)
             {
                 var glowSpite = LoadAsset<Texture2D>("content:Textures/LensFlare/Glow");
                 Texture2D[] flareSprites =
@@ -137,7 +133,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // スクリーン スペース シャドウ マッピング
-            if (GraphicsSettings.Sssm.Enabled)
+            if (GraphicsSettings.SssmEnabled)
             {
                 // スクリーン スペース シャドウ マッピング モジュール
                 var shadowSceneEffect = LoadAsset<Effect>("content:Effects/ShadowScene");
@@ -154,7 +150,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // スクリーン スペース アンビエント オクルージョン
-            if (GraphicsSettings.Ssao.Enabled)
+            if (GraphicsSettings.SsaoEnabled)
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var ssaoMapEffect = LoadAsset<Effect>("content:Effects/SsaoMap");
@@ -169,7 +165,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // エッジ強調
-            if (GraphicsSettings.Edge.Enabled)
+            if (GraphicsSettings.EdgeEnabled)
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var edgeEffect = LoadAsset<Effect>("content:Effects/Edge");
@@ -180,7 +176,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // ブルーム
-            if (GraphicsSettings.Bloom.Enabled)
+            if (GraphicsSettings.BloomEnabled)
             {
                 var bloomExtractEffect = LoadAsset<Effect>("content:Effects/BloomExtract");
                 var bloomEffect = LoadAsset<Effect>("content:Effects/Bloom");
@@ -192,7 +188,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // 被写界深度
-            if (GraphicsSettings.Dof.Enabled)
+            if (GraphicsSettings.DofEnabled)
             {
                 var depthMapEffect = LoadAsset<Effect>("content:Effects/DepthMap");
                 var dofEffect = LoadAsset<Effect>("content:Effects/Dof");
@@ -204,7 +200,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // カラー オーバラップ
-            if (colorOverlapEnabled)
+            if (GraphicsSettings.ColorOverlapEnabled)
             {
                 ColorOverlap = new ColorOverlap(spriteBatch);
 
@@ -212,7 +208,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // モノクローム
-            if (monochromeEnabled)
+            if (GraphicsSettings.MonochromeEnabled)
             {
                 var monochromeEffect = LoadAsset<Effect>("content:Effects/Monochrome");
 
@@ -298,7 +294,8 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // シーン マネージャ
 
-            SceneManager.BackgroundColor = SceneSettings.SkyColor;
+            //SceneManager.BackgroundColor = SceneSettings.SkyColor;
+            SceneManager.BackgroundColor = Vector3.One;
             SceneManager.Draw(gameTime);
         }
 
