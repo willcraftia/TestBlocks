@@ -1,7 +1,7 @@
 //=============================================================================
 // Variables
 //-----------------------------------------------------------------------------
-float4x4 WorldViewProjection;
+float4x4 ViewProjection;
 
 float3 SkyColor;
 
@@ -36,7 +36,7 @@ VSOutput VS(VSInput input)
 {
     VSOutput output;
 
-    output.Position = mul(input.Position, WorldViewProjection);
+    output.Position = mul(input.Position, ViewProjection);
     output.Normal = input.Normal;
 
     return output;
@@ -53,7 +53,7 @@ float4 PS(VSOutput input) : COLOR0
     // ‘¾—z‚Ì‹t•ûŒü‚Í 0 ‚Æ‚µ‚Ä”jŠü
     float amount = saturate(dot(normalize(input.Normal), SunDirection)) * SunVisible;
 
-    // (1 - SunThreshold) ˆÈãˆê’v‚µ‚Ä‚¢‚é”ÍˆÍ‚È‚ç‚Î‘¾—z‚Ì”ÍˆÍ
+    // SunThreshold ‚©‚ç‘¾—z‚Ì”ÍˆÍ‚ğZo
     amount -= SunThreshold;
     amount = saturate(amount);
     amount *= 1 / (1 - SunThreshold);

@@ -18,7 +18,7 @@ namespace Willcraftia.Xna.Blocks.Models
         //====================================================================
         // EffectParameter
 
-        EffectParameter worldViewProjection;
+        EffectParameter viewProjection;
 
         EffectParameter skyColor;
 
@@ -40,10 +40,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectPass currentPass;
 
-        public Matrix WorldViewProjection
+        public Matrix ViewProjection
         {
-            get { return worldViewProjection.GetValueMatrix(); }
-            set { worldViewProjection.SetValue(value); }
+            get { return viewProjection.GetValueMatrix(); }
+            set { viewProjection.SetValue(value); }
         }
 
         public Vector3 SkyColor
@@ -82,7 +82,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.effect = effect;
 
-            worldViewProjection = effect.Parameters["WorldViewProjection"];
+            viewProjection = effect.Parameters["ViewProjection"];
             skyColor = effect.Parameters["SkyColor"];
             sunDirection = effect.Parameters["SunDirection"];
             sunDiffuseColor = effect.Parameters["SunDiffuseColor"];

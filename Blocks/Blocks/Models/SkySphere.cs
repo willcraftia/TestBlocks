@@ -110,7 +110,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix viewProjection;
             Matrix.Multiply(ref view, ref projection, out viewProjection);
 
-            Effect.WorldViewProjection = viewProjection;
+            Effect.ViewProjection = viewProjection;
 
             GraphicsDevice.SetVertexBuffer(sphereMesh.VertexBuffer);
             GraphicsDevice.Indices = sphereMesh.IndexBuffer;
