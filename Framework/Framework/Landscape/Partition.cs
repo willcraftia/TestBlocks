@@ -10,6 +10,9 @@ using Willcraftia.Xna.Framework;
 
 namespace Willcraftia.Xna.Framework.Landscape
 {
+    /// <summary>
+    /// パーティションを表すクラスです。
+    /// </summary>
     public abstract class Partition : IDisposable
     {
         /// <summary>
@@ -18,21 +21,36 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
 
+        /// <summary>
+        /// パーティション空間でのパーティションの位置。
+        /// </summary>
         VectorI3 position;
 
+        /// <summary>
+        /// アクティブ化が完了しているか否かを示す値。
+        /// </summary>
         volatile bool activationCompleted;
 
+        /// <summary>
+        /// アクティブ化が取り消されているか否かを示す値。
+        /// </summary>
         volatile bool activationCanceled;
 
+        /// <summary>
+        /// 非アクティブ化が完了しているか否かを示す値。
+        /// </summary>
         volatile bool passivationCompleted;
 
+        /// <summary>
+        /// 非アクティブ化が取り消されているか否かを示す値。
+        /// </summary>
         volatile bool passivationCanceled;
 
         /// <summary>
-        /// 座標を取得します。
+        /// パーティションの位置を取得します。
         /// </summary>
         /// <value>
-        /// パーティション空間における座標。
+        /// パーティション空間でのパーティションの位置。
         /// </value>
         public VectorI3 Position
         {
@@ -103,12 +121,22 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal Action PassivateAction { get; private set; }
 
+        /// <summary>
+        /// インスタンスを生成します。
+        /// </summary>
         protected Partition()
         {
             ActivateAction = new Action(Activate);
             PassivateAction = new Action(Passivate);
         }
 
+        /// <summary>
+        /// アクティブ パーティション領域に含まれるか否かを検査します。
+        /// </summary>
+        /// <param name="volume">アクティブ パーティション領域。</param>
+        /// <returns>
+        /// true (アクティブ パーティション領域に含まれる場合)、false (それ以外の場合)。
+        /// </returns>
         internal bool IsInLandscapeVolume(ILandscapeVolume volume)
         {
             bool result;

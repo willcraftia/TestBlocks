@@ -174,69 +174,120 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         #endregion
 
+        /// <summary>
+        /// ワールド空間でのパーティションのサイズ。
+        /// </summary>
         Vector3 partitionSize;
 
+        /// <summary>
+        /// 1 / partitionSize。
+        /// </summary>
         Vector3 inversePartitionSize;
 
+        /// <summary>
+        /// パーティションのプール。
+        /// </summary>
         Pool<Partition> partitionPool;
 
         // 効率のためにキュー構造を採用。
         // 全件対象の処理が大半であり、リストでは削除のたびに配列コピーが発生して無駄。
 
+        /// <summary>
+        /// アクティブなパーティションのキュー。
+        /// </summary>
         ClusteredPartitionQueue activePartitions;
 
+        /// <summary>
+        /// アクティブ化中パーティションのキュー。
+        /// </summary>
         PartitionQueue activatingPartitions;
 
+        /// <summary>
+        /// 非アクティブ化中パーティションのキュー。
+        /// </summary>
         PartitionQueue passivatingPartitions;
 
-        // 同時アクティブ化許容量。
+        /// <summary>
+        /// 同時アクティブ化許容量。
+        /// </summary>
         int activationCapacity;
 
-        // 同時非アクティブ化許容量。
+        /// <summary>
+        /// 同時非アクティブ化許容量。
+        /// </summary>
         int passivationCapacity;
 
-        // アクティブ化可能パーティション検索の最大試行数。
+        /// <summary>
+        /// アクティブ化可能パーティション検索の最大試行数。
+        /// </summary>
         int activationSearchCapacity;
 
-        // 非アクティブ化可能パーティション検索の最大試行数。
+        /// <summary>
+        /// 非アクティブ化可能パーティション検索の最大試行数。
+        /// </summary>
         int passivationSearchCapacity;
 
-        // アクティブ化可能パーティション検索の開始インデックス。
+        /// <summary>
+        /// アクティブ化可能パーティション検索の開始インデックス。
+        /// </summary>
         int activationSearchOffset = 0;
 
+        /// <summary>
+        /// パーティションのアクティブ化タスク キュー。
+        /// </summary>
         TaskQueue activationTaskQueue = new TaskQueue();
 
+        /// <summary>
+        /// パーティションの非アクティブ化タスク キュー。
+        /// </summary>
         TaskQueue passivationTaskQueue = new TaskQueue();
 
-        // 最小アクティブ領域。
+        /// <summary>
+        /// 最小アクティブ領域。
+        /// </summary>
         ILandscapeVolume minLandscapeVolume;
 
-        // 最大アクティブ領域。
+        /// <summary>
+        /// 最大アクティブ領域。
+        /// </summary>
         ILandscapeVolume maxLandscapeVolume;
 
-        // 最小アクティブ領域に含まれる座標の配列。
+        /// <summary>
+        /// 最小アクティブ領域に含まれる座標の配列。
+        /// </summary>
         VectorI3[] minActivePointOffsets;
 
+        /// <summary>
+        /// パーティション空間での視点の位置。
+        /// </summary>
         VectorI3 eyePosition;
 
+        /// <summary>
+        /// クローズ処理中であるか否かを示す値を取得します。
+        /// </summary>
+        /// <value>
+        /// true (クローズ処理中である場合)、false (それ以外の場合)。
+        /// </value>
         public bool Closing { get; private set; }
 
+        /// <summary>
+        /// クローズ処理が完了しているか否かを示す値を取得します。
+        /// </summary>
+        /// <value>
+        /// true (クローズ処理が完了している場合)、false (それ以外の場合)。
+        /// </value>
         public bool Closed { get; private set; }
 
-        public int ActivationTaskQueueSlotCount
-        {
-            get { return activationTaskQueue.SlotCount; }
-            set { activationTaskQueue.SlotCount = value; }
-        }
-
-        public int PassivationTaskQueueSlotCount
-        {
-            get { return passivationTaskQueue.SlotCount; }
-            set { passivationTaskQueue.SlotCount = value; }
-        }
-
+        /// <summary>
+        /// モニタを取得します。
+        /// </summary>
         public PartitionManagerMonitor Monitor { get; private set; }
 
+        /// <summary>
+        /// インスタンスを生成します。
+        /// 指定する設定は、パーティション マネージャのインスタンス化後に外部から変更しても反映されません。
+        /// </summary>
+        /// <param name="settings">パーティション マネージャ設定。</param>
         public PartitionManager(Settings settings)
         {
             if (settings == null) throw new ArgumentNullException("settings");
@@ -275,6 +326,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             Monitor = new PartitionManagerMonitor(this);
         }
 
+        /// <summary>
+        /// パーティションのアクティブ化と非アクティブ化を行います。
+        /// </summary>
+        /// <param name="eyeWorldPosition">ワールド空間での視点の位置。</param>
         public void Update(ref Vector3 eyeWorldPosition)
         {
             if (Closed) return;
@@ -332,6 +387,14 @@ namespace Willcraftia.Xna.Framework.Landscape
             Monitor.OnEndUpdate();
         }
 
+        /// <summary>
+        /// パーティション マネージャをクローズします。
+        /// クローズ処理が開始すると、パーティションのアクティブ化は完全に停止し、
+        /// アクティブ化中のパーティションはその処理が破棄され、
+        /// アクティブなパーティションは全て非アクティブ化されます。
+        /// なお、非アクティブ化は非同期に行われるため、
+        /// クローズ処理の完了は Closed プロパティで確認する必要があります。
+        /// </summary>
         public void Close()
         {
             if (Closing || Closed) return;
@@ -340,22 +403,54 @@ namespace Willcraftia.Xna.Framework.Landscape
             OnClosing();
         }
 
+        /// <summary>
+        /// 事前にパーティション プールにインスタンスを生成する場合に、
+        /// サブクラスのコンストラクタで呼び出します。
+        /// </summary>
+        /// <param name="initialCapacity">パーティション プールの初期容量。</param>
         protected void PrepareInitialPartitions(int initialCapacity)
         {
             partitionPool.Prepare(initialCapacity);
         }
 
+        /// <summary>
+        /// クローズ処理が開始する時に呼び出されます。
+        /// </summary>
         protected virtual void OnClosing() { }
 
+        /// <summary>
+        /// クローズ処理が完了した時に呼び出されます。
+        /// </summary>
         protected virtual void OnClosed() { }
 
+        /// <summary>
+        /// パーティション プールでパーティションの新規生成が必要となる際に呼び出されます。
+        /// </summary>
+        /// <returns>パーティション。</returns>
         protected abstract Partition CreatePartition();
 
+        /// <summary>
+        /// パーティションをアクティブ化可能であるか否かを検査します。
+        /// パーティション マネージャは、アクティブ領域の観点からアクティブ化すべきパーティションの位置を決定しますが、
+        /// 実際にその位置にパーティションが存在するか否かは実装によります。
+        /// </summary>
+        /// <param name="position">アクティブ化しようとするパーティションの位置。</param>
+        /// <returns>
+        /// true (指定の位置でパーティションをアクティブ化できる場合)、false (それ以外の場合)。
+        /// </returns>
         protected virtual bool CanActivatePartition(ref VectorI3 position)
         {
             return true;
         }
 
+        /// <summary>
+        /// 非同期に実行されている非アクティブ化の完了を検査します。
+        /// 非アクティブ化の完了には、成功と取消が存在します。
+        /// 非アクティブ化が成功している場合には、
+        /// 対象のパーティションは非アクティブ化中リストから削除され、プールへ戻されます。
+        /// 非アクティブ化が取り消されている場合には、
+        /// 対象のパーティションは非アクティブ化中リストから削除され、アクティブ リストへ戻されます。
+        /// </summary>
         void CheckPassivationCompleted()
         {
             Monitor.OnBeginCheckPassivationCompleted();
@@ -394,6 +489,14 @@ namespace Willcraftia.Xna.Framework.Landscape
             Monitor.OnEndCheckPassivationCompleted();
         }
 
+        /// <summary>
+        /// 非同期に実行されているアクティブ化の完了を検査します。
+        /// アクティブ化の完了には、成功と取消が存在します。
+        /// アクティブ化が成功している場合には、
+        /// 対象のパーティションはアクティブ化中リストから削除され、アクティブ リストへ追加されます。
+        /// アクティブ化が取り消されている場合には、
+        /// 対象のパーティションはアクティブ化中リストから削除され、プールへ戻されます。
+        /// </summary>
         void CheckActivationCompleted()
         {
             Monitor.OnBeginCheckActivationCompleted();
@@ -429,6 +532,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             Monitor.OnEndCheckActivationCompleted();
         }
 
+        /// <summary>
+        /// パーティションが非アクティブ化された事を隣接パーティションへ通知します。
+        /// </summary>
+        /// <param name="partition">非アクティブ化されたパーティション。</param>
         void NortifyNeighborPassivated(Partition partition)
         {
             var position = partition.Position;
@@ -453,6 +560,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
+        /// <summary>
+        /// パーティションがアクティブ化された事を隣接パーティションへ通知します。
+        /// </summary>
+        /// <param name="partition">アクティブ化されたパーティション。</param>
         void NotifyNeighborActivated(Partition partition)
         {
             var position = partition.Position;
@@ -481,6 +592,14 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
+        /// <summary>
+        /// パーティションの非アクティブ化を試行します。
+        /// 非アクティブ化すべきと判定されたパーティションは、
+        /// 非アクティブ化中リストへ追加され、
+        /// 非同期に非アクティブ化を実行するためのタスク キューへ追加されます。
+        /// なお、同時に非アクティブ化可能なパーティションの数には上限があり、
+        /// 上限に到達した場合には、このフレームでの非アクティブ化は保留されます。
+        /// </summary>
         void PassivatePartitions()
         {
             Monitor.OnBeginPassivatePartitions();
@@ -514,6 +633,14 @@ namespace Willcraftia.Xna.Framework.Landscape
             Monitor.OnEndPassivatePartitions();
         }
 
+        /// <summary>
+        /// パーティションのアクティブ化を試行します。
+        /// アクティブ化すべきと判定されたパーティションは、
+        /// アクティブ化中リストへ追加され、
+        /// 非同期にアクティブ化を実行するためのタスク キューへ追加されます。
+        /// なお、同時にアクティブ化可能なパーティションの数には上限があり、
+        /// 上限に到達した場合には、このフレームでのアクティブ化は保留されます。
+        /// </summary>
         void ActivatePartitions()
         {
             Monitor.OnBeginActivatePartitions();
@@ -569,6 +696,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             Monitor.OnEndActivatePartitions();
         }
 
+        /// <summary>
+        /// インスタンスの破棄で呼び出されます。
+        /// </summary>
+        /// <param name="disposing">
+        /// true (明示的な破棄である場合)、false (それ以外の場合)。
+        /// </param>
         protected virtual void DisposeOverride(bool disposing) { }
 
         #region IDisposable

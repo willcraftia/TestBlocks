@@ -8,12 +8,25 @@ using System.Collections.ObjectModel;
 
 namespace Willcraftia.Xna.Framework.Landscape
 {
+    /// <summary>
+    /// アクティブ パーティション領域のデフォルト実装です。
+    /// この実装では、円形のような形状で領域を管理します。
+    /// </summary>
     public sealed class DefaultLandscapeVolume : ILandscapeVolume
     {
+        /// <summary>
+        /// 領域の中心位置。
+        /// </summary>
         VectorI3 center;
 
+        /// <summary>
+        /// 領域の半径。
+        /// </summary>
         int radius;
 
+        /// <summary>
+        /// radius * radius。
+        /// </summary>
         int radiusSquared;
 
         // I/F
@@ -23,11 +36,19 @@ namespace Willcraftia.Xna.Framework.Landscape
             set { center = value; }
         }
 
+        /// <summary>
+        /// 領域の半径を取得します。
+        /// </summary>
         public int Radius
         {
             get { return radius; }
         }
 
+        /// <summary>
+        /// インスタンスを生成します。
+        /// </summary>
+        /// <param name="center">領域の中心位置。</param>
+        /// <param name="radius">領域の半径。</param>
         public DefaultLandscapeVolume(VectorI3 center, int radius)
         {
             if (radius < 0) throw new ArgumentOutOfRangeException("radius");
