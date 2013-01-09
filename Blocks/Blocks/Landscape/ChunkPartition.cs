@@ -28,22 +28,6 @@ namespace Willcraftia.Xna.Blocks.Landscape
             this.regionManager = regionManager;
         }
 
-        protected override void InitializeOverride()
-        {
-            base.InitializeOverride();
-        }
-
-        protected override void ReleaseOverride()
-        {
-            // 状態のリセットはここで行う。
-            // 非同期な非アクティブ化の最中にも OnNeighborPassivated を受信することがある。
-
-            chunk = null;
-            region = null;
-
-            base.ReleaseOverride();
-        }
-
         protected override bool ActivateOverride()
         {
             var position = Position;
@@ -63,19 +47,24 @@ namespace Willcraftia.Xna.Blocks.Landscape
 
             if (!region.PassivateChunk(chunk)) return false;
 
+            chunk = null;
+            region = null;
+
             return base.PassivateOverride();
         }
 
         public override void OnNeighborActivated(Partition neighbor, CubicSide side)
         {
-            chunk.OnNeighborActivated(side);
+            // 非アクティブ化によりチャンクが null の場合あり。
+            if (chunk != null) chunk.OnNeighborActivated(side);
 
             base.OnNeighborActivated(neighbor, side);
         }
 
         public override void OnNeighborPassivated(Partition neighbor, CubicSide side)
         {
-            chunk.OnNeighborPassivated(side);
+            // 非アクティブ化によりチャンクが null の場合あり。
+            if (chunk != null) chunk.OnNeighborPassivated(side);
 
             base.OnNeighborPassivated(neighbor, side);
         }
