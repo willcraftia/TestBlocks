@@ -874,6 +874,52 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Radius = 1,
                             Amount = 1
                         }
+                    },
+                    Sssm = new SssmSettingsDefinition
+                    {
+                        Enabled = false,
+                        MapScale = 0.5f,
+                        BlurEnabled = true,
+                        Blur = new BlurSettingsDefinition
+                        {
+                            Radius = 1,
+                            Amount = 1
+                        }
+                    },
+                    Ssao = new SsaoSettingsDefinition
+                    {
+                        Enabled = true,
+                        MapScale = 1,
+                        Blur = new BlurSettingsDefinition
+                        {
+                            Radius = 1,
+                            Amount = 1
+                        }
+                    },
+                    Edge = new EdgeSettingsDefinition
+                    {
+                        Enabled = false,
+                        MapScale = 0.5f,
+                    },
+                    Bloom = new BloomSettingsDefinition
+                    {
+                        Enabled = false,
+                        MapScale = 0.25f,
+                        Blur = new BlurSettingsDefinition
+                        {
+                            Radius = 1,
+                            Amount = 4
+                        }
+                    },
+                    Dof = new DofSettingsDefinition
+                    {
+                        Enabled = true,
+                        MapScale = 0.5f,
+                        Blur = new BlurSettingsDefinition
+                        {
+                            Radius = 1,
+                            Amount = 1
+                        }
                     }
                 };
                 var jsonResource = SerializeToJson<GraphicsSettingsDefinition>("GraphicsSettings", settings);

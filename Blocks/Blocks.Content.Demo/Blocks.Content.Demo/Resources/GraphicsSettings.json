@@ -11,5 +11,42 @@
       "Radius": 1,
       "Amount": 1.0
     }
+  },
+  "Sssm": {
+    "Enabled": false,
+    "BlurEnabled": true,
+    "Blur": {
+      "Radius": 1,
+      "Amount": 1.0
+    },
+    "MapScale": 0.5
+  },
+  "Ssao": {
+    "Enabled": true,
+    "MapScale": 1.0,
+    "Blur": {
+      "Radius": 1,
+      "Amount": 1.0
+    }
+  },
+  "Edge": {
+    "Enabled": false,
+    "MapScale": 0.5
+  },
+  "Bloom": {
+    "Enabled": false,
+    "MapScale": 0.25,
+    "Blur": {
+      "Radius": 1,
+      "Amount": 4.0
+    }
+  },
+  "Dof": {
+    "Enabled": true,
+    "MapScale": 0.5,
+    "Blur": {
+      "Radius": 1,
+      "Amount": 1.0
+    }
   }
 }

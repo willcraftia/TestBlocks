@@ -105,12 +105,6 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
             SceneManager.DirectionalLights.Add(SceneSettings.Moonlight);
 
-            var sssmSettings = new Sssm.Settings();
-            var ssaoSettings = new Ssao.Settings();
-            var edgeSettings = new Edge.Settings();
-            var bloomSettings = new Bloom.Settings();
-            var dofSettings = new Dof.Settings();
-
             const bool lensFlareEnabled = true;
             const bool colorOverlapEnabled = false;
             const bool monochromeEnabled = false;
@@ -143,14 +137,14 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // スクリーン スペース シャドウ マッピング
-            if (sssmSettings.Enabled)
+            if (GraphicsSettings.Sssm.Enabled)
             {
                 // スクリーン スペース シャドウ マッピング モジュール
                 var shadowSceneEffect = LoadAsset<Effect>("content:Effects/ShadowScene");
                 var sssmEffect = LoadAsset<Effect>("content:Effects/Sssm");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                Sssm = new Sssm(spriteBatch, GraphicsSettings.ShadowMap, sssmSettings, shadowSceneEffect, sssmEffect, blurEffect);
+                Sssm = new Sssm(spriteBatch, GraphicsSettings.ShadowMap, GraphicsSettings.Sssm, shadowSceneEffect, sssmEffect, blurEffect);
                 Sssm.ShadowColor = SceneSettings.ShadowColor;
 
                 SceneManager.PostProcessors.Add(Sssm);
@@ -160,7 +154,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // スクリーン スペース アンビエント オクルージョン
-            if (ssaoSettings.SsaoEnabled)
+            if (GraphicsSettings.Ssao.Enabled)
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var ssaoMapEffect = LoadAsset<Effect>("content:Effects/SsaoMap");
@@ -168,43 +162,43 @@ namespace Willcraftia.Xna.Blocks.Models
                 var ssaoEffect = LoadAsset<Effect>("content:Effects/Ssao");
                 var randomNormalMap = LoadAsset<Texture2D>("content:Textures/RandomNormal");
 
-                Ssao = new Ssao(spriteBatch, ssaoSettings,
+                Ssao = new Ssao(spriteBatch, GraphicsSettings.Ssao,
                     normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
 
                 SceneManager.PostProcessors.Add(Ssao);
             }
 
             // エッジ強調
-            if (edgeSettings.Enabled)
+            if (GraphicsSettings.Edge.Enabled)
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var edgeEffect = LoadAsset<Effect>("content:Effects/Edge");
 
-                Edge = new Edge(spriteBatch, edgeSettings, normalDepthMapEffect, edgeEffect);
+                Edge = new Edge(spriteBatch, GraphicsSettings.Edge, normalDepthMapEffect, edgeEffect);
 
                 SceneManager.PostProcessors.Add(Edge);
             }
 
             // ブルーム
-            if (bloomSettings.Enabled)
+            if (GraphicsSettings.Bloom.Enabled)
             {
                 var bloomExtractEffect = LoadAsset<Effect>("content:Effects/BloomExtract");
                 var bloomEffect = LoadAsset<Effect>("content:Effects/Bloom");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                Bloom = new Bloom(spriteBatch, bloomSettings, bloomExtractEffect, bloomEffect, blurEffect);
+                Bloom = new Bloom(spriteBatch, GraphicsSettings.Bloom, bloomExtractEffect, bloomEffect, blurEffect);
 
                 SceneManager.PostProcessors.Add(Bloom);
             }
 
             // 被写界深度
-            if (dofSettings.Enabled)
+            if (GraphicsSettings.Dof.Enabled)
             {
                 var depthMapEffect = LoadAsset<Effect>("content:Effects/DepthMap");
                 var dofEffect = LoadAsset<Effect>("content:Effects/Dof");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                Dof = new Dof(spriteBatch, dofSettings, depthMapEffect, dofEffect, blurEffect);
+                Dof = new Dof(spriteBatch, GraphicsSettings.Dof, depthMapEffect, dofEffect, blurEffect);
 
                 SceneManager.PostProcessors.Add(Dof);
             }

@@ -12,4 +12,41 @@
 			<Amount>1</Amount>
 		</VsmBlur>
 	</ShadowMap>
+	<Sssm>
+		<Enabled>false</Enabled>
+		<BlurEnabled>true</BlurEnabled>
+		<Blur>
+			<Radius>1</Radius>
+			<Amount>1</Amount>
+		</Blur>
+		<MapScale>0.5</MapScale>
+	</Sssm>
+	<Ssao>
+		<Enabled>true</Enabled>
+		<MapScale>1</MapScale>
+		<Blur>
+			<Radius>1</Radius>
+			<Amount>1</Amount>
+		</Blur>
+	</Ssao>
+	<Edge>
+		<Enabled>false</Enabled>
+		<MapScale>0.5</MapScale>
+	</Edge>
+	<Bloom>
+		<Enabled>false</Enabled>
+		<MapScale>0.25</MapScale>
+		<Blur>
+			<Radius>1</Radius>
+			<Amount>4</Amount>
+		</Blur>
+	</Bloom>
+	<Dof>
+		<Enabled>true</Enabled>
+		<MapScale>0.5</MapScale>
+		<Blur>
+			<Radius>1</Radius>
+			<Amount>1</Amount>
+		</Blur>
+	</Dof>
 </GraphicsSettingsDefinition>

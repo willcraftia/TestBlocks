@@ -87,6 +87,7 @@
     <Compile Include="Models\SkySphere.cs" />
     <Compile Include="Models\SkySphereEffect.cs" />
     <Compile Include="Models\WorldManager.cs" />
+    <Compile Include="Serialization\BloomSettingsDefinition.cs" />
     <Compile Include="Serialization\BlurSettingsDefinition.cs" />
     <Compile Include="Serialization\ChunkStoreTypes.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
@@ -109,6 +110,8 @@
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\GradientDensity.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
+    <Compile Include="Serialization\DofSettingsDefinition.cs" />
+    <Compile Include="Serialization\EdgeSettingsDefinition.cs" />
     <Compile Include="Serialization\GraphicsSettingsDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
@@ -143,6 +146,8 @@
     <Compile Include="Serialization\ShadowMapSettingsDefinition.cs" />
     <Compile Include="Serialization\SkyColorDefinition.cs" />
     <Compile Include="Serialization\SkySphereDefinition.cs" />
+    <Compile Include="Serialization\SsaoSettingsDefinition.cs" />
+    <Compile Include="Serialization\SssmSettingsDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
   </ItemGroup>

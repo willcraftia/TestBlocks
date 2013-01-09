@@ -33,6 +33,45 @@ namespace Willcraftia.Xna.Blocks.Content
             settings.ShadowMap.VsmBlur.Radius = definition.ShadowMap.VsmBlur.Radius;
             settings.ShadowMap.VsmBlur.Amount = definition.ShadowMap.VsmBlur.Amount;
 
+            //----------------------------------------------------------------
+            // スクリーン スペース シャドウ マッピング
+
+            settings.Sssm.Enabled = definition.Sssm.Enabled;
+            settings.Sssm.MapScale = definition.Sssm.MapScale;
+            settings.Sssm.BlurEnabled = definition.Sssm.BlurEnabled;
+            settings.Sssm.Blur.Radius = definition.Sssm.Blur.Radius;
+            settings.Sssm.Blur.Amount = definition.Sssm.Blur.Amount;
+
+            //----------------------------------------------------------------
+            // スクリーン スペース アンビエント オクルージョン
+
+            settings.Ssao.Enabled = definition.Ssao.Enabled;
+            settings.Ssao.MapScale = definition.Ssao.MapScale;
+            settings.Ssao.Blur.Radius = definition.Ssao.Blur.Radius;
+            settings.Ssao.Blur.Amount = definition.Ssao.Blur.Amount;
+
+            //----------------------------------------------------------------
+            // エッジ強調
+
+            settings.Edge.Enabled = definition.Edge.Enabled;
+            settings.Edge.MapScale = definition.Edge.MapScale;
+
+            //----------------------------------------------------------------
+            // ブルーム
+
+            settings.Bloom.Enabled = definition.Edge.Enabled;
+            settings.Bloom.MapScale = definition.Bloom.MapScale;
+            settings.Bloom.Blur.Radius = definition.Bloom.Blur.Radius;
+            settings.Bloom.Blur.Amount = definition.Bloom.Blur.Amount;
+
+            //----------------------------------------------------------------
+            // 被写界深度
+
+            settings.Dof.Enabled = definition.Dof.Enabled;
+            settings.Dof.MapScale = definition.Dof.MapScale;
+            settings.Dof.Blur.Radius = definition.Dof.Blur.Radius;
+            settings.Dof.Blur.Amount = definition.Dof.Blur.Amount;
+
             return settings;
         }
 
@@ -59,7 +98,74 @@ namespace Willcraftia.Xna.Blocks.Content
                         Radius = settings.ShadowMap.VsmBlur.Radius,
                         Amount = settings.ShadowMap.VsmBlur.Amount
                     }
+                },
+
+                //------------------------------------------------------------
+                // スクリーン スペース シャドウ マッピング
+
+                Sssm = new SssmSettingsDefinition
+                {
+                    Enabled = settings.Sssm.Enabled,
+                    MapScale = settings.Sssm.MapScale,
+                    BlurEnabled = settings.Sssm.BlurEnabled,
+                    Blur = new BlurSettingsDefinition
+                    {
+                        Radius = settings.Sssm.Blur.Radius,
+                        Amount = settings.Sssm.Blur.Amount
+                    }
+                },
+
+                //------------------------------------------------------------
+                // スクリーン スペース アンビエント オクルージョン
+
+                Ssao = new SsaoSettingsDefinition
+                {
+                    Enabled = settings.Ssao.Enabled,
+                    MapScale = settings.Ssao.MapScale,
+                    Blur = new BlurSettingsDefinition
+                    {
+                        Radius = settings.Ssao.Blur.Radius,
+                        Amount = settings.Ssao.Blur.Amount
+                    }
+                },
+
+                //------------------------------------------------------------
+                // エッジ強調
+
+                Edge = new EdgeSettingsDefinition
+                {
+                    Enabled = settings.Edge.Enabled,
+                    MapScale = settings.Edge.MapScale
+                },
+
+                //------------------------------------------------------------
+                // ブルーム
+
+                Bloom = new BloomSettingsDefinition
+                {
+                    Enabled = settings.Bloom.Enabled,
+                    MapScale = settings.Bloom.MapScale,
+                    Blur = new BlurSettingsDefinition
+                    {
+                        Radius = settings.Ssao.Blur.Radius,
+                        Amount = settings.Ssao.Blur.Amount
+                    }
+                },
+
+                //------------------------------------------------------------
+                // 被写界深度
+
+                Dof = new DofSettingsDefinition
+                {
+                    Enabled = settings.Dof.Enabled,
+                    MapScale = settings.Dof.MapScale,
+                    Blur = new BlurSettingsDefinition
+                    {
+                        Radius = settings.Dof.Blur.Radius,
+                        Amount = settings.Dof.Blur.Amount
+                    }
                 }
+
             };
 
             serializer.Serialize(resource, definition);
