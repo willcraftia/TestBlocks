@@ -19,8 +19,6 @@ namespace Willcraftia.Xna.Framework.Threading
 
         #endregion
 
-        public const int MaxSlotCount = 20;
-
         public const int DefaultSlotCount = 4;
 
         int slotCount = DefaultSlotCount;
@@ -36,8 +34,7 @@ namespace Willcraftia.Xna.Framework.Threading
             get { return slotCount; }
             set
             {
-                if (slotCount < 1 || MaxSlotCount < slotCount)
-                    throw new InvalidOperationException("SlotCount < 1 || MaxSlotCount < SlotCount");
+                if (value < 1) throw new ArgumentOutOfRangeException("value");
 
                 slotCount = value;
             }
