@@ -532,47 +532,17 @@ namespace Willcraftia.Xna.Framework.Graphics
             PostProcess();
 
             //----------------------------------------------------------------
+            // レンズ フレア
+
+            if (LensFlare != null && LensFlare.Enabled)
+                DrawLensFlare();
+
+            //----------------------------------------------------------------
             // レンダ ターゲットの反映
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
-        }
-
-        void DrawParticles(GameTime gameTime)
-        {
-            GraphicsDevice.SetRenderTarget(renderTarget);
-
-            foreach (var particleSystem in ParticleSystems)
-            {
-                if (particleSystem.Enabled)
-                    particleSystem.Draw(gameTime, activeCamera);
-            }
-
-            GraphicsDevice.SetRenderTarget(null);
-        }
-
-        void PostProcess()
-        {
-            Monitor.OnBeginPostProcess();
-
-            foreach (var postProcessor in PostProcessors)
-            {
-                if (postProcessor.Enabled)
-                {
-                    postProcessor.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
-                    SwapRenderTargets();
-                }
-            }
-
-            Monitor.OnEndPostProcess();
-        }
-
-        void SwapRenderTargets()
-        {
-            var temp = renderTarget;
-            renderTarget = postProcessRenderTarget;
-            postProcessRenderTarget = temp;
         }
 
         bool IsVisibleObject(SceneObject sceneObject)
@@ -707,17 +677,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 SkySphere.Draw();
             }
 
-            //----------------------------------------------------------------
-            // レンズ フレア
-
-            // レンズ フレアはスカイ スフィアの後でなければならない。
-
-            if (LensFlare != null && LensFlare.Enabled)
-            {
-                // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
-                LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
-            }
-
             Monitor.OnEndDrawSceneRendering();
 
             GraphicsDevice.SetRenderTarget(null);
@@ -807,22 +766,56 @@ namespace Willcraftia.Xna.Framework.Graphics
                 SkySphere.Draw();
             }
 
-            //----------------------------------------------------------------
-            // レンズ フレア
-
-            // レンズ フレアはスカイ スフィアの後でなければならない。
-
-            if (LensFlare != null && LensFlare.Enabled)
-            {
-                // TODO: 描画位置がおかしいか？ここはオクルージョン クエリのみで良いかも。
-                LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
-            }
-
             Monitor.OnEndDrawSceneRendering();
 
             GraphicsDevice.SetRenderTarget(null);
 
             Monitor.OnEndDrawScene();
+        }
+
+        void DrawParticles(GameTime gameTime)
+        {
+            GraphicsDevice.SetRenderTarget(renderTarget);
+
+            foreach (var particleSystem in ParticleSystems)
+            {
+                if (particleSystem.Enabled)
+                    particleSystem.Draw(gameTime, activeCamera);
+            }
+
+            GraphicsDevice.SetRenderTarget(null);
+        }
+
+        void PostProcess()
+        {
+            Monitor.OnBeginPostProcess();
+
+            foreach (var postProcessor in PostProcessors)
+            {
+                if (postProcessor.Enabled)
+                {
+                    postProcessor.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
+                    SwapRenderTargets();
+                }
+            }
+
+            Monitor.OnEndPostProcess();
+        }
+
+        void SwapRenderTargets()
+        {
+            var temp = renderTarget;
+            renderTarget = postProcessRenderTarget;
+            postProcessRenderTarget = temp;
+        }
+
+        void DrawLensFlare()
+        {
+            GraphicsDevice.SetRenderTarget(renderTarget);
+
+            LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
+
+            GraphicsDevice.SetRenderTarget(null);
         }
 
         [Conditional("DEBUG"), Conditional("TRACE")]
