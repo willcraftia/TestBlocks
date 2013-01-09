@@ -70,8 +70,6 @@ namespace Willcraftia.Xna.Blocks.Models
             spriteBatch = new SpriteBatch(graphicsDevice);
             assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
-            SceneManager = new SceneManager(graphicsDevice);
-            RegionManager = new RegionManager(serviceProvider, SceneManager);
         }
 
         public void Initialize()
@@ -93,6 +91,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // シーン マネージャ
 
+            SceneManager = new SceneManager(GraphicsDevice);
             SceneManager.Initialize(SceneManagerSettings);
 
             // 太陽と月をディレクショナル ライトとして登録。
@@ -225,6 +224,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // リージョン マネージャ
 
+            RegionManager = new RegionManager(serviceProvider, SceneManager);
             RegionManager.Initialize(SceneSettings);
 
             //----------------------------------------------------------------
