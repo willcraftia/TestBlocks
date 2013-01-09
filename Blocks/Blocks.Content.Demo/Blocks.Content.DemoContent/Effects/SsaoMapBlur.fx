@@ -38,7 +38,7 @@ float4 HorizontalBlurPixelShader(float2 texCoord : TEXCOORD0) : COLOR0
 {
     float4 normalDepth = tex2D(NormalDepthMapSampler, texCoord);
     float3 normal = normalize(normalDepth.rgb * 2.0f - 1.0f);
-    float ssao = tex2D(SsaoMapSampler, texCoord).r;
+    float ao = tex2D(SsaoMapSampler, texCoord).r;
 
     float4 c = 0;
     for (int i = 0; i < KernelSize; i++)
@@ -50,14 +50,14 @@ float4 HorizontalBlurPixelShader(float2 texCoord : TEXCOORD0) : COLOR0
         float coeff = dot(sampleNormal, normal);
         c += tex2D(SsaoMapSampler, sampleTexCoord) * Weights[i] * coeff;
     }
-    return c;
+    return ao * c;
 }
 
 float4 VerticalBlurPixelShader(float2 texCoord : TEXCOORD0) : COLOR0
 {
     float4 normalDepth = tex2D(NormalDepthMapSampler, texCoord);
     float3 normal = normalize(normalDepth.rgb * 2.0f - 1.0f);
-    float ssao = tex2D(SsaoMapSampler, texCoord).r;
+    float ao = tex2D(SsaoMapSampler, texCoord).r;
 
     float4 c = 0;
     for (int i = 0; i < KernelSize; i++)
@@ -69,7 +69,7 @@ float4 VerticalBlurPixelShader(float2 texCoord : TEXCOORD0) : COLOR0
         float coeff = dot(sampleNormal, normal);
         c += tex2D(SsaoMapSampler, sampleTexCoord) * Weights[i] * coeff;
     }
-    return c;
+    return ao * c;
 }
 
 //=============================================================================
