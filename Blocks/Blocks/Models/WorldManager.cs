@@ -239,7 +239,6 @@ namespace Willcraftia.Xna.Blocks.Models
             };
 
             PartitionManager = new ChunkPartitionManager(partitionManagerSettings, RegionManager);
-            //PartitionManager.Initialize(PartitionMinActiveRange, PartitionMaxActiveRange);
         }
 
         // TODO: 戻り値を Region にしない。
