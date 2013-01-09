@@ -22,18 +22,10 @@ namespace Willcraftia.Xna.Blocks.Models
         // それらに適切な値を設定することはなく、また、それらの値に意味はない。
         //
 
-        //
-        // TODO
-        //
-        // 後々、空テクスチャはバイオームで管理し、
-        // バイオームの切り替わりと共に様相が変化するように修正したい。
-        //
-
         SphereMesh sphereMesh;
 
         bool sunVisible = true;
 
-        // 0.999f 以上くらいでほどほどの太陽の大きさとなる。
         float sunThreshold = 0.999f;
 
         Vector3[] frustumCorners = new Vector3[8];
@@ -45,12 +37,22 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SkySphereEffect Effect { get; set; }
 
+        /// <summary>
+        /// 球面に描画する太陽の範囲を定める閾値を取得または設定します。
+        /// 0.999f 以上くらいでほどほどの太陽の大きさです。
+        /// </summary>
         public float SunThreshold
         {
             get { return sunThreshold; }
             set { sunThreshold = value; }
         }
 
+        /// <summary>
+        /// 球面に太陽を描画するか否かを示す値を取得または設定します。
+        /// </summary>
+        /// <value>
+        /// true (球面に太陽を描画する場合)、false (それ以外の場合)。
+        /// </value>
         public bool SunVisible
         {
             get { return sunVisible; }
@@ -116,7 +118,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Effect.Apply();
 
             // 深度は読み取り専用。
-            // スカイ スフィアは最後に描画する前提。
+            // スカイ スフィアは最後に描画する前提。ただし、レンズ フレアの前。
             GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
             GraphicsDevice.DrawIndexedPrimitives(sphereMesh.PrimitiveType, 0, 0, sphereMesh.NumVertices, 0, sphereMesh.PrimitiveCount);
