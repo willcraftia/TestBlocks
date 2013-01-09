@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Blocks.Content
             //----------------------------------------------------------------
             // ブルーム
 
-            settings.Bloom.Enabled = definition.Edge.Enabled;
+            settings.Bloom.Enabled = definition.Bloom.Enabled;
             settings.Bloom.MapScale = definition.Bloom.MapScale;
             settings.Bloom.Blur.Radius = definition.Bloom.Blur.Radius;
             settings.Bloom.Blur.Amount = definition.Bloom.Blur.Amount;
