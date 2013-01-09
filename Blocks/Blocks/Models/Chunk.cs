@@ -199,8 +199,27 @@ namespace Willcraftia.Xna.Blocks.Models
         public void OnPassivated()
         {
             lock (activeLock) active = false;
+
+            // この後、チャンクはプールへ戻されるため、チャンクの状態を初期化しておく。
+            Array.Clear(blockIndices, 0, blockIndices.Length);
+
+            activeNeighbors = CubicSide.Flags.None;
+            neighborsReferencedOnUpdate = CubicSide.Flags.None;
+
+            MeshDirty = true;
+            DefinitionDirty = false;
         }
 
+        /// <summary>
+        /// 更新ロックの取得を試行します。
+        /// 他のスレッドがロック中の場合、非アクティブな場合、非アクティブ化中の場合は、
+        /// 更新ロックの取得に失敗します。
+        /// 更新ロックの取得に成功した場合には、
+        /// 必ず ExitUpdate メソッドでロックを解放しなければなりません。
+        /// </summary>
+        /// <returns>
+        /// true (更新ロックを取得できた場合)、false (それ以外の場合)。
+        /// </returns>
         public bool EnterUpdate()
         {
             if (!Monitor.TryEnter(activeLock)) return false;
@@ -219,11 +238,24 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// EnterUpdate メソッドで取得した更新ロックを開放します。
+        /// </summary>
         public void ExitUpdate()
         {
             updating = false;
         }
 
+        /// <summary>
+        /// 描画ロックの取得を試行します。
+        /// 他のスレッドがロック中の場合、非アクティブな場合、非アクティブ化中の場合は、
+        /// 描画ロックの取得に失敗します。
+        /// 描画ロックの取得に成功した場合には、
+        /// 必ず ExitDraw メソッドでロックを解放しなければなりません。
+        /// </summary>
+        /// <returns>
+        /// true (描画ロックを取得できた場合)、false (それ以外の場合)。
+        /// </returns>
         public bool EnterDraw()
         {
             if (!Monitor.TryEnter(activeLock)) return false;
@@ -242,11 +274,24 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// EnterDraw メソッドで取得した描画ロックを開放します。
+        /// </summary>
         public void ExitDraw()
         {
             drawing = false;
         }
 
+        /// <summary>
+        /// 非アクティブ化ロックの取得を試行します。
+        /// 他のスレッドがロック中の場合、非アクティブな場合、更新ロック中の場合、描画ロック中の場合は、
+        /// 非アクティブ化ロックの取得に失敗します。
+        /// 非アクティブ化ロックの取得に成功した場合には、
+        /// 必ず ExitPassivate メソッドでロックを解放しなければなりません。
+        /// </summary>
+        /// <returns>
+        /// true (非アクティブ化ロックを取得できた場合)、false (それ以外の場合)。
+        /// </returns>
         public bool EnterPassivate()
         {
             if (!Monitor.TryEnter(activeLock)) return false;
@@ -265,21 +310,42 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// EnterPassivate メソッドで取得した描画ロックを開放します。
+        /// </summary>
         public void ExitPassivate()
         {
             passivating = false;
         }
 
+        /// <summary>
+        /// 隣接チャンクのアクティブ化が完了した場合に呼び出されます。
+        /// </summary>
+        /// <param name="side">アクティブ化が完了した隣接チャンクの方向。</param>
         public void OnNeighborActivated(CubicSide side)
         {
+            // パーティションがパーティション マネージャで完全に非アクティブになる前に
+            // チャンクはチャンク マネージャで非アクティブになる。
+            // このため、非アクティブな場合、パーティションからの通知を無視しなければならない。
+            if (!active) return;
+
             lock (activeNeighborsLock)
             {
                 activeNeighbors |= side.ToFlags();
             }
         }
 
+        /// <summary>
+        /// 隣接チャンクが非アクティブ化が完了した場合に呼び出されます。
+        /// </summary>
+        /// <param name="side">非アクティブ化が完了した隣接チャンクの方向。</param>
         public void OnNeighborPassivated(CubicSide side)
         {
+            // パーティションがパーティション マネージャで完全に非アクティブになる前に
+            // チャンクはチャンク マネージャで非アクティブになる。
+            // このため、非アクティブな場合、パーティションからの通知を無視しなければならない。
+            if (!active) return;
+
             lock (activeNeighborsLock)
             {
                 var flag = side.ToFlags();
@@ -337,29 +403,11 @@ namespace Willcraftia.Xna.Blocks.Models
                 writer.Write(blockIndices[i]);
         }
 
-        public void Clear()
-        {
-            Array.Clear(blockIndices, 0, blockIndices.Length);
-            
-            neighborsReferencedOnUpdate = CubicSide.Flags.None;
-
-            MeshDirty = true;
-            DefinitionDirty = false;
-        }
-
         public bool Contains(ref VectorI3 blockPosition)
         {
             return 0 <= blockPosition.X && blockPosition.X < size.X &&
                 0 <= blockPosition.Y && blockPosition.Y < size.Y &&
                 0 <= blockPosition.Z && blockPosition.Z < size.Z;
-        }
-
-        public bool IsInFrustum(BoundingFrustum frustum)
-        {
-            ContainmentType containmentType;
-            frustum.Contains(ref boundingBox, out containmentType);
-
-            return containmentType != ContainmentType.Disjoint;
         }
     }
 }

@@ -261,7 +261,6 @@ namespace Willcraftia.Xna.Blocks.Models
             chunk.OnPassivated();
             chunk.ExitPassivate();
 
-            chunk.Clear();
             chunkPool.Return(chunk);
 
             return true;
