@@ -91,8 +91,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // シーン マネージャ
 
-            SceneManager = new SceneManager(GraphicsDevice);
-            SceneManager.Initialize(SceneManagerSettings);
+            SceneManager = new SceneManager(SceneManagerSettings, GraphicsDevice);
 
             // 太陽と月をディレクショナル ライトとして登録。
             SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
@@ -149,6 +148,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
                 Sssm = new Sssm(spriteBatch, shadowMapSettings, sssmSettings, shadowSceneEffect, sssmEffect, blurEffect);
+                Sssm.ShadowColor = SceneSettings.ShadowColor;
 
                 SceneManager.PostProcessors.Add(Sssm);
             }
@@ -280,8 +280,6 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 SceneManager.ActiveDirectionalLightName = null;
             }
-
-            SceneManager.ShadowColor = SceneSettings.ShadowColor;
 
             //----------------------------------------------------------------
             // リージョン マネージャ

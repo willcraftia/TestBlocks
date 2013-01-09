@@ -17,20 +17,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public sealed class Settings
         {
-            public const bool DefaultSssmEnabled = false;
-
-            /// <summary>
-            /// スクリーン スペース シャドウ マッピングが有効か否かを示す値を取得または設定します。
-            /// </summary>
-            /// <value>
-            /// true (スクリーン スペース シャドウ マッピングが有効な場合)、false (それ以外の場合)。
-            /// </value>
-            public bool SssmEnabled { get; set; }
-
-            public Settings()
-            {
-                SssmEnabled = DefaultSssmEnabled;
-            }
+            // TODO
+            // 各種初期設定をここへ。
         }
 
         #endregion
@@ -75,12 +63,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             public ShadowMap ShadowMap
             {
                 get { return sceneManager.ShadowMap; }
-            }
-
-            // I/F
-            public Vector3 ShadowColor
-            {
-                get { return sceneManager.ShadowColor; }
             }
 
             // I/F
@@ -353,14 +335,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public int ShadowMapSize { get; set; }
+        public bool SssmEnabled { get; set; }
 
-        public Vector3 ShadowColor { get; set; }
-
-        public SceneManager(GraphicsDevice graphicsDevice)
+        public SceneManager(Settings settings, GraphicsDevice graphicsDevice)
         {
+            if (settings == null) throw new ArgumentNullException("settings");
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
+            this.settings = settings;
             GraphicsDevice = graphicsDevice;
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -371,13 +353,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             PostProcessors = new PostProcessorCollection(InitialPostProcessorCapacity);
 
             Monitor = new SceneManagerMonitor(this);
-        }
-
-        public void Initialize(Settings settings)
-        {
-            if (settings == null) throw new ArgumentNullException("settings");
-
-            this.settings = settings;
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -536,7 +511,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // シーン
 
-            if (shadowMapAvailable && !settings.SssmEnabled)
+            if (shadowMapAvailable && !SssmEnabled)
             {
                 DrawScene(ShadowMap);
             }

@@ -350,6 +350,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         Settings sssmSettings;
 
+        Vector3 shadowColor;
+
+        public Vector3 ShadowColor
+        {
+            get { return shadowColor; }
+            set { shadowColor = value; }
+        }
+
         public SssmMonitor Monitor { get; private set; }
 
         public Sssm(SpriteBatch spriteBatch, ShadowMap.Settings shadowMapSettings, Settings sssmSettings,
@@ -470,7 +478,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
-            shadowColorParameter.SetValue(context.ShadowColor);
+            shadowColorParameter.SetValue(shadowColor);
             shadowSceneMapParameter.SetValue(shadowSceneMap);
 
             //----------------------------------------------------------------
