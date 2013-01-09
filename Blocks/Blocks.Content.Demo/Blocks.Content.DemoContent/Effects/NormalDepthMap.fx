@@ -67,6 +67,8 @@ technique Default
 {
     pass P0
     {
+        FillMode = SOLID;
+        CullMode = CCW;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 PS();
     }

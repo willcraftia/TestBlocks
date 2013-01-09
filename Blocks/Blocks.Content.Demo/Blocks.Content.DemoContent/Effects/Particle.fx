@@ -174,6 +174,8 @@ technique Particles
 {
     pass P0
     {
+        FillMode = SOLID;
+        CullMode = CCW;
         VertexShader = compile vs_2_0 ParticleVertexShader();
         PixelShader = compile ps_2_0 ParticlePixelShader();
     }
