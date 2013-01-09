@@ -89,8 +89,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             float depthBias = DefaultDepthBias;
 
-            float nearPlaneDistance = PerspectiveFov.DefaultNearPlaneDistance;
-
             float farPlaneDistance = PerspectiveFov.DefaultFarPlaneDistance;
 
             int splitCount = DefaultSplitCount;
@@ -160,20 +158,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                     if (value < 0) throw new ArgumentOutOfRangeException("value");
 
                     depthBias = value;
-                }
-            }
-
-            /// <summary>
-            /// シャドウ マップ描画で使用するカメラの NearPlaneDistance を取得または設定します。
-            /// </summary>
-            public float NearPlaneDistance
-            {
-                get { return nearPlaneDistance; }
-                set
-                {
-                    if (value < 0) throw new ArgumentOutOfRangeException("value");
-
-                    nearPlaneDistance = value;
                 }
             }
 
@@ -498,7 +482,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.View.Up = viewerCamera.View.Up;
             internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
-            internalCamera.Projection.NearPlaneDistance = settings.NearPlaneDistance;
+            internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
             internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
             internalCamera.Update();
 
@@ -514,7 +498,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.View.Up = viewerCamera.View.Up;
             internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
-            internalCamera.Projection.NearPlaneDistance = settings.NearPlaneDistance;
+            internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
             internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
             internalCamera.Update();
 

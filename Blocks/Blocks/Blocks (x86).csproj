@@ -66,6 +66,7 @@
     <Compile Include="Content\BlockCatalogLoader.cs" />
     <Compile Include="Content\BlockLoader.cs" />
     <Compile Include="Content\ChunkProcedureLoader.cs" />
+    <Compile Include="Content\GraphicsSettingsLoader.cs" />
     <Compile Include="Content\Image2DLoader.cs" />
     <Compile Include="Content\MeshLoader.cs" />
     <Compile Include="Content\NoiseLoader.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
+    <Compile Include="Models\GraphicsSettings.cs" />
     <Compile Include="Models\RegionManagerMonitor.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SkyColor.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Models\SkySphere.cs" />
     <Compile Include="Models\SkySphereEffect.cs" />
     <Compile Include="Models\WorldManager.cs" />
+    <Compile Include="Serialization\BlurSettingsDefinition.cs" />
     <Compile Include="Serialization\ChunkStoreTypes.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
@@ -106,6 +109,7 @@
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\GradientDensity.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
+    <Compile Include="Serialization\GraphicsSettingsDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
     <Compile Include="Content\TileLoader.cs" />
@@ -136,6 +140,7 @@
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />
+    <Compile Include="Serialization\ShadowMapSettingsDefinition.cs" />
     <Compile Include="Serialization\SkyColorDefinition.cs" />
     <Compile Include="Serialization\SkySphereDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />

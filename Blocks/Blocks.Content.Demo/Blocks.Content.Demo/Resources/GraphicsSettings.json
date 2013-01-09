@@ -1,0 +1,15 @@
+{
+  "ShadowMap": {
+    "Enabled": true,
+    "Technique": 0,
+    "Size": 2048,
+    "DepthBias": 0.0005,
+    "FarPlaneDistance": 128.0,
+    "SplitCount": 3,
+    "SplitLambda": 0.5,
+    "VsmBlur": {
+      "Radius": 1,
+      "Amount": 1.0
+    }
+  }
+}

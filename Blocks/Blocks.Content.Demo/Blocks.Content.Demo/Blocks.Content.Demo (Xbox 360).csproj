@@ -99,6 +99,7 @@
     <Content Include="Resources\DefaultSnowParticle.xml" />
     <Content Include="Resources\DefaultTerrainNoise.xml" />
     <Content Include="Resources\DefaultTerrainProcedure.xml" />
+    <Content Include="Resources\GraphicsSettings.xml" />
     <Content Include="Resources\SceneSettings.xml" />
     <None Include="Resources\DirtBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -106,6 +107,7 @@
     <None Include="Resources\DirtTile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\GraphicsSettings.json" />
     <None Include="Resources\GrassBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

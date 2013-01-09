@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Component;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Noise;
 using Willcraftia.Xna.Framework.Serialization;
@@ -845,6 +846,40 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var xmlResource = SerializeToXml<SkySphereDefinition>("DefaultSkySphere", skySphere);
                 var fromJson = DeserializeFromJson<SkySphereDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<SkySphereDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
+            #region GraphicsSettingsDefinition
+
+            //================================================================
+            // GraphicsSettingsDefinition
+
+            Console.WriteLine("GraphicsSettingsDefinition");
+            {
+                var settings = new GraphicsSettingsDefinition
+                {
+                    ShadowMap = new ShadowMapSettingsDefinition
+                    {
+                        Enabled = true,
+                        Technique = ShadowMap.Techniques.Classic,
+                        Size = 2048,
+                        DepthBias = 0.0005f,
+                        FarPlaneDistance = 8 * 16,
+                        SplitCount = 3,
+                        SplitLambda = 0.5f,
+                        VsmBlur = new BlurSettingsDefinition
+                        {
+                            Radius = 1,
+                            Amount = 1
+                        }
+                    }
+                };
+                var jsonResource = SerializeToJson<GraphicsSettingsDefinition>("GraphicsSettings", settings);
+                var xmlResource = SerializeToXml<GraphicsSettingsDefinition>("GraphicsSettings", settings);
+                var fromJson = DeserializeFromJson<GraphicsSettingsDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<GraphicsSettingsDefinition>(xmlResource);
             }
             Console.WriteLine();
 

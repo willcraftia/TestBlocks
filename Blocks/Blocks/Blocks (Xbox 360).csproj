@@ -100,6 +100,7 @@
     <Compile Include="Content\BlockCatalogLoader.cs" />
     <Compile Include="Content\BlockLoader.cs" />
     <Compile Include="Content\ChunkProcedureLoader.cs" />
+    <Compile Include="Content\GraphicsSettingsLoader.cs" />
     <Compile Include="Content\Image2DLoader.cs" />
     <Compile Include="Content\MeshLoader.cs" />
     <Compile Include="Content\NoiseLoader.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Models\FlatTerrainProcedure.cs" />
     <Compile Include="Models\GlobalSceneSettings.cs" />
     <Compile Include="Models\GradientDensity.cs" />
+    <Compile Include="Models\GraphicsSettings.cs" />
     <Compile Include="Models\IBiome.cs" />
     <Compile Include="Models\IBiomeManager.cs" />
     <Compile Include="Models\IChunkProcedure.cs" />
@@ -163,14 +165,17 @@
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
+    <Compile Include="Serialization\BlurSettingsDefinition.cs" />
     <Compile Include="Serialization\ChunkStoreTypes.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
+    <Compile Include="Serialization\GraphicsSettingsDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\ParticleSettingsDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />
+    <Compile Include="Serialization\ShadowMapSettingsDefinition.cs" />
     <Compile Include="Serialization\SkyColorDefinition.cs" />
     <Compile Include="Serialization\SkySphereDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />

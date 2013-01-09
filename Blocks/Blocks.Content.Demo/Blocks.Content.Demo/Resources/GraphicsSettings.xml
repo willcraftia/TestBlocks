@@ -1,0 +1,15 @@
+﻿<GraphicsSettingsDefinition>
+	<ShadowMap>
+		<Enabled>true</Enabled>
+		<Technique>Classic</Technique>
+		<Size>2048</Size>
+		<DepthBias>0.0005</DepthBias>
+		<FarPlaneDistance>128</FarPlaneDistance>
+		<SplitCount>3</SplitCount>
+		<SplitLambda>0.5</SplitLambda>
+		<VsmBlur>
+			<Radius>1</Radius>
+			<Amount>1</Amount>
+		</VsmBlur>
+	</ShadowMap>
+</GraphicsSettingsDefinition>

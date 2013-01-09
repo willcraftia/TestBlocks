@@ -39,6 +39,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkPartitionManager PartitionManager { get; private set; }
 
+        public GraphicsSettings GraphicsSettings { get; private set; }
+
         public SceneSettings SceneSettings { get; private set; }
 
         public ShadowMap ShadowMap { get; private set; }
@@ -69,11 +71,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
             spriteBatch = new SpriteBatch(graphicsDevice);
             assetManager = new AssetManager(serviceProvider);
+            assetManager.RegisterLoader(typeof(GraphicsSettings), new GraphicsSettingsLoader());
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
         }
 
         public void Initialize()
         {
+            //----------------------------------------------------------------
+            // グラフィックス設定
+
+            GraphicsSettings = LoadAsset<GraphicsSettings>("title:Resources/GraphicsSettings.json");
+
             //----------------------------------------------------------------
             // シーン設定
 
@@ -97,11 +105,6 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.DirectionalLights.Add(SceneSettings.Sunlight);
             SceneManager.DirectionalLights.Add(SceneSettings.Moonlight);
 
-            // TODO
-            var shadowMapSettings = new ShadowMap.Settings();
-            shadowMapSettings.FarPlaneDistance = (PartitionMinActiveRange - 1) * 16;
-            shadowMapSettings.FarPlaneDistance -= 64;
-
             var sssmSettings = new Sssm.Settings();
             var ssaoSettings = new Ssao.Settings();
             var edgeSettings = new Edge.Settings();
@@ -113,12 +116,12 @@ namespace Willcraftia.Xna.Blocks.Models
             const bool monochromeEnabled = false;
 
             // シャドウ マップ
-            if (shadowMapSettings.Enabled)
+            if (GraphicsSettings.ShadowMap.Enabled)
             {
                 var shadowMapEffect = LoadAsset<Effect>("content:Effects/ShadowMap");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                ShadowMap = new ShadowMap(GraphicsDevice, shadowMapSettings, spriteBatch, shadowMapEffect, blurEffect);
+                ShadowMap = new ShadowMap(GraphicsDevice, GraphicsSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
 
                 SceneManager.ShadowMap = ShadowMap;
             }
@@ -147,10 +150,13 @@ namespace Willcraftia.Xna.Blocks.Models
                 var sssmEffect = LoadAsset<Effect>("content:Effects/Sssm");
                 var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
 
-                Sssm = new Sssm(spriteBatch, shadowMapSettings, sssmSettings, shadowSceneEffect, sssmEffect, blurEffect);
+                Sssm = new Sssm(spriteBatch, GraphicsSettings.ShadowMap, sssmSettings, shadowSceneEffect, sssmEffect, blurEffect);
                 Sssm.ShadowColor = SceneSettings.ShadowColor;
 
                 SceneManager.PostProcessors.Add(Sssm);
+
+                // SSSM は直接的なシャドウ描画を回避しなければならないため明示。
+                SceneManager.SssmEnabled = true;
             }
 
             // スクリーン スペース アンビエント オクルージョン
