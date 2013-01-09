@@ -801,6 +801,11 @@ namespace Willcraftia.Xna.Framework.Graphics
                 LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
             }
 
+            //----------------------------------------------------------------
+            // スカイ スフィア
+
+            if (SkySphere != null && SkySphere.Visible) SkySphere.Draw();
+
             Monitor.OnEndDrawSceneRendering();
 
             GraphicsDevice.SetRenderTarget(null);
