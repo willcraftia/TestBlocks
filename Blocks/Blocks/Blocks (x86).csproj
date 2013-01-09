@@ -69,6 +69,7 @@
     <Compile Include="Content\Image2DLoader.cs" />
     <Compile Include="Content\MeshLoader.cs" />
     <Compile Include="Content\NoiseLoader.cs" />
+    <Compile Include="Content\ParticleSettingsLoader.cs" />
     <Compile Include="Content\RegionLoader.cs" />
     <Compile Include="Content\SceneSettingsLoader.cs" />
     <Compile Include="Content\SkySphereLoader.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Serialization\BlockDefinition.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
+    <Compile Include="Serialization\ParticleSettingsDefinition.cs" />
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />

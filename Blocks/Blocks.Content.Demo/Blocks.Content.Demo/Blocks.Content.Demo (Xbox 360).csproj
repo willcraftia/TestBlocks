@@ -72,6 +72,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\DefaultSkySphere.json" />
+    <None Include="Resources\DefaultSnowParticle.json" />
     <None Include="Resources\DefaultTerrainNoise.json" />
     <None Include="Resources\DefaultTerrainProcedure.json" />
     <None Include="Resources\DefaultTile.json">
@@ -92,6 +93,10 @@
     <Content Include="GameThumbnail.png" />
     <Content Include="Resources\DefaultDensityNoise.xml" />
     <Content Include="Resources\DefaultSkySphere.xml" />
+    <None Include="Resources\DefaultSnowParticle.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="Resources\DefaultSnowParticle.xml" />
     <Content Include="Resources\DefaultTerrainNoise.xml" />
     <Content Include="Resources\DefaultTerrainProcedure.xml" />
     <Content Include="Resources\SceneSettings.xml" />

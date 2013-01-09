@@ -912,6 +912,45 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
+            #region  DefaultSnowParticle (ParticleSettingsDefinition)
+
+            //================================================================
+            // DefaultSnowParticle (ParticleSettingsDefinition)
+
+            Console.WriteLine("ParticleSettingsDefinition");
+            {
+                var definition = new ParticleSettingsDefinition
+                {
+                    Name = "Default Snow Particle",
+                    MaxParticles = 4000,
+                    Duration = 5,
+                    DurationRandomness = 0,
+                    MinHorizontalVelocity = 0,
+                    MaxHorizontalVelocity = 0,
+                    MinVerticalVelocity = -10,
+                    MaxVerticalVelocity = -10,
+                    Gravity = new Vector3(-1, -1, 0),
+                    EndVelocity = 1,
+                    MinColor = Color.White.ToVector4(),
+                    MaxColor = Color.White.ToVector4(),
+                    MinRotateSpeed = 0,
+                    MaxRotateSpeed = 0,
+                    MinStartSize = 0.5f,
+                    MaxStartSize = 0.5f,
+                    MinEndSize = 0.2f,
+                    MaxEndSize = 0.2f,
+                    Texture = "title:Resources/DefaultSnowParticle.png",
+                    BlendState = BlendState.AlphaBlend
+                };
+                var jsonResource = SerializeToJson<ParticleSettingsDefinition>("DefaultSnowParticle", definition);
+                var xmlResource = SerializeToXml<ParticleSettingsDefinition>("DefaultSnowParticle", definition);
+                var fromJson = DeserializeFromJson<ParticleSettingsDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ParticleSettingsDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
             #region Exit
 
             //================================================================

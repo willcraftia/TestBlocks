@@ -59,6 +59,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
             assetManager.RegisterLoader(typeof(SkySphere), new SkySphereLoader(resourceManager, GraphicsDevice));
+            assetManager.RegisterLoader(typeof(ParticleSettings), new ParticleSettingsLoader(resourceManager));
 
             Monitor = new RegionManagerMonitor(this);
         }
@@ -90,30 +91,9 @@ namespace Willcraftia.Xna.Blocks.Models
             // これはバイオームで定義できるべきか？
             {
                 var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
+                var snowParticleSettings = LoadAsset<ParticleSettings>("title:Resources/DefaultSnowParticle.json");
 
-                var particleSettings = new ParticleSettings();
-                particleSettings.MaxParticles = 4000;
-                particleSettings.Duration = TimeSpan.FromSeconds(5);
-                particleSettings.DurationRandomness = 0;
-                particleSettings.MinHorizontalVelocity = 0;
-                particleSettings.MaxHorizontalVelocity = 0;
-                particleSettings.MinVerticalVelocity = -10;
-                particleSettings.MaxVerticalVelocity = -10;
-                //particleSettings.Gravity = Vector3.Down;
-                particleSettings.Gravity = new Vector3(-1, -1, 0);
-                particleSettings.EndVelocity = 1;
-                particleSettings.MinColor = Color.White;
-                particleSettings.MaxColor = Color.White;
-                particleSettings.MinRotateSpeed = 0;
-                particleSettings.MaxRotateSpeed = 0;
-                particleSettings.MinStartSize = 0.5f;
-                particleSettings.MaxStartSize = 0.5f;
-                particleSettings.MinEndSize = 0.2f;
-                particleSettings.MaxEndSize = 0.2f;
-                particleSettings.Texture = LoadAsset<Texture2D>("content:Textures/Snow/Snow");
-                particleSettings.BlendState = BlendState.AlphaBlend;
-
-                snowParticleSystem = new ParticleSystem(particleSettings, particleEffect);
+                snowParticleSystem = new ParticleSystem(snowParticleSettings, particleEffect);
 
                 sceneManager.ParticleSystems.Add(snowParticleSystem);
             }
