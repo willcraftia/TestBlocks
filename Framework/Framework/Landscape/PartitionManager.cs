@@ -135,7 +135,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
-        public PartitionManagerMonitor Monitor { get; private set;}
+        public PartitionManagerMonitor Monitor { get; private set; }
 
         public PartitionManager(Vector3 partitionSize)
         {
