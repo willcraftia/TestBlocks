@@ -139,8 +139,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Effects\GaussianBlur.fx">
-      <Name>GaussianBlur</Name>
+    <Compile Include="Effects\Blur.fx">
+      <Name>Blur</Name>
       <Importer>EffectImporter</Importer>
       <Processor>EffectProcessor</Processor>
     </Compile>

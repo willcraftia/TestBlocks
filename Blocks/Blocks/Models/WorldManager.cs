@@ -113,7 +113,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (GraphicsSettings.ShadowMap.Enabled)
             {
                 var shadowMapEffect = LoadAsset<Effect>("content:Effects/ShadowMap");
-                var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
+                var blurEffect = LoadAsset<Effect>("content:Effects/Blur");
 
                 ShadowMap = new ShadowMap(GraphicsDevice, GraphicsSettings.ShadowMap, spriteBatch, shadowMapEffect, blurEffect);
 
@@ -142,7 +142,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 // スクリーン スペース シャドウ マッピング モジュール
                 var shadowSceneEffect = LoadAsset<Effect>("content:Effects/ShadowScene");
                 var sssmEffect = LoadAsset<Effect>("content:Effects/Sssm");
-                var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
+                var blurEffect = LoadAsset<Effect>("content:Effects/Blur");
 
                 Sssm = new Sssm(spriteBatch, GraphicsSettings.ShadowMap, GraphicsSettings.Sssm, shadowSceneEffect, sssmEffect, blurEffect);
                 Sssm.ShadowColor = SceneSettings.ShadowColor;
@@ -184,7 +184,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var bloomExtractEffect = LoadAsset<Effect>("content:Effects/BloomExtract");
                 var bloomEffect = LoadAsset<Effect>("content:Effects/Bloom");
-                var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
+                var blurEffect = LoadAsset<Effect>("content:Effects/Blur");
 
                 Bloom = new Bloom(spriteBatch, GraphicsSettings.Bloom, bloomExtractEffect, bloomEffect, blurEffect);
 
@@ -196,7 +196,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var depthMapEffect = LoadAsset<Effect>("content:Effects/DepthMap");
                 var dofEffect = LoadAsset<Effect>("content:Effects/Dof");
-                var blurEffect = LoadAsset<Effect>("content:Effects/GaussianBlur");
+                var blurEffect = LoadAsset<Effect>("content:Effects/Blur");
 
                 Dof = new Dof(spriteBatch, GraphicsSettings.Dof, depthMapEffect, dofEffect, blurEffect);
 
