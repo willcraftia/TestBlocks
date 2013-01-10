@@ -154,7 +154,6 @@
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
-    <Compile Include="Graphics\BilateralBlur.cs" />
     <Compile Include="Graphics\Bloom.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\CameraCollection.cs" />
@@ -187,6 +186,7 @@
     <Compile Include="Graphics\ShadowMap.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Ssao.cs" />
+    <Compile Include="Graphics\SsaoMapBlur.cs" />
     <Compile Include="Graphics\Sssm.cs" />
     <Compile Include="Graphics\Texture2DHelper.cs" />
     <Compile Include="Graphics\TextureExtension.cs" />

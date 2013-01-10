@@ -214,7 +214,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingSphere frustumSphere;
 
-        BilateralBlur blur;
+        SsaoMapBlur blur;
 
         FullscreenQuad fullscreenQuad;
 
@@ -339,7 +339,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // バイラテラル ブラー
 
-            blur = new BilateralBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Single,
+            blur = new SsaoMapBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Single,
                 settings.Blur.Radius, settings.Blur.Amount);
             
             //----------------------------------------------------------------

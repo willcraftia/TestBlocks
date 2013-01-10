@@ -13,7 +13,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// このクラスのバイラテラル ブラーでは、法線深度マップを用い、
     /// 法線のなす角と深度の差から重み付けの度合いを変化させてブラー結果を算出します。
     /// </summary>
-    public sealed class BilateralBlur
+    public sealed class SsaoMapBlur
     {
 #if SHADER_3_0
         public const int MaxRadius = 7;
@@ -56,12 +56,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public float Amount { get; private set; }
 
-        public BilateralBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format)
+        public SsaoMapBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format)
             : this(effect, spriteBatch, width, height, format, DefaultRadius, DefaultAmount)
         {
         }
 
-        public BilateralBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format, int radius, float amount)
+        public SsaoMapBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format, int radius, float amount)
         {
             if (effect == null) throw new ArgumentNullException("effect");
             if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
@@ -182,7 +182,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         bool disposed;
 
-        ~BilateralBlur()
+        ~SsaoMapBlur()
         {
             Dispose(false);
         }

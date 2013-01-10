@@ -154,7 +154,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var ssaoMapEffect = LoadAsset<Effect>("content:Effects/SsaoMap");
-                var blurEffect = LoadAsset<Effect>("content:Effects/BilateralBlur");
+                var blurEffect = LoadAsset<Effect>("content:Effects/SsaoMapBlur");
                 var ssaoEffect = LoadAsset<Effect>("content:Effects/Ssao");
                 var randomNormalMap = LoadAsset<Texture2D>("content:Textures/RandomNormal");
 
