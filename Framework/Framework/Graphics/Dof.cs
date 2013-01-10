@@ -176,7 +176,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         DofEffect dofEffect;
 
-        Blur blur;
+        GaussianBlur blur;
 
         RenderTarget2D depthMap;
 
@@ -236,7 +236,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // ブラー
 
-            blur = new Blur(blurEffect, spriteBatch, width, height, SurfaceFormat.Color,
+            blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Color,
                 settings.Blur.Radius, settings.Blur.Amount);
 
             //----------------------------------------------------------------

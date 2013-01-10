@@ -329,7 +329,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         EffectPass currentPass;
 
-        Blur blur;
+        GaussianBlur blur;
 
         RenderTarget2D shadowSceneMap;
 
@@ -400,7 +400,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (sssmSettings.BlurEnabled)
             {
                 var blurSettings = sssmSettings.Blur;
-                blur = new Blur(blurEffect, spriteBatch, width, height, SurfaceFormat.Vector2,
+                blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Vector2,
                     blurSettings.Radius, blurSettings.Amount);
             }
 

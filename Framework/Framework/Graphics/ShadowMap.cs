@@ -348,7 +348,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         SpriteBatch spriteBatch;
 
-        Blur blur;
+        GaussianBlur blur;
 
         BoundingBox frustumBoundingBox;
 
@@ -447,7 +447,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             if (settings.Technique == Techniques.Vsm)
             {
-                blur = new Blur(blurEffect, spriteBatch, settings.Size, settings.Size, SurfaceFormat.Vector2,
+                blur = new GaussianBlur(blurEffect, spriteBatch, settings.Size, settings.Size, SurfaceFormat.Vector2,
                     settings.VsmBlur.Radius, settings.VsmBlur.Amount);
             }
 

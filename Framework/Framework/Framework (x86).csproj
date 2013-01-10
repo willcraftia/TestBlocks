@@ -140,7 +140,7 @@
     <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
-    <Compile Include="Graphics\Blur.cs" />
+    <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\ShadowMap.cs" />

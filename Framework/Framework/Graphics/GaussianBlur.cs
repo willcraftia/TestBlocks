@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// <summary>
     /// ガウシアン ブラーを行うクラスです。
     /// </summary>
-    public sealed class Blur : IDisposable
+    public sealed class GaussianBlur : IDisposable
     {
 #if SHADER_3_0
         public const int MaxRadius = 7;
@@ -48,12 +48,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public float Amount { get; private set; }
 
-        public Blur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format)
+        public GaussianBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format)
             : this(effect, spriteBatch, width, height, format, DefaultRadius, DefaultAmount)
         {
         }
 
-        public Blur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format, int radius, float amount)
+        public GaussianBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format, int radius, float amount)
         {
             if (effect == null) throw new ArgumentNullException("effect");
             if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
@@ -173,7 +173,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         bool disposed;
 
-        ~Blur()
+        ~GaussianBlur()
         {
             Dispose(false);
         }

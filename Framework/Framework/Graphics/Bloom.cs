@@ -150,7 +150,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BloomEffect bloomEffect;
 
-        Blur blur;
+        GaussianBlur blur;
 
         RenderTarget2D bloomExtractMap;
 
@@ -250,7 +250,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // ブラー
 
-            blur = new Blur(blurEffect, spriteBatch, width, height,
+            blur = new GaussianBlur(blurEffect, spriteBatch, width, height,
                 SurfaceFormat.Color, settings.Blur.Radius, settings.Blur.Amount);
 
             //----------------------------------------------------------------
