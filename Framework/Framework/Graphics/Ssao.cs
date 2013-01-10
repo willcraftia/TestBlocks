@@ -391,8 +391,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
             internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
-            //internalCamera.Projection.FarPlaneDistance = Settings.FarPlaneDistance;
-            internalCamera.Projection.FarPlaneDistance = viewerCamera.Projection.FarPlaneDistance;
+            // TODO
+            // 状況に応じて FarPlaneDistance を変化させられるように。
+            //internalCamera.Projection.FarPlaneDistance = viewerCamera.Projection.FarPlaneDistance;
+            internalCamera.Projection.FarPlaneDistance = 32;
             internalCamera.Update();
 
             internalCamera.Frustum.GetCorners(frustumCorners);
