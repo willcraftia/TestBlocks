@@ -154,12 +154,12 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var normalDepthMapEffect = LoadAsset<Effect>("content:Effects/NormalDepthMap");
                 var ssaoMapEffect = LoadAsset<Effect>("content:Effects/SsaoMap");
-                var ssaoMapBlurEffect = LoadAsset<Effect>("content:Effects/SsaoMapBlur");
+                var blurEffect = LoadAsset<Effect>("content:Effects/BilateralBlur");
                 var ssaoEffect = LoadAsset<Effect>("content:Effects/Ssao");
                 var randomNormalMap = LoadAsset<Texture2D>("content:Textures/RandomNormal");
 
                 Ssao = new Ssao(spriteBatch, GraphicsSettings.Ssao,
-                    normalDepthMapEffect, ssaoMapEffect, ssaoMapBlurEffect, ssaoEffect, randomNormalMap);
+                    normalDepthMapEffect, ssaoMapEffect, blurEffect, ssaoEffect, randomNormalMap);
 
                 SceneManager.PostProcessors.Add(Ssao);
             }

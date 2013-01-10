@@ -1,3 +1,5 @@
+#include "Common.fxh"
+
 //=============================================================================
 //
 // 変数宣言
@@ -74,11 +76,6 @@ void VS(inout float4 position : POSITION0, inout float2 texCoord : TEXCOORD0)
 // ピクセル シェーダ
 //
 //-----------------------------------------------------------------------------
-float3 DecodeNormal(float3 encodedNormal)
-{
-    return encodedNormal * 2 - 1;
-}
-
 float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
 {
     float3 randomNormal = DecodeNormal(tex2D(RandomNormalMapSampler, texCoord * RandomOffset).xyz);

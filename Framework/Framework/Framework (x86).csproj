@@ -117,6 +117,7 @@
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
+    <Compile Include="Graphics\BilateralBlur.cs" />
     <Compile Include="Graphics\Bloom.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
     <Compile Include="Graphics\CameraCollection.cs" />

@@ -1,9 +1,11 @@
+#include "Common.fxh"
+
 //=============================================================================
 //
 // 変数宣言
 //
 //-----------------------------------------------------------------------------
-#define MAX_RADIUS 2
+#define MAX_RADIUS 4
 #define KERNEL_SIZE (MAX_RADIUS * 2 + 1)
 
 float KernelSize = KERNEL_SIZE;
@@ -11,10 +13,10 @@ float Weights[KERNEL_SIZE];
 float2 OffsetsH[KERNEL_SIZE];
 float2 OffsetsV[KERNEL_SIZE];
 
-texture SsaoMap;
-sampler2D SsaoMapSampler : register(s0) = sampler_state
+texture ColorMap;
+sampler2D ColorMapSampler : register(s0) = sampler_state
 {
-    Texture = <SsaoMap>;
+    Texture = <ColorMap>;
     MinFilter = Point;
     MagFilter = Point;
     MipFilter = None;
@@ -31,6 +33,17 @@ sampler2D NormalDepthMapSampler = sampler_state
 
 //=============================================================================
 //
+// 構造体宣言
+//
+//-----------------------------------------------------------------------------
+struct NormalDepth
+{
+    float3 Normal;
+    float Depth;
+};
+
+//=============================================================================
+//
 // 頂点シェーダ
 //
 //-----------------------------------------------------------------------------
@@ -43,29 +56,18 @@ void VS(inout float4 position : POSITION0, inout float2 texCoord : TEXCOORD0)
 // ピクセル シェーダ
 //
 //-----------------------------------------------------------------------------
-float3 DecodeNormal(float3 encodedNormal)
-{
-    return encodedNormal * 2 - 1;
-}
-
-struct NormalDepth
-{
-    float3 Normal;
-    float Depth;
-};
-
 NormalDepth GetNormalDepth(float2 texCoord)
 {
     NormalDepth output;
 
     float4 normalDepth = tex2D(NormalDepthMapSampler, texCoord);
-    output.Normal = normalize(DecodeNormal(normalDepth.xyz));
+    output.Normal = DecodeNormal(normalDepth.xyz);
     output.Depth = normalDepth.w;
 
     return output;
 }
 
-float SampleAo(NormalDepth center, float2 sampleTexCoord, float baseWeight, inout float totalWeight)
+float SampleColor(NormalDepth center, float2 sampleTexCoord, float baseWeight, inout float totalWeight)
 {
     //------------------------------------------------------------------------
     // サンプル位置での法線と深度を取得
@@ -96,42 +98,42 @@ float SampleAo(NormalDepth center, float2 sampleTexCoord, float baseWeight, inou
     totalWeight += weight;
 
     //------------------------------------------------------------------------
-    // 重み付けされた AO 値
+    // 重み付けされた色
 
-    float sampleAo = tex2D(SsaoMapSampler, sampleTexCoord).x;
-    return sampleAo * weight;
+    float color = tex2D(ColorMapSampler, sampleTexCoord).x;
+    return color * weight;
 }
 
 float4 HorizontalBlurPS(float2 texCoord : TEXCOORD0) : COLOR0
 {
     NormalDepth center = GetNormalDepth(texCoord);
 
-    float4 totalAo = 0;
+    float4 totalColor = 0;
     float totalWeight = 0;
 
     for (int i = 0; i < KernelSize; i++)
     {
         float2 sampleTexCoord = texCoord + OffsetsH[i];
-        totalAo += SampleAo(center, sampleTexCoord, Weights[i], totalWeight);
+        totalColor += SampleColor(center, sampleTexCoord, Weights[i], totalWeight);
     }
 
-    return totalAo / totalWeight;
+    return totalColor / totalWeight;
 }
 
 float4 VerticalBlurPS(float2 texCoord : TEXCOORD0) : COLOR0
 {
     NormalDepth center = GetNormalDepth(texCoord);
 
-    float4 totalAo = 0;
+    float4 totalColor = 0;
     float totalWeight = 0;
 
     for (int i = 0; i < KernelSize; i++)
     {
         float2 sampleTexCoord = texCoord + OffsetsV[i];
-        totalAo += SampleAo(center, sampleTexCoord, Weights[i], totalWeight);
+        totalColor += SampleColor(center, sampleTexCoord, Weights[i], totalWeight);
     }
 
-    return totalAo / totalWeight;
+    return totalColor / totalWeight;
 }
 
 //=============================================================================

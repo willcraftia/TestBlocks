@@ -124,136 +124,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        #region SsaoMapBlurEffect
-
-        sealed class SsaoMapBlurEffect
-        {
-            EffectParameter kernelSize;
-            
-            EffectParameter weights;
-            
-            EffectParameter offsetH;
-            
-            EffectParameter offsetV;
-            
-            EffectParameter normalDepthMap;
-
-            EffectTechnique horizontalBlurTechnique;
-
-            EffectTechnique verticalBlurTechnique;
-
-            public Effect Effect { get; private set; }
-
-            public int Width { get; set; }
-
-            public int Height { get; set; }
-
-            public int Radius { get; set; }
-
-            public float Amount { get; set; }
-
-            public Texture2D NormalDepthMap
-            {
-                get { return normalDepthMap.GetValueTexture2D(); }
-                set { normalDepthMap.SetValue(value); }
-            }
-
-            public SsaoMapBlurEffect(Effect effect)
-            {
-                Effect = effect;
-
-                kernelSize = effect.Parameters["KernelSize"];
-                weights = effect.Parameters["Weights"];
-                offsetH = effect.Parameters["OffsetsH"];
-                offsetV = effect.Parameters["OffsetsV"];
-                normalDepthMap = effect.Parameters["NormalDepthMap"];
-
-                horizontalBlurTechnique = effect.Techniques["HorizontalBlur"];
-                verticalBlurTechnique = effect.Techniques["VerticalBlur"];
-            }
-
-            public void Initialize()
-            {
-                kernelSize.SetValue(Radius * 2 + 1);
-                PopulateWeights();
-                PopulateOffsetsH();
-                PopulateOffsetsV();
-            }
-
-            public void EnableHorizontalBlurTechnique()
-            {
-                Effect.CurrentTechnique = horizontalBlurTechnique;
-            }
-
-            public void EnableVerticalBlurTechnique()
-            {
-                Effect.CurrentTechnique = verticalBlurTechnique;
-            }
-
-            /// <summary>
-            /// Calculates the kernel and populates them into the shader. 
-            /// </summary>
-            void PopulateWeights()
-            {
-                var w = new float[Radius * 2 + 1];
-                var totalWeight = 0.0f;
-                var sigma = Radius / Amount;
-
-                int index = 0;
-                for (int i = -Radius; i <= Radius; i++)
-                {
-                    w[index] = CalculateGaussian(sigma, i);
-                    totalWeight += w[index];
-                    index++;
-                }
-
-                // Normalize
-                for (int i = 0; i < w.Length; i++)
-                {
-                    w[i] /= totalWeight;
-                }
-
-                weights.SetValue(w);
-            }
-
-            float CalculateGaussian(float sigma, float n)
-            {
-                var twoSigmaSquare = 2.0f * sigma * sigma;
-                //
-                // REFERENCE: (float) Math.Sqrt(2.0f * Math.PI * sigma * sigma)
-                //
-                var sigmaRoot = (float) Math.Sqrt(Math.PI * twoSigmaSquare);
-
-                return (float) Math.Exp(-(n * n) / twoSigmaSquare) / sigmaRoot;
-            }
-
-            void PopulateOffsetsH()
-            {
-                offsetH.SetValue(CalculateOffsets(1.0f / (float) Width, 0));
-            }
-
-            void PopulateOffsetsV()
-            {
-                offsetV.SetValue(CalculateOffsets(0, 1.0f / (float) Height));
-            }
-
-            Vector2[] CalculateOffsets(float dx, float dy)
-            {
-                var offsets = new Vector2[Radius * 2 + 1];
-
-                int index = 0;
-                for (int i = -Radius; i <= Radius; i++)
-                {
-                    offsets[index] = new Vector2(i * dx, i * dy);
-                    index++;
-                }
-
-                return offsets;
-            }
-        }
-
-        #endregion
-
         #region SsaoEffect
 
         public sealed class SsaoEffect
@@ -336,8 +206,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         SsaoMapEffect ssaoMapEffect;
 
-        SsaoMapBlurEffect ssaoMapBlurEffect;
-
         SsaoEffect ssaoEffect;
 
         BasicCamera internalCamera = new BasicCamera("SsaoInternal");
@@ -346,7 +214,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         BoundingSphere frustumSphere;
 
-        RenderTarget2D blurRenderTarget;
+        BilateralBlur blur;
 
         FullscreenQuad fullscreenQuad;
 
@@ -427,14 +295,14 @@ namespace Willcraftia.Xna.Framework.Graphics
         public SsaoMonitor Monitor { get; private set; }
 
         public Ssao(SpriteBatch spriteBatch, Settings settings,
-            Effect normalDepthMapEffect, Effect ssaoMapEffect, Effect ssaoMapBlurEffect, Effect ssaoEffect,
+            Effect normalDepthMapEffect, Effect ssaoMapEffect, Effect blurEffect, Effect ssaoEffect,
             Texture2D randomNormalMap)
             : base(spriteBatch)
         {
             if (settings == null) throw new ArgumentNullException("settings");
             if (normalDepthMapEffect == null) throw new ArgumentNullException("normalDepthMapEffect");
             if (ssaoMapEffect == null) throw new ArgumentNullException("ssaoMapEffect");
-            if (ssaoMapBlurEffect == null) throw new ArgumentNullException("ssaoMapBlurEffect");
+            if (blurEffect == null) throw new ArgumentNullException("blurEffect");
             if (ssaoEffect == null) throw new ArgumentNullException("ssaoEffect");
             if (randomNormalMap == null) throw new ArgumentNullException("randomNormalMap");
 
@@ -454,14 +322,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             this.ssaoMapEffect = new SsaoMapEffect(ssaoMapEffect);
             this.ssaoMapEffect.RandomNormalMap = randomNormalMap;
 
-            // SSAO マップ ブラー
-            this.ssaoMapBlurEffect = new SsaoMapBlurEffect(ssaoMapBlurEffect);
-            this.ssaoMapBlurEffect.Width = width;
-            this.ssaoMapBlurEffect.Height = height;
-            this.ssaoMapBlurEffect.Radius = settings.Blur.Radius;
-            this.ssaoMapBlurEffect.Amount = settings.Blur.Amount;
-            this.ssaoMapBlurEffect.Initialize();
-
             // SSAO
             this.ssaoEffect = new SsaoEffect(ssaoEffect);
 
@@ -476,9 +336,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             ssaoMap = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
-            // SSAO マップのブラー用
-            blurRenderTarget = new RenderTarget2D(GraphicsDevice, width, height,
-                false, SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
+            //----------------------------------------------------------------
+            // バイラテラル ブラー
+
+            blur = new BilateralBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Single,
+                settings.Blur.Radius, settings.Blur.Amount);
 
             //----------------------------------------------------------------
             // SsaoMap.fx は ps_3_0 を使うため、SpriteBatch を利用できない。
@@ -591,35 +453,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             //================================================================
             //
-            // SSAO マップへブラーを適用
+            // SSAO マップへバイラテラル ブラーを適用
             //
 
-            //----------------------------------------------------------------
-            // エフェクト
-
-            ssaoMapBlurEffect.NormalDepthMap = normalDepthMap;
-
-            //----------------------------------------------------------------
-            // HorizontalBlur テクニックで描画
-
-            ssaoMapBlurEffect.EnableHorizontalBlurTechnique();
-
-            GraphicsDevice.SetRenderTarget(blurRenderTarget);
-            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
-            SpriteBatch.Draw(ssaoMap, blurRenderTarget.Bounds, Color.White);
-            SpriteBatch.End();
-            GraphicsDevice.SetRenderTarget(null);
-
-            //----------------------------------------------------------------
-            // VerticalBlur テクニックで描画
-
-            ssaoMapBlurEffect.EnableVerticalBlurTechnique();
-
-            GraphicsDevice.SetRenderTarget(ssaoMap);
-            SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoMapBlurEffect.Effect);
-            SpriteBatch.Draw(blurRenderTarget, ssaoMap.Bounds, Color.White);
-            SpriteBatch.End();
-            GraphicsDevice.SetRenderTarget(null);
+            blur.Filter(ssaoMap, normalDepthMap);
 
             Monitor.OnEndDrawSsaoMap();
         }
@@ -681,7 +518,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 normalDepthMapEffect.Dispose();
                 normalDepthMap.Dispose();
                 ssaoMap.Dispose();
-                blurRenderTarget.Dispose();
+                blur.Dispose();
             }
 
             disposed = true;

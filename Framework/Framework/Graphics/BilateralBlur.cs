@@ -9,9 +9,11 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Willcraftia.Xna.Framework.Graphics
 {
     /// <summary>
-    /// ガウシアン ブラー (ガウシアン フィルタ) を行うクラスです。
+    /// バイラテラル ブラー (バイラテラル フィルタ) を行うクラスです。
+    /// このクラスのバイラテラル ブラーでは、法線深度マップを用い、
+    /// 法線のなす角と深度の差から重み付けの度合いを変化させてブラー結果を算出します。
     /// </summary>
-    public sealed class GaussianBlur : IDisposable
+    public sealed class BilateralBlur
     {
 #if SHADER_3_0
         public const int MaxRadius = 7;
@@ -27,6 +29,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const float DefaultAmount = 2.0f;
 
         RenderTarget2D backingRenderTarget;
+
+        EffectParameter normalDepthMap;
 
         EffectTechnique horizontalBlurTechnique;
 
@@ -48,12 +52,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public float Amount { get; private set; }
 
-        public GaussianBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format)
+        public BilateralBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format)
             : this(effect, spriteBatch, width, height, format, DefaultRadius, DefaultAmount)
         {
         }
 
-        public GaussianBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format, int radius, float amount)
+        public BilateralBlur(Effect effect, SpriteBatch spriteBatch, int width, int height, SurfaceFormat format, int radius, float amount)
         {
             if (effect == null) throw new ArgumentNullException("effect");
             if (spriteBatch == null) throw new ArgumentNullException("spriteBatch");
@@ -71,20 +75,25 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             graphicsDevice = effect.GraphicsDevice;
 
+            normalDepthMap = effect.Parameters["NormalDepthMap"];
+            horizontalBlurTechnique = effect.Techniques["HorizontalBlur"];
+            verticalBlurTechnique = effect.Techniques["VerticalBlur"];
+
             InitializeEffectParameters();
-            CacheEffectTechniques();
 
             backingRenderTarget = new RenderTarget2D(graphicsDevice, width, height, false, format,
                 DepthFormat.None, 0, RenderTargetUsage.PlatformContents);
         }
 
-        public void Filter(RenderTarget2D source)
+        public void Filter(RenderTarget2D source, Texture2D normalDepthMap)
         {
-            Filter(source, source);
+            Filter(source, normalDepthMap, source);
         }
 
-        public void Filter(Texture2D source, RenderTarget2D destination)
+        public void Filter(Texture2D source, Texture2D normalDepthMap, RenderTarget2D destination)
         {
+            this.normalDepthMap.SetValue(normalDepthMap);
+
             Draw(horizontalBlurTechnique, source, backingRenderTarget);
             Draw(verticalBlurTechnique, backingRenderTarget, destination);
         }
@@ -102,12 +111,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             graphicsDevice.SetRenderTarget(null);
         }
 
-        void CacheEffectTechniques()
-        {
-            horizontalBlurTechnique = effect.Techniques["HorizontalBlur"];
-            verticalBlurTechnique = effect.Techniques["VerticalBlur"];
-        }
-
         void InitializeEffectParameters()
         {
             effect.Parameters["KernelSize"].SetValue(Radius * 2 + 1);
@@ -118,22 +121,17 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void PopulateWeights()
         {
+            // ガウシアン ブラーとは異なり、シェーダ内で深度や法線の関係から重みが変化するため、
+            // 正規化せずにシェーダへ設定する。
+
             var weights = new float[Radius * 2 + 1];
-            var totalWeight = 0.0f;
             var sigma = Radius / Amount;
 
             int index = 0;
             for (int i = -Radius; i <= Radius; i++)
             {
                 weights[index] = MathExtension.CalculateGaussian(sigma, i);
-                totalWeight += weights[index];
                 index++;
-            }
-
-            // Normalize
-            for (int i = 0; i < weights.Length; i++)
-            {
-                weights[i] /= totalWeight;
             }
 
             effect.Parameters["Weights"].SetValue(weights);
@@ -173,7 +171,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         bool disposed;
 
-        ~GaussianBlur()
+        ~BilateralBlur()
         {
             Dispose(false);
         }
