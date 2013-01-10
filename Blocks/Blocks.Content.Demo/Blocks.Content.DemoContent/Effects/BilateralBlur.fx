@@ -8,13 +8,15 @@
 #define MAX_RADIUS 4
 #define KERNEL_SIZE (MAX_RADIUS * 2 + 1)
 
+float2 HalfPixel;
+
 float KernelSize = KERNEL_SIZE;
 float Weights[KERNEL_SIZE];
 float2 OffsetsH[KERNEL_SIZE];
 float2 OffsetsV[KERNEL_SIZE];
 
 texture ColorMap;
-sampler2D ColorMapSampler : register(s0) = sampler_state
+sampler2D ColorMapSampler = sampler_state
 {
     Texture = <ColorMap>;
     MinFilter = Point;
@@ -49,6 +51,8 @@ struct NormalDepth
 //-----------------------------------------------------------------------------
 void VS(inout float4 position : POSITION0, inout float2 texCoord : TEXCOORD0)
 {
+    position.w = 1;
+    texCoord -= HalfPixel;
 }
 
 //=============================================================================
@@ -81,6 +85,7 @@ float SampleColor(NormalDepth center, float2 sampleTexCoord, float baseWeight, i
     float deltaDepth = abs(center.Depth - sample.Depth);
     float depthCoeff = (1 - saturate(deltaDepth));
     depthCoeff *= depthCoeff;
+    depthCoeff = 1;
 
     //------------------------------------------------------------------------
     // 法線のなす角についての重み付けの度合い
@@ -88,6 +93,7 @@ float SampleColor(NormalDepth center, float2 sampleTexCoord, float baseWeight, i
     // なす角が平行に近い程、影響が大きくなるようにする。
     float normalCoeff = abs(dot(center.Normal, sample.Normal));
     normalCoeff *= normalCoeff;
+    normalCoeff = 1;
 
     //------------------------------------------------------------------------
     // 重みの決定
@@ -145,6 +151,8 @@ technique HorizontalBlur
 {
     pass P0
     {
+        FillMode = SOLID;
+        CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
         PixelShader = compile ps_3_0 HorizontalBlurPS();
     }
@@ -154,6 +162,8 @@ technique VerticalBlur
 {
     pass P0
     {
+        FillMode = SOLID;
+        CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
         PixelShader = compile ps_3_0 VerticalBlurPS();
     }

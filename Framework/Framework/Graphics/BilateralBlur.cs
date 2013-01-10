@@ -30,6 +30,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         RenderTarget2D backingRenderTarget;
 
+        EffectParameter colorMap;
+
         EffectParameter normalDepthMap;
 
         EffectTechnique horizontalBlurTechnique;
@@ -41,6 +43,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         SpriteBatch spriteBatch;
 
         GraphicsDevice graphicsDevice;
+
+        FullscreenQuad fullscreenQuad;
 
         public int Width { get; private set; }
 
@@ -75,6 +79,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             graphicsDevice = effect.GraphicsDevice;
 
+            colorMap = effect.Parameters["ColorMap"];
             normalDepthMap = effect.Parameters["NormalDepthMap"];
             horizontalBlurTechnique = effect.Techniques["HorizontalBlur"];
             verticalBlurTechnique = effect.Techniques["VerticalBlur"];
@@ -83,6 +88,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             backingRenderTarget = new RenderTarget2D(graphicsDevice, width, height, false, format,
                 DepthFormat.None, 0, RenderTargetUsage.PlatformContents);
+
+            fullscreenQuad = new FullscreenQuad(graphicsDevice);
         }
 
         public void Filter(RenderTarget2D source, Texture2D normalDepthMap)
@@ -92,6 +99,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public void Filter(Texture2D source, Texture2D normalDepthMap, RenderTarget2D destination)
         {
+            this.colorMap.SetValue(source);
             this.normalDepthMap.SetValue(normalDepthMap);
 
             Draw(horizontalBlurTechnique, source, backingRenderTarget);
@@ -102,17 +110,20 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             effect.CurrentTechnique = technique;
 
-            var samplerState = destination.GetPreferredSamplerState();
-
             graphicsDevice.SetRenderTarget(destination);
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, samplerState, null, null, effect);
-            spriteBatch.Draw(source, destination.Bounds, Color.White);
-            spriteBatch.End();
+            graphicsDevice.DepthStencilState = DepthStencilState.None;
+            graphicsDevice.BlendState = BlendState.Opaque;
+
+            effect.CurrentTechnique.Passes[0].Apply();
+            fullscreenQuad.Draw();
+
             graphicsDevice.SetRenderTarget(null);
         }
 
         void InitializeEffectParameters()
         {
+            effect.Parameters["HalfPixel"].SetValue(new Vector2(0.5f / (float) Width, 0.5f / (float) Height));
+
             effect.Parameters["KernelSize"].SetValue(Radius * 2 + 1);
             PopulateWeights();
             PopulateOffsetsH();

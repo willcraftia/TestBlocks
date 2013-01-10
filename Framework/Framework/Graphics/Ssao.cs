@@ -194,7 +194,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const float DefaultTotalStrength = 1;
+        public const float DefaultTotalStrength = 10;
 
         public const float DefaultStrength = 1;
 
@@ -341,7 +341,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             blur = new BilateralBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Single,
                 settings.Blur.Radius, settings.Blur.Amount);
-
+            
             //----------------------------------------------------------------
             // SsaoMap.fx は ps_3_0 を使うため、SpriteBatch を利用できない。
             // そこで、Quad を用いて SpriteBatch 風に SsaoMap.fx を利用する。

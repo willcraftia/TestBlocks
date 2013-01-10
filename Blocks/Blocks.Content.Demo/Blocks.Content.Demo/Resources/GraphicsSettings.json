@@ -26,7 +26,7 @@
     "MapScale": 1.0,
     "Blur": {
       "Radius": 1,
-      "Amount": 1.0
+      "Amount": 2.0
     }
   },
   "EdgeEnabled": false,
