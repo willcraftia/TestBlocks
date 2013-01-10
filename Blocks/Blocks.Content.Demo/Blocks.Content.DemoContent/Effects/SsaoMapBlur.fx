@@ -8,6 +8,8 @@
 #define MAX_RADIUS 4
 #define KERNEL_SIZE (MAX_RADIUS * 2 + 1)
 
+float Sigma2 = 25;
+
 float2 HalfPixel;
 
 float KernelSize = KERNEL_SIZE;
@@ -83,22 +85,34 @@ float SampleColor(NormalDepth center, float2 sampleTexCoord, float baseWeight, i
 
     // 深度差が小さい程、影響が大きくなるようにする。
     float deltaDepth = abs(center.Depth - sample.Depth);
+/*
     float depthCoeff = (1 - saturate(deltaDepth));
     depthCoeff *= depthCoeff;
-    depthCoeff = 1;
+*/
 
     //------------------------------------------------------------------------
     // 法線のなす角についての重み付けの度合い
 
     // なす角が平行に近い程、影響が大きくなるようにする。
+/*
     float normalCoeff = abs(dot(center.Normal, sample.Normal));
     normalCoeff *= normalCoeff;
-    normalCoeff = 1;
+*/
+
+    float deltaNormal = dot(center.Normal, sample.Normal);
+    deltaNormal = 1 - deltaNormal;
+
+    float d = deltaDepth * deltaNormal;
 
     //------------------------------------------------------------------------
     // 重みの決定
 
-    float weight = baseWeight * depthCoeff * normalCoeff;
+    float w = exp(- deltaDepth * deltaDepth / 2 * Sigma2 * Sigma2);
+//    float w = exp(- d * d / 2 * Sigma2 * Sigma2);
+//    float weight = w;
+    float weight = baseWeight * w;
+
+//    float weight = baseWeight * depthCoeff * normalCoeff;
 
     // 重みの和を記録
     totalWeight += weight;

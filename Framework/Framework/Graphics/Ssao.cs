@@ -194,7 +194,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const float DefaultTotalStrength = 10;
+        public const float DefaultTotalStrength = 4;
 
         public const float DefaultStrength = 1;
 
@@ -458,7 +458,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             // SSAO マップへバイラテラル ブラーを適用
             //
 
-            blur.Filter(ssaoMap, normalDepthMap);
+            // TODO
+            for (int i = 0; i < 5; i++)
+                blur.Filter(ssaoMap, normalDepthMap);
 
             Monitor.OnEndDrawSsaoMap();
         }
