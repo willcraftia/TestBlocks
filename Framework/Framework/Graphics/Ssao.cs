@@ -50,6 +50,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         sealed class SsaoMapEffect
         {
+            EffectParameter viewportSize;
+
             EffectParameter totalStrength;
             
             EffectParameter strength;
@@ -65,6 +67,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             EffectParameter normalDepthMap;
             
             public Effect Effect { get; private set; }
+
+            public Vector2 ViewportSize
+            {
+                get { return viewportSize.GetValueVector2(); }
+                set { viewportSize.SetValue(value); }
+            }
 
             public float TotalStrength
             {
@@ -112,6 +120,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 Effect = effect;
 
+                viewportSize = effect.Parameters["ViewportSize"];
                 totalStrength = effect.Parameters["TotalStrength"];
                 strength = effect.Parameters["Strength"];
                 randomOffset = effect.Parameters["RandomOffset"];
@@ -194,9 +203,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const float DefaultTotalStrength = 10;
+        public const float DefaultTotalStrength = 20;
 
-        public const float DefaultStrength = 1;
+        public const float DefaultStrength = 0.01f;
 
         public const float DefaultFalloff = 0.00001f;
 
@@ -320,6 +329,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             
             // SSAO マップ
             this.ssaoMapEffect = new SsaoMapEffect(ssaoMapEffect);
+            this.ssaoMapEffect.ViewportSize = new Vector2(width, height);
             this.ssaoMapEffect.RandomNormalMap = randomNormalMap;
 
             // SSAO
