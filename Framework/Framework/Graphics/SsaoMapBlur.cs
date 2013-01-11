@@ -45,8 +45,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         GraphicsDevice graphicsDevice;
 
-        FullscreenQuad fullscreenQuad;
-
         public int Width { get; private set; }
 
         public int Height { get; private set; }
@@ -89,8 +87,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             backingRenderTarget = new RenderTarget2D(graphicsDevice, width, height, false, format,
                 DepthFormat.None, 0, RenderTargetUsage.PlatformContents);
-
-            fullscreenQuad = new FullscreenQuad(graphicsDevice);
         }
 
         public void Filter(RenderTarget2D source, Texture2D normalDepthMap)
