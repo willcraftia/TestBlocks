@@ -35,43 +35,23 @@ sampler2D NormalDepthMapSampler = sampler_state
 
 //=============================================================================
 //
-// 構造体宣言
-//
-//-----------------------------------------------------------------------------
-struct NormalDepth
-{
-    float3 Normal;
-    float Depth;
-};
-
-//=============================================================================
-//
 // ピクセル シェーダ
 //
 //-----------------------------------------------------------------------------
-NormalDepth GetNormalDepth(float2 texCoord)
-{
-    NormalDepth output;
-
-    float4 normalDepth = tex2D(NormalDepthMapSampler, texCoord);
-    output.Normal = DecodeNormal(normalDepth.xyz);
-    output.Depth = normalDepth.w;
-
-    return output;
-}
-
-float SampleColor(NormalDepth center, float2 sampleTexCoord, float baseWeight, inout float totalWeight)
+float SampleColor(float3 centerNormal, float centerDepth, float2 sampleTexCoord, float baseWeight, inout float totalWeight)
 {
     //------------------------------------------------------------------------
     // サンプル位置での法線と深度を取得
 
-    NormalDepth sample = GetNormalDepth(sampleTexCoord);
+    float4 sampleNormalDepth = tex2D(NormalDepthMapSampler, sampleTexCoord);
+    float3 sampleNormal = DecodeNormal(sampleNormalDepth.xyz);
+    float sampleDepth = sampleNormalDepth.w;
 
     //------------------------------------------------------------------------
     // 深度差についての重み付けの度合い
 
     // 深度差が小さい程、影響が大きくなるようにする。
-    float deltaDepth = abs(center.Depth - sample.Depth);
+    float deltaDepth = abs(centerDepth - sampleDepth);
 /*
     float depthCoeff = (1 - saturate(deltaDepth));
     depthCoeff *= depthCoeff;
@@ -80,13 +60,12 @@ float SampleColor(NormalDepth center, float2 sampleTexCoord, float baseWeight, i
     //------------------------------------------------------------------------
     // 法線のなす角についての重み付けの度合い
 
-    // なす角が平行に近い程、影響が大きくなるようにする。
 /*
     float normalCoeff = abs(dot(center.Normal, sample.Normal));
     normalCoeff *= normalCoeff;
 */
 
-    float deltaNormal = dot(center.Normal, sample.Normal);
+    float deltaNormal = dot(centerNormal, sampleNormal);
     deltaNormal = 1 - deltaNormal;
 
     float d = deltaDepth * deltaNormal;
@@ -113,7 +92,9 @@ float SampleColor(NormalDepth center, float2 sampleTexCoord, float baseWeight, i
 
 float4 HorizontalBlurPS(float2 texCoord : TEXCOORD0) : COLOR0
 {
-    NormalDepth center = GetNormalDepth(texCoord);
+    float4 normalDepth = tex2D(NormalDepthMapSampler, texCoord);
+    float3 normal = DecodeNormal(normalDepth.xyz);
+    float depth = normalDepth.w;
 
     float4 totalColor = 0;
     float totalWeight = 0;
@@ -121,7 +102,7 @@ float4 HorizontalBlurPS(float2 texCoord : TEXCOORD0) : COLOR0
     for (int i = 0; i < KernelSize; i++)
     {
         float2 sampleTexCoord = texCoord + OffsetsH[i];
-        totalColor += SampleColor(center, sampleTexCoord, Weights[i], totalWeight);
+        totalColor += SampleColor(normal, depth, sampleTexCoord, Weights[i], totalWeight);
     }
 
     return totalColor / totalWeight;
@@ -129,7 +110,9 @@ float4 HorizontalBlurPS(float2 texCoord : TEXCOORD0) : COLOR0
 
 float4 VerticalBlurPS(float2 texCoord : TEXCOORD0) : COLOR0
 {
-    NormalDepth center = GetNormalDepth(texCoord);
+    float4 normalDepth = tex2D(NormalDepthMapSampler, texCoord);
+    float3 normal = DecodeNormal(normalDepth.xyz);
+    float depth = normalDepth.w;
 
     float4 totalColor = 0;
     float totalWeight = 0;
@@ -137,7 +120,7 @@ float4 VerticalBlurPS(float2 texCoord : TEXCOORD0) : COLOR0
     for (int i = 0; i < KernelSize; i++)
     {
         float2 sampleTexCoord = texCoord + OffsetsV[i];
-        totalColor += SampleColor(center, sampleTexCoord, Weights[i], totalWeight);
+        totalColor += SampleColor(normal, depth, sampleTexCoord, Weights[i], totalWeight);
     }
 
     return totalColor / totalWeight;
