@@ -221,7 +221,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Chunk.ExitDraw();
         }
 
-        public void SetVertices(VertexPositionNormalTexture[] vertices, int vertexCount)
+        public void SetVertices(VertexPositionNormalColorTexture[] vertices, int vertexCount)
         {
             if (vertices == null) throw new ArgumentNullException("vertices");
             if (vertexCount < 0 || vertices.Length < vertexCount) throw new ArgumentOutOfRangeException("vertexCount");

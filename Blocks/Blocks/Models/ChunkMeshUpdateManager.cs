@@ -7,6 +7,7 @@ using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Threading;
 
 #endregion
@@ -248,7 +249,17 @@ namespace Willcraftia.Xna.Blocks.Models
             var vertices = source.Vertices;
             for (int i = 0; i < vertices.Length; i++)
             {
-                var vertex = vertices[i];
+                var sourceVertex = vertices[i];
+
+                var vertex = new VertexPositionNormalColorTexture
+                {
+                    Position = sourceVertex.Position,
+                    Normal = sourceVertex.Normal,
+                    Color = Color.White,
+                    TextureCoordinate = sourceVertex.TextureCoordinate
+                };
+
+                //var vertex = vertices[i];
 
                 // チャンク座標内での位置へ移動。
                 vertex.Position.X += x;

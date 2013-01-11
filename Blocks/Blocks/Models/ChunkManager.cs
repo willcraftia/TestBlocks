@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Threading;
 
@@ -306,7 +307,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         VertexBuffer CreateVertexBuffer()
         {
-            return new VertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalTexture), VertexCapacity, BufferUsage.WriteOnly);
+            return new VertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalColorTexture), VertexCapacity, BufferUsage.WriteOnly);
         }
 
         IndexBuffer CreateIndexBuffer()

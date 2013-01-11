@@ -126,16 +126,11 @@ float2 PcfOffsets[MAX_PCF_TAP_COUNT];
 // 構造体宣言
 //
 //-----------------------------------------------------------------------------
-struct ColorPair
-{
-    float3 Diffuse;
-    float3 Specular;
-};
-
 struct VSInput
 {
     float4 Position : POSITION0;
     float3 Normal   : NORMAL0;
+    float4 Color    : COLOR0;
     float2 TexCoord : TEXCOORD0;
 };
 
@@ -143,6 +138,7 @@ struct VSOutput
 {
     float4 Position : POSITION0;
     float3 Normal   : NORMAL0;
+    float4 Color    : COLOR0;
     float2 TexCoord : TEXCOORD0;
     float FogFactor : TEXCOORD1;
 };
@@ -151,10 +147,17 @@ struct ShadowVSOutput
 {
     float4 Position         : POSITION0;
     float3 Normal           : NORMAL0;
+    float4 Color            : COLOR0;
     float2 TexCoord         : TEXCOORD0;
     float FogFactor         : TEXCOORD1;
     float4 WorldPosition    : TEXCOORD2;
     float4 ViewPosition     : TEXCOORD3;
+};
+
+struct ColorPair
+{
+    float3 Diffuse;
+    float3 Specular;
 };
 
 //=============================================================================
@@ -171,6 +174,7 @@ VSOutput VS(VSInput input)
 
     output.Position = mul(viewPosition, Projection);
     output.Normal = input.Normal;
+    output.Color = input.Color;
     output.TexCoord = input.TexCoord;
 
     float eyeDistance = distance(worldPosition, EyePosition);
@@ -188,6 +192,7 @@ ShadowVSOutput ShadowVS(VSInput input)
 
     output.Position = mul(viewPosition, Projection);
     output.Normal = input.Normal;
+    output.Color = input.Color;
     output.TexCoord = input.TexCoord;
 
     float eyeDistance = distance(worldPosition, EyePosition);
@@ -266,6 +271,7 @@ float4 DefaultPS(VSOutput input) : COLOR0
 
     // Base color
     color += tex2D(TileMapSampler, input.TexCoord);
+    color *= input.Color;
 
     // Lighting
     float3 E = normalize(-EyePosition);
@@ -310,6 +316,7 @@ float4 ClassicShadowPS(ShadowVSOutput input) : COLOR0
 
     // 基本カラー
     color += tex2D(TileMapSampler, input.TexCoord);
+    color *= input.Color;
 
     // ライティング
     float3 E = normalize(-EyePosition);
@@ -348,6 +355,7 @@ float4 Pcf2x2PS(ShadowVSOutput input) : COLOR
 
     // 基本カラー
     color += tex2D(TileMapSampler, input.TexCoord);
+    color *= input.Color;
 
     // ライティング
     float3 E = normalize(-EyePosition);
@@ -386,6 +394,7 @@ float4 Pcf3x3PS(ShadowVSOutput input) : COLOR
 
     // 基本カラー
     color += tex2D(TileMapSampler, input.TexCoord);
+    color *= input.Color;
 
     // ライティング
     float3 E = normalize(-EyePosition);
@@ -423,6 +432,7 @@ float4 VsmShadowPS(ShadowVSOutput input) : COLOR0
 
     // 基本カラー
     color += tex2D(TileMapSampler, input.TexCoord);
+    color *= input.Color;
 
     // ライティング
     float3 E = normalize(-EyePosition);

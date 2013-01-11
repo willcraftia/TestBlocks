@@ -2,9 +2,9 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
+using Willcraftia.Xna.Framework.Graphics;
 
 #endregion
 
@@ -21,11 +21,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         const ushort defaultIndexCapacity = 10000;
 
-        static readonly VertexPositionNormalTexture[] emptyVertices = new VertexPositionNormalTexture[0];
+        static readonly VertexPositionNormalColorTexture[] emptyVertices = new VertexPositionNormalColorTexture[0];
 
         static readonly ushort[] emptyIndices = new ushort[0];
 
-        VertexPositionNormalTexture[] vertices;
+        VertexPositionNormalColorTexture[] vertices;
 
         ushort[] indices;
 
@@ -58,7 +58,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (0 < value)
                 {
-                    var newVertices = new VertexPositionNormalTexture[value];
+                    var newVertices = new VertexPositionNormalColorTexture[value];
                     if (0 < vertexCount) Array.Copy(vertices, 0, newVertices, 0, vertexCount);
                     vertices = newVertices;
                 }
@@ -93,7 +93,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public InterChunkMesh()
         {
-            vertices = new VertexPositionNormalTexture[defaultVertexCapacity];
+            vertices = new VertexPositionNormalColorTexture[defaultVertexCapacity];
             indices = new ushort[defaultIndexCapacity];
         }
 
@@ -121,7 +121,7 @@ namespace Willcraftia.Xna.Blocks.Models
             indices[indexCount++] = (ushort) (vertexCount + index);
         }
 
-        public void AddVertex(ref VertexPositionNormalTexture vertex)
+        public void AddVertex(ref VertexPositionNormalColorTexture vertex)
         {
             if (vertexCount == vertices.Length) EnsureVertexCapacity(vertexCount + 1);
 
