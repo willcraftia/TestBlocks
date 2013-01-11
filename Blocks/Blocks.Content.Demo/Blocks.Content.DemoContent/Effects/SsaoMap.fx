@@ -8,15 +8,13 @@
 //=============================================================================
 
 #include "Common.fxh"
+#include "SpriteBatch3.fxh"
 
 //=============================================================================
 //
 // 変数宣言
 //
 //-----------------------------------------------------------------------------
-// SpriteBatch で利用するため。
-float4x4 MatrixTransform;
-
 float TotalStrength = 1;
 float Strength = 1;
 float RandomOffset = 18;
@@ -111,16 +109,6 @@ sampler RandomNormalMapSampler = sampler_state
     AddressU = Wrap;
     AddressV = Wrap;
 };
-
-//=============================================================================
-//
-// 頂点シェーダ
-//
-//-----------------------------------------------------------------------------
-void VS(inout float4 color : COLOR0, inout float2 texCoord : TEXCOORD0, inout float4 position : SV_Position)
-{
-    position = mul(position, MatrixTransform);
-}
 
 //=============================================================================
 //

@@ -1,4 +1,5 @@
 #include "Common.fxh"
+#include "SpriteBatch3.fxh"
 
 //=============================================================================
 //
@@ -7,9 +8,6 @@
 //-----------------------------------------------------------------------------
 #define MAX_RADIUS 4
 #define KERNEL_SIZE (MAX_RADIUS * 2 + 1)
-
-// SpriteBatch で利用するため。
-float4x4 MatrixTransform;
 
 float Sigma2 = 25;
 float KernelSize = KERNEL_SIZE;
@@ -40,33 +38,11 @@ sampler2D NormalDepthMapSampler = sampler_state
 // 構造体宣言
 //
 //-----------------------------------------------------------------------------
-struct VSInput
-{
-    float4 Position : POSITION0;
-    float2 TexCoord : TEXCOORD0;
-};
-
-struct VSOutput
-{
-    float4 Position : POSITION0;
-    float2 TexCoord : TEXCOORD0;
-};
-
 struct NormalDepth
 {
     float3 Normal;
     float Depth;
 };
-
-//=============================================================================
-//
-// 頂点シェーダ
-//
-//-----------------------------------------------------------------------------
-void VS(inout float4 color : COLOR0, inout float2 texCoord : TEXCOORD0, inout float4 position : SV_Position)
-{
-    position = mul(position, MatrixTransform);
-}
 
 //=============================================================================
 //
