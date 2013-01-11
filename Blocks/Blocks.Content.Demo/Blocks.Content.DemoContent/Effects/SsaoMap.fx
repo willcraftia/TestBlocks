@@ -78,30 +78,56 @@ void VS(inout float4 position : POSITION0, inout float2 texCoord : TEXCOORD0)
 //-----------------------------------------------------------------------------
 float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
 {
+    // ランダムなレイを算出するための法線。
     float3 randomNormal = DecodeNormal(tex2D(RandomNormalMapSampler, texCoord * RandomOffset).xyz);
 
+    // 現在対象とする位置での法線と深度。
     float4 normalDepth = tex2D(NormalDepthMapSampler, texCoord);
     float3 normal = DecodeNormal(normalDepth.xyz);
     float depth = normalDepth.w;
 
-    float occlusion = 0;
+    // 遠方である程にサンプリングの半径を小さくする。
     float adjustedRadius = Radius * (1 - depth);
 
+    // 最背面は処理しない。
+    // 最背面の法線はシーンの法線ではなく、それらを用いて演算を行うと、
+    // 最背面に対して誤った閉塞情報を出力してしまう。
+    float occlusion = 0;
     if (depth < 0.999999f)
     {
         for (int i = 0; i < SAMPLE_COUNT; i++)
         {
+            // サンプルの座標を決定するためのレイ。
             float3 ray = adjustedRadius * reflect(SampleSphere[i], randomNormal);
-            float2 occluderTexCoord = texCoord + sign(dot(ray, normal)) * ray * float2(1, -1);
 
+            // サンプルの座標。
+            float2 occluderTexCoord = texCoord + sign(dot(ray, normal)) * ray;
+
+            // サンプルの法線と深度。
             float4 occluderNormalDepth = tex2D(NormalDepthMapSampler, occluderTexCoord);
             float3 occluderNormal = DecodeNormal(occluderNormalDepth.xyz);
             float occluderDepth = occluderNormalDepth.w;
 
+            // 深度差。
+            // deltaDepth < 0 は、サンプルがより奥にある状態。
             float deltaDepth = depth - occluderDepth;
+
+            // 法線のなす角を算出。
             float dotNormals = dot(occluderNormal, normal);
+
+            // 法線のなす角が並行ではない程に影響が大きくなるようにする。
             float deltaNormal = 1 - dotNormals * dotNormals;
-            occlusion += step(Falloff, deltaDepth) * deltaNormal * (1 - smoothstep(Falloff, Strength, deltaDepth));
+
+            // サンプルが奥にある場合は凸状態であり、
+            // step により法線の影響を 0 にしてしまう。
+            deltaNormal *= step(Falloff, deltaDepth);
+
+            // [Falloff, Strength] の間で深度差による影響の度合いを変える。
+            // より深度差が小さい程に影響が大きく、より深度差が大きい程に影響が小さい。
+            deltaNormal *= (1 - smoothstep(Falloff, Strength, deltaDepth));
+
+            // 法線の影響の度合いを足す。
+            occlusion += deltaNormal;
         }
 
         occlusion *= invSamples * TotalStrength;

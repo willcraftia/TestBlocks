@@ -194,13 +194,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const float DefaultTotalStrength = 4;
+        public const float DefaultTotalStrength = 1;
 
         public const float DefaultStrength = 1;
 
         public const float DefaultFalloff = 0.00001f;
 
-        public const float DefaultRadius = 2;
+        public const float DefaultRadius = 1f;
 
         NormalDepthMapEffect normalDepthMapEffect;
 
@@ -436,7 +436,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             ssaoMapEffect.Strength = Strength;
             ssaoMapEffect.Falloff = Falloff;
             ssaoMapEffect.Radius = Radius;
-            ssaoMapEffect.RandomOffset = viewerCamera.View.Position.LengthSquared();
+            //ssaoMapEffect.RandomOffset = viewerCamera.View.Position.LengthSquared();
             ssaoMapEffect.NormalDepthMap = normalDepthMap;
 
             //----------------------------------------------------------------
@@ -459,8 +459,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             //
 
             // TODO
-            for (int i = 0; i < 5; i++)
-                blur.Filter(ssaoMap, normalDepthMap);
+            //for (int i = 0; i < 5; i++)
+            //    blur.Filter(ssaoMap, normalDepthMap);
 
             Monitor.OnEndDrawSsaoMap();
         }
