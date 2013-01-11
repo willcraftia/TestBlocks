@@ -432,11 +432,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // エフェクト
 
+            var randomOffsetVector = viewerCamera.View.Position + viewerCamera.View.Direction;
+
             ssaoMapEffect.TotalStrength = TotalStrength;
             ssaoMapEffect.Strength = Strength;
             ssaoMapEffect.Falloff = Falloff;
             ssaoMapEffect.Radius = Radius;
-            //ssaoMapEffect.RandomOffset = viewerCamera.View.Position.LengthSquared();
+            ssaoMapEffect.RandomOffset = randomOffsetVector.LengthSquared();
             ssaoMapEffect.NormalDepthMap = normalDepthMap;
 
             //----------------------------------------------------------------
