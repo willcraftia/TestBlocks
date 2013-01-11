@@ -245,12 +245,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new DofMonitor(this);
         }
 
-        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        public override void Process(IPostProcessorContext context)
         {
             Monitor.OnBeginProcess();
 
             DrawDepth(context);
-            Filter(context, source, destination);
+            Filter(context);
 
             if (DebugMapDisplay.Available)
             {
@@ -311,14 +311,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.OnEndDrawDepth();
         }
 
-        void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        void Filter(IPostProcessorContext context)
         {
             Monitor.OnBeginFilter();
 
             //================================================================
             // シーンにブラーを適用
 
-            blur.Filter(source, bluredSceneMap);
+            blur.Filter(context.Source, bluredSceneMap);
 
             //================================================================
             // シーンとブラー済みシーンを深度マップに基いて合成
@@ -337,9 +337,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.SetRenderTarget(destination);
+            GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, dofEffect.Effect);
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.Draw(context.Source, context.Destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 

@@ -382,12 +382,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new EdgeMonitor(this);
         }
 
-        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        public override void Process(IPostProcessorContext context)
         {
             Monitor.OnBeginProcess();
 
             DrawNormalDepth(context);
-            Filter(context, source, destination);
+            Filter(context);
 
             if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(normalDepthMap);
 
@@ -443,7 +443,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.OnEndDrawNormalDepth();
         }
 
-        void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        void Filter(IPostProcessorContext context)
         {
             Monitor.OnBeginFilter();
 
@@ -462,9 +462,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.SetRenderTarget(destination);
+            GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, edgeEffect.Effect);
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.Draw(context.Source, context.Destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 

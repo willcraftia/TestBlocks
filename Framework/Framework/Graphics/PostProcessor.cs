@@ -55,6 +55,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice = spriteBatch.GraphicsDevice;
         }
 
-        public abstract void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination);
+        public abstract void Process(IPostProcessorContext context);
     }
 }

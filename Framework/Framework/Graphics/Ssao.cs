@@ -354,12 +354,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new SsaoMonitor(this);
         }
 
-        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        public override void Process(IPostProcessorContext context)
         {
             Monitor.OnBeginProcess();
 
             DrawSsaoMap(context);
-            Filter(context, source, destination);
+            Filter(context);
 
             if (DebugMapDisplay.Available)
             {
@@ -465,7 +465,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.OnEndDrawSsaoMap();
         }
 
-        void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        void Filter(IPostProcessorContext context)
         {
             Monitor.OnBeginFilter();
 
@@ -477,9 +477,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.SetRenderTarget(destination);
+            GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, ssaoEffect.Effect);
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.Draw(context.Source, context.Destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 

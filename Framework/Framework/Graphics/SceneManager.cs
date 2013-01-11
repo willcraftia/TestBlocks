@@ -71,6 +71,18 @@ namespace Willcraftia.Xna.Framework.Graphics
                 get { return sceneManager.visibleSceneObjects; }
             }
 
+            // I/F
+            public RenderTarget2D Source
+            {
+                get { return sceneManager.renderTarget; }
+            }
+
+            // I/F
+            public RenderTarget2D Destination
+            {
+                get { return sceneManager.postProcessRenderTarget; }
+            }
+
             public PostProcessorContext(SceneManager sceneManager)
             {
                 this.sceneManager = sceneManager;
@@ -706,7 +718,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 if (postProcessor.Enabled)
                 {
-                    postProcessor.Process(postProcessorContext, renderTarget, postProcessRenderTarget);
+                    postProcessor.Process(postProcessorContext);
                     SwapRenderTargets();
                 }
             }

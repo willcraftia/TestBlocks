@@ -259,7 +259,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new BloomMonitor(this);
         }
 
-        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        public override void Process(IPostProcessorContext context)
         {
             Monitor.OnBeginProcess();
 
@@ -270,7 +270,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(bloomExtractMap);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, bloomExtractEffect.Effect);
-            SpriteBatch.Draw(source, bloomExtractMap.Bounds, Color.White);
+            SpriteBatch.Draw(context.Source, bloomExtractMap.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
@@ -288,9 +288,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             bloomEffect.BaseSaturation = BaseSaturation;
             bloomEffect.BloomExtractMap = bloomExtractMap;
 
-            GraphicsDevice.SetRenderTarget(destination);
+            GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, bloomEffect.Effect);
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.Draw(context.Source, context.Destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 

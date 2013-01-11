@@ -410,12 +410,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new SssmMonitor(this);
         }
 
-        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        public override void Process(IPostProcessorContext context)
         {
             Monitor.OnBeginProcess();
 
             DrawShadowScene(context);
-            Filter(context, source, destination);
+            Filter(context);
 
             if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowSceneMap);
 
@@ -456,7 +456,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.OnEndDrawShadowScene();
         }
 
-        void Filter(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        void Filter(IPostProcessorContext context)
         {
             Monitor.OnBeginFilter();
 
@@ -471,10 +471,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 描画
 
-            GraphicsDevice.SetRenderTarget(destination);
+            GraphicsDevice.SetRenderTarget(context.Destination);
 
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, sssmEffect);
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.Draw(context.Source, context.Destination.Bounds, Color.White);
             SpriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);

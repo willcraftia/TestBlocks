@@ -45,14 +45,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new ColorOverlapMonitor(this);
         }
 
-        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        public override void Process(IPostProcessorContext context)
         {
             Monitor.OnBeginProcess();
 
-            GraphicsDevice.SetRenderTarget(destination);
+            GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin();
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
-            SpriteBatch.Draw(fillTexture, destination.Bounds, Color);
+            SpriteBatch.Draw(context.Source, context.Destination.Bounds, Color.White);
+            SpriteBatch.Draw(fillTexture, context.Destination.Bounds, Color);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 

@@ -15,5 +15,9 @@ namespace Willcraftia.Xna.Framework.Graphics
         ShadowMap ShadowMap { get; }
 
         IEnumerable<SceneObject> VisibleSceneObjects { get; }
+
+        RenderTarget2D Source { get; }
+
+        RenderTarget2D Destination { get; }
     }
 }

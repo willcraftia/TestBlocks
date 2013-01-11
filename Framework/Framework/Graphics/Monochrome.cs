@@ -81,16 +81,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor = new MonochromeMonitor(this);
         }
 
-        public override void Process(IPostProcessorContext context, RenderTarget2D source, RenderTarget2D destination)
+        public override void Process(IPostProcessorContext context)
         {
             Monitor.OnBeginProcess();
 
             monochromeEffect.Cb = cbCr.X;
             monochromeEffect.Cr = cbCr.Y;
 
-            GraphicsDevice.SetRenderTarget(destination);
+            GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, null, null, null, monochromeEffect.Effect);
-            SpriteBatch.Draw(source, destination.Bounds, Color.White);
+            SpriteBatch.Draw(context.Source, context.Destination.Bounds, Color.White);
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
