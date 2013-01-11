@@ -61,10 +61,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             EffectParameter falloff;
             
             EffectParameter radius;
-
-            EffectParameter randomNormalMap;
-            
-            EffectParameter normalDepthMap;
             
             public Effect Effect { get; private set; }
 
@@ -104,18 +100,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 set { radius.SetValue(value); }
             }
 
-            public Texture2D RandomNormalMap
-            {
-                get { return randomNormalMap.GetValueTexture2D(); }
-                set { randomNormalMap.SetValue(value); }
-            }
-
-            public Texture2D NormalDepthMap
-            {
-                get { return normalDepthMap.GetValueTexture2D(); }
-                set { normalDepthMap.SetValue(value); }
-            }
-
             public SsaoMapEffect(Effect effect)
             {
                 Effect = effect;
@@ -126,8 +110,19 @@ namespace Willcraftia.Xna.Framework.Graphics
                 randomOffset = effect.Parameters["RandomOffset"];
                 falloff = effect.Parameters["Falloff"];
                 radius = effect.Parameters["Radius"];
-                randomNormalMap = effect.Parameters["RandomNormalMap"];
-                normalDepthMap = effect.Parameters["NormalDepthMap"];
+            }
+
+            public void Initialize(int width, int height, Texture2D randomNormalMap)
+            {
+                //------------------------------------------------------------
+                // スプライト バッチで描画するための行列の初期化
+
+                Effect.Parameters["MatrixTransform"].SetValue(EffectHelper.CreateSpriteBatchMatrixTransform(width, height));
+
+                //------------------------------------------------------------
+                // ランダム法線マップ
+
+                Effect.Parameters["RandomNormalMap"].SetValue(randomNormalMap);
             }
         }
 
@@ -203,13 +198,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const float DefaultTotalStrength = 20;
+        public const float DefaultTotalStrength = 10;
 
         public const float DefaultStrength = 0.01f;
 
         public const float DefaultFalloff = 0.00001f;
 
-        public const float DefaultRadius = 0.1f;
+        public const float DefaultRadius = 5;
+
+        SpriteBatch spriteBatch;
 
         NormalDepthMapEffect normalDepthMapEffect;
 
@@ -224,8 +221,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         BoundingSphere frustumSphere;
 
         SsaoMapBlur blur;
-
-        FullscreenQuad fullscreenQuad;
 
         RenderTarget2D normalDepthMap;
 
@@ -316,6 +311,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (randomNormalMap == null) throw new ArgumentNullException("randomNormalMap");
 
             this.settings = settings;
+            this.spriteBatch = spriteBatch;
 
             var pp = GraphicsDevice.PresentationParameters;
             var width = (int) (pp.BackBufferWidth * settings.MapScale);
@@ -329,8 +325,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             
             // SSAO マップ
             this.ssaoMapEffect = new SsaoMapEffect(ssaoMapEffect);
-            this.ssaoMapEffect.ViewportSize = new Vector2(width, height);
-            this.ssaoMapEffect.RandomNormalMap = randomNormalMap;
+            this.ssaoMapEffect.Initialize(width, height, randomNormalMap);
 
             // SSAO
             this.ssaoEffect = new SsaoEffect(ssaoEffect);
@@ -347,16 +342,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                 false, SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.PreserveContents);
 
             //----------------------------------------------------------------
-            // バイラテラル ブラー
+            // SSAO マップブラー
 
             blur = new SsaoMapBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Single,
                 settings.Blur.Radius, settings.Blur.Amount);
-            
-            //----------------------------------------------------------------
-            // SsaoMap.fx は ps_3_0 を使うため、SpriteBatch を利用できない。
-            // そこで、Quad を用いて SpriteBatch 風に SsaoMap.fx を利用する。
-
-            fullscreenQuad = new FullscreenQuad(GraphicsDevice);
 
             //----------------------------------------------------------------
             // モニタ
@@ -449,19 +438,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             ssaoMapEffect.Falloff = Falloff;
             ssaoMapEffect.Radius = Radius;
             ssaoMapEffect.RandomOffset = randomOffsetVector.LengthSquared();
-            ssaoMapEffect.NormalDepthMap = normalDepthMap;
 
             //----------------------------------------------------------------
             // 描画
 
             GraphicsDevice.SetRenderTarget(ssaoMap);
-            GraphicsDevice.DepthStencilState = DepthStencilState.None;
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
-            GraphicsDevice.Clear(Color.White);
 
-            ssaoMapEffect.Effect.CurrentTechnique.Passes[0].Apply();
-            fullscreenQuad.Draw();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, null, null, ssaoMapEffect.Effect);
+            spriteBatch.Draw(normalDepthMap, ssaoMap.Bounds, Color.White);
+            spriteBatch.End();
 
             GraphicsDevice.SetRenderTarget(null);
 
@@ -471,8 +456,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             //
 
             // TODO
-            //for (int i = 0; i < 5; i++)
-            //    blur.Filter(ssaoMap, normalDepthMap);
+            for (int i = 0; i < 3; i++)
+                blur.Filter(ssaoMap, normalDepthMap);
 
             Monitor.OnEndDrawSsaoMap();
         }

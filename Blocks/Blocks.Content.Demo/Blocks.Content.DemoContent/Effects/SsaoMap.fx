@@ -14,8 +14,8 @@
 // 変数宣言
 //
 //-----------------------------------------------------------------------------
-float2 ViewportSize : VIEWPORTPIXELSIZE;
-static float2 ViewportOffset = float2(0.5, 0.5) / ViewportSize;
+// SpriteBatch で利用するため。
+float4x4 MatrixTransform;
 
 float TotalStrength = 1;
 float Strength = 1;
@@ -91,7 +91,7 @@ const float3 SampleSphere[16] =
 #endif
 
 texture NormalDepthMap;
-sampler NormalDepthMapSampler = sampler_state
+sampler NormalDepthMapSampler : register(s0) = sampler_state
 {
     Texture = <NormalDepthMap>;
     MinFilter = Point;
@@ -114,34 +114,12 @@ sampler RandomNormalMapSampler = sampler_state
 
 //=============================================================================
 //
-// 構造体宣言
-//
-//-----------------------------------------------------------------------------
-struct VSInput
-{
-    float4 Position : POSITION0;
-    float2 TexCoord : TEXCOORD0;
-};
-
-struct VSOutput
-{
-    float4 Position : POSITION0;
-    float2 TexCoord : TEXCOORD0;
-};
-
-//=============================================================================
-//
 // 頂点シェーダ
 //
 //-----------------------------------------------------------------------------
-VSOutput VS(VSInput input)
+void VS(inout float4 color : COLOR0, inout float2 texCoord : TEXCOORD0, inout float4 position : SV_Position)
 {
-    VSOutput output;
-
-    output.Position = input.Position;
-    output.TexCoord = input.TexCoord + ViewportOffset;
-
-    return output;
+    position = mul(position, MatrixTransform);
 }
 
 //=============================================================================
@@ -149,10 +127,8 @@ VSOutput VS(VSInput input)
 // ピクセル シェーダ
 //
 //-----------------------------------------------------------------------------
-float4 PS(VSOutput input) : COLOR0
+float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
 {
-    float2 texCoord = input.TexCoord;
-
     // ランダムなレイを算出するための法線。
     float3 randomNormal = DecodeNormal(tex2D(RandomNormalMapSampler, texCoord * RandomOffset).xyz);
 
@@ -162,9 +138,9 @@ float4 PS(VSOutput input) : COLOR0
     float depth = normalDepth.w;
 
     // 遠方である程にサンプリングの半径を小さくする。
-//    float adjustedRadius = Radius * (1 - depth);
+    float adjustedRadius = Radius * (1 - depth);
     // 視点近隣である程にサンプリングの半径を大きくする。
-    float adjustedRadius = Radius / depth;
+//    float adjustedRadius = Radius / depth;
 
     float totalOcclusion = 0;
     for (int i = 0; i < SAMPLE_COUNT; i++)
@@ -216,8 +192,8 @@ technique Default
 {
     pass P0
     {
-        // ps_3_0 を使うので vs_3_0 を明示。
-        // これを明示しなければ実行時エラーとなる。
+        FillMode = SOLID;
+        CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
         PixelShader  = compile ps_3_0 PS();
     }

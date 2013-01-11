@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
@@ -111,18 +112,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             effect.CurrentTechnique = technique;
 
             graphicsDevice.SetRenderTarget(destination);
-            graphicsDevice.DepthStencilState = DepthStencilState.None;
-            graphicsDevice.BlendState = BlendState.Opaque;
-
-            effect.CurrentTechnique.Passes[0].Apply();
-            fullscreenQuad.Draw();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque, SamplerState.PointClamp, null, null, effect);
+            spriteBatch.Draw(source, destination.Bounds, Color.White);
+            spriteBatch.End();
+            graphicsDevice.SetRenderTarget(null);
 
             graphicsDevice.SetRenderTarget(null);
         }
 
         void InitializeEffectParameters()
         {
-            effect.Parameters["HalfPixel"].SetValue(new Vector2(0.5f / (float) Width, 0.5f / (float) Height));
+            //------------------------------------------------------------
+            // スプライト バッチで描画するための行列の初期化
+
+            effect.Parameters["MatrixTransform"].SetValue(EffectHelper.CreateSpriteBatchMatrixTransform(Width, Height));
+
+            //----------------------------------------------------------------
+            // カーネルの初期化
 
             effect.Parameters["KernelSize"].SetValue(Radius * 2 + 1);
             PopulateWeights();

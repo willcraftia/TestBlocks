@@ -164,6 +164,7 @@
     <Compile Include="Graphics\DirectionalLightCollection.cs" />
     <Compile Include="Graphics\Dof.cs" />
     <Compile Include="Graphics\Edge.cs" />
+    <Compile Include="Graphics\EffectHelper.cs" />
     <Compile Include="Graphics\FlipTexture2D.cs" />
     <Compile Include="Graphics\FullscreenQuad.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />

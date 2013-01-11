@@ -117,6 +117,7 @@
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
+    <Compile Include="Graphics\EffectHelper.cs" />
     <Compile Include="Graphics\SsaoMapBlur.cs" />
     <Compile Include="Graphics\Bloom.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
