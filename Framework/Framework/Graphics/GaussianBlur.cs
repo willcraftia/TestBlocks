@@ -24,7 +24,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int DefaultRadius = 1;
 
-        public const float DefaultAmount = 2.0f;
+        public const float DefaultAmount = 2;
 
         RenderTarget2D backingRenderTarget;
 
@@ -141,12 +141,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void PopulateOffsetsH()
         {
-            effect.Parameters["OffsetsH"].SetValue(CalculateOffsets(1.0f / (float) Width, 0));
+            effect.Parameters["OffsetsH"].SetValue(CalculateOffsets(1 / (float) Width, 0));
         }
 
         void PopulateOffsetsV()
         {
-            effect.Parameters["OffsetsV"].SetValue(CalculateOffsets(0, 1.0f / (float) Height));
+            effect.Parameters["OffsetsV"].SetValue(CalculateOffsets(0, 1 / (float) Height));
         }
 
         Vector2[] CalculateOffsets(float dx, float dy)
