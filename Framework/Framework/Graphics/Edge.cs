@@ -217,15 +217,15 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultEdgeWidth = 1;
 
-        public const float DefaultEdgeIntensity = 20;
+        public const float DefaultEdgeIntensity = 200;
 
-        public const float DefaultNormalThreshold = 0.1f;
+        public const float DefaultNormalThreshold = 0.5f;
 
         public const float DefaultDepthThreshold = 0;
 
         public const float DefaultNormalSensitivity = 1;
 
-        public const float DefaultDepthSensitivity = 1000;
+        public const float DefaultDepthSensitivity = 1;
 
         NormalDepthMapEffect normalDepthMapEffect;
 
@@ -256,7 +256,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         Vector3 edgeColor = Vector3.Zero;
 
         // TODO
-        float farPlaneDistance = 128;
+        float farPlaneDistance = 64;
 
         public float EdgeWidth
         {

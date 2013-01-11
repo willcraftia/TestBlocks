@@ -58,9 +58,12 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
     deltaDepth = saturate((deltaDepth - DepthThreshold) * DepthSensitivity);
 
     float amount = saturate(deltaNormal + deltaDepth);
-    amount *= saturate(-log(s.w) * EdgeIntensity);
 
-    color.rgb = lerp(color.rgb, color.rgb * EdgeColor, amount);
+    // XNA サンプルとは異なり、遠方に行く程に影響を少なくする。
+    // これにより、ファー クリップ面での不正なエッジ描画が無くなる。
+    amount *= EdgeIntensity * (1 - s.w);
+
+    color.rgb = lerp(color.rgb, color.rgb * EdgeColor, saturate(amount));
 
     return color;
 }

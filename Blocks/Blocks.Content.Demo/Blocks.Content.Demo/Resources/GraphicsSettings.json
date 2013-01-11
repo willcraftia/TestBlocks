@@ -21,7 +21,7 @@
       "Amount": 1.0
     }
   },
-  "SsaoEnabled": true,
+  "SsaoEnabled": false,
   "Ssao": {
     "MapScale": 1.0,
     "Blur": {
@@ -29,9 +29,9 @@
       "Amount": 2.0
     }
   },
-  "EdgeEnabled": false,
+  "EdgeEnabled": true,
   "Edge": {
-    "MapScale": 0.5
+    "MapScale": 1.0
   },
   "BloomEnabled": false,
   "Bloom": {
