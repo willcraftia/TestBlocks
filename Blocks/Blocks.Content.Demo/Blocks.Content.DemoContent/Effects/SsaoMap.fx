@@ -92,6 +92,7 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
     // 最背面は処理しない。
     // 最背面の法線はシーンの法線ではなく、それらを用いて演算を行うと、
     // 最背面に対して誤った閉塞情報を出力してしまう。
+    // また、演算を省く意味もある。
     float occlusion = 0;
     if (depth < 0.999999f)
     {
@@ -116,15 +117,18 @@ float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
             float dotNormals = dot(occluderNormal, normal);
 
             // 法線のなす角が並行ではない程に影響が大きくなるようにする。
-            float deltaNormal = 1 - dotNormals * dotNormals;
+            float deltaNormal = 1 - (dotNormals * 0.5 + 0.5);
 
             // サンプルが奥にある場合は凸状態であり、
             // step により法線の影響を 0 にしてしまう。
+            //
+            // TODO
+            // 必ずしもそうではないのでは？
             deltaNormal *= step(Falloff, deltaDepth);
 
             // [Falloff, Strength] の間で深度差による影響の度合いを変える。
             // より深度差が小さい程に影響が大きく、より深度差が大きい程に影響が小さい。
-            deltaNormal *= (1 - smoothstep(Falloff, Strength, deltaDepth));
+//            deltaNormal *= (1 - smoothstep(Falloff, Strength, deltaDepth));
 
             // 法線の影響の度合いを足す。
             occlusion += deltaNormal;

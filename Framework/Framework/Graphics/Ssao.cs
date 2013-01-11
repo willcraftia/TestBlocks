@@ -194,13 +194,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const float DefaultTotalStrength = 1;
+        public const float DefaultTotalStrength = 10;
 
         public const float DefaultStrength = 1;
 
         public const float DefaultFalloff = 0.00001f;
 
-        public const float DefaultRadius = 1f;
+        public const float DefaultRadius = 0.1f;
 
         NormalDepthMapEffect normalDepthMapEffect;
 
