@@ -3,7 +3,7 @@
 // ïœêîêÈåæ
 //
 //-----------------------------------------------------------------------------
-float3 ShadowColor = float3(0, 0, 0);
+float3 ShadowColor = float3(0.4, 0.4, 0.4);
 
 texture SceneMap;
 sampler2D SceneMapSampler : register(s0) = sampler_state
@@ -30,14 +30,11 @@ sampler2D SsaoMapSampler = sampler_state
 //-----------------------------------------------------------------------------
 float4 PS(float2 texCoord : TEXCOORD0) : COLOR0
 {
-    float ao = tex2D(SsaoMapSampler, texCoord).r;
+    float ao = tex2D(SsaoMapSampler, texCoord).x;
     float3 sceneColor = tex2D(SceneMapSampler, texCoord);
-//    float3 mixedLightColor = lerp(ShadowColor, sceneColor, ao);
-//    return float4(sceneColor * mixedLightColor, 1);
-//    return float4(sceneColor * ao, 1);
-//    float3 shadowSceneColor = ShadowColor * sceneColor;
-//    return float4(lerp(sceneColor, shadowSceneColor, (1.0 - ao)), 1);
-    return float4(sceneColor * ao, 1);
+
+    float3 color = lerp(sceneColor * ShadowColor, sceneColor, ao);
+    return float4(color, 1);
 }
 
 //=============================================================================

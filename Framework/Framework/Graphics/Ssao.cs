@@ -198,7 +198,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const float DefaultTotalStrength = 10;
+        public const float DefaultTotalStrength = 5;
 
         public const float DefaultStrength = 0.01f;
 
@@ -452,7 +452,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             //================================================================
             //
-            // SSAO マップへバイラテラル ブラーを適用
+            // SSAO マップへブラーを適用
             //
 
             // TODO

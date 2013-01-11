@@ -50,35 +50,13 @@ float SampleColor(float3 centerNormal, float centerDepth, float2 sampleTexCoord,
     //------------------------------------------------------------------------
     // 深度差についての重み付けの度合い
 
-    // 深度差が小さい程、影響が大きくなるようにする。
     float deltaDepth = abs(centerDepth - sampleDepth);
-/*
-    float depthCoeff = (1 - saturate(deltaDepth));
-    depthCoeff *= depthCoeff;
-*/
-
-    //------------------------------------------------------------------------
-    // 法線のなす角についての重み付けの度合い
-
-/*
-    float normalCoeff = abs(dot(center.Normal, sample.Normal));
-    normalCoeff *= normalCoeff;
-*/
-
-    float deltaNormal = dot(centerNormal, sampleNormal);
-    deltaNormal = 1 - deltaNormal;
-
-    float d = deltaDepth * deltaNormal;
+    float w = exp(- deltaDepth * deltaDepth / 2 * Sigma2 * Sigma2);
 
     //------------------------------------------------------------------------
     // 重みの決定
 
-    float w = exp(- deltaDepth * deltaDepth / 2 * Sigma2 * Sigma2);
-//    float w = exp(- d * d / 2 * Sigma2 * Sigma2);
-//    float weight = w;
     float weight = baseWeight * w;
-
-//    float weight = baseWeight * depthCoeff * normalCoeff;
 
     // 重みの和を記録
     totalWeight += weight;
