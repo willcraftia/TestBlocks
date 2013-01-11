@@ -36,7 +36,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        #region EdgeDetectionEffect
+        #region EdgeEffect
 
         sealed class EdgeEffect
         {
