@@ -831,6 +831,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (!DebugBoundingBoxVisible) return;
 
+            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
             GraphicsDevice.SetRenderTarget(renderTarget);
 
             foreach (var sceneObject in visibleSceneObjects)
