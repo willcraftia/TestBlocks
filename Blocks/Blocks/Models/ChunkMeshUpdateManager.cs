@@ -226,11 +226,13 @@ namespace Willcraftia.Xna.Blocks.Models
             // 1 は一切遮蔽されていない状態を表す。
             float occlustion = 1;
 
+            var mySide = side.Reverse();
+
             // 隣接ブロック位置の各方向に隣接ブロックが存在する場合、遮蔽有りと判定。
             foreach (var s in CubicSide.Items)
             {
                 // 自身に対する方向はスキップ。
-                if (s == side) continue;
+                if (mySide == s) continue;
 
                 // 遮蔽対象のブロック位置を算出。
                 var occluderBlockPosition = nearbyBlockPosition + s.Direction;
