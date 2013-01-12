@@ -1,5 +1,7 @@
 //=============================================================================
-// Variables
+//
+// 定数
+//
 //-----------------------------------------------------------------------------
 float4x4 World;
 float4x4 LightViewProjection;
@@ -11,7 +13,9 @@ struct VSOutput
 };
 
 //=============================================================================
-// Vertex shader
+//
+// 頂点シェーダ
+//
 //-----------------------------------------------------------------------------
 VSOutput VS(float4 position : POSITION)
 {
@@ -24,7 +28,9 @@ VSOutput VS(float4 position : POSITION)
 }
 
 //=============================================================================
-// Pixel shader
+//
+// ピクセル シェーダ
+//
 //-----------------------------------------------------------------------------
 float4 DefaultPS(VSOutput input) : COLOR0
 {
@@ -39,7 +45,9 @@ float4 VsmPS(VSOutput input) : COLOR0
 }
 
 //=============================================================================
-// Technique
+//
+// テクニック
+//
 //-----------------------------------------------------------------------------
 technique Default
 {
@@ -52,9 +60,7 @@ technique Default
         // http://msdn.microsoft.com/ja-jp/library/ee416324(VS.85).aspx
         // 『背面と全面』参照。
         //
-//        CullMode = CW;
         CullMode = CCW;
-//        CullMode = None;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 DefaultPS();
     }
@@ -64,9 +70,7 @@ technique Vsm
 {
     pass P0
     {
-//        CullMode = CW;
         CullMode = CCW;
-//        CullMode = None;
         VertexShader = compile vs_2_0 VS();
         PixelShader = compile ps_2_0 VsmPS();
     }
