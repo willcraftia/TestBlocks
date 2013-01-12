@@ -122,12 +122,10 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // エフェクト
 
-            // TODO
-            // オクルージョン クエリ専用テクニックを作る
-            effect.ResolveCurrentTechnique();
+            effect.EnableOcclusionQueryTechnique();
 
             effect.World = world;
-            effect.Apply();
+            effect.CurrentTechnique.Passes[0].Apply();
 
             //----------------------------------------------------------------
             // 描画
@@ -148,7 +146,7 @@ namespace Willcraftia.Xna.Blocks.Models
             effect.ResolveCurrentTechnique();
 
             effect.World = world;
-            effect.Apply();
+            effect.CurrentTechnique.Passes[0].Apply();
 
             //----------------------------------------------------------------
             // 描画

@@ -64,6 +64,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectTechnique defaultTechnique;
 
+        EffectTechnique occlusionQueryTechnique;
+
         EffectTechnique wireframeTechnique;
 
         EffectTechnique basicShadowTechnique;
@@ -73,11 +75,6 @@ namespace Willcraftia.Xna.Blocks.Models
         EffectTechnique pcf3x3ShadowTechnique;
 
         EffectTechnique vsmShadowTechnique;
-
-        //====================================================================
-        // パスのキャッシュ
-
-        EffectPass currentPass;
 
         //--------------------------------------------------------------------
         // IEffectMatrices
@@ -256,6 +253,11 @@ namespace Willcraftia.Xna.Blocks.Models
             CacheEffectTechniques();
         }
 
+        public void EnableOcclusionQueryTechnique()
+        {
+            CurrentTechnique = occlusionQueryTechnique;
+        }
+
         public void ResolveCurrentTechnique()
         {
             if (WireframeEnabled)
@@ -295,13 +297,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     }
                 }
             }
-
-            currentPass = CurrentTechnique.Passes[0];
-        }
-
-        public void Apply()
-        {
-            currentPass.Apply();
         }
 
         protected override void OnApply()
@@ -358,14 +353,13 @@ namespace Willcraftia.Xna.Blocks.Models
         void CacheEffectTechniques()
         {
             defaultTechnique = Techniques["Default"];
+            occlusionQueryTechnique = Techniques["OcclusionQuery"];
             wireframeTechnique = Techniques["Wireframe"];
 
             basicShadowTechnique = Techniques["BasicShadow"];
             pcf2x2ShadowTechnique = Techniques["Pcf2x2Shadow"];
             pcf3x3ShadowTechnique = Techniques["Pcf3x3Shadow"];
             vsmShadowTechnique = Techniques["VsmShadow"];
-
-            currentPass = defaultTechnique.Passes[0];
         }
 
         //====================================================================

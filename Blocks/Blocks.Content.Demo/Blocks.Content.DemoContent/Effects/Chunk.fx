@@ -126,12 +126,22 @@ float2 PcfOffsets[MAX_PCF_TAP_COUNT];
 // 構造体
 //
 //-----------------------------------------------------------------------------
+struct VSInput
+{
+    float4 Position : POSITION0;
+};
+
 struct VSInputNmTxVc
 {
     float4 Position : POSITION0;
     float3 Normal   : NORMAL0;
     float4 Color    : COLOR0;
     float2 TexCoord : TEXCOORD0;
+};
+
+struct VSOutput
+{
+    float4 Position : POSITION0;
 };
 
 struct VSOutputNmTxVcFog
@@ -165,6 +175,18 @@ struct ColorPair
 // 頂点シェーダ
 //
 //-----------------------------------------------------------------------------
+VSOutput VS(VSInput input)
+{
+    VSOutput output;
+
+    float4 worldPosition = mul(input.Position, World);
+    float4 viewPosition = mul(worldPosition, View);
+
+    output.Position = mul(viewPosition, Projection);
+
+    return output;
+}
+
 VSOutputNmTxVcFog VSNmTxVcFog(VSInputNmTxVc input)
 {
     VSOutputNmTxVcFog output;
@@ -286,7 +308,12 @@ float4 PSNmTxVcFog(VSOutputNmTxVcFog input) : COLOR0
     return color;
 }
 
-float4 PSWireframe(VSOutputNmTxVcFog input) : COLOR0
+float4 PSOcclusionQuery(VSOutput input) : COLOR0
+{
+    return float4(0, 0, 0, 1);
+}
+
+float4 PSWireframe(VSOutput input) : COLOR0
 {
     return float4(0, 0, 0, 1);
 }
@@ -463,13 +490,24 @@ technique Default
     }
 }
 
+technique OcclusionQuery
+{
+    pass P0
+    {
+        FillMode = SOLID;
+        CullMode = CCW;
+        VertexShader = compile vs_3_0 VS();
+        PixelShader = compile ps_3_0 PSOcclusionQuery();
+    }
+}
+
 technique Wireframe
 {
     pass P0
     {
         FillMode = WIREFRAME;
         CullMode = CCW;
-        VertexShader = compile vs_3_0 VSNmTxVcFog();
+        VertexShader = compile vs_3_0 VS();
         PixelShader = compile ps_3_0 PSWireframe();
     }
 }
