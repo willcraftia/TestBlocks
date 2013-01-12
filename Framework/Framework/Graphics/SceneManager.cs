@@ -575,6 +575,11 @@ namespace Willcraftia.Xna.Framework.Graphics
                 DrawLensFlare();
 
             //----------------------------------------------------------------
+            // デバッグのための BoundingBox 描画
+
+            DebugDrawBoundingBoxes();
+
+            //----------------------------------------------------------------
             // レンダ ターゲットの反映
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
@@ -738,13 +743,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (opaque.Occluded)
                 {
                     Monitor.OccludedSceneObjectCount++;
-                    DebugDrawBoundingBox(opaque);
                     continue;
                 }
 
                 opaque.Draw();
-
-                DebugDrawBoundingBox(opaque);
             }
 
             //----------------------------------------------------------------
@@ -757,13 +759,10 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (translucent.Occluded)
                 {
                     Monitor.OccludedSceneObjectCount++;
-                    DebugDrawBoundingBox(translucent);
                     continue;
                 }
 
                 translucent.Draw();
-
-                DebugDrawBoundingBox(translucent);
             }
 
             //----------------------------------------------------------------
@@ -828,10 +827,23 @@ namespace Willcraftia.Xna.Framework.Graphics
         }
 
         [Conditional("DEBUG"), Conditional("TRACE")]
-        void DebugDrawBoundingBox(SceneObject sceneObject)
+        void DebugDrawBoundingBoxes()
         {
             if (!DebugBoundingBoxVisible) return;
 
+            GraphicsDevice.SetRenderTarget(renderTarget);
+
+            foreach (var sceneObject in visibleSceneObjects)
+            {
+                DebugDrawBoundingBox(sceneObject);
+            }
+
+            GraphicsDevice.SetRenderTarget(null);
+        }
+
+        [Conditional("DEBUG"), Conditional("TRACE")]
+        void DebugDrawBoundingBox(SceneObject sceneObject)
+        {
             var color = (sceneObject.Occluded) ? Color.Gray : Color.White;
             debugBoundingBoxDrawer.Draw(ref sceneObject.BoundingBox, debugBoundingBoxEffect, ref color);
         }
