@@ -235,6 +235,7 @@ namespace Willcraftia.Xna.Blocks.Models
             RegionManager.Initialize(SceneSettings);
 
             // イベント ハンドラ
+            // シャドウ マップ更新にあわせて、リージョン マネージャで管理しているエフェクトを準備する。
             SceneManager.ShadowMapUpdated += RegionManager.OnShadowMapUpdated;
 
             //----------------------------------------------------------------
