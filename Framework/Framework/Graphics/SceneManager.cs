@@ -289,7 +289,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        // I/F
         public DirectionalLight ActiveDirectionalLight
         {
             get { return activeDirectionalLight; }
