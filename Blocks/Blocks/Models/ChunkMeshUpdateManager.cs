@@ -157,15 +157,16 @@ namespace Willcraftia.Xna.Blocks.Models
             chunk.NeighborsReferencedOnUpdate = flags;
 
             // メッシュを更新。
-            for (int z = 0; z < chunkSize.Z; z++)
-                for (int y = 0; y < chunkSize.Y; y++)
-                    for (int x = 0; x < chunkSize.X; x++)
-                        UpdateChunk(chunk, x, y, z, ref nearbyChunks);
+            VectorI3 blockPosition = new VectorI3();
+            for (blockPosition.Z = 0; blockPosition.Z < chunkSize.Z; blockPosition.Z++)
+                for (blockPosition.Y = 0; blockPosition.Y < chunkSize.Y; blockPosition.Y++)
+                    for (blockPosition.X = 0; blockPosition.X < chunkSize.X; blockPosition.X++)
+                        UpdateChunk(chunk, ref nearbyChunks, ref blockPosition);
         }
 
-        void UpdateChunk(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks)
+        void UpdateChunk(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 blockPosition)
         {
-            var blockIndex = chunk[x, y, z];
+            var blockIndex = chunk[blockPosition.X, blockPosition.Y, blockPosition.Z];
 
             // 空ならば頂点は存在しない。
             if (Block.EmptyIndex == blockIndex) return;
@@ -183,7 +184,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (meshPart == null) continue;
 
                 // 対象面に隣接する Block を探索。
-                var nearbyBlockIndex = GetNearbyBlockIndex(chunk, x, y, z, ref nearbyChunks, side);
+                var nearbyBlockPosition = blockPosition + side.Direction;
+                var nearbyBlockIndex = GetNearbyBlockIndex(chunk, ref nearbyChunks, ref nearbyBlockPosition, side);
                 if (nearbyBlockIndex != Block.EmptyIndex)
                 {
                     // 隣接 Block との関係から対象面の要否を判定。
@@ -197,24 +199,66 @@ namespace Willcraftia.Xna.Blocks.Models
                     if (!block.IsTranslucentTile(side)) continue;
                 }
 
+                // 環境光遮蔽を計算。
+                var ambientOcclusion = CalculateAmbientOcclusion(chunk, ref nearbyChunks, ref nearbyBlockPosition, side);
+
+                // 環境光遮蔽に基づいた頂点色を計算。
+                // 一切の遮蔽が無い場合は Color.White、
+                // 現在対象とする面を遮蔽するブロックが存在する程に Color.Block へ近づく。
+                var vertexColor = new Color(ambientOcclusion, ambientOcclusion, ambientOcclusion);
+
+                // メッシュを追加。
                 if (block.Fluid || block.IsTranslucentTile(side))
                 {
-                    AddMesh(x, y, z, meshPart, chunk.InterChunk.Translucent);
+                    AddMesh(ref blockPosition, ref vertexColor, meshPart, chunk.InterChunk.Translucent);
                 }
                 else
                 {
-                    AddMesh(x, y, z, meshPart, chunk.InterChunk.Opaque);
+                    AddMesh(ref blockPosition, ref vertexColor, meshPart, chunk.InterChunk.Opaque);
                 }
             }
         }
 
-        byte GetNearbyBlockIndex(Chunk chunk, int x, int y, int z, ref NearbyChunks nearbyChunks, CubicSide side)
+        float CalculateAmbientOcclusion(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 nearbyBlockPosition, CubicSide side)
         {
-            var nearbyBlockPosition = side.Direction;
-            nearbyBlockPosition.X += x;
-            nearbyBlockPosition.Y += y;
-            nearbyBlockPosition.Z += z;
+            const float occlusionPerFace = 0.1f;
 
+            // 1 は一切遮蔽されていない状態を表す。
+            float occlustion = 1;
+
+            // 隣接ブロック位置の各方向に隣接ブロックが存在する場合、遮蔽有りと判定。
+            foreach (var s in CubicSide.Items)
+            {
+                // 自身に対する方向はスキップ。
+                if (s == side) continue;
+
+                // 遮蔽対象のブロック位置を算出。
+                var occluderBlockPosition = nearbyBlockPosition + s.Direction;
+
+                // 遮蔽対象のブロックのインデックスを取得。
+                var occluderBlockIndex = GetNearbyBlockIndex(chunk, ref nearbyChunks, ref occluderBlockPosition, s);
+
+                // 空の場合は遮蔽無し。
+                if (occluderBlockIndex == Block.EmptyIndex) continue;
+
+                // ブロック情報を取得。
+                var occluderBlock = region.BlockCatalog[occluderBlockIndex];
+
+                // 流体ブロックは光を遮らないものとする。
+                if (occluderBlock.Fluid) continue;
+
+                // 遮蔽面が半透明の場合は光を遮らないものとする。
+                if (occluderBlock.IsTranslucentTile(side.Reverse())) continue;
+
+                // 遮蔽度で減算。
+                occlustion -= occlusionPerFace;
+            }
+
+            return occlustion;
+        }
+
+        byte GetNearbyBlockIndex(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 nearbyBlockPosition, CubicSide side)
+        {
             // 対象面に隣接する Block を探索。
             if (chunk.Contains(ref nearbyBlockPosition))
             {
@@ -241,7 +285,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        void AddMesh(int x, int y, int z, MeshPart source, InterChunkMesh destination)
+        void AddMesh(ref VectorI3 blockPosition, ref Color color, MeshPart source, InterChunkMesh destination)
         {
             foreach (var index in source.Indices)
                 destination.AddIndex(index);
@@ -255,16 +299,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     Position = sourceVertex.Position,
                     Normal = sourceVertex.Normal,
-                    Color = Color.White,
+                    Color = color,
                     TextureCoordinate = sourceVertex.TextureCoordinate
                 };
 
-                //var vertex = vertices[i];
-
                 // チャンク座標内での位置へ移動。
-                vertex.Position.X += x;
-                vertex.Position.Y += y;
-                vertex.Position.Z += z;
+                vertex.Position.X += blockPosition.X;
+                vertex.Position.Y += blockPosition.Y;
+                vertex.Position.Z += blockPosition.Z;
 
                 // ブロックの MeshPart はその中心に原点があるため、半ブロック移動。
                 vertex.Position += blockMeshOffset;

@@ -1,5 +1,5 @@
 {
-  "ShadowMapEnabled": true,
+  "ShadowMapEnabled": false,
   "ShadowMap": {
     "Technique": 0,
     "Size": 2048,
@@ -29,7 +29,7 @@
       "Amount": 2.0
     }
   },
-  "EdgeEnabled": true,
+  "EdgeEnabled": false,
   "Edge": {
     "MapScale": 1.0
   },
