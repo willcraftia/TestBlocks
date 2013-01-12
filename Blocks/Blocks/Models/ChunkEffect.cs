@@ -64,17 +64,27 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectTechnique defaultTechnique;
 
+        EffectTechnique noFogTechnique;
+
         EffectTechnique occlusionQueryTechnique;
 
         EffectTechnique wireframeTechnique;
 
         EffectTechnique basicShadowTechnique;
 
+        EffectTechnique basicShadowNoFogTechnique;
+
         EffectTechnique pcf2x2ShadowTechnique;
+
+        EffectTechnique pcf2x2ShadowNoFogTechnique;
 
         EffectTechnique pcf3x3ShadowTechnique;
 
+        EffectTechnique pcf3x3ShadowNoFogTechnique;
+
         EffectTechnique vsmShadowTechnique;
+
+        EffectTechnique vsmShadowNoFogTechnique;
 
         //--------------------------------------------------------------------
         // IEffectMatrices
@@ -268,31 +278,31 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (!ShadowMapEnabled)
                 {
-                    CurrentTechnique = defaultTechnique;
+                    CurrentTechnique = FogEnabled ? defaultTechnique : noFogTechnique;
                 }
                 else
                 {
                     switch (ShadowMapTechnique)
                     {
                         case ShadowMap.Techniques.Basic:
-                            CurrentTechnique = basicShadowTechnique;
+                            CurrentTechnique = FogEnabled ? basicShadowTechnique : basicShadowNoFogTechnique;
                             break;
                         case ShadowMap.Techniques.Pcf2x2:
                             if (CurrentTechnique != pcf2x2ShadowTechnique)
                             {
-                                CurrentTechnique = pcf2x2ShadowTechnique;
+                                CurrentTechnique = FogEnabled ? pcf2x2ShadowTechnique : pcf2x2ShadowNoFogTechnique;
                                 InitializePcfKernel(2);
                             }
                             break;
                         case ShadowMap.Techniques.Pcf3x3:
                             if (CurrentTechnique != pcf3x3ShadowTechnique)
                             {
-                                CurrentTechnique = pcf3x3ShadowTechnique;
+                                CurrentTechnique = FogEnabled ? pcf3x3ShadowTechnique : pcf3x3ShadowNoFogTechnique;
                                 InitializePcfKernel(3);
                             }
                             break;
                         case ShadowMap.Techniques.Vsm:
-                            CurrentTechnique = vsmShadowTechnique;
+                            CurrentTechnique = FogEnabled ? vsmShadowTechnique : vsmShadowNoFogTechnique;
                             break;
                     }
                 }
@@ -353,13 +363,18 @@ namespace Willcraftia.Xna.Blocks.Models
         void CacheEffectTechniques()
         {
             defaultTechnique = Techniques["Default"];
+            noFogTechnique = Techniques["NoFog"];
             occlusionQueryTechnique = Techniques["OcclusionQuery"];
             wireframeTechnique = Techniques["Wireframe"];
 
             basicShadowTechnique = Techniques["BasicShadow"];
+            basicShadowNoFogTechnique = Techniques["BasicShadowNoFog"];
             pcf2x2ShadowTechnique = Techniques["Pcf2x2Shadow"];
+            pcf2x2ShadowNoFogTechnique = Techniques["Pcf2x2ShadowNoFog"];
             pcf3x3ShadowTechnique = Techniques["Pcf3x3Shadow"];
+            pcf3x3ShadowNoFogTechnique = Techniques["Pcf3x3ShadowNoFog"];
             vsmShadowTechnique = Techniques["VsmShadow"];
+            vsmShadowNoFogTechnique = Techniques["VsmShadowNoFog"];
         }
 
         //====================================================================

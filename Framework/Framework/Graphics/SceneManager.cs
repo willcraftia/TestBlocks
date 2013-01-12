@@ -621,10 +621,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             var fog = effect as IEffectFog;
             if (fog != null)
             {
+                if (FogEnabled)
+                {
+                    fog.FogStart = FogStart;
+                    fog.FogEnd = FogEnd;
+                    fog.FogColor = fogColor;
+                }
                 fog.FogEnabled = FogEnabled;
-                fog.FogStart = FogStart;
-                fog.FogEnd = FogEnd;
-                fog.FogColor = fogColor;
             }
         }
 
