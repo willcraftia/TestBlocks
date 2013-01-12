@@ -45,6 +45,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        // TODO
+        public const int TaskQueueSlotCount = 50;
+
         static readonly VectorI3 chunkSize = Chunk.Size;
 
         static readonly Vector3 chunkMeshOffset = Chunk.HalfSize.ToVector3();
@@ -78,6 +81,8 @@ namespace Willcraftia.Xna.Blocks.Models
             this.chunkManager = chunkManager;
 
             taskPool = new Pool<Task>(() => { return new Task(this); });
+
+            taskQueue.SlotCount = TaskQueueSlotCount;
         }
 
         public void EnqueueChunk(Chunk chunk)

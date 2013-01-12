@@ -31,11 +31,11 @@ namespace Willcraftia.Xna.Blocks.Models
         public const ushort IndexCapacity = 11000;
 
         // 更新の最大試行数。
-        public const int UpdateCapacity = 1000;
+        public const int UpdateCapacity = 100;
 
         public const int InitialActiveChunkCapacity = 3000;
 
-        public const int InterChunkCapacity = 100;
+        public const int InterChunkCapacity = 50;
 
         static readonly VectorI3 chunkSize = Chunk.Size;
 
