@@ -24,9 +24,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 moonRotationAxis;
 
-        float initialFogStartScale = 0.7f;
+        float initialFogStartScale = 0.9f;
 
-        float initialFogEndScale = 0.9f;
+        float initialFogEndScale = 0.99f;
 
         float secondsPerDay = DefaultSecondsPerDay;
 

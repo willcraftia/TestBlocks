@@ -61,8 +61,8 @@
     }
   ],
   "InitialFogEnabled": true,
-  "InitialFogStartRate": 0.7,
-  "InitialFogEndRate": 0.9,
+  "InitialFogStartRate": 0.9,
+  "InitialFogEndRate": 0.99,
   "SecondsPerDay": 20.0,
   "TimeStopped": true,
   "FixedSecondsPerDay": 8.3
