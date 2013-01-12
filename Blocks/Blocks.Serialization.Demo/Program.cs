@@ -965,7 +965,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     AmbientLightColors = new TimeColorDefinition[]
                     {
                         new TimeColorDefinition { Time = 0, Color = new Vector3(0.1f) },
-                        new TimeColorDefinition { Time = 0.5f, Color = new Vector3(0.6f) },
+                        new TimeColorDefinition { Time = 0.5f, Color = new Vector3(1) },
                         new TimeColorDefinition { Time = 1, Color = new Vector3(0.1f) }
                     },
                     SecondsPerDay = 20f,
