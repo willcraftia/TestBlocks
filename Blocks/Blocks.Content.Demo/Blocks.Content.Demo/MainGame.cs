@@ -449,7 +449,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 RegionManager.Wireframe = !RegionManager.Wireframe;
             // F4
             if (keyboardState.IsKeyUp(Keys.F4) && lastKeyboardState.IsKeyDown(Keys.F4))
-                GlobalSceneSettings.FogEnabled = !GlobalSceneSettings.FogEnabled;
+                worldManager.SceneSettings.FogEnabled = !worldManager.SceneSettings.FogEnabled;
             // F5
             if (DebugMapDisplay.Available && keyboardState.IsKeyUp(Keys.F5) && lastKeyboardState.IsKeyDown(Keys.F5))
                 DebugMapDisplay.Instance.Visible = !DebugMapDisplay.Instance.Visible;

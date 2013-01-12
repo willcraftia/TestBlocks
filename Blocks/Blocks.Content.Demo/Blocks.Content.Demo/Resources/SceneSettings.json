@@ -60,6 +60,9 @@
       "Color": "0.1, 0.1, 0.1"
     }
   ],
+  "InitialFogEnabled": true,
+  "InitialFogStartRate": 0.7,
+  "InitialFogEndRate": 0.9,
   "SecondsPerDay": 20.0,
   "TimeStopped": true,
   "FixedSecondsPerDay": 8.3

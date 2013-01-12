@@ -120,7 +120,7 @@
 			</Color>
 		</TimeColorDefinition>
 		<TimeColorDefinition>
-			<Time>0.75</Time>
+			<Time>0.84</Time>
 			<Color>
 				<X>0.1</X>
 				<Y>0.1</Y>
@@ -136,6 +136,9 @@
 			</Color>
 		</TimeColorDefinition>
 	</AmbientLightColors>
+	<InitialFogEnabled>true</InitialFogEnabled>
+	<InitialFogStartRate>0.7</InitialFogStartRate>
+	<InitialFogEndRate>0.9</InitialFogEndRate>
 	<SecondsPerDay>20</SecondsPerDay>
 	<TimeStopped>false</TimeStopped>
 	<FixedSecondsPerDay>0</FixedSecondsPerDay>

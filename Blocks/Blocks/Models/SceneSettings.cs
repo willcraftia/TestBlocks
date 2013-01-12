@@ -24,6 +24,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 moonRotationAxis;
 
+        float initialFogStartScale = 0.7f;
+
+        float initialFogEndScale = 0.9f;
+
         float secondsPerDay = DefaultSecondsPerDay;
 
         float fixedSecondsPerDay;
@@ -109,9 +113,31 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public TimeColorCollection AmbientLightColors { get; private set; }
 
-        public Vector3 CurrentSkyColor { get; private set; }
+        public bool InitialFogEnabled { get; set; }
 
-        public Vector3 CurrentAmbientLightColor { get; private set; }
+        // FarPlaneDistance に対する割合
+        public float InitialFogStartScale
+        {
+            get { return initialFogStartScale; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                initialFogStartScale = value;
+            }
+        }
+
+        // FarPlaneDistance に対する割合
+        public float InitialFogEndScale
+        {
+            get { return initialFogEndScale; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                initialFogEndScale = value;
+            }
+        }
 
         public float SecondsPerDay
         {
@@ -159,6 +185,16 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return 0 <= moonDirection.Y; }
         }
 
+        public Vector3 CurrentSkyColor { get; private set; }
+
+        public Vector3 CurrentAmbientLightColor { get; private set; }
+
+        public bool FogEnabled { get; set; }
+
+        public float FogStartScale { get; set; }
+
+        public float FogEndScale { get; set; }
+
         public SceneSettings()
         {
             Sunlight = new DirectionalLight("Sun");
@@ -177,6 +213,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             InitializeSunRotationAxis();
             InitializeMoonRotationAxis();
+
+            FogEnabled = InitialFogEnabled;
+            FogStartScale = initialFogStartScale;
+            FogEndScale = initialFogEndScale;
 
             halfDaySeconds = secondsPerDay * 0.5f;
             inverseHalfDaySeconds = 1 / halfDaySeconds;

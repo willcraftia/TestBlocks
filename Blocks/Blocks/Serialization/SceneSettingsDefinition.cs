@@ -31,6 +31,12 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public TimeColorDefinition[] AmbientLightColors;
 
+        public bool InitialFogEnabled;
+
+        public float InitialFogStartRate;
+
+        public float InitialFogEndRate;
+
         public float SecondsPerDay;
 
         public bool TimeStopped;

@@ -94,7 +94,6 @@
     <Compile Include="Serialization\ChunkStoreTypes.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
-    <Compile Include="Models\GlobalSceneSettings.cs" />
     <Compile Include="Models\IChunkProcedure.cs" />
     <Compile Include="Models\DefinedBiomeManager.cs" />
     <Compile Include="Models\FlatTerrainProcedure.cs" />

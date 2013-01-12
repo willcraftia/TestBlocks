@@ -1002,9 +1002,12 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         new TimeColorDefinition { Time = 0.84f, Color = new Vector3(0.1f) },
                         new TimeColorDefinition { Time = 1, Color = new Vector3(0.1f) }
                     },
+                    InitialFogEnabled = true,
+                    InitialFogStartRate = 0.7f,
+                    InitialFogEndRate = 0.9f,
                     SecondsPerDay = 20f,
                     TimeStopped = false,
-                    FixedSecondsPerDay = 0
+                    FixedSecondsPerDay = 8.3f
                 };
                 var jsonResource = SerializeToJson<SceneSettingsDefinition>("SceneSettings", sceneSettings);
                 var xmlResource = SerializeToXml<SceneSettingsDefinition>("SceneSettings", sceneSettings);

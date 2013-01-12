@@ -311,11 +311,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 SceneManager.ActiveDirectionalLightName = null;
             }
 
-            // TODO
-            SceneManager.FogEnabled = GlobalSceneSettings.FogEnabled;
-            SceneManager.FogStart = SceneManager.ActiveCamera.Projection.FarPlaneDistance * 0.7f;
-            SceneManager.FogEnd = SceneManager.ActiveCamera.Projection.FarPlaneDistance * 0.9f;
-            SceneManager.FogColor = SceneSettings.CurrentSkyColor;
+            if (SceneSettings.FogEnabled)
+            {
+                var currentFarPlaneDistance = SceneManager.ActiveCamera.Projection.FarPlaneDistance;
+                SceneManager.FogStart = currentFarPlaneDistance * SceneSettings.FogStartScale;
+                SceneManager.FogEnd = currentFarPlaneDistance * SceneSettings.FogEndScale;
+                SceneManager.FogColor = SceneSettings.CurrentSkyColor;
+            }
+            SceneManager.FogEnabled = SceneSettings.FogEnabled;
 
             // 太陽が見える場合にのみレンズ フレアを描画。
             LensFlare.Enabled = SceneSettings.SunAboveHorizon;

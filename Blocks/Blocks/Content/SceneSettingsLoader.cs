@@ -24,6 +24,9 @@ namespace Willcraftia.Xna.Blocks.Content
                 MidnightSunDirection = definition.MidnightSunDirection,
                 MidnightMoonDirection = definition.MidnightMoonDirection,
                 ShadowColor = definition.ShadowColor,
+                InitialFogEnabled = definition.InitialFogEnabled,
+                InitialFogStartScale = definition.InitialFogStartRate,
+                InitialFogEndScale = definition.InitialFogEndRate,
                 SecondsPerDay = definition.SecondsPerDay,
                 TimeStopped = definition.TimeStopped,
                 FixedSecondsPerDay = definition.FixedSecondsPerDay
@@ -74,6 +77,9 @@ namespace Willcraftia.Xna.Blocks.Content
                 MoonlightDiffuseColor = sceneSettings.Moonlight.DiffuseColor,
                 MoonlightSpecularColor = sceneSettings.Moonlight.SpecularColor,
                 MoonlightEnabled = sceneSettings.Moonlight.Enabled,
+                InitialFogEnabled = sceneSettings.InitialFogEnabled,
+                InitialFogStartRate = sceneSettings.InitialFogStartScale,
+                InitialFogEndRate = sceneSettings.InitialFogEndScale,
                 SecondsPerDay = sceneSettings.SecondsPerDay,
                 TimeStopped = sceneSettings.TimeStopped,
                 FixedSecondsPerDay = sceneSettings.FixedSecondsPerDay
