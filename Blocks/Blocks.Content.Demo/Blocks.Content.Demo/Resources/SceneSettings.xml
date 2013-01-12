@@ -10,16 +10,6 @@
 		<Y>1</Y>
 		<Z>1</Z>
 	</MidnightMoonDirection>
-	<MiddayAmbientLightColor>
-		<X>0.6</X>
-		<Y>0.6</Y>
-		<Z>0.6</Z>
-	</MiddayAmbientLightColor>
-	<MidnightAmbientLightColor>
-		<X>0.1</X>
-		<Y>0.1</Y>
-		<Z>0.1</Z>
-	</MidnightAmbientLightColor>
 	<ShadowColor>
 		<X>0.4117647</X>
 		<Y>0.4117647</Y>
@@ -105,6 +95,32 @@
 			</Color>
 		</TimeColorDefinition>
 	</SkyColors>
+	<AmbientLightColors>
+		<TimeColorDefinition>
+			<Time>0</Time>
+			<Color>
+				<X>0.1</X>
+				<Y>0.1</Y>
+				<Z>0.1</Z>
+			</Color>
+		</TimeColorDefinition>
+		<TimeColorDefinition>
+			<Time>0.5</Time>
+			<Color>
+				<X>0.6</X>
+				<Y>0.6</Y>
+				<Z>0.6</Z>
+			</Color>
+		</TimeColorDefinition>
+		<TimeColorDefinition>
+			<Time>1</Time>
+			<Color>
+				<X>0.1</X>
+				<Y>0.1</Y>
+				<Z>0.1</Z>
+			</Color>
+		</TimeColorDefinition>
+	</AmbientLightColors>
 	<SecondsPerDay>20</SecondsPerDay>
 	<TimeStopped>false</TimeStopped>
 	<FixedSecondsPerDay>0</FixedSecondsPerDay>

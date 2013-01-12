@@ -24,8 +24,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 EarthRotationEnabled = definition.EarthRotationEnabled,
                 MidnightSunDirection = definition.MidnightSunDirection,
                 MidnightMoonDirection = definition.MidnightMoonDirection,
-                MiddayAmbientLightColor = definition.MiddayAmbientLightColor,
-                MidnightAmbientLightColor = definition.MidnightAmbientLightColor,
+                //MiddayAmbientLightColor = definition.MiddayAmbientLightColor,
+                //MidnightAmbientLightColor = definition.MidnightAmbientLightColor,
                 ShadowColor = definition.ShadowColor,
                 SecondsPerDay = definition.SecondsPerDay,
                 TimeStopped = definition.TimeStopped,
@@ -48,6 +48,15 @@ namespace Willcraftia.Xna.Blocks.Content
                 }
             }
 
+            if (!ArrayHelper.IsNullOrEmpty(definition.AmbientLightColors))
+            {
+                for (int i = 0; i < definition.AmbientLightColors.Length; i++)
+                {
+                    var timeColor = ToTimeColor(ref definition.AmbientLightColors[i]);
+                    sceneSettings.AmbientLightColors.AddColor(timeColor);
+                }
+            }
+
             sceneSettings.Initialize();
 
             return sceneSettings;
@@ -62,8 +71,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 EarthRotationEnabled = sceneSettings.EarthRotationEnabled,
                 MidnightSunDirection = sceneSettings.MidnightSunDirection,
                 MidnightMoonDirection = sceneSettings.MidnightMoonDirection,
-                MiddayAmbientLightColor = sceneSettings.MiddayAmbientLightColor,
-                MidnightAmbientLightColor = sceneSettings.MidnightAmbientLightColor,
+                //MiddayAmbientLightColor = sceneSettings.MiddayAmbientLightColor,
+                //MidnightAmbientLightColor = sceneSettings.MidnightAmbientLightColor,
                 ShadowColor = sceneSettings.ShadowColor,
                 SunlightDiffuseColor = sceneSettings.Sunlight.DiffuseColor,
                 SunlightSpecularColor = sceneSettings.Sunlight.SpecularColor,
@@ -80,12 +89,26 @@ namespace Willcraftia.Xna.Blocks.Content
             {
                 definition.SkyColors = new TimeColorDefinition[sceneSettings.SkyColors.Count];
                 int index = 0;
-                foreach (var skyColor in sceneSettings.SkyColors)
+                foreach (var timeColor in sceneSettings.SkyColors)
                 {
                     definition.SkyColors[index++] = new TimeColorDefinition
                     {
-                        Time = skyColor.Time,
-                        Color = skyColor.Color
+                        Time = timeColor.Time,
+                        Color = timeColor.Color
+                    };
+                }
+            }
+
+            if (sceneSettings.AmbientLightColors.Count != 0)
+            {
+                definition.AmbientLightColors = new TimeColorDefinition[sceneSettings.AmbientLightColors.Count];
+                int index = 0;
+                foreach (var timeColor in sceneSettings.AmbientLightColors)
+                {
+                    definition.AmbientLightColors[index++] = new TimeColorDefinition
+                    {
+                        Time = timeColor.Time,
+                        Color = timeColor.Color
                     };
                 }
             }

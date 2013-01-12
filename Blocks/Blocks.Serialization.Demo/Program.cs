@@ -946,8 +946,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     EarthRotationEnabled = true,
                     MidnightSunDirection = new Vector3(0, -1, 1),
                     MidnightMoonDirection = new Vector3(0, 1, 1),
-                    MiddayAmbientLightColor = new Vector3(0.6f),
-                    MidnightAmbientLightColor = new Vector3(0.1f),
                     ShadowColor = Color.DimGray.ToVector3(),
                     SunlightDiffuseColor = Vector3.One,
                     SunlightSpecularColor = Vector3.Zero,
@@ -963,7 +961,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         new TimeColorDefinition { Time = 0.5f, Color = Color.CornflowerBlue.ToVector3() },
                         new TimeColorDefinition { Time = 0.75f, Color = Color.CornflowerBlue.ToVector3() },
                         new TimeColorDefinition { Time = 0.84f, Color = Color.Black.ToVector3() },
-                        new TimeColorDefinition { Time = 1, Color = Color.Black.ToVector3() },
+                        new TimeColorDefinition { Time = 1, Color = Color.Black.ToVector3() }
+                    },
+                    AmbientLightColors = new TimeColorDefinition[]
+                    {
+                        new TimeColorDefinition { Time = 0, Color = new Vector3(0.1f) },
+                        new TimeColorDefinition { Time = 0.5f, Color = new Vector3(0.6f) },
+                        new TimeColorDefinition { Time = 1, Color = new Vector3(0.1f) }
                     },
                     SecondsPerDay = 20f,
                     TimeStopped = false,

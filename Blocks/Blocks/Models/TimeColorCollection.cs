@@ -9,12 +9,22 @@ using Willcraftia.Xna.Framework;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
+    /// <summary>
+    /// ある時間における色を管理するクラスです。
+    /// 時間は 0 を 0 時、1 を 24 時として [0, 1] で管理されます。
+    /// [0, 1] にある時間を指定すると、その時間よりも前の時間で定義された色、
+    /// および、その次の時間で定義された色の間で線形補間した色を取得できます。
+    /// この仕組から、0 時および 24 時には必ず色を設定しなければなりません。
+    /// </summary>
     public sealed class TimeColorCollection : IEnumerable<TimeColor>
     {
         public const int InitialCapacity = 10;
 
         List<TimeColor> entries = new List<TimeColor>(InitialCapacity);
 
+        /// <summary>
+        /// 登録されている時間色の数を取得します。
+        /// </summary>
         public int Count
         {
             get { return entries.Count; }
@@ -32,12 +42,21 @@ namespace Willcraftia.Xna.Blocks.Models
             return entries.GetEnumerator();
         }
 
+        /// <summary>
+        /// 時間色を追加します。
+        /// </summary>
+        /// <param name="timeColor"></param>
         public void AddColor(TimeColor timeColor)
         {
             var index = FindInsertionIndex(timeColor.Time);
             entries.Insert(index, timeColor);
         }
 
+        /// <summary>
+        /// 指定の時間に対する色を取得します。
+        /// </summary>
+        /// <param name="time">時間 ([0, 1])。</param>
+        /// <returns>色。</returns>
         public Vector3 GetColor(float time)
         {
             Vector3 result;
@@ -45,6 +64,11 @@ namespace Willcraftia.Xna.Blocks.Models
             return result;
         }
 
+        /// <summary>
+        /// 指定の時間に対する色を取得します。
+        /// </summary>
+        /// <param name="time">時間 ([0, 1])。</param>
+        /// <param name="result">色。</param>
         public void GetColor(float time, out Vector3 result)
         {
             int baseIndex = 0;

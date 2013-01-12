@@ -232,7 +232,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // ライティング
 
-            chunkEffect.AmbientLightColor = SceneSettings.AmbientLightColor;
+            chunkEffect.AmbientLightColor = SceneSettings.CurrentAmbientLightColor;
 
             //
             // TODO

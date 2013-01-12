@@ -2,8 +2,6 @@
   "EarthRotationEnabled": true,
   "MidnightSunDirection": "0, -1, 1",
   "MidnightMoonDirection": "0, 1, 1",
-  "MiddayAmbientLightColor": "0.6, 0.6, 0.6",
-  "MidnightAmbientLightColor": "0.1, 0.1, 0.1",
   "ShadowColor": "0.4117647, 0.4117647, 0.4117647",
   "SunlightDiffuseColor": "1, 1, 1",
   "SunlightSpecularColor": "0, 0, 0",
@@ -41,7 +39,21 @@
       "Color": "0, 0, 0"
     }
   ],
+  "AmbientLightColors": [
+    {
+      "Time": 0.0,
+      "Color": "0.1, 0.1, 0.1"
+    },
+    {
+      "Time": 0.5,
+      "Color": "0.6, 0.6, 0.6"
+    },
+    {
+      "Time": 1.0,
+      "Color": "0.1, 0.1, 0.1"
+    }
+  ],
   "SecondsPerDay": 20.0,
-  "TimeStopped": true,
-  "FixedSecondsPerDay": 8.3
+  "TimeStopped": false,
+  "FixedSecondsPerDay": 0.0
 }

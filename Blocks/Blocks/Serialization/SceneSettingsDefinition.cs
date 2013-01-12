@@ -15,9 +15,9 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public Vector3 MidnightMoonDirection;
 
-        public Vector3 MiddayAmbientLightColor;
+        //public Vector3 MiddayAmbientLightColor;
 
-        public Vector3 MidnightAmbientLightColor;
+        //public Vector3 MidnightAmbientLightColor;
 
         public Vector3 ShadowColor;
 
@@ -34,6 +34,8 @@ namespace Willcraftia.Xna.Blocks.Serialization
         public bool MoonlightEnabled;
 
         public TimeColorDefinition[] SkyColors;
+
+        public TimeColorDefinition[] AmbientLightColors;
 
         public float SecondsPerDay;
 

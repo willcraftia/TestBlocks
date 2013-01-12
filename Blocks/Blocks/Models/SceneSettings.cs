@@ -18,10 +18,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 midnightMoonDirection = DefaultMidnightMoonDirection;
 
-        Vector3 middayAmbientLightColor = new Vector3(0.6f);
-
-        Vector3 midnightAmbientLightColor = new Vector3(0.1f);
-
         Vector3 shadowColor = Vector3.Zero;
 
         Vector3 sunRotationAxis;
@@ -41,8 +37,6 @@ namespace Willcraftia.Xna.Blocks.Models
         Vector3 sunDirection;
 
         Vector3 moonDirection;
-
-        Vector3 ambientLightColor;
 
         public static Vector3 DefaultMidnightSunDirection
         {
@@ -93,18 +87,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public Vector3 MiddayAmbientLightColor
-        {
-            get { return middayAmbientLightColor; }
-            set { middayAmbientLightColor = value; }
-        }
-
-        public Vector3 MidnightAmbientLightColor
-        {
-            get { return midnightAmbientLightColor; }
-            set { midnightAmbientLightColor = value; }
-        }
-
         public Vector3 ShadowColor
         {
             get { return shadowColor; }
@@ -127,7 +109,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public TimeColorCollection SkyColors { get; private set; }
 
+        public TimeColorCollection AmbientLightColors { get; private set; }
+
         public Vector3 CurrentSkyColor { get; private set; }
+
+        public Vector3 CurrentAmbientLightColor { get; private set; }
 
         public float SecondsPerDay
         {
@@ -147,18 +133,13 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return fixedSecondsPerDay; }
             set
             {
-                if (value <= 0) throw new ArgumentOutOfRangeException("value");
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
 
                 fixedSecondsPerDay = value;
             }
         }
 
         public float ElapsedSecondsPerDay { get; private set; }
-
-        public Vector3 AmbientLightColor
-        {
-            get { return ambientLightColor; }
-        }
 
         public Vector3 SunDirection
         {
@@ -189,6 +170,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Moonlight.Direction = -DefaultMidnightMoonDirection;
 
             SkyColors = new TimeColorCollection();
+            AmbientLightColors = new TimeColorCollection();
         }
 
         public void Initialize()
@@ -206,6 +188,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
+            //----------------------------------------------------------------
+            // 0 時からの経過時間 (ゲーム内での一日の経過時間)
+
             if (!TimeStopped)
             {
                 ElapsedSecondsPerDay = (float) gameTime.TotalGameTime.TotalSeconds % secondsPerDay;
@@ -215,30 +200,27 @@ namespace Willcraftia.Xna.Blocks.Models
                 ElapsedSecondsPerDay = fixedSecondsPerDay;
             }
 
+            //----------------------------------------------------------------
+            // 太陽と月
+
             UpdateSun();
             UpdateMoon();
 
+            //----------------------------------------------------------------
+            // 環境光
+
             UpdateAmbientLightColor();
+
+            //----------------------------------------------------------------
+            // 空の色
 
             UpdateSkyColor();
         }
-
-        public void CalculateSkyColor(ref Vector3 middaySkyColor, ref Vector3 midnightSkyColor, out Vector3 resul)
-        {
-            if (ElapsedSecondsPerDay < halfDaySeconds)
-            {
-                var amount = ElapsedSecondsPerDay * inverseHalfDaySeconds;
-                Vector3.Lerp(ref midnightSkyColor, ref middaySkyColor, amount, out resul);
-            }
-            else
-            {
-                var amount = (ElapsedSecondsPerDay - halfDaySeconds) * inverseHalfDaySeconds;
-                Vector3.Lerp(ref middaySkyColor, ref midnightSkyColor, amount, out resul);
-            }
-        }
-
+        
         void UpdateSun()
         {
+            // 0 時での太陽の位置を基点に、設定された軸の周囲で太陽を回転。
+
             var angle = (ElapsedSecondsPerDay / secondsPerDay) * MathHelper.TwoPi;
             Matrix transform;
             Matrix.CreateFromAxisAngle(ref sunRotationAxis, angle, out transform);
@@ -250,6 +232,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void UpdateMoon()
         {
+            // 0 時での月の位置を基点に、設定された軸の周囲で月を回転。
+
             var angle = (ElapsedSecondsPerDay / secondsPerDay) * MathHelper.TwoPi;
             Matrix transform;
             Matrix.CreateFromAxisAngle(ref moonRotationAxis, angle, out transform);
@@ -261,16 +245,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void UpdateAmbientLightColor()
         {
-            if (ElapsedSecondsPerDay < halfDaySeconds)
-            {
-                var amount = ElapsedSecondsPerDay * inverseHalfDaySeconds;
-                Vector3.Lerp(ref midnightAmbientLightColor, ref middayAmbientLightColor, amount, out ambientLightColor);
-            }
-            else
-            {
-                var amount = (ElapsedSecondsPerDay - halfDaySeconds) * inverseHalfDaySeconds;
-                Vector3.Lerp(ref middayAmbientLightColor, ref midnightAmbientLightColor, amount, out ambientLightColor);
-            }
+            // 一日の時間を [0, 1] へ変換。
+            // 0 が 0 時、1 が 24 時。
+            var elapsed = ElapsedSecondsPerDay / SecondsPerDay;
+
+            CurrentAmbientLightColor = AmbientLightColors.GetColor(elapsed);
         }
 
         void UpdateSkyColor()
@@ -284,12 +263,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void InitializeSunRotationAxis()
         {
+            // 0 時での太陽の位置から回転軸を算出。
             var right = Vector3.Cross(midnightSunDirection, Vector3.Up);
             sunRotationAxis = Vector3.Cross(right, midnightSunDirection);
         }
 
         void InitializeMoonRotationAxis()
         {
+            // 0 時での月の位置から回転軸を算出。
             var right = Vector3.Cross(midnightMoonDirection, Vector3.Up);
             moonRotationAxis = Vector3.Cross(right, midnightMoonDirection);
         }
