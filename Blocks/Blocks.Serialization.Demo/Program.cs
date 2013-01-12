@@ -943,7 +943,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var sceneSettings = new SceneSettingsDefinition
                 {
-                    EarthRotationEnabled = true,
                     MidnightSunDirection = new Vector3(0, -1, 1),
                     MidnightMoonDirection = new Vector3(0, 1, 1),
                     ShadowColor = Color.DimGray.ToVector3(),

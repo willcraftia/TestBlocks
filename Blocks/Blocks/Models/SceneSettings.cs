@@ -61,8 +61,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public IResource Resource { get; set; }
 
-        public bool EarthRotationEnabled { get; set; }
-
         public Vector3 MidnightSunDirection
         {
             get { return midnightSunDirection; }
