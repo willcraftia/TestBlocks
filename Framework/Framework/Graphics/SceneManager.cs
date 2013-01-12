@@ -643,8 +643,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                 effect.ShadowMapSize = ShadowMap.Size;
                 effect.ShadowMapDepthBias = ShadowMap.DepthBias;
                 effect.ShadowMapCount = ShadowMap.SplitCount;
-                effect.ShadowMapSplitDistances = ShadowMap.SplitDistances;
-                effect.ShadowMapSplitLightViewProjections = ShadowMap.SplitLightViewProjections;
+                effect.ShadowMapDistances = ShadowMap.SplitDistances;
+                effect.ShadowMapLightViewProjections = ShadowMap.SplitLightViewProjections;
                 effect.ShadowMaps = ShadowMap.SplitShadowMaps;
             }
         }

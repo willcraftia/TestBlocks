@@ -21,9 +21,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         int ShadowMapCount { get; set; }
 
-        float[] ShadowMapSplitDistances { get; set; }
+        float[] ShadowMapDistances { get; set; }
 
-        Matrix[] ShadowMapSplitLightViewProjections { get; set; }
+        Matrix[] ShadowMapLightViewProjections { get; set; }
 
         Texture2D[] ShadowMaps { get; set; }
     }

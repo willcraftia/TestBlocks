@@ -13,9 +13,9 @@ float4x4 Projection;
 float3 EyePosition;
 
 float3 AmbientLightColor;
-float3 LightDirection;
-float3 LightDiffuseColor;
-float3 LightSpecularColor;
+float3 DirLight0Direction;
+float3 DirLight0DiffuseColor;
+float3 DirLight0SpecularColor;
 
 float FogEnabled;
 float FogStart;
@@ -69,23 +69,23 @@ sampler SpecularMapSampler = sampler_state
 //-----------------------------------------------------------------------------
 // シャドウ マッピング用
 
-float DepthBias;
+float ShadowMapDepthBias;
 
-#define MAX_SPLIT_COUNT 3
+#define MAX_SHADOW_MAP_COUNT 3
 
-int SplitCount = MAX_SPLIT_COUNT;
-float SplitDistances[MAX_SPLIT_COUNT + 1];
-float4x4 SplitLightViewProjections[MAX_SPLIT_COUNT];
+int ShadowMapCount = MAX_SHADOW_MAP_COUNT;
+float ShadowMapDistances[MAX_SHADOW_MAP_COUNT + 1];
+float4x4 ShadowMapLightViewProjections[MAX_SHADOW_MAP_COUNT];
 
 texture ShadowMap0;
-#if MAX_SPLIT_COUNT > 1
+#if MAX_SHADOW_MAP_COUNT > 1
 texture ShadowMap1;
 #endif
-#if MAX_SPLIT_COUNT > 2
+#if MAX_SHADOW_MAP_COUNT > 2
 texture ShadowMap2;
 #endif
 
-sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
+sampler ShadowMapSampler[MAX_SHADOW_MAP_COUNT] =
 {
     sampler_state
     {
@@ -94,7 +94,7 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
         MagFilter = Point;
         MipFilter = None;
     },
-#if MAX_SPLIT_COUNT > 1
+#if MAX_SHADOW_MAP_COUNT > 1
     sampler_state
     {
         Texture = <ShadowMap1>;
@@ -103,7 +103,7 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
         MipFilter = None;
     },
 #endif
-#if MAX_SPLIT_COUNT > 2
+#if MAX_SHADOW_MAP_COUNT > 2
     sampler_state
     {
         Texture = <ShadowMap2>;
@@ -218,16 +218,16 @@ ColorPair CalculateLight(float3 E, float3 N, float2 texCoord)
 
     float4 specular = tex2D(SpecularMapSampler, texCoord);
 
-    float3 L = -LightDirection;
+    float3 L = -DirLight0Direction;
     float3 H = normalize(E + L);
     float dt = max(0, dot(L, N));
-    result.Diffuse += LightDiffuseColor * dt;
+    result.Diffuse += DirLight0DiffuseColor * dt;
     if (dt != 0)
-        result.Specular += LightSpecularColor * pow(max(0.00001f, dot(H, N)), specular.a);
+        result.Specular += DirLight0SpecularColor * pow(max(0.00001f, dot(H, N)), specular.a);
 // XNA 4.0 Release ビルドでは、シェーダが pow(0,e) を exp(log(0) * e) へ展開し、
 // これが exp(-inf * e) となるため、コンパイル エラーとなることが既知の問題らしい。
 // ゆえに、0 の部分を限りなく 0 に近い値にして回避するらしい。
-//        result.Specular += LightSpecularColor * pow(max(0, dot(H, N)), specular.a);
+//        result.Specular += DirLight0SpecularColor * pow(max(0, dot(H, N)), specular.a);
 
     result.Diffuse *= tex2D(DiffuseMapSampler, texCoord);
     result.Diffuse += tex2D(EmissiveMapSampler, texCoord);
@@ -245,13 +245,13 @@ ColorPair CalculateLightWithShadow(float3 E, float3 N, float2 texCoord, float sh
 
     float4 specular = tex2D(SpecularMapSampler, texCoord);
 
-    float3 L = -LightDirection;
+    float3 L = -DirLight0Direction;
     float3 H = normalize(E + L);
     float dt = max(0, dot(L, N));
     dt = min(dt, shadow);
-    result.Diffuse += LightDiffuseColor * dt;
+    result.Diffuse += DirLight0DiffuseColor * dt;
     if (dt != 0)
-        result.Specular += LightSpecularColor * pow(max(0.00001f, dot(H, N)), specular.a);
+        result.Specular += DirLight0SpecularColor * pow(max(0.00001f, dot(H, N)), specular.a);
 
     result.Diffuse *= tex2D(DiffuseMapSampler, texCoord);
     result.Diffuse += tex2D(EmissiveMapSampler, texCoord);
@@ -296,11 +296,11 @@ float4 ClassicShadowPS(ShadowVSOutput input) : COLOR0
     // シャドウ
     float distance = abs(input.ViewPosition.z);
     float shadow = 1;
-    for (int i = 0; i < SplitCount; i++)
+    for (int i = 0; i < ShadowMapCount; i++)
     {
-        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        if (ShadowMapDistances[i] <= distance && distance < ShadowMapDistances[i + 1])
         {
-            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float4 lightingPosition = mul(input.WorldPosition, ShadowMapLightViewProjections[i]);
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
             shadow = TestClassicShadowMap(
                 ShadowMapSampler[i],
@@ -308,7 +308,7 @@ float4 ClassicShadowPS(ShadowVSOutput input) : COLOR0
                 ShadowMapTexelSize,
                 shadowTexCoord,
                 lightingPosition,
-                DepthBias);
+                ShadowMapDepthBias);
         }
     }
 
@@ -336,17 +336,17 @@ float4 Pcf2x2PS(ShadowVSOutput input) : COLOR
     // シャドウ
     float distance = abs(input.ViewPosition.z);
     float shadow = 1;
-    for (int i = 0; i < SplitCount; i++)
+    for (int i = 0; i < ShadowMapCount; i++)
     {
-        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        if (ShadowMapDistances[i] <= distance && distance < ShadowMapDistances[i + 1])
         {
-            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float4 lightingPosition = mul(input.WorldPosition, ShadowMapLightViewProjections[i]);
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
             shadow = TestPcf2x2ShadowMap(
                 ShadowMapSampler[i],
                 shadowTexCoord,
                 lightingPosition,
-                DepthBias,
+                ShadowMapDepthBias,
                 PcfOffsets);
         }
     }
@@ -375,17 +375,17 @@ float4 Pcf3x3PS(ShadowVSOutput input) : COLOR
     // シャドウ
     float distance = abs(input.ViewPosition.z);
     float shadow = 1;
-    for (int i = 0; i < SplitCount; i++)
+    for (int i = 0; i < ShadowMapCount; i++)
     {
-        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        if (ShadowMapDistances[i] <= distance && distance < ShadowMapDistances[i + 1])
         {
-            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float4 lightingPosition = mul(input.WorldPosition, ShadowMapLightViewProjections[i]);
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
             shadow = TestPcf3x3ShadowMap(
                 ShadowMapSampler[i],
                 shadowTexCoord,
                 lightingPosition,
-                DepthBias,
+                ShadowMapDepthBias,
                 PcfOffsets);
         }
     }
@@ -414,17 +414,17 @@ float4 VsmShadowPS(ShadowVSOutput input) : COLOR0
     // シャドウ
     float distance = abs(input.ViewPosition.z);
     float shadow = 1;
-    for (int i = 0; i < SplitCount; i++)
+    for (int i = 0; i < ShadowMapCount; i++)
     {
-        if (SplitDistances[i] <= distance && distance < SplitDistances[i + 1])
+        if (ShadowMapDistances[i] <= distance && distance < ShadowMapDistances[i + 1])
         {
-            float4 lightingPosition = mul(input.WorldPosition, SplitLightViewProjections[i]);
+            float4 lightingPosition = mul(input.WorldPosition, ShadowMapLightViewProjections[i]);
             float2 shadowTexCoord = ProjectionToTexCoord(lightingPosition);
             shadow = TestVarianceShadowMap(
                 ShadowMapSampler[i],
                 shadowTexCoord,
                 lightingPosition,
-                DepthBias);
+                ShadowMapDepthBias);
         }
     }
 
