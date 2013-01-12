@@ -79,11 +79,5 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         /// <param name="effect"></param>
         public abstract void Draw(Effect effect);
-
-        /// <summary>
-        /// シャドウ マップと共に自身が管理するエフェクトを用いて描画します。
-        /// </summary>
-        /// <param name="shadowMap"></param>
-        public abstract void Draw(ShadowMap shadowMap);
     }
 }

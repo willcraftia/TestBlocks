@@ -134,12 +134,6 @@ namespace Willcraftia.Xna.Blocks.Models
             // スカイ スフィアは特殊なエフェクトには対応しない (その必要もない)。
         }
 
-        public override void Draw(ShadowMap shadowMap)
-        {
-            // スカイ スフィアには投影しない。
-            Draw();
-        }
-
         #region ToString
 
         public override string ToString()

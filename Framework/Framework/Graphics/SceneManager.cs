@@ -221,6 +221,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             ColorWriteChannels = ColorWriteChannels.None
         };
 
+        /// <summary>
+        /// シャドウ マップの更新完了で発生するイベント。
+        /// </summary>
+        public event EventHandler ShadowMapUpdated = delegate { };
+
         List<SceneObject> sceneObjects = new List<SceneObject>(InitialSceneObjectCapacity);
 
         SceneObject skySphere;
@@ -433,9 +438,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (gameTime == null) throw new ArgumentNullException("gameTime");
             if (activeCamera == null) throw new InvalidOperationException("ActiveCamera is null.");
 
-            // カメラ更新。
-            activeCamera.Update();
-
             activeCamera.Frustum.GetCorners(frustumCorners);
             frustumSphere = BoundingSphere.CreateFromPoints(frustumCorners);
 
@@ -518,6 +520,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 DrawShadowMap();
                 shadowMapAvailable = true;
+
+                ShadowMapUpdated(this, EventArgs.Empty);
             }
 
             //----------------------------------------------------------------
@@ -555,6 +559,25 @@ namespace Willcraftia.Xna.Framework.Graphics
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
+        }
+
+        public void UpdateEffectShadowMap(IEffectShadowMap effect)
+        {
+            if (effect == null) throw new ArgumentNullException("effect");
+
+            if (SssmEnabled)
+            {
+                effect.ShadowMapEnabled = false;
+            }
+            else
+            {
+                effect.ShadowMapEnabled = true;
+                effect.DepthBias = ShadowMap.DepthBias;
+                effect.SplitCount = ShadowMap.SplitCount;
+                effect.SplitDistances = ShadowMap.SplitDistances;
+                effect.SplitLightViewProjections = ShadowMap.SplitLightViewProjections;
+                effect.SplitShadowMaps = ShadowMap.SplitShadowMaps;
+            }
         }
 
         bool IsVisibleObject(SceneObject sceneObject)
@@ -648,14 +671,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                     continue;
                 }
 
-                if (shadowMap != null)
-                {
-                    opaque.Draw(shadowMap);
-                }
-                else
-                {
-                    opaque.Draw();
-                }
+                opaque.Draw();
 
                 DebugDrawBoundingBox(opaque);
             }
@@ -674,8 +690,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                     continue;
                 }
 
-                // TODO
-                // 半透明に対してシャドウ マップは必要か？
                 translucent.Draw();
 
                 DebugDrawBoundingBox(translucent);

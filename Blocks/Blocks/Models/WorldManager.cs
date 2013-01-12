@@ -235,6 +235,9 @@ namespace Willcraftia.Xna.Blocks.Models
             RegionManager = new RegionManager(serviceProvider, SceneManager);
             RegionManager.Initialize(SceneSettings);
 
+            // イベント ハンドラ
+            SceneManager.ShadowMapUpdated += RegionManager.OnShadowMapUpdated;
+
             //----------------------------------------------------------------
             // パーティション マネージャ
 
@@ -263,12 +266,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
-            var camera = SceneManager.ActiveCamera;
-            var cameraPosition = camera.View.Position;
+            //----------------------------------------------------------------
+            // カメラ更新
+
+            SceneManager.ActiveCamera.Update();
 
             //----------------------------------------------------------------
             // パーティション マネージャ
 
+            var cameraPosition = SceneManager.ActiveCamera.View.Position;
             PartitionManager.Update(ref cameraPosition);
 
             //----------------------------------------------------------------
@@ -304,7 +310,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // リージョン マネージャ
 
             // チャンク エフェクトを更新。
-            RegionManager.UpdateChunkEffect();
+            RegionManager.PrepareChunkEffect();
 
             //----------------------------------------------------------------
             // シーン マネージャ

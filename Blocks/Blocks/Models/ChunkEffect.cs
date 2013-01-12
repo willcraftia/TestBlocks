@@ -9,13 +9,8 @@ using Willcraftia.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkEffect
+    public sealed class ChunkEffect : Effect, IEffectMatrices, IEffectShadowMap
     {
-        //====================================================================
-        // Real Effect
-
-        Effect backingEffect;
-
         //====================================================================
         // EffectParameter
 
@@ -94,18 +89,21 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectPass currentPass;
 
+        // I/F
         public Matrix World
         {
             get { return world.GetValueMatrix(); }
             set { world.SetValue(value); }
         }
 
+        // I/F
         public Matrix View
         {
             get { return view.GetValueMatrix(); }
             set { view.SetValue(value); }
         }
 
+        // I/F
         public Matrix Projection
         {
             get { return projection.GetValueMatrix(); }
@@ -190,30 +188,34 @@ namespace Willcraftia.Xna.Blocks.Models
             set { specularMap.SetValue(value); }
         }
 
-        public EffectTechnique CurrentTechnique
-        {
-            get { return backingEffect.CurrentTechnique; }
-            set { backingEffect.CurrentTechnique = value; }
-        }
+        // I/F
+        public bool ShadowMapEnabled { get; set; }
 
+        // I/F
+        public ShadowMap.Techniques ShadowMapTechnique { get; set; }
+
+        // I/F
         public float DepthBias
         {
             get { return depthBias.GetValueSingle(); }
             set { depthBias.SetValue(value); }
         }
 
+        // I/F
         public int SplitCount
         {
             get { return splitCount.GetValueInt32(); }
             set { splitCount.SetValue(value); }
         }
 
+        // I/F
         public float[] SplitDistances
         {
             get { return splitDistances.GetValueSingleArray(ShadowMap.Settings.MaxSplitCount); }
             set { splitDistances.SetValue(value); }
         }
 
+        // I/F
         public Matrix[] SplitLightViewProjections
         {
             get { return splitLightViewProjections.GetValueMatrixArray(ShadowMap.Settings.MaxSplitCount); }
@@ -222,6 +224,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Texture2D[] shadowMapBuffer = new Texture2D[ShadowMap.Settings.MaxSplitCount];
 
+        // I/F
         public Texture2D[] SplitShadowMaps
         {
             get
@@ -257,14 +260,56 @@ namespace Willcraftia.Xna.Blocks.Models
         //
         //--------------------------------------------------------------------
 
-        public ChunkEffect(Effect backingEffect)
+        public bool WireframeEnabled { get; set; }
+
+        public ChunkEffect(Effect cloneSource)
+            : base(cloneSource)
         {
-            if (backingEffect == null) throw new ArgumentNullException("backingEffect");
-
-            this.backingEffect = backingEffect;
-
             CacheEffectParameters();
             CacheEffectTechniques();
+        }
+
+        public void ResolveCurrentTechnique()
+        {
+            if (WireframeEnabled)
+            {
+                CurrentTechnique = wireframeTechnique;
+            }
+            else
+            {
+                if (!ShadowMapEnabled)
+                {
+                    CurrentTechnique = defaultTechnique;
+                }
+                else
+                {
+                    switch (ShadowMapTechnique)
+                    {
+                        case ShadowMap.Techniques.Classic:
+                            CurrentTechnique = classicShadowTechnique;
+                            break;
+                        case ShadowMap.Techniques.Pcf2x2:
+                            if (CurrentTechnique != pcf2x2ShadowTechnique)
+                            {
+                                CurrentTechnique = pcf2x2ShadowTechnique;
+                                InitializePcfKernel(2);
+                            }
+                            break;
+                        case ShadowMap.Techniques.Pcf3x3:
+                            if (CurrentTechnique != pcf3x3ShadowTechnique)
+                            {
+                                CurrentTechnique = pcf3x3ShadowTechnique;
+                                InitializePcfKernel(3);
+                            }
+                            break;
+                        case ShadowMap.Techniques.Vsm:
+                            CurrentTechnique = vsmShadowTechnique;
+                            break;
+                    }
+                }
+            }
+
+            currentPass = CurrentTechnique.Passes[0];
         }
 
         public void Apply()
@@ -272,91 +317,51 @@ namespace Willcraftia.Xna.Blocks.Models
             currentPass.Apply();
         }
 
-        public void EnableDefaultTechnique()
-        {
-            backingEffect.CurrentTechnique = defaultTechnique;
-            currentPass = backingEffect.CurrentTechnique.Passes[0];
-        }
-
-        public void EnableWireframeTechnique()
-        {
-            backingEffect.CurrentTechnique = wireframeTechnique;
-            currentPass = backingEffect.CurrentTechnique.Passes[0];
-        }
-
-        public void EnableShadowTechnique(ShadowMap.Techniques shadowMapTechnique)
-        {
-            switch (shadowMapTechnique)
-            {
-                case ShadowMap.Techniques.Classic:
-                    backingEffect.CurrentTechnique = classicShadowTechnique;
-                    break;
-                case ShadowMap.Techniques.Pcf2x2:
-                    if (backingEffect.CurrentTechnique != pcf2x2ShadowTechnique)
-                    {
-                        backingEffect.CurrentTechnique = pcf2x2ShadowTechnique;
-                        InitializePcfKernel(2);
-                    }
-                    break;
-                case ShadowMap.Techniques.Pcf3x3:
-                    if (backingEffect.CurrentTechnique != pcf3x3ShadowTechnique)
-                    {
-                        backingEffect.CurrentTechnique = pcf3x3ShadowTechnique;
-                        InitializePcfKernel(3);
-                    }
-                    break;
-                case ShadowMap.Techniques.Vsm:
-                    backingEffect.CurrentTechnique = vsmShadowTechnique;
-                    break;
-            }
-            currentPass = backingEffect.CurrentTechnique.Passes[0];
-        }
-
         void CacheEffectParameters()
         {
-            world = backingEffect.Parameters["World"];
-            view = backingEffect.Parameters["View"];
-            projection = backingEffect.Parameters["Projection"];
+            world = Parameters["World"];
+            view = Parameters["View"];
+            projection = Parameters["Projection"];
 
-            eyePosition = backingEffect.Parameters["EyePosition"];
+            eyePosition = Parameters["EyePosition"];
 
-            ambientLightColor = backingEffect.Parameters["AmbientLightColor"];
-            lightDirection = backingEffect.Parameters["LightDirection"];
-            lightDiffuseColor = backingEffect.Parameters["LightDiffuseColor"];
-            lightSpecularColor = backingEffect.Parameters["LightSpecularColor"];
+            ambientLightColor = Parameters["AmbientLightColor"];
+            lightDirection = Parameters["LightDirection"];
+            lightDiffuseColor = Parameters["LightDiffuseColor"];
+            lightSpecularColor = Parameters["LightSpecularColor"];
 
-            fogEnabled = backingEffect.Parameters["FogEnabled"];
-            fogStart = backingEffect.Parameters["FogStart"];
-            fogEnd = backingEffect.Parameters["FogEnd"];
-            fogColor = backingEffect.Parameters["FogColor"];
+            fogEnabled = Parameters["FogEnabled"];
+            fogStart = Parameters["FogStart"];
+            fogEnd = Parameters["FogEnd"];
+            fogColor = Parameters["FogColor"];
 
-            tileMap = backingEffect.Parameters["TileMap"];
-            diffuseMap = backingEffect.Parameters["DiffuseMap"];
-            emissiveMap = backingEffect.Parameters["EmissiveMap"];
-            specularMap = backingEffect.Parameters["SpecularMap"];
+            tileMap = Parameters["TileMap"];
+            diffuseMap = Parameters["DiffuseMap"];
+            emissiveMap = Parameters["EmissiveMap"];
+            specularMap = Parameters["SpecularMap"];
 
-            depthBias = backingEffect.Parameters["DepthBias"];
-            splitCount = backingEffect.Parameters["SplitCount"];
-            splitDistances = backingEffect.Parameters["SplitDistances"];
-            splitLightViewProjections = backingEffect.Parameters["SplitLightViewProjections"];
+            depthBias = Parameters["DepthBias"];
+            splitCount = Parameters["SplitCount"];
+            splitDistances = Parameters["SplitDistances"];
+            splitLightViewProjections = Parameters["SplitLightViewProjections"];
 
             shadowMaps = new EffectParameter[ShadowMap.Settings.MaxSplitCount];
             for (int i = 0; i < shadowMaps.Length; i++)
-                shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
+                shadowMaps[i] = Parameters["ShadowMap" + i];
 
-            shadowMapSize = backingEffect.Parameters["ShadowMapSize"];
-            pcfOffsetsParameter = backingEffect.Parameters["PcfOffsets"];
+            shadowMapSize = Parameters["ShadowMapSize"];
+            pcfOffsetsParameter = Parameters["PcfOffsets"];
         }
 
         void CacheEffectTechniques()
         {
-            defaultTechnique = backingEffect.Techniques["Default"];
-            wireframeTechnique = backingEffect.Techniques["Wireframe"];
+            defaultTechnique = Techniques["Default"];
+            wireframeTechnique = Techniques["Wireframe"];
 
-            classicShadowTechnique = backingEffect.Techniques["ClassicShadow"];
-            pcf2x2ShadowTechnique = backingEffect.Techniques["Pcf2x2Shadow"];
-            pcf3x3ShadowTechnique = backingEffect.Techniques["Pcf3x3Shadow"];
-            vsmShadowTechnique = backingEffect.Techniques["VsmShadow"];
+            classicShadowTechnique = Techniques["ClassicShadow"];
+            pcf2x2ShadowTechnique = Techniques["Pcf2x2Shadow"];
+            pcf3x3ShadowTechnique = Techniques["Pcf3x3Shadow"];
+            vsmShadowTechnique = Techniques["VsmShadow"];
 
             currentPass = defaultTechnique.Passes[0];
         }

@@ -123,6 +123,11 @@ namespace Willcraftia.Xna.Blocks.Models
             // エフェクト
 
             var effect = region.ChunkEffect;
+
+            // TODO
+            // オクルージョン クエリ専用テクニックを作る
+            effect.ResolveCurrentTechnique();
+
             effect.World = world;
             effect.Apply();
 
@@ -143,6 +148,9 @@ namespace Willcraftia.Xna.Blocks.Models
             // エフェクト
 
             var effect = region.ChunkEffect;
+
+            effect.ResolveCurrentTechnique();
+
             effect.World = world;
             effect.Apply();
 
@@ -165,39 +173,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 DrawCore();
             }
-        }
-
-        public override void Draw(ShadowMap shadowMap)
-        {
-            if (Occluded) return;
-
-            var effect = region.ChunkEffect;
-
-            //----------------------------------------------------------------
-            // エフェクトへシャドウ マップを設定
-
-            effect.DepthBias = shadowMap.DepthBias;
-            effect.SplitCount = shadowMap.SplitCount;
-            effect.ShadowMapSize = shadowMap.Size;
-            effect.SplitDistances = shadowMap.SplitDistances;
-            effect.SplitLightViewProjections = shadowMap.SplitLightViewProjections;
-            effect.SplitShadowMaps = shadowMap.SplitShadowMaps;
-
-            //----------------------------------------------------------------
-            // シャドウ マップ対応テクニックを設定
-
-            effect.EnableShadowTechnique(shadowMap.Technique);
-
-            //----------------------------------------------------------------
-            // 変換行列
-
-            effect.World = world;
-            effect.Apply();
-
-            //----------------------------------------------------------------
-            // 描画
-
-            DrawCore();
         }
 
         void DrawCore()

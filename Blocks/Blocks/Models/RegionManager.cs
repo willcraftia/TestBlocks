@@ -18,7 +18,7 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class RegionManager
+    public sealed class RegionManager : IDisposable
     {
         static readonly Logger logger = new Logger(typeof(RegionManager).Name);
 
@@ -259,7 +259,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Monitor.OnEndUpdate();
         }
 
-        public void UpdateChunkEffect()
+        public void PrepareChunkEffect()
         {
             var camera = sceneManager.ActiveCamera;
             var projection = camera.Projection;
@@ -304,11 +304,9 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkEffect.FogColor = SceneSettings.CurrentSkyColor;
 
             //----------------------------------------------------------------
-            // テクニック
+            // ワイヤフレーム設定
 
-            chunkEffect.EnableDefaultTechnique();
-            
-            if (Wireframe) chunkEffect.EnableWireframeTechnique();
+            chunkEffect.WireframeEnabled = Wireframe;
         }
 
         public void Close()
@@ -316,10 +314,44 @@ namespace Willcraftia.Xna.Blocks.Models
             foreach (var region in regions) region.Close();
         }
 
+        internal void OnShadowMapUpdated(object sender, EventArgs e)
+        {
+            sceneManager.UpdateEffectShadowMap(chunkEffect);
+        }
+
         T LoadAsset<T>(string uri)
         {
             var resource = resourceManager.Load(uri);
             return assetManager.Load<T>(resource);
         }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~RegionManager()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                chunkEffect.Dispose();
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }
