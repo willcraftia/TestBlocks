@@ -1,6 +1,6 @@
 {
-  "MinActiveRange": 12,
-  "MaxActiveRange": 13,
+  "MinActiveRange": 10,
+  "MaxActiveRange": 12,
   "PartitionPoolMaxCapacity": 0,
   "ClusterExtent": 8,
   "InitialActivePartitionCapacity": 5000,
