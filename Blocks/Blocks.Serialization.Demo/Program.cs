@@ -935,6 +935,37 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
+            #region LandscapeSettingsDefinition
+
+            //================================================================
+            // LandscapeSettingsDefinition
+
+            Console.WriteLine("LandscapeSettingsDefinition");
+            {
+                var settings = new LandscapeSettingsDefinition
+                {
+                    MinActiveRange = 10,
+                    MaxActiveRange = 12,
+                    PartitionPoolMaxCapacity = 0,
+                    ClusterExtent = 8,
+                    InitialActivePartitionCapacity = 5000,
+                    InitialActiveClusterCapacity = 50,
+                    InitialActivationCapacity = 100,
+                    InitialPassivationCapacity = 1000,
+                    ActivationSearchCapacity = 100,
+                    PassivationSearchCapacity = 200,
+                    ActivationTaskQueueSlotCount = 50,
+                    PassivationTaskQueueSlotCount = 50
+                };
+                var jsonResource = SerializeToJson<LandscapeSettingsDefinition>("LandscapeSettings", settings);
+                var xmlResource = SerializeToXml<LandscapeSettingsDefinition>("LandscapeSettings", settings);
+                var fromJson = DeserializeFromJson<LandscapeSettingsDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<LandscapeSettingsDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
             #region SceneSettingsDefinition
 
             //================================================================

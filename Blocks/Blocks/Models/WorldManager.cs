@@ -74,6 +74,7 @@ namespace Willcraftia.Xna.Blocks.Models
             spriteBatch = new SpriteBatch(graphicsDevice);
             assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(GraphicsSettings), new GraphicsSettingsLoader());
+            assetManager.RegisterLoader(typeof(LandscapeSettings), new LandscapeSettingsLoader());
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
         }
 
@@ -241,15 +242,9 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // パーティション マネージャ
 
-            // TODO
-            var partitionManagerSettings = new PartitionManager.Settings
-            {
-                PartitionSize = Chunk.Size.ToVector3(),
-                MinLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, PartitionMinActiveRange),
-                MaxLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, PartitionMaxActiveRange)
-            };
+            var landscapeSettings = LoadAsset<LandscapeSettings>("title:Resources/LandscapeSettings.json");
 
-            PartitionManager = new ChunkPartitionManager(partitionManagerSettings, RegionManager);
+            PartitionManager = new ChunkPartitionManager(landscapeSettings.PartitionManager, RegionManager);
         }
 
         // TODO: 戻り値を Region にしない。

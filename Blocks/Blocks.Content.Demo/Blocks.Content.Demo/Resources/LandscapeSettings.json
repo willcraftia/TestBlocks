@@ -1,0 +1,14 @@
+{
+  "MinActiveRange": 10,
+  "MaxActiveRange": 12,
+  "PartitionPoolMaxCapacity": 0,
+  "ClusterExtent": 8,
+  "InitialActivePartitionCapacity": 5000,
+  "InitialActiveClusterCapacity": 50,
+  "InitialActivationCapacity": 100,
+  "InitialPassivationCapacity": 1000,
+  "ActivationTaskQueueSlotCount": 50,
+  "PassivationTaskQueueSlotCount": 50,
+  "ActivationSearchCapacity": 100,
+  "PassivationSearchCapacity": 200
+}

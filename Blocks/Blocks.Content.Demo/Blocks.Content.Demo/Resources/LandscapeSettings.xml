@@ -1,0 +1,14 @@
+﻿<LandscapeSettingsDefinition>
+	<MinActiveRange>10</MinActiveRange>
+	<MaxActiveRange>12</MaxActiveRange>
+	<PartitionPoolMaxCapacity>0</PartitionPoolMaxCapacity>
+	<ClusterExtent>8</ClusterExtent>
+	<InitialActivePartitionCapacity>5000</InitialActivePartitionCapacity>
+	<InitialActiveClusterCapacity>50</InitialActiveClusterCapacity>
+	<InitialActivationCapacity>100</InitialActivationCapacity>
+	<InitialPassivationCapacity>1000</InitialPassivationCapacity>
+	<ActivationTaskQueueSlotCount>50</ActivationTaskQueueSlotCount>
+	<PassivationTaskQueueSlotCount>50</PassivationTaskQueueSlotCount>
+	<ActivationSearchCapacity>100</ActivationSearchCapacity>
+	<PassivationSearchCapacity>200</PassivationSearchCapacity>
+</LandscapeSettingsDefinition>

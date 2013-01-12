@@ -102,6 +102,7 @@
     <Compile Include="Content\ChunkProcedureLoader.cs" />
     <Compile Include="Content\GraphicsSettingsLoader.cs" />
     <Compile Include="Content\Image2DLoader.cs" />
+    <Compile Include="Content\LandscapeSettingsLoader.cs" />
     <Compile Include="Content\MeshLoader.cs" />
     <Compile Include="Content\NoiseLoader.cs" />
     <Compile Include="Content\ParticleSettingsLoader.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\InterChunk.cs" />
     <Compile Include="Models\InterChunkMesh.cs" />
+    <Compile Include="Models\LandscapeSettings.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />
     <Compile Include="Models\NearbyChunks.cs" />
@@ -173,6 +175,7 @@
     <Compile Include="Serialization\EdgeSettingsDefinition.cs" />
     <Compile Include="Serialization\GraphicsSettingsDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
+    <Compile Include="Serialization\LandscapeSettingsDefinition.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\ParticleSettingsDefinition.cs" />

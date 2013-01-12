@@ -68,6 +68,7 @@
     <Compile Include="Content\ChunkProcedureLoader.cs" />
     <Compile Include="Content\GraphicsSettingsLoader.cs" />
     <Compile Include="Content\Image2DLoader.cs" />
+    <Compile Include="Content\LandscapeSettingsLoader.cs" />
     <Compile Include="Content\MeshLoader.cs" />
     <Compile Include="Content\NoiseLoader.cs" />
     <Compile Include="Content\ParticleSettingsLoader.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\GraphicsSettings.cs" />
+    <Compile Include="Models\LandscapeSettings.cs" />
     <Compile Include="Models\RegionManagerMonitor.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\TimeColor.cs" />
@@ -137,6 +139,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\BlockCatalogDefinition.cs" />
     <Compile Include="Serialization\BlockDefinition.cs" />
+    <Compile Include="Serialization\LandscapeSettingsDefinition.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\ParticleSettingsDefinition.cs" />

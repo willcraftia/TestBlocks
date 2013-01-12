@@ -103,6 +103,7 @@
     <Content Include="Resources\DefaultTerrainNoise.xml" />
     <Content Include="Resources\DefaultTerrainProcedure.xml" />
     <Content Include="Resources\GraphicsSettings.xml" />
+    <Content Include="Resources\LandscapeSettings.xml" />
     <Content Include="Resources\SceneSettings.xml" />
     <None Include="Resources\DirtBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -123,6 +124,7 @@
     <None Include="Resources\GrassTopTile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\LandscapeSettings.json" />
     <None Include="Resources\MantleBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
