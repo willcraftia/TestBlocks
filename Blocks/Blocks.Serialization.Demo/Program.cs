@@ -1006,7 +1006,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             //================================================================
             // DefaultSnowParticle (ParticleSettingsDefinition)
 
-            Console.WriteLine("ParticleSettingsDefinition");
+            Console.WriteLine("DefaultSnowParticle (ParticleSettingsDefinition)");
             {
                 var definition = new ParticleSettingsDefinition
                 {
@@ -1033,6 +1033,45 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 };
                 var jsonResource = SerializeToJson<ParticleSettingsDefinition>("DefaultSnowParticle", definition);
                 var xmlResource = SerializeToXml<ParticleSettingsDefinition>("DefaultSnowParticle", definition);
+                var fromJson = DeserializeFromJson<ParticleSettingsDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ParticleSettingsDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
+            #region  DefaultRainParticle (ParticleSettingsDefinition)
+
+            //================================================================
+            // DefaultRainParticle (ParticleSettingsDefinition)
+
+            Console.WriteLine("DefaultRainParticle (ParticleSettingsDefinition)");
+            {
+                var definition = new ParticleSettingsDefinition
+                {
+                    Name = "Default Rain Particle",
+                    MaxParticles = 8000,
+                    Duration = 2,
+                    DurationRandomness = 0,
+                    MinHorizontalVelocity = 0,
+                    MaxHorizontalVelocity = 0,
+                    MinVerticalVelocity = -50,
+                    MaxVerticalVelocity = -50,
+                    Gravity = new Vector3(-1, -1, 0),
+                    EndVelocity = 1,
+                    MinColor = Color.White.ToVector4(),
+                    MaxColor = Color.White.ToVector4(),
+                    MinRotateSpeed = 0,
+                    MaxRotateSpeed = 0,
+                    MinStartSize = 0.5f,
+                    MaxStartSize = 0.5f,
+                    MinEndSize = 0.5f,
+                    MaxEndSize = 0.5f,
+                    Texture = "title:Resources/DefaultRainParticle.png",
+                    BlendState = BlendState.AlphaBlend
+                };
+                var jsonResource = SerializeToJson<ParticleSettingsDefinition>("DefaultRainParticle", definition);
+                var xmlResource = SerializeToXml<ParticleSettingsDefinition>("DefaultRainParticle", definition);
                 var fromJson = DeserializeFromJson<ParticleSettingsDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<ParticleSettingsDefinition>(xmlResource);
             }

@@ -38,6 +38,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ParticleSystem snowParticleSystem;
 
+        ParticleSystem rainParticleSystem;
+
         public static bool Wireframe { get; set; }
 
         public GraphicsDevice GraphicsDevice { get; private set; }
@@ -91,11 +93,29 @@ namespace Willcraftia.Xna.Blocks.Models
             // これはバイオームで定義できるべきか？
             {
                 var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
-                var snowParticleSettings = LoadAsset<ParticleSettings>("title:Resources/DefaultSnowParticle.json");
+                var particleSettings = LoadAsset<ParticleSettings>("title:Resources/DefaultSnowParticle.json");
 
-                snowParticleSystem = new ParticleSystem(snowParticleSettings, particleEffect);
+                snowParticleSystem = new ParticleSystem(particleSettings, particleEffect);
 
                 sceneManager.ParticleSystems.Add(snowParticleSystem);
+
+                snowParticleSystem.Enabled = true;
+            }
+
+            //----------------------------------------------------------------
+            // 降雨パーティクル
+
+            // TODO
+            // これはバイオームで定義できるべきか？
+            {
+                var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
+                var particleSettings = LoadAsset<ParticleSettings>("title:Resources/DefaultRainParticle.json");
+
+                rainParticleSystem = new ParticleSystem(particleSettings, particleEffect);
+
+                sceneManager.ParticleSystems.Add(rainParticleSystem);
+
+                rainParticleSystem.Enabled = false;
             }
         }
 
@@ -198,19 +218,41 @@ namespace Willcraftia.Xna.Blocks.Models
             // 降雪パーティクル
 
             // TODO
+            if (snowParticleSystem.Enabled)
             {
-                int snowBoundsX = 128 * 2;
-                int snowBoundsZ = 128 * 2;
-                int snowMinY = 32;
-                int snowMaxY = 64;
+                int boundsX = 128 * 2;
+                int boundsZ = 128 * 2;
+                int minY = 32;
+                int maxY = 64;
 
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 40; i++)
                 {
-                    var randomX = random.Next(snowBoundsX) - snowBoundsX / 2;
-                    var randomY = random.Next(snowMaxY - snowMinY) + snowMinY;
-                    var randomZ = random.Next(snowBoundsZ) - snowBoundsZ / 2;
-                    var snowPosition = new Vector3(randomX, randomY, randomZ) + sceneManager.ActiveCamera.View.Position;
-                    snowParticleSystem.AddParticle(snowPosition, Vector3.Zero);
+                    var randomX = random.Next(boundsX) - boundsX / 2;
+                    var randomY = random.Next(maxY - minY) + minY;
+                    var randomZ = random.Next(boundsZ) - boundsZ / 2;
+                    var position = new Vector3(randomX, randomY, randomZ) + sceneManager.ActiveCamera.View.Position;
+                    snowParticleSystem.AddParticle(position, Vector3.Zero);
+                }
+            }
+
+            //----------------------------------------------------------------
+            // 降雨パーティクル
+
+            // TODO
+            if (rainParticleSystem.Enabled)
+            {
+                int boundsX = 128 * 2;
+                int boundsZ = 128 * 2;
+                int minY = 32;
+                int maxY = 64;
+
+                for (int i = 0; i < 80; i++)
+                {
+                    var randomX = random.Next(boundsX) - boundsX / 2;
+                    var randomY = random.Next(maxY - minY) + minY;
+                    var randomZ = random.Next(boundsZ) - boundsZ / 2;
+                    var position = new Vector3(randomX, randomY, randomZ) + sceneManager.ActiveCamera.View.Position;
+                    rainParticleSystem.AddParticle(position, Vector3.Zero);
                 }
             }
 
