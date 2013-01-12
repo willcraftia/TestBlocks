@@ -297,7 +297,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMesh CreateChunkMesh()
         {
-            return new ChunkMesh(region);
+            return new ChunkMesh(region.ChunkEffect);
         }
 
         InterChunk CreateInterChunk()

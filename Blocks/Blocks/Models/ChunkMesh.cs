@@ -16,7 +16,7 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         static readonly VectorI3 chunkSize = Chunk.Size;
 
-        Region region;
+        ChunkEffect effect;
 
         Matrix world = Matrix.Identity;
 
@@ -87,13 +87,13 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public ChunkMesh(Region region)
+        public ChunkMesh(ChunkEffect effect)
         {
-            if (region == null) throw new ArgumentNullException("region");
+            if (effect == null) throw new ArgumentNullException("effect");
 
-            this.region = region;
+            this.effect = effect;
 
-            GraphicsDevice = region.GraphicsDevice;
+            GraphicsDevice = effect.GraphicsDevice;
             occlusionQuery = new OcclusionQuery(GraphicsDevice);
         }
 
@@ -122,8 +122,6 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // エフェクト
 
-            var effect = region.ChunkEffect;
-
             // TODO
             // オクルージョン クエリ専用テクニックを作る
             effect.ResolveCurrentTechnique();
@@ -146,8 +144,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             //----------------------------------------------------------------
             // エフェクト
-
-            var effect = region.ChunkEffect;
 
             effect.ResolveCurrentTechnique();
 
