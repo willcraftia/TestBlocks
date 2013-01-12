@@ -277,6 +277,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 SceneManager.ActiveDirectionalLightName = null;
             }
 
+            // 太陽が見える場合にのみレンズ フレアを描画。
+            LensFlare.Enabled = SceneSettings.SunVisible;
+
             //----------------------------------------------------------------
             // リージョン マネージャ
 
