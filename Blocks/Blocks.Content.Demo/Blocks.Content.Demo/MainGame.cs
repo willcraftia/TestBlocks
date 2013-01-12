@@ -26,8 +26,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         KeyboardState lastKeyboardState;
 
-        BasicCamera camera = new BasicCamera("Default");
-
         FreeViewInput viewInput = new FreeViewInput();
 
         float moveVelocity = 10;
@@ -276,19 +274,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var viewport = GraphicsDevice.Viewport;
             viewInput.InitialMousePositionX = viewport.Width / 2;
             viewInput.InitialMousePositionY = viewport.Height / 2;
-            viewInput.View = camera.View;
             viewInput.MoveVelocity = moveVelocity;
             viewInput.DashFactor = dashFactor;
             viewInput.Yaw(MathHelper.Pi);
-
-            //camera.View.Position = new Vector3(0, 16 * 18, 0);
-            camera.View.Position = new Vector3(0, 16 * 16, 0);
-            //camera.View.Position = new Vector3(0, 16 * 3, 0);
-            //camera.View.Position = new Vector3(0, 16 * 2, 0);
-            camera.Projection.AspectRatio = viewport.AspectRatio;
-            camera.Projection.FarPlaneDistance = (WorldManager.PartitionMinActiveRange - 1) * 16;
-
-            camera.Update();
 
             //================================================================
             // WorldManager
@@ -297,8 +285,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             worldManager.Initialize();
 
             // TODO: Žb’è
-            worldManager.SceneManager.Cameras.Add(camera);
-            worldManager.SceneManager.ActiveCameraName = camera.Name;
 
             #region Monitor
 
@@ -434,7 +420,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //================================================================
             // ViewInput
 
-            viewInput.Update(gameTime);
+            viewInput.Update(gameTime, worldManager.SceneManager.ActiveCamera.View);
 
             if (keyboardState.IsKeyDown(Keys.PageUp))
                 viewInput.MoveVelocity += 10;
@@ -443,11 +429,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 viewInput.MoveVelocity -= 10;
                 if (viewInput.MoveVelocity < 10) viewInput.MoveVelocity = 10;
             }
-
-            //================================================================
-            // Camera
-
-            camera.Update();
 
             //================================================================
             // WorldManager
@@ -535,9 +516,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(graphics.PreferredBackBufferWidth).Append('x');
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
 
-            sb.Append("FarPlane: ");
-            sb.AppendNumber((WorldManager.PartitionMinActiveRange - 1) * 16).AppendLine();
-
             var partitionManagerMonitor = worldManager.PartitionManager.Monitor;
             sb.Append("Partition: ");
             sb.Append("A(").AppendNumber(partitionManagerMonitor.ActiveClusterCount).Append(":");
@@ -585,7 +563,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             sb.Append("MoveVelocity: ");
             sb.AppendNumber(viewInput.MoveVelocity).AppendLine();
-            
+
+            var camera = worldManager.SceneManager.ActiveCamera;
             sb.Append("Eye: ");
             sb.Append("P(");
             sb.AppendNumber(camera.View.Position.X).Append(", ");
@@ -594,7 +573,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("D(");
             sb.AppendNumber(camera.View.Direction.X).Append(", ");
             sb.AppendNumber(camera.View.Direction.Y).Append(", ");
-            sb.AppendNumber(camera.View.Direction.Z).Append(")");
+            sb.AppendNumber(camera.View.Direction.Z).Append(")").AppendLine();
+
+            sb.Append("Near/Far: ").AppendNumber(camera.Projection.NearPlaneDistance).Append("/");
+            sb.AppendNumber(camera.Projection.FarPlaneDistance);
         }
 
         void DrawHelp()

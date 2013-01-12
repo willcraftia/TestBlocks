@@ -17,10 +17,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class WorldManager
     {
-        // TODO
-        public const int PartitionMinActiveRange = 10;
-        public const int PartitionMaxActiveRange = 12;
-
         IServiceProvider serviceProvider;
 
         SpriteBatch spriteBatch;
@@ -28,6 +24,8 @@ namespace Willcraftia.Xna.Blocks.Models
         ResourceManager resourceManager = new ResourceManager();
 
         AssetManager assetManager;
+
+        BasicCamera defaultCamera = new BasicCamera("Default");
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -245,6 +243,26 @@ namespace Willcraftia.Xna.Blocks.Models
             var landscapeSettings = LoadAsset<LandscapeSettings>("title:Resources/LandscapeSettings.json");
 
             PartitionManager = new ChunkPartitionManager(landscapeSettings.PartitionManager, RegionManager);
+
+            //----------------------------------------------------------------
+            // デフォルト カメラ
+
+            //camera.View.Position = new Vector3(0, 16 * 18, 0);
+            defaultCamera.View.Position = new Vector3(0, 16 * 16, 0);
+            //camera.View.Position = new Vector3(0, 16 * 3, 0);
+            //camera.View.Position = new Vector3(0, 16 * 2, 0);
+            defaultCamera.Projection.AspectRatio = GraphicsDevice.Viewport.AspectRatio;
+
+            // 最小アクティブ範囲を超えない位置へ FarPlaneDistance を設定。
+            // パーティション (チャンク) のサイズを掛けておく。
+            defaultCamera.Projection.FarPlaneDistance = (landscapeSettings.MinActiveRange - 1) * 16;
+
+            // 念のためここで一度更新。
+            defaultCamera.Update();
+
+            // シーン マネージャへ登録してアクティブ化。
+            SceneManager.Cameras.Add(defaultCamera);
+            SceneManager.ActiveCameraName = defaultCamera.Name;
         }
 
         // TODO: 戻り値を Region にしない。
