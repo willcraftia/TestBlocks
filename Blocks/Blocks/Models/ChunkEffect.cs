@@ -66,7 +66,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectTechnique wireframeTechnique;
 
-        EffectTechnique classicShadowTechnique;
+        EffectTechnique basicShadowTechnique;
 
         EffectTechnique pcf2x2ShadowTechnique;
 
@@ -272,8 +272,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     switch (ShadowMapTechnique)
                     {
-                        case ShadowMap.Techniques.Classic:
-                            CurrentTechnique = classicShadowTechnique;
+                        case ShadowMap.Techniques.Basic:
+                            CurrentTechnique = basicShadowTechnique;
                             break;
                         case ShadowMap.Techniques.Pcf2x2:
                             if (CurrentTechnique != pcf2x2ShadowTechnique)
@@ -360,7 +360,7 @@ namespace Willcraftia.Xna.Blocks.Models
             defaultTechnique = Techniques["Default"];
             wireframeTechnique = Techniques["Wireframe"];
 
-            classicShadowTechnique = Techniques["ClassicShadow"];
+            basicShadowTechnique = Techniques["BasicShadow"];
             pcf2x2ShadowTechnique = Techniques["Pcf2x2Shadow"];
             pcf3x3ShadowTechnique = Techniques["Pcf3x3Shadow"];
             vsmShadowTechnique = Techniques["VsmShadow"];

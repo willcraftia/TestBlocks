@@ -61,7 +61,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         sealed class ShadowSceneEffect : Effect, IEffectMatrices
         {
             //====================================================================
-            // EffectParameter
+            // パラメータのキャッシュ
 
             EffectParameter projection;
 
@@ -80,23 +80,23 @@ namespace Willcraftia.Xna.Framework.Graphics
             EffectParameter[] shadowMaps;
 
             //--------------------------------------------------------------------
-            // Classic specific
+            // Basic 固有
 
             EffectParameter shadowMapSize;
 
             EffectParameter shadowMapTexelSize;
 
             //--------------------------------------------------------------------
-            // PCF specific
+            // PCF 固有
 
             EffectParameter pcfOffsetsParameter;
 
             //====================================================================
-            // EffectTechnique
+            // テクニックのキャッシュ
 
             ShadowMap.Techniques shadowMapTechnique;
 
-            EffectTechnique classicTechnique;
+            EffectTechnique basicTechnique;
 
             EffectTechnique pcf2x2Technique;
 
@@ -169,7 +169,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             //--------------------------------------------------------------------
-            // Classic & PCF specific
+            // Basic & PCF 固有
 
             // PCF の場合、PCF テクニックを設定する前に必ず設定していなければならない。
             public int ShadowMapSize
@@ -208,7 +208,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                             InitializePcfKernel(3);
                             break;
                         default:
-                            CurrentTechnique = classicTechnique;
+                            CurrentTechnique = basicTechnique;
                             break;
                     }
                 }
@@ -235,7 +235,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 pcfOffsetsParameter = Parameters["PcfOffsets"];
 
-                classicTechnique = Techniques["Classic"];
+                basicTechnique = Techniques["Basic"];
                 pcf2x2Technique = Techniques["Pcf2x2"];
                 pcf3x3Technique = Techniques["Pcf3x3"];
                 vsmTechnique = Techniques["Vsm"];

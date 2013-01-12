@@ -126,7 +126,7 @@ float2 PcfOffsets[MAX_PCF_TAP_COUNT];
 // 構造体
 //
 //-----------------------------------------------------------------------------
-struct VSInput
+struct VSInputNmTxVc
 {
     float4 Position : POSITION0;
     float3 Normal   : NORMAL0;
@@ -134,7 +134,7 @@ struct VSInput
     float2 TexCoord : TEXCOORD0;
 };
 
-struct VSOutput
+struct VSOutputNmTxVcFog
 {
     float4 Position : POSITION0;
     float3 Normal   : NORMAL0;
@@ -165,9 +165,9 @@ struct ColorPair
 // 頂点シェーダ
 //
 //-----------------------------------------------------------------------------
-VSOutput VS(VSInput input)
+VSOutputNmTxVcFog VSNmTxVcFog(VSInputNmTxVc input)
 {
-    VSOutput output;
+    VSOutputNmTxVcFog output;
 
     float4 worldPosition = mul(input.Position, World);
     float4 viewPosition = mul(worldPosition, View);
@@ -183,7 +183,7 @@ VSOutput VS(VSInput input)
     return output;
 }
 
-ShadowVSOutput ShadowVS(VSInput input)
+ShadowVSOutput VSShadow(VSInputNmTxVc input)
 {
     ShadowVSOutput output;
 
@@ -265,7 +265,7 @@ ColorPair CalculateLightWithShadow(float3 E, float3 N, float2 texCoord, float sh
 // ピクセル シェーダ
 //
 //-----------------------------------------------------------------------------
-float4 DefaultPS(VSOutput input) : COLOR0
+float4 PSNmTxVcFog(VSOutputNmTxVcFog input) : COLOR0
 {
     float4 color = float4(0, 0, 0, 1);
 
@@ -286,12 +286,12 @@ float4 DefaultPS(VSOutput input) : COLOR0
     return color;
 }
 
-float4 WireframePS(VSOutput input) : COLOR0
+float4 PSWireframe(VSOutputNmTxVcFog input) : COLOR0
 {
     return float4(0, 0, 0, 1);
 }
 
-float4 ClassicShadowPS(ShadowVSOutput input) : COLOR0
+float4 PSShadowBasic(ShadowVSOutput input) : COLOR0
 {
     // シャドウ
     float distance = abs(input.ViewPosition.z);
@@ -331,7 +331,7 @@ float4 ClassicShadowPS(ShadowVSOutput input) : COLOR0
     return color;
 }
 
-float4 Pcf2x2PS(ShadowVSOutput input) : COLOR
+float4 PSShadowPcf2x2(ShadowVSOutput input) : COLOR
 {
     // シャドウ
     float distance = abs(input.ViewPosition.z);
@@ -370,7 +370,7 @@ float4 Pcf2x2PS(ShadowVSOutput input) : COLOR
     return color;
 }
 
-float4 Pcf3x3PS(ShadowVSOutput input) : COLOR
+float4 PSShadowPcf3x3(ShadowVSOutput input) : COLOR
 {
     // シャドウ
     float distance = abs(input.ViewPosition.z);
@@ -409,7 +409,7 @@ float4 Pcf3x3PS(ShadowVSOutput input) : COLOR
     return color;
 }
 
-float4 VsmShadowPS(ShadowVSOutput input) : COLOR0
+float4 PSShadowVsm(ShadowVSOutput input) : COLOR0
 {
     // シャドウ
     float distance = abs(input.ViewPosition.z);
@@ -458,8 +458,8 @@ technique Default
     {
         FillMode = SOLID;
         CullMode = CCW;
-        VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 DefaultPS();
+        VertexShader = compile vs_3_0 VSNmTxVcFog();
+        PixelShader = compile ps_3_0 PSNmTxVcFog();
     }
 }
 
@@ -469,19 +469,19 @@ technique Wireframe
     {
         FillMode = WIREFRAME;
         CullMode = CCW;
-        VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 WireframePS();
+        VertexShader = compile vs_3_0 VSNmTxVcFog();
+        PixelShader = compile ps_3_0 PSWireframe();
     }
 }
 
-technique ClassicShadow
+technique BasicShadow
 {
     pass P0
     {
         FillMode = SOLID;
         CullMode = CCW;
-        VertexShader = compile vs_3_0 ShadowVS();
-        PixelShader = compile ps_3_0 ClassicShadowPS();
+        VertexShader = compile vs_3_0 VSShadow();
+        PixelShader = compile ps_3_0 PSShadowBasic();
     }
 }
 
@@ -491,8 +491,8 @@ technique Pcf2x2Shadow
     {
         FillMode = SOLID;
         CullMode = CCW;
-        VertexShader = compile vs_3_0 ShadowVS();
-        PixelShader = compile ps_3_0 Pcf2x2PS();
+        VertexShader = compile vs_3_0 VSShadow();
+        PixelShader = compile ps_3_0 PSShadowPcf2x2();
     }
 }
 
@@ -502,8 +502,8 @@ technique Pcf3x3Shadow
     {
         FillMode = SOLID;
         CullMode = CCW;
-        VertexShader = compile vs_3_0 ShadowVS();
-        PixelShader = compile ps_3_0 Pcf3x3PS();
+        VertexShader = compile vs_3_0 VSShadow();
+        PixelShader = compile ps_3_0 PSShadowPcf3x3();
     }
 }
 
@@ -513,7 +513,7 @@ technique VsmShadow
     {
         FillMode = SOLID;
         CullMode = CCW;
-        VertexShader = compile vs_3_0 ShadowVS();
-        PixelShader = compile ps_3_0 VsmShadowPS();
+        VertexShader = compile vs_3_0 VSShadow();
+        PixelShader = compile ps_3_0 PSShadowVsm();
     }
 }

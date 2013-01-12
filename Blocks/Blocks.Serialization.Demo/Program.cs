@@ -863,7 +863,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ShadowMapEnabled = true,
                     ShadowMap = new ShadowMapSettingsDefinition
                     {
-                        Technique = ShadowMap.Techniques.Classic,
+                        Technique = ShadowMap.Techniques.Basic,
                         Size = 2048,
                         DepthBias = 0.0005f,
                         FarPlaneDistance = 8 * 16,

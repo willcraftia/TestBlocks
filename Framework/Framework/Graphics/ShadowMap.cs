@@ -22,9 +22,9 @@ namespace Willcraftia.Xna.Framework.Graphics
         public enum Techniques
         {
             /// <summary>
-            /// クラシック。
+            /// 基礎的なシャドウ マッピング。
             /// </summary>
-            Classic,
+            Basic,
 
             /// <summary>
             /// VSM (Variant Shadow Mapping)。
@@ -54,9 +54,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             // また、高い崖のような地形による投影において、ライト ブリーディングが激しい。
             // なお、分割数 1 で VSM を行うと、カメラ近隣はほとんどが影なしと判定される。
             //
-            // Pcf は、3x3 程度なら Classic とそれ程変わりがない。
+            // Pcf は、3x3 程度なら Basic とそれ程変わりがない。
             //
-            // 最も無難な設定が Classic であり、ライト ブリーディングを解決できるならば VSM。
+            // 最も無難な設定が Basic であり、ライト ブリーディングを解決できるならば VSM。
             //
 
             public const int MinSplitCount = 1;
@@ -65,7 +65,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             int size = 2048;
 
-            Techniques technique = Techniques.Classic;
+            Techniques technique = Techniques.Basic;
 
             SurfaceFormat format = SurfaceFormat.Single;
 
@@ -116,7 +116,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             /// <summary>
             /// シャドウ マップの SurfaceFormat を取得します。
             /// シャドウ マップの SurfaceFormat はシャドウ マップ生成方法により決定され、
-            /// Classic および Pcf の場合は SurfaceFormat.Single、
+            /// Basic および Pcf の場合は SurfaceFormat.Single、
             /// Vsm の場合は SurfaceFormat.Vector2 となります。
             /// </summary>
             public SurfaceFormat Format
@@ -320,7 +320,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const Techniques DefaultShadowMapTechnique = Techniques.Classic;
+        public const Techniques DefaultShadowMapTechnique = Techniques.Basic;
 
         BasicCamera internalCamera = new BasicCamera("ShadowMapInternal");
 

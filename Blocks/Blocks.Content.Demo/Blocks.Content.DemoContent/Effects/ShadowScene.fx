@@ -56,13 +56,13 @@ sampler ShadowMapSampler[MAX_SPLIT_COUNT] =
 };
 
 //-----------------------------------------------------------------------------
-// Classic specific
+// Basic 固有
 
 float ShadowMapSize;
 float ShadowMapTexelSize;
 
 //-----------------------------------------------------------------------------
-// PCF specific
+// PCF 固有
 
 float2 PcfOffsets[MAX_PCF_TAP_COUNT];
 
@@ -111,7 +111,7 @@ VSOutput VS(VSInput input)
 // ピクセル シェーダ
 //
 //-----------------------------------------------------------------------------
-float4 ClassicPS(VSOutput input) : COLOR0
+float4 PSBasic(VSOutput input) : COLOR0
 {
     float distance = abs(input.ViewPosition.z);
 
@@ -140,7 +140,7 @@ float4 ClassicPS(VSOutput input) : COLOR0
     return float4(r, g, b, 1);
 }
 
-float4 Pcf2x2PS(VSOutput input) : COLOR
+float4 PSPcf2x2(VSOutput input) : COLOR
 {
     float distance = abs(input.ViewPosition.z);
 
@@ -168,7 +168,7 @@ float4 Pcf2x2PS(VSOutput input) : COLOR
     return float4(r, g, b, 1);
 }
 
-float4 Pcf3x3PS(VSOutput input) : COLOR
+float4 PSPcf3x3(VSOutput input) : COLOR
 {
     float distance = abs(input.ViewPosition.z);
 
@@ -196,7 +196,7 @@ float4 Pcf3x3PS(VSOutput input) : COLOR
     return float4(r, g, b, 1);
 }
 
-float4 VsmPS(VSOutput input) : COLOR0
+float4 PSVsm(VSOutput input) : COLOR0
 {
     float distance = abs(input.ViewPosition.z);
 
@@ -229,13 +229,13 @@ float4 VsmPS(VSOutput input) : COLOR0
 // テクニック
 //
 //-----------------------------------------------------------------------------
-technique Classic
+technique Basic
 {
     pass P0
     {
         CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 ClassicPS();
+        PixelShader = compile ps_3_0 PSBasic();
     }
 }
 
@@ -245,7 +245,7 @@ technique Pcf2x2
     {
         CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 Pcf2x2PS();
+        PixelShader = compile ps_3_0 PSPcf2x2();
     }
 }
 
@@ -255,7 +255,7 @@ technique Pcf3x3
     {
         CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 Pcf3x3PS();
+        PixelShader = compile ps_3_0 PSPcf3x3();
     }
 }
 
@@ -265,6 +265,6 @@ technique Vsm
     {
         CullMode = CCW;
         VertexShader = compile vs_3_0 VS();
-        PixelShader = compile ps_3_0 VsmPS();
+        PixelShader = compile ps_3_0 PSVsm();
     }
 }
