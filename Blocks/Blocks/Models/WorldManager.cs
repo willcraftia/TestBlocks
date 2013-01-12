@@ -264,11 +264,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
             SceneSettings.Update(gameTime);
 
-            if (SceneSettings.SunVisible)
+            if (SceneSettings.Sunlight.Enabled && SceneSettings.SunAboveHorizon)
             {
                 SceneManager.ActiveDirectionalLightName = SceneSettings.Sunlight.Name;
             }
-            else if (SceneSettings.MoonVisible)
+            else if (SceneSettings.Moonlight.Enabled && SceneSettings.MoonAboveHorizon)
             {
                 SceneManager.ActiveDirectionalLightName = SceneSettings.Moonlight.Name;
             }
@@ -278,7 +278,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // 太陽が見える場合にのみレンズ フレアを描画。
-            LensFlare.Enabled = SceneSettings.SunVisible;
+            LensFlare.Enabled = SceneSettings.SunAboveHorizon;
 
             //----------------------------------------------------------------
             // リージョン マネージャ

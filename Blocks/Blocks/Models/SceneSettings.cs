@@ -149,12 +149,12 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return moonDirection; }
         }
 
-        public bool SunVisible
+        public bool SunAboveHorizon
         {
             get { return 0 <= sunDirection.Y; }
         }
 
-        public bool MoonVisible
+        public bool MoonAboveHorizon
         {
             get { return 0 <= moonDirection.Y; }
         }
