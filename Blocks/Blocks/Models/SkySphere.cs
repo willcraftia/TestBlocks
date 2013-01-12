@@ -80,6 +80,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 太陽の情報。
             if (SunVisible)
             {
+                // 太陽は夜間も描画し続ける。
                 Effect.SunDiffuseColor = SceneSettings.Sunlight.DiffuseColor;
                 Effect.SunDirection = SceneSettings.SunDirection;
                 Effect.SunThreshold = sunThreshold;
