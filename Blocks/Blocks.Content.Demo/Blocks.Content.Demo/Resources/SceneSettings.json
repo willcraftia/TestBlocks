@@ -1,5 +1,4 @@
 {
-  "EarthRotationEnabled": true,
   "MidnightSunDirection": "0, -1, 1",
   "MidnightMoonDirection": "0, 1, 1",
   "ShadowColor": "0.4117647, 0.4117647, 0.4117647",
@@ -45,8 +44,16 @@
       "Color": "0.1, 0.1, 0.1"
     },
     {
+      "Time": 0.15,
+      "Color": "0.1, 0.1, 0.1"
+    },
+    {
       "Time": 0.5,
-      "Color": "1.0, 1.0, 1.0"
+      "Color": "1, 1, 1"
+    },
+    {
+      "Time": 0.84,
+      "Color": "0.1, 0.1, 0.1"
     },
     {
       "Time": 1.0,

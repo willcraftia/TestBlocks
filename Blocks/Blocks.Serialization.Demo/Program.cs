@@ -951,7 +951,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     SunlightEnabled = true,
                     MoonlightDiffuseColor = new Vector3(0.5f),
                     MoonlightSpecularColor = Vector3.Zero,
-                    MoonlightEnabled = true,
+                    MoonlightEnabled = false,
                     SkyColors = new TimeColorDefinition[]
                     {
                         new TimeColorDefinition { Time = 0, Color = Color.Black.ToVector3() },
@@ -965,7 +965,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     AmbientLightColors = new TimeColorDefinition[]
                     {
                         new TimeColorDefinition { Time = 0, Color = new Vector3(0.1f) },
+                        new TimeColorDefinition { Time = 0.15f, Color = new Vector3(0.1f) },
                         new TimeColorDefinition { Time = 0.5f, Color = new Vector3(1) },
+                        new TimeColorDefinition { Time = 0.84f, Color = new Vector3(0.1f) },
                         new TimeColorDefinition { Time = 1, Color = new Vector3(0.1f) }
                     },
                     SecondsPerDay = 20f,

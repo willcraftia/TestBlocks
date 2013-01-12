@@ -1,5 +1,4 @@
 ﻿<SceneSettingsDefinition>
-	<EarthRotationEnabled>true</EarthRotationEnabled>
 	<MidnightSunDirection>
 		<X>0</X>
 		<Y>-1</Y>
@@ -36,7 +35,7 @@
 		<Y>0</Y>
 		<Z>0</Z>
 	</MoonlightSpecularColor>
-	<MoonlightEnabled>true</MoonlightEnabled>
+	<MoonlightEnabled>false</MoonlightEnabled>
 	<SkyColors>
 		<TimeColorDefinition>
 			<Time>0</Time>
@@ -105,11 +104,27 @@
 			</Color>
 		</TimeColorDefinition>
 		<TimeColorDefinition>
+			<Time>0.15</Time>
+			<Color>
+				<X>0.1</X>
+				<Y>0.1</Y>
+				<Z>0.1</Z>
+			</Color>
+		</TimeColorDefinition>
+		<TimeColorDefinition>
 			<Time>0.5</Time>
 			<Color>
-				<X>0.6</X>
-				<Y>0.6</Y>
-				<Z>0.6</Z>
+				<X>1</X>
+				<Y>1</Y>
+				<Z>1</Z>
+			</Color>
+		</TimeColorDefinition>
+		<TimeColorDefinition>
+			<Time>0.75</Time>
+			<Color>
+				<X>0.1</X>
+				<Y>0.1</Y>
+				<Z>0.1</Z>
 			</Color>
 		</TimeColorDefinition>
 		<TimeColorDefinition>

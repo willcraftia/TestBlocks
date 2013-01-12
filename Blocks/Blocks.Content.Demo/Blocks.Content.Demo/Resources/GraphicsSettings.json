@@ -1,5 +1,5 @@
 {
-  "ShadowMapEnabled": false,
+  "ShadowMapEnabled": true,
   "ShadowMap": {
     "Technique": 0,
     "Size": 2048,
