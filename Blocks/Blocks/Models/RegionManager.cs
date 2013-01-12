@@ -259,49 +259,9 @@ namespace Willcraftia.Xna.Blocks.Models
             Monitor.OnEndUpdate();
         }
 
-        public void PrepareChunkEffect()
+        public void PrepareSharedEffects()
         {
-            var camera = sceneManager.ActiveCamera;
-            var projection = camera.Projection;
-
-            //----------------------------------------------------------------
-            // カメラ設定
-
-            chunkEffect.EyePosition = camera.View.Position;
-            chunkEffect.View = camera.View.Matrix;
-            chunkEffect.Projection = camera.Projection.Matrix;
-
-            //----------------------------------------------------------------
-            // ライティング
-
-            chunkEffect.AmbientLightColor = SceneSettings.CurrentAmbientLightColor;
-
-            //
-            // TODO
-            //
-            // ChunkEffect に DirectionalLight プロパティを作る。
-            //
-            var activeDirectionalLight = sceneManager.ActiveDirectionalLight;
-            if (activeDirectionalLight != null && activeDirectionalLight.Enabled)
-            {
-                chunkEffect.LightDirection = activeDirectionalLight.Direction;
-                chunkEffect.LightDiffuseColor = activeDirectionalLight.DiffuseColor;
-                chunkEffect.LightSpecularColor = activeDirectionalLight.SpecularColor;
-            }
-            else
-            {
-                chunkEffect.LightDirection = Vector3.Down;
-                chunkEffect.LightDiffuseColor = Vector3.Zero;
-                chunkEffect.LightSpecularColor = Vector3.Zero;
-            }
-
-            //----------------------------------------------------------------
-            // フォグ
-
-            chunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
-            chunkEffect.FogStart = projection.FarPlaneDistance * 0.7f;
-            chunkEffect.FogEnd = projection.FarPlaneDistance * 0.9f;
-            chunkEffect.FogColor = SceneSettings.CurrentSkyColor;
+            sceneManager.UpdateEffect(chunkEffect);
 
             //----------------------------------------------------------------
             // ワイヤフレーム設定

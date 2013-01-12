@@ -9,10 +9,14 @@ using Willcraftia.Xna.Framework.Graphics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkEffect : Effect, IEffectMatrices, IEffectShadowMap
+    using XnaDirectionalLight = Microsoft.Xna.Framework.Graphics.DirectionalLight;
+
+    public sealed class ChunkEffect : Effect, IEffectMatrices, IEffectEye, IEffectLights, IEffectFog, IEffectShadowMap
     {
+        Texture2D[] shadowMapBuffer = new Texture2D[ShadowMap.Settings.MaxSplitCount];
+
         //====================================================================
-        // EffectParameter
+        // パラメータのキャッシュ
 
         EffectParameter world;
 
@@ -23,12 +27,6 @@ namespace Willcraftia.Xna.Blocks.Models
         EffectParameter eyePosition;
 
         EffectParameter ambientLightColor;
-
-        EffectParameter lightDirection;
-
-        EffectParameter lightDiffuseColor;
-
-        EffectParameter lightSpecularColor;
 
         EffectParameter fogEnabled;
 
@@ -47,30 +45,26 @@ namespace Willcraftia.Xna.Blocks.Models
         EffectParameter specularMap;
 
         //--------------------------------------------------------------------
-        // Shadow Maps
+        // シャドウ マップ用
 
-        EffectParameter depthBias;
+        EffectParameter shadowMapDepthBias;
 
-        EffectParameter splitCount;
+        EffectParameter shadowMapCount;
 
-        EffectParameter splitDistances;
+        EffectParameter shadowMapSplitDistances;
 
-        EffectParameter splitLightViewProjections;
+        EffectParameter shadowMapSplitLightViewProjections;
 
         EffectParameter[] shadowMaps;
 
-        //--------------------------------------------------------------------
-        // Classic specific
-
+        // Classic テクニック用
         EffectParameter shadowMapSize;
 
-        //--------------------------------------------------------------------
-        // PCF specific
-
+        // PCF テクニック用
         EffectParameter pcfOffsetsParameter;
 
         //====================================================================
-        // EffectTechnique
+        // テクニックのキャッシュ
 
         EffectTechnique defaultTechnique;
 
@@ -85,30 +79,33 @@ namespace Willcraftia.Xna.Blocks.Models
         EffectTechnique vsmShadowTechnique;
 
         //====================================================================
-        // Cached pass
+        // パスのキャッシュ
 
         EffectPass currentPass;
 
-        // I/F
+        //--------------------------------------------------------------------
+        // IEffectMatrices
+
         public Matrix World
         {
             get { return world.GetValueMatrix(); }
             set { world.SetValue(value); }
         }
 
-        // I/F
         public Matrix View
         {
             get { return view.GetValueMatrix(); }
             set { view.SetValue(value); }
         }
 
-        // I/F
         public Matrix Projection
         {
             get { return projection.GetValueMatrix(); }
             set { projection.SetValue(value); }
         }
+
+        //--------------------------------------------------------------------
+        // IEffectEye
 
         public Vector3 EyePosition
         {
@@ -116,29 +113,30 @@ namespace Willcraftia.Xna.Blocks.Models
             set { eyePosition.SetValue(value); }
         }
 
+        //--------------------------------------------------------------------
+        // IEffectLights
+
         public Vector3 AmbientLightColor
         {
             get { return ambientLightColor.GetValueVector3(); }
             set { ambientLightColor.SetValue(value); }
         }
 
-        public Vector3 LightDirection
+        public XnaDirectionalLight DirectionalLight0 { get; private set; }
+
+        public XnaDirectionalLight DirectionalLight1 { get; private set; }
+
+        public XnaDirectionalLight DirectionalLight2 { get; private set; }
+
+        public void EnableDefaultLighting()
         {
-            get { return lightDirection.GetValueVector3(); }
-            set { lightDirection.SetValue(value); }
+            throw new NotSupportedException();
         }
 
-        public Vector3 LightDiffuseColor
-        {
-            get { return lightDiffuseColor.GetValueVector3(); }
-            set { lightDiffuseColor.SetValue(value); }
-        }
+        public bool LightingEnabled { get; set; }
 
-        public Vector3 LightSpecularColor
-        {
-            get { return lightSpecularColor.GetValueVector3(); }
-            set { lightSpecularColor.SetValue(value); }
-        }
+        //--------------------------------------------------------------------
+        // IEffectFog
 
         public bool FogEnabled
         {
@@ -164,6 +162,69 @@ namespace Willcraftia.Xna.Blocks.Models
             set { fogColor.SetValue(value); }
         }
 
+        //--------------------------------------------------------------------
+        // IEffectShadowMap
+
+        public bool ShadowMapEnabled { get; set; }
+
+        // PCF の場合、PCF テクニックを設定する前に必ず設定していなければならない。
+        public int ShadowMapSize
+        {
+            get { return shadowMapSize.GetValueInt32(); }
+            set
+            {
+                if (value < 1) throw new ArgumentOutOfRangeException("value");
+
+                shadowMapSize.SetValue(value);
+            }
+        }
+
+        public ShadowMap.Techniques ShadowMapTechnique { get; set; }
+
+        public float ShadowMapDepthBias
+        {
+            get { return shadowMapDepthBias.GetValueSingle(); }
+            set { shadowMapDepthBias.SetValue(value); }
+        }
+
+        public int ShadowMapCount
+        {
+            get { return shadowMapCount.GetValueInt32(); }
+            set { shadowMapCount.SetValue(value); }
+        }
+
+        public float[] ShadowMapSplitDistances
+        {
+            get { return shadowMapSplitDistances.GetValueSingleArray(ShadowMap.Settings.MaxSplitCount); }
+            set { shadowMapSplitDistances.SetValue(value); }
+        }
+
+        public Matrix[] ShadowMapSplitLightViewProjections
+        {
+            get { return shadowMapSplitLightViewProjections.GetValueMatrixArray(ShadowMap.Settings.MaxSplitCount); }
+            set { shadowMapSplitLightViewProjections.SetValue(value); }
+        }
+
+        public Texture2D[] ShadowMaps
+        {
+            get
+            {
+                for (int i = 0; i < ShadowMap.Settings.MaxSplitCount; i++)
+                    shadowMapBuffer[i] = shadowMaps[i].GetValueTexture2D();
+                return shadowMapBuffer;
+            }
+            set
+            {
+                if (value == null) return;
+
+                for (int i = 0; i < value.Length; i++)
+                    shadowMaps[i].SetValue(value[i]);
+            }
+        }
+
+        //--------------------------------------------------------------------
+        // その他プロパティ
+
         public Texture2D TileMap
         {
             get { return tileMap.GetValueTexture2D(); }
@@ -187,78 +248,6 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return specularMap.GetValueTexture2D(); }
             set { specularMap.SetValue(value); }
         }
-
-        // I/F
-        public bool ShadowMapEnabled { get; set; }
-
-        // I/F
-        public ShadowMap.Techniques ShadowMapTechnique { get; set; }
-
-        // I/F
-        public float DepthBias
-        {
-            get { return depthBias.GetValueSingle(); }
-            set { depthBias.SetValue(value); }
-        }
-
-        // I/F
-        public int SplitCount
-        {
-            get { return splitCount.GetValueInt32(); }
-            set { splitCount.SetValue(value); }
-        }
-
-        // I/F
-        public float[] SplitDistances
-        {
-            get { return splitDistances.GetValueSingleArray(ShadowMap.Settings.MaxSplitCount); }
-            set { splitDistances.SetValue(value); }
-        }
-
-        // I/F
-        public Matrix[] SplitLightViewProjections
-        {
-            get { return splitLightViewProjections.GetValueMatrixArray(ShadowMap.Settings.MaxSplitCount); }
-            set { splitLightViewProjections.SetValue(value); }
-        }
-
-        Texture2D[] shadowMapBuffer = new Texture2D[ShadowMap.Settings.MaxSplitCount];
-
-        // I/F
-        public Texture2D[] SplitShadowMaps
-        {
-            get
-            {
-                for (int i = 0; i < ShadowMap.Settings.MaxSplitCount; i++)
-                    shadowMapBuffer[i] = shadowMaps[i].GetValueTexture2D();
-                return shadowMapBuffer;
-            }
-            set
-            {
-                if (value == null) return;
-
-                for (int i = 0; i < value.Length; i++)
-                    shadowMaps[i].SetValue(value[i]);
-            }
-        }
-
-        //--------------------------------------------------------------------
-        // Classic & PCF specific
-
-        // PCF の場合、PCF テクニックを設定する前に必ず設定していなければならない。
-        public int ShadowMapSize
-        {
-            get { return shadowMapSize.GetValueInt32(); }
-            set
-            {
-                if (value < 1) throw new ArgumentOutOfRangeException("value");
-
-                shadowMapSize.SetValue(value);
-            }
-        }
-
-        //
-        //--------------------------------------------------------------------
 
         public bool WireframeEnabled { get; set; }
 
@@ -326,24 +315,20 @@ namespace Willcraftia.Xna.Blocks.Models
             eyePosition = Parameters["EyePosition"];
 
             ambientLightColor = Parameters["AmbientLightColor"];
-            lightDirection = Parameters["LightDirection"];
-            lightDiffuseColor = Parameters["LightDiffuseColor"];
-            lightSpecularColor = Parameters["LightSpecularColor"];
+            DirectionalLight0 = new XnaDirectionalLight(
+                Parameters["LightDirection"], Parameters["LightDiffuseColor"], Parameters["LightSpecularColor"], null);
+            DirectionalLight1 = new XnaDirectionalLight(null, null, null, null);
+            DirectionalLight2 = new XnaDirectionalLight(null, null, null, null);
 
             fogEnabled = Parameters["FogEnabled"];
             fogStart = Parameters["FogStart"];
             fogEnd = Parameters["FogEnd"];
             fogColor = Parameters["FogColor"];
 
-            tileMap = Parameters["TileMap"];
-            diffuseMap = Parameters["DiffuseMap"];
-            emissiveMap = Parameters["EmissiveMap"];
-            specularMap = Parameters["SpecularMap"];
-
-            depthBias = Parameters["DepthBias"];
-            splitCount = Parameters["SplitCount"];
-            splitDistances = Parameters["SplitDistances"];
-            splitLightViewProjections = Parameters["SplitLightViewProjections"];
+            shadowMapDepthBias = Parameters["DepthBias"];
+            shadowMapCount = Parameters["SplitCount"];
+            shadowMapSplitDistances = Parameters["SplitDistances"];
+            shadowMapSplitLightViewProjections = Parameters["SplitLightViewProjections"];
 
             shadowMaps = new EffectParameter[ShadowMap.Settings.MaxSplitCount];
             for (int i = 0; i < shadowMaps.Length; i++)
@@ -351,6 +336,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
             shadowMapSize = Parameters["ShadowMapSize"];
             pcfOffsetsParameter = Parameters["PcfOffsets"];
+
+            tileMap = Parameters["TileMap"];
+            diffuseMap = Parameters["DiffuseMap"];
+            emissiveMap = Parameters["EmissiveMap"];
+            specularMap = Parameters["SpecularMap"];
         }
 
         void CacheEffectTechniques()

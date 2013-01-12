@@ -234,9 +234,13 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         ICamera activeCamera;
 
+        Vector3 ambientLightColor;
+
         string activeDirectionalLightName;
 
         DirectionalLight activeDirectionalLight;
+
+        Vector3 fogColor;
 
         Queue<SceneObject> workingSceneObjects = new Queue<SceneObject>(InitialSceneObjectCapacity);
 
@@ -263,20 +267,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         PostProcessorContext postProcessorContext;
 
         Settings settings;
-
-        public CameraCollection Cameras { get; private set; }
-
-        public DirectionalLightCollection DirectionalLights { get; private set; }
-
-        public ShadowMap ShadowMap { get; set; }
-
-        public ParticleSystemCollection ParticleSystems { get; private set; }
-
-        public LensFlare LensFlare { get; set; }
-
-        public PostProcessorCollection PostProcessors { get; private set; }
-
-        public SceneManagerMonitor Monitor { get; private set; }
 
         #region Debug
 
@@ -307,6 +297,20 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
+        public CameraCollection Cameras { get; private set; }
+
+        public DirectionalLightCollection DirectionalLights { get; private set; }
+
+        public ShadowMap ShadowMap { get; set; }
+
+        public ParticleSystemCollection ParticleSystems { get; private set; }
+
+        public LensFlare LensFlare { get; set; }
+
+        public PostProcessorCollection PostProcessors { get; private set; }
+
+        public SceneManagerMonitor Monitor { get; private set; }
+
         public string ActiveCameraName
         {
             get { return activeCameraName; }
@@ -335,6 +339,24 @@ namespace Willcraftia.Xna.Framework.Graphics
                 activeDirectionalLightName = value;
                 activeDirectionalLight = (activeDirectionalLightName != null) ? DirectionalLights[activeDirectionalLightName] : null;
             }
+        }
+
+        public Vector3 AmbientLightColor
+        {
+            get { return ambientLightColor; }
+            set { ambientLightColor = value; }
+        }
+
+        public bool FogEnabled { get; set; }
+
+        public float FogStart { get; set; }
+
+        public float FogEnd { get; set; }
+
+        public Vector3 FogColor
+        {
+            get { return fogColor; }
+            set { fogColor = value; }
         }
 
         public Vector3 BackgroundColor { get; set; }
@@ -561,6 +583,52 @@ namespace Willcraftia.Xna.Framework.Graphics
             spriteBatch.End();
         }
 
+        public void UpdateEffect(Effect effect)
+        {
+            var matrices = effect as IEffectMatrices;
+            if (matrices != null)
+            {
+                matrices.View = activeCamera.View.Matrix;
+                matrices.Projection = activeCamera.Projection.Matrix;
+            }
+
+            var eye = effect as IEffectEye;
+            if (eye != null)
+            {
+                eye.EyePosition = activeCamera.View.Position;
+            }
+
+            var lights = effect as IEffectLights;
+            if (lights != null)
+            {
+                lights.AmbientLightColor = ambientLightColor;
+
+                if (activeDirectionalLight != null && activeDirectionalLight.Enabled)
+                {
+                    lights.DirectionalLight0.Enabled = true;
+                    lights.DirectionalLight0.Direction = activeDirectionalLight.Direction;
+                    lights.DirectionalLight0.DiffuseColor = activeDirectionalLight.DiffuseColor;
+                    lights.DirectionalLight0.SpecularColor = activeDirectionalLight.SpecularColor;
+                }
+                else
+                {
+                    lights.DirectionalLight0.Enabled = false;
+                    lights.DirectionalLight0.Direction = Vector3.Down;
+                    lights.DirectionalLight0.DiffuseColor = Vector3.Zero;
+                    lights.DirectionalLight0.SpecularColor = Vector3.Zero;
+                }
+            }
+
+            var fog = effect as IEffectFog;
+            if (fog != null)
+            {
+                fog.FogEnabled = FogEnabled;
+                fog.FogStart = FogStart;
+                fog.FogEnd = FogEnd;
+                fog.FogColor = fogColor;
+            }
+        }
+
         public void UpdateEffectShadowMap(IEffectShadowMap effect)
         {
             if (effect == null) throw new ArgumentNullException("effect");
@@ -572,11 +640,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             else
             {
                 effect.ShadowMapEnabled = true;
-                effect.DepthBias = ShadowMap.DepthBias;
-                effect.SplitCount = ShadowMap.SplitCount;
-                effect.SplitDistances = ShadowMap.SplitDistances;
-                effect.SplitLightViewProjections = ShadowMap.SplitLightViewProjections;
-                effect.SplitShadowMaps = ShadowMap.SplitShadowMaps;
+                effect.ShadowMapSize = ShadowMap.Size;
+                effect.ShadowMapDepthBias = ShadowMap.DepthBias;
+                effect.ShadowMapCount = ShadowMap.SplitCount;
+                effect.ShadowMapSplitDistances = ShadowMap.SplitDistances;
+                effect.ShadowMapSplitLightViewProjections = ShadowMap.SplitLightViewProjections;
+                effect.ShadowMaps = ShadowMap.SplitShadowMaps;
             }
         }
 

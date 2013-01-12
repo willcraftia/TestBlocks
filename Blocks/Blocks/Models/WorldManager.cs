@@ -282,6 +282,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             SceneSettings.Update(gameTime);
 
+            SceneManager.AmbientLightColor = SceneSettings.CurrentAmbientLightColor;
+
             if (SceneSettings.Sunlight.Enabled && SceneSettings.SunAboveHorizon)
             {
                 SceneManager.ActiveDirectionalLightName = SceneSettings.Sunlight.Name;
@@ -294,6 +296,12 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 SceneManager.ActiveDirectionalLightName = null;
             }
+
+            // TODO
+            SceneManager.FogEnabled = GlobalSceneSettings.FogEnabled;
+            SceneManager.FogStart = SceneManager.ActiveCamera.Projection.FarPlaneDistance * 0.7f;
+            SceneManager.FogEnd = SceneManager.ActiveCamera.Projection.FarPlaneDistance * 0.9f;
+            SceneManager.FogColor = SceneSettings.CurrentSkyColor;
 
             // 太陽が見える場合にのみレンズ フレアを描画。
             LensFlare.Enabled = SceneSettings.SunAboveHorizon;
@@ -310,7 +318,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // リージョン マネージャ
 
             // チャンク エフェクトを更新。
-            RegionManager.PrepareChunkEffect();
+            RegionManager.PrepareSharedEffects();
 
             //----------------------------------------------------------------
             // シーン マネージャ

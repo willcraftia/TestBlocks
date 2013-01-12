@@ -13,16 +13,18 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         bool ShadowMapEnabled { get; set; }
 
+        int ShadowMapSize { get; set; }
+
         ShadowMap.Techniques ShadowMapTechnique { get; set; }
 
-        float DepthBias { get; set; }
+        float ShadowMapDepthBias { get; set; }
 
-        int SplitCount { get; set; }
+        int ShadowMapCount { get; set; }
 
-        float[] SplitDistances { get; set; }
+        float[] ShadowMapSplitDistances { get; set; }
 
-        Matrix[] SplitLightViewProjections { get; set; }
+        Matrix[] ShadowMapSplitLightViewProjections { get; set; }
 
-        Texture2D[] SplitShadowMaps { get; set; }
+        Texture2D[] ShadowMaps { get; set; }
     }
 }
