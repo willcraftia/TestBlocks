@@ -69,8 +69,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectParameter shadowMapSize;
 
-        EffectParameter shadowMapTexelSize;
-
         //--------------------------------------------------------------------
         // PCF specific
 
@@ -253,7 +251,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (value < 1) throw new ArgumentOutOfRangeException("value");
 
                 shadowMapSize.SetValue(value);
-                shadowMapTexelSize.SetValue(1 / (float) value);
             }
         }
 
@@ -348,8 +345,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 shadowMaps[i] = backingEffect.Parameters["ShadowMap" + i];
 
             shadowMapSize = backingEffect.Parameters["ShadowMapSize"];
-            shadowMapTexelSize = backingEffect.Parameters["ShadowMapTexelSize"];
-
             pcfOffsetsParameter = backingEffect.Parameters["PcfOffsets"];
         }
 
@@ -371,7 +366,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void InitializePcfKernel(int kernelSize)
         {
-            var texelSize = shadowMapTexelSize.GetValueSingle();
+            var texelSize = 1 / shadowMapSize.GetValueSingle();
 
             int start;
             if (kernelSize % 2 == 0)
