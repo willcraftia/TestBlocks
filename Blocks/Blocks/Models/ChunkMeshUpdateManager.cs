@@ -191,10 +191,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 対象面に隣接する Block を探索。
                 var nearbyBlockPosition = blockPosition + side.Direction;
                 var nearbyBlockIndex = GetNearbyBlockIndex(chunk, ref nearbyChunks, ref nearbyBlockPosition, side);
+
+                // 未定の場合は面なしとする。
+                // デバッグ上は未定の場合に面を描画したいが、
+                // 未定の場合に面を無視することで相当数の頂点を節約できる。
+                if (nearbyBlockIndex == null) continue;
+
                 if (nearbyBlockIndex != Block.EmptyIndex)
                 {
                     // 隣接 Block との関係から対象面の要否を判定。
-                    var nearbyBlock = region.BlockCatalog[nearbyBlockIndex];
+                    var nearbyBlock = region.BlockCatalog[nearbyBlockIndex.Value];
 
                     // 半透明な連続した流体 Block を並べる際、流体 Block 間の面は不要。
                     // ※流体 Block は常に半透明を仮定して処理。
@@ -245,11 +251,11 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 遮蔽対象のブロックのインデックスを取得。
                 var occluderBlockIndex = GetNearbyBlockIndex(chunk, ref nearbyChunks, ref occluderBlockPosition, s);
 
-                // 空の場合は遮蔽無し。
-                if (occluderBlockIndex == Block.EmptyIndex) continue;
+                // 未定と空の場合は遮蔽無し。
+                if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
 
                 // ブロック情報を取得。
-                var occluderBlock = region.BlockCatalog[occluderBlockIndex];
+                var occluderBlock = region.BlockCatalog[occluderBlockIndex.Value];
 
                 // 流体ブロックは光を遮らないものとする。
                 if (occluderBlock.Fluid) continue;
@@ -264,7 +270,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return occlustion;
         }
 
-        byte GetNearbyBlockIndex(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 nearbyBlockPosition, CubicSide side)
+        byte? GetNearbyBlockIndex(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 nearbyBlockPosition, CubicSide side)
         {
             // 対象面に隣接する Block を探索。
             if (chunk.Contains(ref nearbyBlockPosition))
@@ -277,8 +283,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 隣接 Block が隣接 Chunk に含まれている場合。
                 var nearbyChunk = nearbyChunks[side];
                 
-                // 隣接 Chunk がないならば空。
-                if (nearbyChunk == null) return Block.EmptyIndex;
+                // 隣接 Chunk がないならば未定として null。
+                if (nearbyChunk == null) return null;
 
                 // 隣接 Chunk での相対座標を算出。
                 var relativeX = nearbyBlockPosition.X % chunkSize.X;
