@@ -51,5 +51,6 @@
   },
   "ColorOverlapEnabled": false,
   "MonochromeEnabled": false,
+  "ScanlineEnabled": false,
   "LensFlareEnabled": true
 }

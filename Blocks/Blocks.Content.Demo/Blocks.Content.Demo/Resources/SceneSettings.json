@@ -61,6 +61,6 @@
     }
   ],
   "SecondsPerDay": 20.0,
-  "TimeStopped": false,
-  "FixedSecondsPerDay": 0.0
+  "TimeStopped": true,
+  "FixedSecondsPerDay": 8.3
 }

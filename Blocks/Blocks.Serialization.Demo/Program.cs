@@ -886,20 +886,20 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                             Amount = 1
                         }
                     },
-                    SsaoEnabled = true,
+                    SsaoEnabled = false,
                     Ssao = new SsaoSettingsDefinition
                     {
                         MapScale = 1,
                         Blur = new BlurSettingsDefinition
                         {
                             Radius = 1,
-                            Amount = 1
+                            Amount = 2
                         }
                     },
                     EdgeEnabled = false,
                     Edge = new EdgeSettingsDefinition
                     {
-                        MapScale = 0.5f,
+                        MapScale = 1,
                     },
                     BloomEnabled = false,
                     Bloom = new BloomSettingsDefinition
@@ -923,6 +923,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     },
                     ColorOverlapEnabled = false,
                     MonochromeEnabled = false,
+                    ScanlineEnabled = false,
                     LensFlareEnabled = true,
                 };
                 var jsonResource = SerializeToJson<GraphicsSettingsDefinition>("GraphicsSettings", settings);

@@ -21,17 +21,17 @@
 			<Amount>1</Amount>
 		</Blur>
 	</Sssm>
-	<SsaoEnabled>true</SsaoEnabled>
+	<SsaoEnabled>false</SsaoEnabled>
 	<Ssao>
 		<MapScale>1</MapScale>
 		<Blur>
 			<Radius>1</Radius>
-			<Amount>1</Amount>
+			<Amount>2</Amount>
 		</Blur>
 	</Ssao>
 	<EdgeEnabled>false</EdgeEnabled>
 	<Edge>
-		<MapScale>0.5</MapScale>
+		<MapScale>1</MapScale>
 	</Edge>
 	<BloomEnabled>false</BloomEnabled>
 	<Bloom>
@@ -51,5 +51,6 @@
 	</Dof>
 	<ColorOverlapEnabled>false</ColorOverlapEnabled>
 	<MonochromeEnabled>false</MonochromeEnabled>
+	<ScanlineEnabled>false</ScanlineEnabled>
 	<LensFlareEnabled>true</LensFlareEnabled>
 </GraphicsSettingsDefinition>

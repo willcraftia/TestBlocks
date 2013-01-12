@@ -36,6 +36,8 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public bool MonochromeEnabled;
 
+        public bool ScanlineEnabled;
+
         public bool LensFlareEnabled;
     }
 }

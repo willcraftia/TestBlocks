@@ -83,6 +83,11 @@ namespace Willcraftia.Xna.Blocks.Content
             settings.MonochromeEnabled = definition.MonochromeEnabled;
 
             //----------------------------------------------------------------
+            // 走査線
+
+            settings.ScanlineEnabled = definition.ScanlineEnabled;
+
+            //----------------------------------------------------------------
             // レンズ フレア
 
             settings.LensFlareEnabled = definition.LensFlareEnabled;
@@ -190,6 +195,11 @@ namespace Willcraftia.Xna.Blocks.Content
                 // モノクローム
 
                 MonochromeEnabled = settings.MonochromeEnabled,
+
+                //------------------------------------------------------------
+                // 走査線
+
+                ScanlineEnabled = settings.ScanlineEnabled,
 
                 //------------------------------------------------------------
                 // レンズ フレア

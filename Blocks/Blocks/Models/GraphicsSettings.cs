@@ -86,6 +86,14 @@ namespace Willcraftia.Xna.Blocks.Models
         public bool MonochromeEnabled { get; set; }
 
         /// <summary>
+        /// 走査線が有効か否かを示す値を取得または設定します。
+        /// </summary>
+        /// <value>
+        /// true (走査線が有効な場合)、false (それ以外の場合)。
+        /// </value>
+        public bool ScanlineEnabled { get; set; }
+
+        /// <summary>
         /// レンズ フレアが有効か否かを示す値を取得または設定します。
         /// </summary>
         /// <value>

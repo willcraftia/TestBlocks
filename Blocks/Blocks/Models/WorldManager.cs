@@ -61,6 +61,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Monochrome Monochrome { get; private set; }
 
+        public Scanline Scanline { get; private set; }
+
         public WorldManager(IServiceProvider serviceProvider, GraphicsDevice graphicsDevice)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
@@ -215,6 +217,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 Monochrome = new Monochrome(spriteBatch, monochromeEffect);
 
                 SceneManager.PostProcessors.Add(Monochrome);
+            }
+
+            // 走査線
+            if (GraphicsSettings.ScanlineEnabled)
+            {
+                var effect = LoadAsset<Effect>("content:Effects/Scanline");
+
+                Scanline = new Scanline(spriteBatch, effect);
+
+                SceneManager.PostProcessors.Add(Scanline);
             }
 
             //----------------------------------------------------------------
