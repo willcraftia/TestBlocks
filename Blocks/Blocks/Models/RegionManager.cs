@@ -259,7 +259,7 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkEffect.FogEnabled = GlobalSceneSettings.FogEnabled;
             chunkEffect.FogStart = projection.FarPlaneDistance * 0.7f;
             chunkEffect.FogEnd = projection.FarPlaneDistance * 0.9f;
-            chunkEffect.FogColor = SceneSettings.SkyColor;
+            chunkEffect.FogColor = SceneSettings.CurrentSkyColor;
 
             //----------------------------------------------------------------
             // テクニック

@@ -153,13 +153,13 @@
     <Compile Include="Models\RegionMonitor.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
-    <Compile Include="Models\SkyColor.cs" />
-    <Compile Include="Models\SkyColorTable.cs" />
     <Compile Include="Models\SkySphere.cs" />
     <Compile Include="Models\SkySphereEffect.cs" />
     <Compile Include="Models\StorageChunkStore.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Models\TileCatalog.cs" />
+    <Compile Include="Models\TimeColor.cs" />
+    <Compile Include="Models\TimeColorCollection.cs" />
     <Compile Include="Models\WorldManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
@@ -179,12 +179,12 @@
     <Compile Include="Serialization\RegionDefinition.cs" />
     <Compile Include="Serialization\SceneSettingsDefinition.cs" />
     <Compile Include="Serialization\ShadowMapSettingsDefinition.cs" />
-    <Compile Include="Serialization\SkyColorDefinition.cs" />
     <Compile Include="Serialization\SkySphereDefinition.cs" />
     <Compile Include="Serialization\SsaoSettingsDefinition.cs" />
     <Compile Include="Serialization\SssmSettingsDefinition.cs" />
     <Compile Include="Serialization\TileCatalogDefinition.cs" />
     <Compile Include="Serialization\TileDefinition.cs" />
+    <Compile Include="Serialization\TimeColorDefinition.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework.IO.Compression\Framework.IO.Compression\Framework.IO.Compression %28Xbox 360%29.csproj">

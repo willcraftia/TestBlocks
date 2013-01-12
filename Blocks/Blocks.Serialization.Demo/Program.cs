@@ -955,15 +955,15 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     MoonlightDiffuseColor = new Vector3(0.5f),
                     MoonlightSpecularColor = Vector3.Zero,
                     MoonlightEnabled = true,
-                    SkyColorTable = new SkyColorDefinition[]
+                    SkyColors = new TimeColorDefinition[]
                     {
-                        new SkyColorDefinition { Time = 0, Color = Color.Black.ToVector3() },
-                        new SkyColorDefinition { Time = 0.15f, Color = Color.Black.ToVector3() },
-                        new SkyColorDefinition { Time = 0.25f, Color = Color.CornflowerBlue.ToVector3() },
-                        new SkyColorDefinition { Time = 0.5f, Color = Color.CornflowerBlue.ToVector3() },
-                        new SkyColorDefinition { Time = 0.75f, Color = Color.CornflowerBlue.ToVector3() },
-                        new SkyColorDefinition { Time = 0.84f, Color = Color.Black.ToVector3() },
-                        new SkyColorDefinition { Time = 1, Color = Color.Black.ToVector3() },
+                        new TimeColorDefinition { Time = 0, Color = Color.Black.ToVector3() },
+                        new TimeColorDefinition { Time = 0.15f, Color = Color.Black.ToVector3() },
+                        new TimeColorDefinition { Time = 0.25f, Color = Color.CornflowerBlue.ToVector3() },
+                        new TimeColorDefinition { Time = 0.5f, Color = Color.CornflowerBlue.ToVector3() },
+                        new TimeColorDefinition { Time = 0.75f, Color = Color.CornflowerBlue.ToVector3() },
+                        new TimeColorDefinition { Time = 0.84f, Color = Color.Black.ToVector3() },
+                        new TimeColorDefinition { Time = 1, Color = Color.Black.ToVector3() },
                     },
                     SecondsPerDay = 20f,
                     TimeStopped = false,

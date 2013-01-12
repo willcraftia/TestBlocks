@@ -125,9 +125,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public DirectionalLight Moonlight { get; private set; }
 
-        public SkyColorTable SkyColorTable { get; private set; }
+        public TimeColorCollection SkyColors { get; private set; }
 
-        public Vector3 SkyColor { get; private set; }
+        public Vector3 CurrentSkyColor { get; private set; }
 
         public float SecondsPerDay
         {
@@ -188,7 +188,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Moonlight = new DirectionalLight("Moon");
             Moonlight.Direction = -DefaultMidnightMoonDirection;
 
-            SkyColorTable = new SkyColorTable();
+            SkyColors = new TimeColorCollection();
         }
 
         public void Initialize()
@@ -279,7 +279,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 0 が 0 時、1 が 24 時。
             var elapsed = ElapsedSecondsPerDay / SecondsPerDay;
 
-            SkyColor = SkyColorTable.GetColor(elapsed);
+            CurrentSkyColor = SkyColors.GetColor(elapsed);
         }
 
         void InitializeSunRotationAxis()

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public struct SkyColorDefinition
+    public struct TimeColorDefinition
     {
         public float Time;
 

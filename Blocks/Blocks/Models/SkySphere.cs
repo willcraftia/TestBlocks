@@ -75,7 +75,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(SceneSettings != null);
 
             // 空の色。
-            Effect.SkyColor = SceneSettings.SkyColor;
+            Effect.SkyColor = SceneSettings.CurrentSkyColor;
 
             // 太陽の情報。
             if (SunVisible)

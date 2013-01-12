@@ -297,7 +297,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // シーン マネージャ
 
-            SceneManager.BackgroundColor = SceneSettings.SkyColor;
+            SceneManager.BackgroundColor = SceneSettings.CurrentSkyColor;
             SceneManager.Draw(gameTime);
         }
 

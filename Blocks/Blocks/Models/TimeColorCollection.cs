@@ -9,11 +9,11 @@ using Willcraftia.Xna.Framework;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SkyColorTable : IEnumerable<SkyColor>
+    public sealed class TimeColorCollection : IEnumerable<TimeColor>
     {
         public const int InitialCapacity = 10;
 
-        List<SkyColor> entries = new List<SkyColor>(InitialCapacity);
+        List<TimeColor> entries = new List<TimeColor>(InitialCapacity);
 
         public int Count
         {
@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // I/F
-        public IEnumerator<SkyColor> GetEnumerator()
+        public IEnumerator<TimeColor> GetEnumerator()
         {
             return entries.GetEnumerator();
         }
@@ -32,10 +32,10 @@ namespace Willcraftia.Xna.Blocks.Models
             return entries.GetEnumerator();
         }
 
-        public void AddColor(SkyColor skyColor)
+        public void AddColor(TimeColor timeColor)
         {
-            var index = FindInsertionIndex(skyColor.Time);
-            entries.Insert(index, skyColor);
+            var index = FindInsertionIndex(timeColor.Time);
+            entries.Insert(index, timeColor);
         }
 
         public Vector3 GetColor(float time)

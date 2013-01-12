@@ -7,13 +7,13 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class SkyColor
+    public sealed class TimeColor
     {
         public float Time { get; set; }
 
         public Vector3 Color { get; set; }
 
-        public SkyColor(float time, Vector3 color)
+        public TimeColor(float time, Vector3 color)
         {
             Time = time;
             Color = color;

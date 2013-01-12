@@ -39,12 +39,12 @@ namespace Willcraftia.Xna.Blocks.Content
             sceneSettings.Moonlight.SpecularColor = definition.MoonlightSpecularColor;
             sceneSettings.Moonlight.Enabled = definition.MoonlightEnabled;
 
-            if (!ArrayHelper.IsNullOrEmpty(definition.SkyColorTable))
+            if (!ArrayHelper.IsNullOrEmpty(definition.SkyColors))
             {
-                for (int i = 0; i < definition.SkyColorTable.Length; i++)
+                for (int i = 0; i < definition.SkyColors.Length; i++)
                 {
-                    var skyColor = ToSkyColor(ref definition.SkyColorTable[i]);
-                    sceneSettings.SkyColorTable.AddColor(skyColor);
+                    var timeColor = ToTimeColor(ref definition.SkyColors[i]);
+                    sceneSettings.SkyColors.AddColor(timeColor);
                 }
             }
 
@@ -76,13 +76,13 @@ namespace Willcraftia.Xna.Blocks.Content
                 FixedSecondsPerDay = sceneSettings.FixedSecondsPerDay
             };
 
-            if (sceneSettings.SkyColorTable.Count != 0)
+            if (sceneSettings.SkyColors.Count != 0)
             {
-                definition.SkyColorTable = new SkyColorDefinition[sceneSettings.SkyColorTable.Count];
+                definition.SkyColors = new TimeColorDefinition[sceneSettings.SkyColors.Count];
                 int index = 0;
-                foreach (var skyColor in sceneSettings.SkyColorTable)
+                foreach (var skyColor in sceneSettings.SkyColors)
                 {
-                    definition.SkyColorTable[index++] = new SkyColorDefinition
+                    definition.SkyColors[index++] = new TimeColorDefinition
                     {
                         Time = skyColor.Time,
                         Color = skyColor.Color
@@ -93,9 +93,9 @@ namespace Willcraftia.Xna.Blocks.Content
             serializer.Serialize(resource, definition);
         }
 
-        SkyColor ToSkyColor(ref SkyColorDefinition definition)
+        TimeColor ToTimeColor(ref TimeColorDefinition definition)
         {
-            return new SkyColor(definition.Time, definition.Color);
+            return new TimeColor(definition.Time, definition.Color);
         }
     }
 }

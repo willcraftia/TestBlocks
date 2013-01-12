@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public bool MoonlightEnabled;
 
-        public SkyColorDefinition[] SkyColorTable;
+        public TimeColorDefinition[] SkyColors;
 
         public float SecondsPerDay;
 
