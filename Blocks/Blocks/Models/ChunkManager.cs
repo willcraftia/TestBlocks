@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // 更新の最大試行数。
         public const int UpdateCapacity = 100;
 
-        public const int InitialActiveChunkCapacity = 3000;
+        public const int InitialActiveChunkCapacity = 5000;
 
         public const int InterChunkCapacity = 50;
 
