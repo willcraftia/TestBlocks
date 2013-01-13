@@ -12,14 +12,21 @@ using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
+using Willcraftia.Xna.Framework.Landscape;
 using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Content.Demo
 {
+    using DiagnosticsMonitor = Willcraftia.Xna.Framework.Diagnostics.Monitor;
+
     public class MainGame : Game
     {
+        public const string MonitorUpdate = "MainGame.Update";
+
+        public const string MonitorDraw = "MainGame.Draw";
+
         static readonly Logger logger = new Logger(typeof(MainGame).Name);
 
         GraphicsDeviceManager graphics;
@@ -40,35 +47,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         TimeRuler timeRuler;
 
-        TimeRulerMarker updateMarker;
-
-        TimeRulerMarker drawMarker;
-
-        TimeRulerMarker partitionManagerUpdateMarker;
-
-        TimeRulerMarker partitionManagerCheckPassivationCompletedMarker;
-
-        TimeRulerMarker partitionManagerCheckActivationCompletedMarker;
-
-        TimeRulerMarker partitionManagerPassivatePartitionsMarker;
-
-        TimeRulerMarker partitionManagerActivatePartitionsMarker;
-
-        TimeRulerMarker regionUpdateMarker;
-
-        TimeRulerMarker classifySceneObjectsMarker;
-
-        TimeRulerMarker drawShadowMapMarker;
-
-        TimeRulerMarker drawSceneMarker;
-
-        TimeRulerMarker drawSceneOcclusionQueryMarker;
-
-        TimeRulerMarker drawSceneRenderingMarker;
-
-        TimeRulerMarker ssaoProcessMarker;
-
-        TimeRulerMarker dofProcessMarker;
+        TimeRulerMonitorListener monitorListener;
 
         string helpMessage =
             "[F1] Help\r\n" +
@@ -98,7 +77,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         public MainGame()
         {
-            //================================================================
+            //----------------------------------------------------------------
             // GraphicsDeviceManager
 
             graphics = new GraphicsDeviceManager(this);
@@ -106,8 +85,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             graphics.PreferredBackBufferHeight = 720;
             //graphics.PreferMultiSampling = true;
 
-            //================================================================
-            // Logging
+            //----------------------------------------------------------------
+            // ロギング
 
             //FileTraceListenerManager.Add(@"Logs\App.log", false);
             logger.InfoGameStarted();
@@ -122,10 +101,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         protected override void Initialize()
         {
-            #region Logging
-
-            //================================================================
-            // Logging
+            #region ロギング
 
             logger.Info("Initialize");
 
@@ -134,10 +110,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             #endregion
 
-            #region FpsCounter
-
-            //================================================================
-            // FpsCounter
+            #region FPS カウンタ
 
             var fpsCounter = new FpsCounter(this);
             fpsCounter.Content.RootDirectory = "Content";
@@ -149,10 +122,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             #endregion
 
-            #region TimeRuler
-
-            //================================================================
-            // TimeRuler
+            #region タイム ルーラ
 
             timeRuler = new TimeRuler(this);
             timeRuler.BackgroundColor = Color.Black;
@@ -160,87 +130,32 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //timeRuler.Visible = false;
             Components.Add(timeRuler);
 
-            updateMarker = timeRuler.CreateMarker();
-            updateMarker.Name = "Update";
-            updateMarker.BarIndex = 0;
-            updateMarker.Color = Color.White;
+            #endregion
 
-            partitionManagerUpdateMarker = timeRuler.CreateMarker();
-            partitionManagerUpdateMarker.Name = "PartitionManagerUpdate";
-            partitionManagerUpdateMarker.BarIndex = 1;
-            partitionManagerUpdateMarker.Color = Color.Cyan;
+            #region モニタ
+            
+            monitorListener = new TimeRulerMonitorListener(timeRuler);
+            DiagnosticsMonitor.Listeners.Add(monitorListener);
 
-            partitionManagerCheckPassivationCompletedMarker = timeRuler.CreateMarker();
-            partitionManagerCheckPassivationCompletedMarker.Name = "PartitionManagerCheckPassivationCompleted";
-            partitionManagerCheckPassivationCompletedMarker.BarIndex = 1;
-            partitionManagerCheckPassivationCompletedMarker.Color = Color.LawnGreen;
+            monitorListener.CreateMarker(MonitorUpdate, 0, Color.White);
 
-            partitionManagerCheckActivationCompletedMarker = timeRuler.CreateMarker();
-            partitionManagerCheckActivationCompletedMarker.Name = "PartitionManagerCheckActivationCompleted";
-            partitionManagerCheckActivationCompletedMarker.BarIndex = 1;
-            partitionManagerCheckActivationCompletedMarker.Color = Color.Green;
+            monitorListener.CreateMarker(PartitionManager.MonitorUpdate, 1, Color.Cyan);
+            monitorListener.CreateMarker(ChunkManager.MonitorUpdate, 1, Color.Orange);
+            monitorListener.CreateMarker(RegionManager.MonitorUpdate, 1, Color.Green);
+            
+            monitorListener.CreateMarker(MonitorDraw, 2, Color.White);
 
-            partitionManagerPassivatePartitionsMarker = timeRuler.CreateMarker();
-            partitionManagerPassivatePartitionsMarker.Name = "PartitionManagerPassivatePartitions";
-            partitionManagerPassivatePartitionsMarker.BarIndex = 1;
-            partitionManagerPassivatePartitionsMarker.Color = Color.Yellow;
-
-            partitionManagerActivatePartitionsMarker = timeRuler.CreateMarker();
-            partitionManagerActivatePartitionsMarker.Name = "PartitionManagerActivatePartitions";
-            partitionManagerActivatePartitionsMarker.BarIndex = 1;
-            partitionManagerActivatePartitionsMarker.Color = Color.Orange;
-
-            regionUpdateMarker = timeRuler.CreateMarker();
-            regionUpdateMarker.Name = "RegionManagerUpdate";
-            regionUpdateMarker.BarIndex = 1;
-            regionUpdateMarker.Color = Color.Blue;
-
-            drawMarker = timeRuler.CreateMarker();
-            drawMarker.Name = "Draw";
-            drawMarker.BarIndex = 2;
-            drawMarker.Color = Color.White;
-
-            classifySceneObjectsMarker = timeRuler.CreateMarker();
-            classifySceneObjectsMarker.Name = "DrawShadowMapMarker";
-            classifySceneObjectsMarker.BarIndex = 3;
-            classifySceneObjectsMarker.Color = Color.Cyan;
-
-            drawShadowMapMarker = timeRuler.CreateMarker();
-            drawShadowMapMarker.Name = "DrawShadowMapMarker";
-            drawShadowMapMarker.BarIndex = 3;
-            drawShadowMapMarker.Color = Color.LawnGreen;
-
-            drawSceneMarker = timeRuler.CreateMarker();
-            drawSceneMarker.Name = "DrawScene";
-            drawSceneMarker.BarIndex = 3;
-            drawSceneMarker.Color = Color.Green;
-
-            drawSceneOcclusionQueryMarker = timeRuler.CreateMarker();
-            drawSceneOcclusionQueryMarker.Name = "DrawSceneOcclusionQuery";
-            drawSceneOcclusionQueryMarker.BarIndex = 3;
-            drawSceneOcclusionQueryMarker.Color = Color.Yellow;
-
-            drawSceneRenderingMarker = timeRuler.CreateMarker();
-            drawSceneRenderingMarker.Name = "DrawSceneRendering";
-            drawSceneRenderingMarker.BarIndex = 3;
-            drawSceneRenderingMarker.Color = Color.Orange;
-
-            ssaoProcessMarker = timeRuler.CreateMarker();
-            ssaoProcessMarker.Name = "SsaoProcessMarker";
-            ssaoProcessMarker.BarIndex = 4;
-            ssaoProcessMarker.Color = Color.Cyan;
-
-            dofProcessMarker = timeRuler.CreateMarker();
-            dofProcessMarker.Name = "DofProcessMarker";
-            dofProcessMarker.BarIndex = 4;
-            dofProcessMarker.Color = Color.LawnGreen;
+            monitorListener.CreateMarker(SceneManager.MonitorClassifySceneObjects, 3, Color.Cyan);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, 3, Color.Orange);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, 3, Color.Green);
+            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, 3, Color.Red);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, 3, Color.Yellow);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, 3, Color.Magenta);
+            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, 3, Color.LawnGreen);
 
             #endregion
 
             #region DebugMapDisplay
-
-            //================================================================
-            // DebugMapDisplay
 
             var debugMapDisplay = new DebugMapDisplay(this);
             debugMapDisplay.Visible = false;
@@ -255,21 +170,21 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         {
             logger.Info("LoadContent");
 
-            //================================================================
-            // StorageManager
+            //----------------------------------------------------------------
+            // ストレージ マネージャ
 
             StorageManager.SelectStorageContainer("Blocks.Demo.MainGame");
 
-            //================================================================
-            // ResourceLoader
+            //----------------------------------------------------------------
+            // リソース ローダ
 
             ResourceLoader.Register(ContentResourceLoader.Instance);
             ResourceLoader.Register(TitleResourceLoader.Instance);
             ResourceLoader.Register(StorageResourceLoader.Instance);
             ResourceLoader.Register(FileResourceLoader.Instance);
 
-            //================================================================
-            // Camera
+            //----------------------------------------------------------------
+            // ビュー コントローラ
 
             var viewport = GraphicsDevice.Viewport;
             viewInput.InitialMousePositionX = viewport.Width / 2;
@@ -278,71 +193,19 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             viewInput.DashFactor = dashFactor;
             viewInput.Yaw(MathHelper.Pi);
 
-            //================================================================
-            // WorldManager
+            //----------------------------------------------------------------
+            // ワールド マネージャ
 
             worldManager = new WorldManager(Services, GraphicsDevice);
             worldManager.Initialize();
 
-            // TODO: 暫定
-
-            #region Monitor
-
             //----------------------------------------------------------------
-            // シーン マネージャ
-
-            worldManager.SceneManager.Monitor.BeginClassifySceneObjects += OnBeginClassifySceneObjects;
-            worldManager.SceneManager.Monitor.EndClassifySceneObjects += OnEndClassifySceneObjects;
-            worldManager.SceneManager.Monitor.BeginDrawShadowMap += OnBeginDrawShadowMap;
-            worldManager.SceneManager.Monitor.EndDrawShadowMap += OnEndDrawShadowMap;
-            worldManager.SceneManager.Monitor.BeginDrawScene += OnBeginDrawScene;
-            worldManager.SceneManager.Monitor.EndDrawScene += OnEndDrawScene;
-            worldManager.SceneManager.Monitor.BeginDrawSceneOcclusionQuery += OnBeginDrawSceneOcclusionQuery;
-            worldManager.SceneManager.Monitor.EndDrawSceneOcclusionQuery += OnEndDrawSceneOcclusionQuery;
-            worldManager.SceneManager.Monitor.BeginDrawSceneRendering += OnBeginDrawSceneRendering;
-            worldManager.SceneManager.Monitor.EndDrawSceneRendering += OnEndDrawSceneRendering;
-
-            //----------------------------------------------------------------
-            // スクリーン スペース アンビエント オクルージョン
-
-            if (worldManager.Ssao != null)
-            {
-                worldManager.Ssao.Monitor.BeginProcess += OnSsaoBeginProcess;
-                worldManager.Ssao.Monitor.EndProcess += OnSsaoEndProcess;
-            }
-
-            //----------------------------------------------------------------
-            // 被写界深度
-
-            if (worldManager.Dof != null)
-            {
-                worldManager.Dof.Monitor.BeginProcess += OnDofBeginProcess;
-                worldManager.Dof.Monitor.EndProcess += OnDofEndProcess;
-            }
-
-            //----------------------------------------------------------------
-            // パーティション マネージャ
-
-            worldManager.PartitionManager.Monitor.BeginUpdate += OnPartitionManagerMonitorBeginUpdate;
-            worldManager.PartitionManager.Monitor.EndUpdate += OnPartitionManagerMonitorEndUpdate;
-            worldManager.PartitionManager.Monitor.BeginCheckPassivationCompleted += OnPartitionManagerMonitorBeginCheckPassivationCompleted;
-            worldManager.PartitionManager.Monitor.EndCheckPassivationCompleted += OnPartitionManagerMonitorEndCheckPassivationCompleted;
-            worldManager.PartitionManager.Monitor.BeginCheckActivationCompleted += OnPartitionManagerBeginCheckActivationCompleted;
-            worldManager.PartitionManager.Monitor.EndCheckActivationCompleted += OnPartitionManagerEndCheckActivationCompleted;
-            worldManager.PartitionManager.Monitor.BeginPassivatePartitions += OnPartitionManagerMonitorBeginPassivatePartitions;
-            worldManager.PartitionManager.Monitor.EndPassivatePartitions += OnPartitionManagerMonitorEndPassivatePartitions;
-            worldManager.PartitionManager.Monitor.BeginActivatePartitions += OnPartitionManagerMonitorBeginActivatePartitions;
-            worldManager.PartitionManager.Monitor.EndActivatePartitions += OnPartitionManagerEndActivatePartitions;
-
-            #endregion
-
-            //================================================================
-            // Region
+            // リージョン
 
             region = worldManager.Load("dummy");
 
-            //================================================================
-            // Others
+            //----------------------------------------------------------------
+            // その他
 
             Content.RootDirectory = "Content";
 
@@ -359,24 +222,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         {
             worldManager.Unload();
 
-            #region TimeRuler
-
-            timeRuler.ReleaseMarker(updateMarker);
-            timeRuler.ReleaseMarker(partitionManagerUpdateMarker);
-            timeRuler.ReleaseMarker(partitionManagerCheckPassivationCompletedMarker);
-            timeRuler.ReleaseMarker(partitionManagerCheckActivationCompletedMarker);
-            timeRuler.ReleaseMarker(partitionManagerCheckPassivationCompletedMarker);
-            timeRuler.ReleaseMarker(partitionManagerCheckActivationCompletedMarker);
-            timeRuler.ReleaseMarker(regionUpdateMarker);
-            timeRuler.ReleaseMarker(drawMarker);
-            timeRuler.ReleaseMarker(drawSceneMarker);
-            timeRuler.ReleaseMarker(drawShadowMapMarker);
-            timeRuler.ReleaseMarker(drawSceneOcclusionQueryMarker);
-            timeRuler.ReleaseMarker(drawSceneRenderingMarker);
-            timeRuler.ReleaseMarker(ssaoProcessMarker);
-            timeRuler.ReleaseMarker(dofProcessMarker);
-
-            #endregion
+            monitorListener.Close();
 
             spriteBatch.Dispose();
             fillTexture.Dispose();
@@ -384,26 +230,20 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         protected override void Update(GameTime gameTime)
         {
-            //================================================================
-            // TimeRuler
-
+            // タイム ルーラの計測開始
             timeRuler.StartFrame();
 
             // これをしないとデバッグできない。
             if (!IsActive) return;
 
-            //================================================================
-            // TimeRuler
+            // モニタ
+            DiagnosticsMonitor.Begin(MonitorUpdate);
 
-            updateMarker.Begin();
-
-            //================================================================
-            // Keyboard State
-
+            // キーボード状態の取得
             var keyboardState = Keyboard.GetState();
 
-            //================================================================
-            // Exit
+            //----------------------------------------------------------------
+            // アプリケーション終了
 
             // TODO
             if (!worldManager.PartitionManager.Closing && !worldManager.PartitionManager.Closed &&
@@ -417,8 +257,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (worldManager.PartitionManager.Closed)
                 Exit();
 
-            //================================================================
-            // ViewInput
+            //----------------------------------------------------------------
+            // ビューの操作
 
             viewInput.Update(gameTime, worldManager.SceneManager.ActiveCamera.View);
 
@@ -430,13 +270,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 if (viewInput.MoveVelocity < 10) viewInput.MoveVelocity = 10;
             }
 
-            //================================================================
-            // WorldManager
+            //----------------------------------------------------------------
+            // ワールドの更新
 
             worldManager.Update(gameTime);
 
-            //================================================================
-            // Others
+            //----------------------------------------------------------------
+            // その他
 
             // F1
             if (keyboardState.IsKeyUp(Keys.F1) && lastKeyboardState.IsKeyDown(Keys.F1))
@@ -454,40 +294,30 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (DebugMapDisplay.Available && keyboardState.IsKeyUp(Keys.F5) && lastKeyboardState.IsKeyDown(Keys.F5))
                 DebugMapDisplay.Instance.Visible = !DebugMapDisplay.Instance.Visible;
 
-            //================================================================
-            // Keyboard State
+            //----------------------------------------------------------------
+            // キーボード状態の記録
 
             lastKeyboardState = keyboardState;
 
             base.Update(gameTime);
 
-            //================================================================
-            // TimeRuler
-
-            updateMarker.End();
+            // モニタ
+            DiagnosticsMonitor.End(MonitorUpdate);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            //================================================================
-            // TimeRuler
+            // モニタ
+            DiagnosticsMonitor.Begin(MonitorDraw);
 
-            drawMarker.Begin();
-
-            //================================================================
-            // WorldManager
-
+            // ワールドの描画
             worldManager.Draw(gameTime);
 
-            //================================================================
-            // Help HUD
-
+            // ヘルプ ウィンドウの描画
             DrawHelp();
 
-            //================================================================
-            // TimeRuler
-
-            drawMarker.End();
+            // モニタ
+            DiagnosticsMonitor.End(MonitorDraw);
 
             base.Draw(gameTime);
         }
@@ -516,42 +346,40 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(graphics.PreferredBackBufferWidth).Append('x');
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
 
-            var partitionManagerMonitor = worldManager.PartitionManager.Monitor;
+            var partitionManager = worldManager.PartitionManager;
             sb.Append("Partition: ");
-            sb.Append("A(").AppendNumber(partitionManagerMonitor.ActiveClusterCount).Append(":");
-            sb.AppendNumber(partitionManagerMonitor.ActivePartitionCount).Append(") ");
-            sb.Append("W(").AppendNumber(partitionManagerMonitor.ActivatingPartitionCount).Append(") ");
-            sb.Append("P(").AppendNumber(partitionManagerMonitor.PassivatingPartitionCount).Append(")").AppendLine();
+            sb.Append("A(").AppendNumber(partitionManager.ActiveClusterCount).Append(":");
+            sb.AppendNumber(partitionManager.ActivePartitionCount).Append(") ");
+            sb.Append("W(").AppendNumber(partitionManager.ActivatingPartitionCount).Append(") ");
+            sb.Append("P(").AppendNumber(partitionManager.PassivatingPartitionCount).Append(")").AppendLine();
 
-            var chunkManagerMonitor = worldManager.ChunkManager.Monitor;
-            sb.Append("Chunk: ").AppendNumber(chunkManagerMonitor.ActiveChunkCount).Append("/");
-            sb.AppendNumber(chunkManagerMonitor.TotalChunkCount).Append(" ");
-            sb.Append("Mesh: ").AppendNumber(chunkManagerMonitor.ActiveChunkMeshCount).Append("/");
-            sb.AppendNumber(chunkManagerMonitor.TotalChunkMeshCount).Append(" ");
-            sb.Append("InterMesh: ").AppendNumber(chunkManagerMonitor.ActiveInterChunkCount).Append("/");
-            sb.AppendNumber(chunkManagerMonitor.TotalInterChunkCount).AppendLine();
+            var chunkManager = worldManager.ChunkManager;
+            sb.Append("Chunk: ").AppendNumber(chunkManager.ActiveChunkCount).Append("/");
+            sb.AppendNumber(chunkManager.TotalChunkCount).Append(" ");
+            sb.Append("Mesh: ").AppendNumber(chunkManager.ActiveChunkMeshCount).Append("/");
+            sb.AppendNumber(chunkManager.TotalChunkMeshCount).Append(" ");
+            sb.Append("InterMesh: ").AppendNumber(chunkManager.ActiveInterChunkCount).Append("/");
+            sb.AppendNumber(chunkManager.TotalInterChunkCount).AppendLine();
 
-            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(chunkManagerMonitor.ActiveBufferCount).Append("/");
-            sb.AppendNumber(chunkManagerMonitor.TotalBufferCount).AppendLine();
-
-            sb.Append("UpdatingChunk: ").AppendNumber(chunkManagerMonitor.UpdatingChunkCount).AppendLine();
+            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(chunkManager.ActiveBufferCount).Append("/");
+            sb.AppendNumber(chunkManager.TotalBufferCount).AppendLine();
 
             sb.Append("ChunkVertex: ");
-            sb.Append("Max(").AppendNumber(chunkManagerMonitor.MaxVertexCount).Append("/");
-            sb.Append(chunkManagerMonitor.VertexCapacity).Append(") ");
-            sb.Append("Total(").AppendNumber(chunkManagerMonitor.TotalVertexCount).Append("/");
-            sb.AppendNumber(chunkManagerMonitor.AllocatedVertexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(chunkManager.MaxVertexCount).Append("/");
+            sb.Append(ChunkManager.VertexCapacity).Append(") ");
+            sb.Append("Total(").AppendNumber(chunkManager.TotalVertexCount).Append("/");
+            sb.AppendNumber(chunkManager.AllocatedVertexCount).Append(")").AppendLine();
 
             sb.Append("ChunkIndex: ");
-            sb.Append("Max(").AppendNumber(chunkManagerMonitor.MaxIndexCount).Append(".");
-            sb.AppendNumber(chunkManagerMonitor.IndexCapacity).Append(") ");
-            sb.Append("Total(").AppendNumber(chunkManagerMonitor.TotalIndexCount).Append("/");
-            sb.AppendNumber(chunkManagerMonitor.AllocatedIndexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(chunkManager.MaxIndexCount).Append(".");
+            sb.AppendNumber(ChunkManager.IndexCapacity).Append(") ");
+            sb.Append("Total(").AppendNumber(chunkManager.TotalIndexCount).Append("/");
+            sb.AppendNumber(chunkManager.AllocatedIndexCount).Append(")").AppendLine();
 
-            var sceneManagerMonitor = worldManager.SceneManager.Monitor;
-            sb.Append("SceneObejcts: ").AppendNumber(sceneManagerMonitor.RenderedSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManagerMonitor.VisibleSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManagerMonitor.TotalSceneObjectCount).AppendLine();
+            var sceneManager = worldManager.SceneManager;
+            sb.Append("SceneObejcts: ").AppendNumber(sceneManager.RenderedSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManager.VisibleSceneObjectCount).Append("/");
+            sb.AppendNumber(sceneManager.TotalSceneObjectCount).AppendLine();
 
             if (worldManager.ShadowMap != null)
             {
@@ -644,129 +472,5 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             spriteBatch.End();
         }
-
-        #region Monitor Callback
-
-        void OnPartitionManagerMonitorEndUpdate(object sender, EventArgs e)
-        {
-            partitionManagerUpdateMarker.End();
-        }
-
-        void OnPartitionManagerMonitorBeginUpdate(object sender, EventArgs e)
-        {
-            partitionManagerUpdateMarker.Begin();
-        }
-
-        void OnPartitionManagerMonitorBeginCheckPassivationCompleted(object sender, EventArgs e)
-        {
-            partitionManagerCheckPassivationCompletedMarker.Begin();
-        }
-
-        void OnPartitionManagerMonitorEndCheckPassivationCompleted(object sender, EventArgs e)
-        {
-            partitionManagerCheckPassivationCompletedMarker.End();
-        }
-
-        void OnPartitionManagerBeginCheckActivationCompleted(object sender, EventArgs e)
-        {
-            partitionManagerCheckActivationCompletedMarker.Begin();
-        }
-
-        void OnPartitionManagerEndCheckActivationCompleted(object sender, EventArgs e)
-        {
-            partitionManagerCheckActivationCompletedMarker.End();
-        }
-
-        void OnPartitionManagerMonitorBeginPassivatePartitions(object sender, EventArgs e)
-        {
-            partitionManagerPassivatePartitionsMarker.Begin();
-        }
-
-        void OnPartitionManagerMonitorEndPassivatePartitions(object sender, EventArgs e)
-        {
-            partitionManagerPassivatePartitionsMarker.End();
-        }
-
-        void OnPartitionManagerMonitorBeginActivatePartitions(object sender, EventArgs e)
-        {
-            partitionManagerActivatePartitionsMarker.Begin();
-        }
-
-        void OnPartitionManagerEndActivatePartitions(object sender, EventArgs e)
-        {
-            partitionManagerActivatePartitionsMarker.End();
-        }
-
-        void OnBeginClassifySceneObjects(object sender, EventArgs e)
-        {
-            classifySceneObjectsMarker.Begin();
-        }
-
-        void OnEndClassifySceneObjects(object sender, EventArgs e)
-        {
-            classifySceneObjectsMarker.End();
-        }
-
-        void OnBeginDrawShadowMap(object sender, EventArgs e)
-        {
-            drawShadowMapMarker.Begin();
-        }
-
-        void OnEndDrawShadowMap(object sender, EventArgs e)
-        {
-            drawShadowMapMarker.End();
-        }
-
-        void OnBeginDrawScene(object sender, EventArgs e)
-        {
-            drawSceneMarker.Begin();
-        }
-
-        void OnEndDrawScene(object sender, EventArgs e)
-        {
-            drawSceneMarker.End();
-        }
-
-        void OnBeginDrawSceneOcclusionQuery(object sender, EventArgs e)
-        {
-            drawSceneOcclusionQueryMarker.Begin();
-        }
-
-        void OnEndDrawSceneOcclusionQuery(object sender, EventArgs e)
-        {
-            drawSceneOcclusionQueryMarker.End();
-        }
-
-        void OnBeginDrawSceneRendering(object sender, EventArgs e)
-        {
-            drawSceneRenderingMarker.Begin();
-        }
-
-        void OnEndDrawSceneRendering(object sender, EventArgs e)
-        {
-            drawSceneRenderingMarker.End();
-        }
-
-        void OnSsaoBeginProcess(object sender, EventArgs e)
-        {
-            ssaoProcessMarker.Begin();
-        }
-
-        void OnSsaoEndProcess(object sender, EventArgs e)
-        {
-            ssaoProcessMarker.End();
-        }
-
-        void OnDofBeginProcess(object sender, EventArgs e)
-        {
-            dofProcessMarker.Begin();
-        }
-
-        void OnDofEndProcess(object sender, EventArgs e)
-        {
-            dofProcessMarker.End();
-        }
-
-        #endregion
     }
 }

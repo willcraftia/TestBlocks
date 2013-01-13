@@ -103,8 +103,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
-            chunkManager.Monitor.UpdatingChunkCount = updatingChunks.Count;
-
             // Update the task queue.
             taskQueue.Update();
 

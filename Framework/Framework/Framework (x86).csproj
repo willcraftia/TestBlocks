@@ -114,8 +114,12 @@
     <Compile Include="CubicSide.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\DebugMapDisplay.cs" />
+    <Compile Include="Diagnostics\IMonitorListener.cs" />
+    <Compile Include="Diagnostics\Monitor.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
+    <Compile Include="Diagnostics\TimeRulerMarkerCollection.cs" />
+    <Compile Include="Diagnostics\TimeRulerMonitorListener.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
     <Compile Include="Graphics\EffectHelper.cs" />
     <Compile Include="Graphics\IEffectEye.cs" />
@@ -163,7 +167,6 @@
     <Compile Include="Landscape\DomeLandscapeVolume.cs" />
     <Compile Include="Landscape\ILandscapeVolume.cs" />
     <Compile Include="Landscape\DefaultLandscapeVolume.cs" />
-    <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="Noise\Cache.cs" />
     <Compile Include="Noise\Const.cs" />

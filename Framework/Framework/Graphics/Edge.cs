@@ -178,43 +178,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        #region EdgeMonitor
-
-        public sealed class EdgeMonitor : PostProcessorMonitor
-        {
-            public event EventHandler BeingDrawNormalDepth = delegate { };
-
-            public event EventHandler EndDrawNormalDepth = delegate { };
-
-            public event EventHandler BeginFilter = delegate { };
-
-            public event EventHandler EndFilter = delegate { };
-
-            internal EdgeMonitor(Edge edge) : base(edge) { }
-
-            internal void OnBeingDrawNormalDepth()
-            {
-                BeingDrawNormalDepth(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnEndDrawNormalDepth()
-            {
-                EndDrawNormalDepth(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnBeginFilter()
-            {
-                BeginFilter(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnEndFilter()
-            {
-                EndFilter(PostProcessor, EventArgs.Empty);
-            }
-        }
-
-        #endregion
-
         public const float DefaultEdgeWidth = 1;
 
         public const float DefaultEdgeIntensity = 200;
@@ -226,6 +189,12 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const float DefaultNormalSensitivity = 1;
 
         public const float DefaultDepthSensitivity = 1;
+
+        public const string MonitorProcess = "Edge.Process";
+
+        public const string MonitorDrawNormalDepth = "Edge.DrawNormalDepth";
+
+        public const string MonitorFilter = "Edge.Filter";
 
         NormalDepthMapEffect normalDepthMapEffect;
 
@@ -344,8 +313,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public EdgeMonitor Monitor { get; private set; }
-
         public Edge(SpriteBatch spriteBatch, Settings settings, Effect normalDepthMapEffect, Effect edgeEffect)
             : base(spriteBatch)
         {
@@ -375,28 +342,23 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             normalDepthMap = new RenderTarget2D(GraphicsDevice, width, height,
                 false, SurfaceFormat.Vector4, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
-
-            //----------------------------------------------------------------
-            // モニタ
-
-            Monitor = new EdgeMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.OnBeginProcess();
+            Monitor.Begin(MonitorProcess);
 
             DrawNormalDepth(context);
             Filter(context);
 
             if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(normalDepthMap);
 
-            Monitor.OnEndProcess();
+            Monitor.End(MonitorProcess);
         }
 
         void DrawNormalDepth(IPostProcessorContext context)
         {
-            Monitor.OnBeingDrawNormalDepth();
+            Monitor.Begin(MonitorDrawNormalDepth);
 
             var viewerCamera = context.ActiveCamera;
             var visibleSceneObjects = context.VisibleSceneObjects;
@@ -440,12 +402,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndDrawNormalDepth();
+            Monitor.End(MonitorDrawNormalDepth);
         }
 
         void Filter(IPostProcessorContext context)
         {
-            Monitor.OnBeginFilter();
+            Monitor.Begin(MonitorFilter);
 
             //----------------------------------------------------------------
             // エフェクト
@@ -468,7 +430,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndFilter();
+            Monitor.End(MonitorFilter);
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

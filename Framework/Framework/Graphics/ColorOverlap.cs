@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
@@ -13,14 +14,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class ColorOverlap : PostProcessor, IDisposable
     {
-        #region ColorOverlapMonitor
-
-        public sealed class ColorOverlapMonitor : PostProcessorMonitor
-        {
-            internal ColorOverlapMonitor(ColorOverlap colorOverlap) : base(colorOverlap) { }
-        }
-
-        #endregion
+        public const string MonitorProcess = "ColorOverlap.Process";
 
         Texture2D fillTexture;
 
@@ -36,18 +30,15 @@ namespace Willcraftia.Xna.Framework.Graphics
             set { color = value; }
         }
 
-        public ColorOverlapMonitor Monitor { get; private set; }
-
         public ColorOverlap(SpriteBatch spriteBatch)
             : base(spriteBatch)
         {
             fillTexture = Texture2DHelper.CreateFillTexture(GraphicsDevice);
-            Monitor = new ColorOverlapMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.OnBeginProcess();
+            Monitor.Begin(MonitorProcess);
 
             GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin();
@@ -56,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndProcess();
+            Monitor.End(MonitorProcess);
         }
 
         #region IDisposable

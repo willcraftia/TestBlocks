@@ -161,42 +161,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        #region SsaoMonitor
+        public const string MonitorProcess = "Ssao.Process";
 
-        public sealed class SsaoMonitor : PostProcessorMonitor
-        {
-            public event EventHandler BeingDrawSsaoMap = delegate { };
+        public const string MonitorDrawSsaoMap = "Ssao.DrawSsaoMap";
 
-            public event EventHandler EndDrawSsaoMap = delegate { };
-
-            public event EventHandler BeginFilter = delegate { };
-
-            public event EventHandler EndFilter = delegate { };
-
-            internal SsaoMonitor(Ssao ssao) : base(ssao) { }
-
-            internal void OnBeingDrawSsaoMap()
-            {
-                BeingDrawSsaoMap(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnEndDrawSsaoMap()
-            {
-                EndDrawSsaoMap(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnBeginFilter()
-            {
-                BeginFilter(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnEndFilter()
-            {
-                EndFilter(PostProcessor, EventArgs.Empty);
-            }
-        }
-
-        #endregion
+        public const string MonitorFilter = "Ssao.Filter";
 
         public const float DefaultTotalStrength = 5;
 
@@ -296,8 +265,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public SsaoMonitor Monitor { get; private set; }
-
         public Ssao(SpriteBatch spriteBatch, Settings settings,
             Effect normalDepthMapEffect, Effect ssaoMapEffect, Effect blurEffect, Effect ssaoEffect,
             Texture2D randomNormalMap)
@@ -346,16 +313,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             blur = new SsaoMapBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Single,
                 settings.Blur.Radius, settings.Blur.Amount);
-
-            //----------------------------------------------------------------
-            // モニタ
-
-            Monitor = new SsaoMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.OnBeginProcess();
+            Monitor.Begin(MonitorProcess);
 
             DrawSsaoMap(context);
             Filter(context);
@@ -366,12 +328,12 @@ namespace Willcraftia.Xna.Framework.Graphics
                 DebugMapDisplay.Instance.Add(ssaoMap);
             }
 
-            Monitor.OnEndProcess();
+            Monitor.End(MonitorProcess);
         }
 
         void DrawSsaoMap(IPostProcessorContext context)
         {
-            Monitor.OnBeingDrawSsaoMap();
+            Monitor.Begin(MonitorDrawSsaoMap);
 
             var viewerCamera = context.ActiveCamera;
             var visibleSceneObjects = context.VisibleSceneObjects;
@@ -459,12 +421,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < 3; i++)
                 blur.Filter(ssaoMap, normalDepthMap);
 
-            Monitor.OnEndDrawSsaoMap();
+            Monitor.End(MonitorDrawSsaoMap);
         }
 
         void Filter(IPostProcessorContext context)
         {
-            Monitor.OnBeginFilter();
+            Monitor.Begin(MonitorFilter);
 
             //----------------------------------------------------------------
             // エフェクト
@@ -480,7 +442,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndFilter();
+            Monitor.End(MonitorFilter);
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

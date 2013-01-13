@@ -91,117 +91,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        #region SceneManagerMonitor
-
-        public sealed class SceneManagerMonitor
-        {
-            public event EventHandler BeginClassifySceneObjects = delegate { };
-
-            public event EventHandler EndClassifySceneObjects = delegate { };
-
-            public event EventHandler BeginDrawShadowMap = delegate { };
-
-            public event EventHandler EndDrawShadowMap = delegate { };
-
-            public event EventHandler BeginDrawScene = delegate { };
-
-            public event EventHandler EndDrawScene = delegate { };
-
-            public event EventHandler BeginDrawSceneOcclusionQuery = delegate { };
-
-            public event EventHandler EndDrawSceneOcclusionQuery = delegate { };
-
-            public event EventHandler BeginDrawSceneRendering = delegate { };
-
-            public event EventHandler EndDrawSceneRendering = delegate { };
-
-            public event EventHandler BeginPostProcess = delegate { };
-
-            public event EventHandler EndPostProcess = delegate { };
-
-            SceneManager sceneManager;
-
-            public int TotalSceneObjectCount { get; internal set; }
-
-            public int VisibleSceneObjectCount { get; internal set; }
-
-            public int OccludedSceneObjectCount { get; internal set; }
-
-            public int RenderedSceneObjectCount
-            {
-                get { return VisibleSceneObjectCount - OccludedSceneObjectCount; }
-            }
-
-            internal SceneManagerMonitor(SceneManager sceneManager)
-            {
-                if (sceneManager == null) throw new ArgumentNullException("sceneManager");
-
-                this.sceneManager = sceneManager;
-            }
-
-            internal void OnBeingClassifySceneObjects()
-            {
-                BeginClassifySceneObjects(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnEndClassifySceneObjects()
-            {
-                EndClassifySceneObjects(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnBeingDrawShadowMap()
-            {
-                BeginDrawShadowMap(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnEndDrawShadowMap()
-            {
-                EndDrawShadowMap(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnBeginDrawScene()
-            {
-                BeginDrawScene(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnEndDrawScene()
-            {
-                EndDrawScene(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnBeginDrawSceneOcclusionQuery()
-            {
-                BeginDrawSceneOcclusionQuery(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnEndDrawSceneOcclusionQuery()
-            {
-                EndDrawSceneOcclusionQuery(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnBeginDrawSceneRendering()
-            {
-                BeginDrawSceneRendering(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnEndDrawSceneRendering()
-            {
-                EndDrawSceneRendering(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnBeginPostProcess()
-            {
-                BeginPostProcess(sceneManager, EventArgs.Empty);
-            }
-
-            internal void OnEndPostProcess()
-            {
-                EndPostProcess(sceneManager, EventArgs.Empty);
-            }
-        }
-
-        #endregion
-
         public const int InitialSceneObjectCapacity = 1000;
 
         public const int InitialCameraCapacity = 10;
@@ -215,6 +104,20 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const int InitialParticleSystemCapacity = 10;
 
         public const int InitialPostProcessorCapacity = 10;
+
+        public const string MonitorClassifySceneObjects = "SceneManager.ClassifySceneObjects";
+        
+        public const string MonitorDrawShadowMap = "SceneManager.DrawShadowMap";
+        
+        public const string MonitorDrawScene = "SceneManager.DrawScene";
+        
+        public const string MonitorOcclusionQuery = "SceneManager.OcclusionQuery";
+        
+        public const string MonitorDrawSceneObjects = "SceneManager.DrawSceneObjects";
+        
+        public const string MonitorDrawParticles = "SceneManager.DrawParticles";
+        
+        public const string MonitorPostProcess = "SceneManager.PostProcess";
 
         static readonly BlendState colorWriteDisable = new BlendState
         {
@@ -308,8 +211,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public PostProcessorCollection PostProcessors { get; private set; }
 
-        public SceneManagerMonitor Monitor { get; private set; }
-
         public string ActiveCameraName
         {
             get { return activeCameraName; }
@@ -375,6 +276,17 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public bool SssmEnabled { get; set; }
 
+        public int TotalSceneObjectCount { get; internal set; }
+
+        public int VisibleSceneObjectCount { get; internal set; }
+
+        public int OccludedSceneObjectCount { get; internal set; }
+
+        public int RenderedSceneObjectCount
+        {
+            get { return VisibleSceneObjectCount - OccludedSceneObjectCount; }
+        }
+
         public SceneManager(Settings settings, GraphicsDevice graphicsDevice)
         {
             if (settings == null) throw new ArgumentNullException("settings");
@@ -389,8 +301,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             DirectionalLights = new DirectionalLightCollection(InitialDirectionalLightCapacity);
             ParticleSystems = new ParticleSystemCollection(InitialParticleSystemCapacity);
             PostProcessors = new PostProcessorCollection(InitialPostProcessorCapacity);
-
-            Monitor = new SceneManagerMonitor(this);
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -469,9 +379,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             activeShadowCasters.Clear();
 
             // カウンタをリセット。
-            Monitor.TotalSceneObjectCount = 0;
-            Monitor.VisibleSceneObjectCount = 0;
-            Monitor.OccludedSceneObjectCount = 0;
+            TotalSceneObjectCount = 0;
+            VisibleSceneObjectCount = 0;
+            OccludedSceneObjectCount = 0;
 
 #if DEBUG || TRACE
             // デバッグ エフェクトへカメラ情報を設定。
@@ -486,45 +396,12 @@ namespace Willcraftia.Xna.Framework.Graphics
                     workingSceneObjects.Enqueue(sceneObject);
             }
 
-            Monitor.TotalSceneObjectCount = workingSceneObjects.Count;
+            TotalSceneObjectCount = workingSceneObjects.Count;
 
-            Monitor.OnBeingClassifySceneObjects();
+            //----------------------------------------------------------------
+            // 可視オブジェクトの収集と種類による分類
 
-            // 可視オブジェクトの収集と種類による分類。
-            while (workingSceneObjects.Count != 0)
-            {
-                var sceneObject = workingSceneObjects.Dequeue();
-
-                bool shouldPreDraw = false;
-
-                if (IsVisibleObject(sceneObject))
-                {
-                    visibleSceneObjects.Add(sceneObject);
-                    shouldPreDraw = true;
-
-                    if (sceneObject.Translucent)
-                    {
-                        translucentSceneObjects.Add(sceneObject);
-                    }
-                    else
-                    {
-                        opaqueSceneObjects.Add(sceneObject);
-                    }
-
-                    Monitor.VisibleSceneObjectCount++;
-                }
-
-                var shadowCaster = sceneObject as ShadowCaster;
-                if (shadowCaster != null && IsActiveShadowCaster(shadowCaster))
-                {
-                    activeShadowCasters.Add(shadowCaster);
-                    shouldPreDraw = true;
-                }
-
-                if (shouldPreDraw) sceneObject.PreDraw();
-            }
-
-            Monitor.OnEndClassifySceneObjects();
+            ClassifySceneObjects();
 
             // 視点からの距離でソート。
             DistanceComparer.Instance.EyePosition = activeCamera.View.Position;
@@ -676,9 +553,50 @@ namespace Willcraftia.Xna.Framework.Graphics
             return true;
         }
 
+        void ClassifySceneObjects()
+        {
+            Monitor.Begin(MonitorClassifySceneObjects);
+
+            // 可視オブジェクトの収集と種類による分類。
+            while (workingSceneObjects.Count != 0)
+            {
+                var sceneObject = workingSceneObjects.Dequeue();
+
+                bool shouldPreDraw = false;
+
+                if (IsVisibleObject(sceneObject))
+                {
+                    visibleSceneObjects.Add(sceneObject);
+                    shouldPreDraw = true;
+
+                    if (sceneObject.Translucent)
+                    {
+                        translucentSceneObjects.Add(sceneObject);
+                    }
+                    else
+                    {
+                        opaqueSceneObjects.Add(sceneObject);
+                    }
+
+                    VisibleSceneObjectCount++;
+                }
+
+                var shadowCaster = sceneObject as ShadowCaster;
+                if (shadowCaster != null && IsActiveShadowCaster(shadowCaster))
+                {
+                    activeShadowCasters.Add(shadowCaster);
+                    shouldPreDraw = true;
+                }
+
+                if (shouldPreDraw) sceneObject.PreDraw();
+            }
+
+            Monitor.End(MonitorClassifySceneObjects);
+        }
+
         void DrawShadowMap()
         {
-            Monitor.OnBeingDrawShadowMap();
+            Monitor.Begin(MonitorDrawShadowMap);
 
             //----------------------------------------------------------------
             // 準備
@@ -697,12 +615,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             var lightDirection = activeDirectionalLight.Direction;
             ShadowMap.Draw(ref lightDirection);
 
-            Monitor.OnEndDrawShadowMap();
+            Monitor.End(MonitorDrawShadowMap);
         }
 
         void DrawScene(ShadowMap shadowMap)
         {
-            Monitor.OnBeginDrawScene();
+            Monitor.Begin(MonitorDrawScene);
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             
@@ -714,7 +632,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // オクルージョン クエリ
             //
 
-            Monitor.OnBeginDrawSceneOcclusionQuery();
+            Monitor.Begin(MonitorOcclusionQuery);
 
             GraphicsDevice.BlendState = colorWriteDisable;
 
@@ -724,14 +642,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             foreach (var translucent in translucentSceneObjects)
                 translucent.UpdateOcclusion();
 
-            Monitor.OnEndDrawSceneOcclusionQuery();
+            Monitor.End(MonitorOcclusionQuery);
 
             //================================================================
             //
             // 描画
             //
 
-            Monitor.OnBeginDrawSceneRendering();
+            Monitor.Begin(MonitorDrawSceneObjects);
 
             //----------------------------------------------------------------
             // 不透明オブジェクト
@@ -742,7 +660,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 if (opaque.Occluded)
                 {
-                    Monitor.OccludedSceneObjectCount++;
+                    OccludedSceneObjectCount++;
                     continue;
                 }
 
@@ -758,7 +676,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 if (translucent.Occluded)
                 {
-                    Monitor.OccludedSceneObjectCount++;
+                    OccludedSceneObjectCount++;
                     continue;
                 }
 
@@ -774,15 +692,17 @@ namespace Willcraftia.Xna.Framework.Graphics
                 SkySphere.Draw();
             }
 
-            Monitor.OnEndDrawSceneRendering();
+            Monitor.End(MonitorDrawSceneObjects);
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndDrawScene();
+            Monitor.End(MonitorDrawScene);
         }
 
         void DrawParticles(GameTime gameTime)
         {
+            Monitor.Begin(MonitorDrawParticles);
+
             GraphicsDevice.SetRenderTarget(renderTarget);
 
             foreach (var particleSystem in ParticleSystems)
@@ -792,11 +712,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             GraphicsDevice.SetRenderTarget(null);
+
+            Monitor.End(MonitorDrawParticles);
         }
 
         void PostProcess()
         {
-            Monitor.OnBeginPostProcess();
+            Monitor.Begin(MonitorPostProcess);
 
             foreach (var postProcessor in PostProcessors)
             {
@@ -807,7 +729,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
             }
 
-            Monitor.OnEndPostProcess();
+            Monitor.End(MonitorPostProcess);
         }
 
         void SwapRenderTargets()

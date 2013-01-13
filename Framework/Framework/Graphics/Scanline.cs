@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
@@ -10,14 +11,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Scanline : PostProcessor
     {
-        #region ScanlineMonitor
-
-        public sealed class ScanlineMonitor : PostProcessorMonitor
-        {
-            internal ScanlineMonitor(Scanline scanline) : base(scanline) { }
-        }
-
-        #endregion
+        public const string MonitorProcess = "Scanline.Process";
 
         Effect effect;
 
@@ -26,8 +20,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         EffectParameter brightness;
 
         public float Brightness { get; set; }
-
-        public ScanlineMonitor Monitor { get; private set; }
 
         public Scanline(SpriteBatch spriteBatch, Effect effect)
             : base(spriteBatch)
@@ -38,13 +30,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             density = effect.Parameters["Density"];
             brightness = effect.Parameters["Brightness"];
             Brightness = 0.75f;
-
-            Monitor = new ScanlineMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.OnBeginProcess();
+            Monitor.Begin(MonitorProcess);
 
             var height = context.Destination.Height;
 
@@ -57,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndProcess();
+            Monitor.End(MonitorProcess);
         }
     }
 }

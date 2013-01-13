@@ -82,7 +82,6 @@
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\GraphicsSettings.cs" />
     <Compile Include="Models\LandscapeSettings.cs" />
-    <Compile Include="Models\RegionManagerMonitor.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\TimeColor.cs" />
     <Compile Include="Models\TimeColorCollection.cs" />
@@ -106,7 +105,6 @@
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\NullChunkStore.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
-    <Compile Include="Models\ChunkManagerMonitor.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\GradientDensity.cs" />

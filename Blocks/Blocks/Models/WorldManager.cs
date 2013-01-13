@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Content;
+using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Landscape;
@@ -17,6 +18,8 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class WorldManager
     {
+        public const string MonitorUpdate = "WorldManager.Update";
+
         IServiceProvider serviceProvider;
 
         SpriteBatch spriteBatch;
@@ -287,6 +290,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
+            Monitor.Begin(MonitorUpdate);
+
             //----------------------------------------------------------------
             // カメラ更新
 
@@ -339,6 +344,8 @@ namespace Willcraftia.Xna.Blocks.Models
             // リージョン マネージャ
 
             RegionManager.Update(gameTime);
+
+            Monitor.End(MonitorUpdate);
         }
 
         public void Draw(GameTime gameTime)

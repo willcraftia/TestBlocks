@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
@@ -125,15 +126,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        #region BloomMonitor
-
-        public sealed class BloomMonitor : PostProcessorMonitor
-        {
-            internal BloomMonitor(Bloom bloom) : base(bloom) { }
-        }
-
-        #endregion
-
         public const float DefaultThreshold = 0.25f;
 
         public const float DefaultBloomIntensity = 1.25f;
@@ -143,6 +135,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         public const float DefaultBloomSaturation = 1;
 
         public const float DefaultBaseSaturation = 1;
+
+        public const string MonitorProcess = "Bloom.Process";
 
         Settings settings;
 
@@ -219,8 +213,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        public BloomMonitor Monitor { get; private set; }
-
         public Bloom(SpriteBatch spriteBatch, Settings settings, Effect bloomExtractEffect, Effect bloomEffect, Effect blurEffect)
             : base(spriteBatch)
         {
@@ -252,16 +244,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             blur = new GaussianBlur(blurEffect, spriteBatch, width, height,
                 SurfaceFormat.Color, settings.Blur.Radius, settings.Blur.Amount);
-
-            //----------------------------------------------------------------
-            // モニタ
-
-            Monitor = new BloomMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.OnBeginProcess();
+            Monitor.Begin(MonitorProcess);
 
             //----------------------------------------------------------------
             // ブルーム エクストラクト マップ
@@ -294,7 +281,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndProcess();
+            Monitor.End(MonitorProcess);
         }
 
         #region IDisposable

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
+using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Threading;
 
 #endregion
@@ -195,6 +196,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         #endregion
 
+        public const string MonitorUpdate = "PartitionManager.Update";
+
         /// <summary>
         /// ワールド空間でのパーティションのサイズ。
         /// </summary>
@@ -300,9 +303,36 @@ namespace Willcraftia.Xna.Framework.Landscape
         public bool Closed { get; private set; }
 
         /// <summary>
-        /// モニタを取得します。
+        /// アクティブ クラスタ数を取得します。
         /// </summary>
-        public PartitionManagerMonitor Monitor { get; private set; }
+        public int ActiveClusterCount
+        {
+            get { return activePartitions.ClusterCount; }
+        }
+
+        /// <summary>
+        /// アクティブ パーティション数を取得します。
+        /// </summary>
+        public int ActivePartitionCount
+        {
+            get { return activePartitions.Count; }
+        }
+
+        /// <summary>
+        /// アクティブ化中パーティション数を取得します。
+        /// </summary>
+        public int ActivatingPartitionCount
+        {
+            get { return activatingPartitions.Count; }
+        }
+
+        /// <summary>
+        /// 非アクティブ化中パーティション数を取得します。
+        /// </summary>
+        public int PassivatingPartitionCount
+        {
+            get { return passivatingPartitions.Count; }
+        }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -349,8 +379,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             activationSearchCapacity = settings.ActivationSearchCapacity;
             passivationSearchCapacity = settings.PassivationSearchCapacity;
-
-            Monitor = new PartitionManagerMonitor(this);
         }
 
         /// <summary>
@@ -361,12 +389,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (Closed) return;
 
-            Monitor.OnBeginUpdate();
-
-            Monitor.ActiveClusterCount = activePartitions.ClusterCount;
-            Monitor.ActivePartitionCount = activePartitions.Count;
-            Monitor.ActivatingPartitionCount = activatingPartitions.Count;
-            Monitor.PassivatingPartitionCount = passivatingPartitions.Count;
+            Monitor.Begin(MonitorUpdate);
 
             eyePosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
             eyePosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
@@ -411,7 +434,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            Monitor.OnEndUpdate();
+            Monitor.End(MonitorUpdate);
         }
 
         /// <summary>
@@ -480,8 +503,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void CheckPassivationCompleted()
         {
-            Monitor.OnBeginCheckPassivationCompleted();
-
             int partitionCount = passivatingPartitions.Count;
             for (int i = 0; i < partitionCount; i++)
             {
@@ -512,8 +533,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 非アクティブ化に成功したのでプールへ戻す。
                 partitionPool.Return(partition);
             }
-
-            Monitor.OnEndCheckPassivationCompleted();
         }
 
         /// <summary>
@@ -526,8 +545,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void CheckActivationCompleted()
         {
-            Monitor.OnBeginCheckActivationCompleted();
-
             int partitionCount = activatingPartitions.Count;
             for (int i = 0; i < partitionCount; i++)
             {
@@ -555,8 +572,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティブな隣接パーティションへ通知。
                 NotifyNeighborActivated(partition);
             }
-
-            Monitor.OnEndCheckActivationCompleted();
         }
 
         /// <summary>
@@ -629,8 +644,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void PassivatePartitions()
         {
-            Monitor.OnBeginPassivatePartitions();
-
             int count = Math.Min(activePartitions.Count, passivationSearchCapacity);
             for (int i = 0; i < count; i++)
             {
@@ -656,8 +669,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 非同期処理を要求。
                 passivationTaskQueue.Enqueue(partition.PassivateAction);
             }
-
-            Monitor.OnEndPassivatePartitions();
         }
 
         /// <summary>
@@ -670,8 +681,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void ActivatePartitions()
         {
-            Monitor.OnBeginActivatePartitions();
-
             int index = activationSearchOffset;
             bool cycled = false;
             for (int i = 0; i < activationSearchCapacity; i++)
@@ -719,8 +728,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
 
             activationSearchOffset = index;
-
-            Monitor.OnEndActivatePartitions();
         }
 
         /// <summary>

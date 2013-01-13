@@ -258,6 +258,15 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             return marker;
         }
 
+        public TimeRulerMarker CreateMarker(string name, int barIndex, Color color)
+        {
+            var marker = CreateMarker();
+            marker.Name = name;
+            marker.BarIndex = barIndex;
+            marker.Color = color;
+            return marker;
+        }
+
         public void ReleaseMarker(TimeRulerMarker marker)
         {
             if (marker == null) throw new ArgumentNullException("marker");

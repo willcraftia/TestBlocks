@@ -20,6 +20,8 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class RegionManager : IDisposable
     {
+        public const string MonitorUpdate = "RegionManager.Update";
+
         static readonly Logger logger = new Logger(typeof(RegionManager).Name);
 
         IServiceProvider serviceProvider;
@@ -46,8 +48,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SceneSettings SceneSettings { get; private set; }
 
-        public RegionManagerMonitor Monitor { get; private set; }
-
         public RegionManager(IServiceProvider serviceProvider, SceneManager sceneManager)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
@@ -62,8 +62,6 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(Image2D), new Image2DLoader(GraphicsDevice));
             assetManager.RegisterLoader(typeof(SkySphere), new SkySphereLoader(resourceManager, GraphicsDevice));
             assetManager.RegisterLoader(typeof(ParticleSettings), new ParticleSettingsLoader(resourceManager));
-
-            Monitor = new RegionManagerMonitor(this);
         }
 
         public void Initialize(SceneSettings sceneSettings)
@@ -202,7 +200,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
-            Monitor.OnBeginUpdate();
+            Monitor.Begin(MonitorUpdate);
 
             //----------------------------------------------------------------
             // シーン設定
@@ -256,7 +254,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            Monitor.OnEndUpdate();
+            Monitor.End(MonitorUpdate);
         }
 
         public void PrepareChunkEffects()

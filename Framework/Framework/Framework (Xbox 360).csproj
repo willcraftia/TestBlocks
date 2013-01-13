@@ -147,11 +147,15 @@
     <Compile Include="Diagnostics\FpsCounter.cs" />
     <Compile Include="Diagnostics\GraphicsAdapterLog.cs" />
     <Compile Include="Diagnostics\IAppender.cs" />
+    <Compile Include="Diagnostics\IMonitorListener.cs" />
     <Compile Include="Diagnostics\LogEvent.cs" />
     <Compile Include="Diagnostics\Logger.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
+    <Compile Include="Diagnostics\Monitor.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
+    <Compile Include="Diagnostics\TimeRulerMarkerCollection.cs" />
+    <Compile Include="Diagnostics\TimeRulerMonitorListener.cs" />
     <Compile Include="Diagnostics\TraceAppender.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
     <Compile Include="Graphics\Bloom.cs" />
@@ -219,7 +223,6 @@
     <Compile Include="Landscape\ILandscapeVolume.cs" />
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
-    <Compile Include="Landscape\PartitionManagerMonitor.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="MathExtension.cs" />
     <Compile Include="Noise\Add.cs" />

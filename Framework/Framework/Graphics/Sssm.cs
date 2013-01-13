@@ -282,42 +282,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        #region SssmMonitor
+        public const string MonitorProcess = "Sssm.Process";
 
-        public sealed class SssmMonitor : PostProcessorMonitor
-        {
-            public event EventHandler BeginDrawShadowScene = delegate { };
+        public const string MonitorDrawShadowScene = "Sssm.DrawShadowScene";
 
-            public event EventHandler EndDrawShadowScene = delegate { };
-
-            public event EventHandler BeginFilter = delegate { };
-
-            public event EventHandler EndFilter = delegate { };
-
-            internal SssmMonitor(Sssm sssm) : base(sssm) { }
-
-            internal void OnBeginDrawShadowScene()
-            {
-                BeginDrawShadowScene(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnEndDrawShadowScene()
-            {
-                EndDrawShadowScene(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnBeginFilter()
-            {
-                BeginFilter(PostProcessor, EventArgs.Empty);
-            }
-
-            internal void OnEndFilter()
-            {
-                EndFilter(PostProcessor, EventArgs.Empty);
-            }
-        }
-
-        #endregion
+        public const string MonitorFilter = "Sssm.Filter";
 
         ShadowSceneEffect shadowSceneEffect;
 
@@ -344,8 +313,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             get { return shadowColor; }
             set { shadowColor = value; }
         }
-
-        public SssmMonitor Monitor { get; private set; }
 
         public Sssm(SpriteBatch spriteBatch, ShadowMap.Settings shadowMapSettings, Settings sssmSettings,
             Effect shadowSceneEffect, Effect sssmEffect, Effect blurEffect)
@@ -403,28 +370,23 @@ namespace Willcraftia.Xna.Framework.Graphics
                 blur = new GaussianBlur(blurEffect, spriteBatch, width, height, SurfaceFormat.Vector2,
                     blurSettings.Radius, blurSettings.Amount);
             }
-
-            //================================================================
-            // モニタ
-
-            Monitor = new SssmMonitor(this);
         }
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.OnBeginProcess();
+            Monitor.Begin(MonitorProcess);
 
             DrawShadowScene(context);
             Filter(context);
 
             if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowSceneMap);
 
-            Monitor.OnEndProcess();
+            Monitor.End(MonitorProcess);
         }
 
         void DrawShadowScene(IPostProcessorContext context)
         {
-            Monitor.OnBeginDrawShadowScene();
+            Monitor.Begin(MonitorDrawShadowScene);
 
             var camera = context.ActiveCamera;
             var shadowMap = context.ShadowMap;
@@ -453,12 +415,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndDrawShadowScene();
+            Monitor.End(MonitorDrawShadowScene);
         }
 
         void Filter(IPostProcessorContext context)
         {
-            Monitor.OnBeginFilter();
+            Monitor.Begin(MonitorFilter);
 
             if (blur != null) blur.Filter(shadowSceneMap);
 
@@ -479,7 +441,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.OnEndFilter();
+            Monitor.End(MonitorFilter);
         }
 
         #region IDisposable
