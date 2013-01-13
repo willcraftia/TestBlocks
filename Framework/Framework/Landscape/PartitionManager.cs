@@ -174,6 +174,27 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         #endregion
 
+        #region VectorI3LengthComparer
+
+        sealed class VectorI3LengthComparer : IComparer<VectorI3>
+        {
+            public static VectorI3LengthComparer Instace = new VectorI3LengthComparer();
+
+            VectorI3LengthComparer() { }
+
+            public int Compare(VectorI3 x, VectorI3 y)
+            {
+                var d1 = x.LengthSquared();
+                var d2 = y.LengthSquared();
+
+                if (d1 == d2) return 0;
+
+                return d1 < d2 ? -1 : 1;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// ワールド空間でのパーティションのサイズ。
         /// </summary>
@@ -318,6 +339,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             // null の場合はデフォルト実装を与える。
             minLandscapeVolume = settings.MinLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
             minActivePointOffsets = minLandscapeVolume.GetPoints();
+
+            // 中心から近い位置からアクティブ化したいため中心に近い位置でソート。
+            // なんらかのアクティブ化中ならば意味は無いが、初回、あるいは、
+            // 待機している全てのアクティブ化を終えた後からの新たなアクティブ化では意味がある。
+            Array.Sort(minActivePointOffsets, VectorI3LengthComparer.Instace);
+
             maxLandscapeVolume = settings.MaxLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
 
             activationSearchCapacity = settings.ActivationSearchCapacity;

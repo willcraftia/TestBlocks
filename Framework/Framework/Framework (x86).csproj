@@ -278,7 +278,6 @@
     <Compile Include="IO\TitleResourceLoader.cs" />
     <Compile Include="IO\ResourceManager.cs" />
     <Compile Include="VectorI3.cs" />
-    <Compile Include="VectorI3LengthComparer.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>
   <ItemGroup>

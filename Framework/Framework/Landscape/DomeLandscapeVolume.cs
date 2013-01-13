@@ -103,11 +103,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            // 中心から近い位置からアクティブ化したいため中心に近い位置でソート。
-            // なんらかのアクティブ化中ならば意味は無いが、初回、あるいは、
-            // 待機している全てのアクティブ化を終えた後からの新たなアクティブ化では意味がある。
-            Array.Sort(points, VectorI3LengthComparer.Instace);
-
             return points;
         }
 

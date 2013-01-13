@@ -283,7 +283,6 @@
     <Compile Include="StringBuilderExtension.cs" />
     <Compile Include="Threading\TaskQueue.cs" />
     <Compile Include="VectorI3.cs" />
-    <Compile Include="VectorI3LengthComparer.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
