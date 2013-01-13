@@ -16,8 +16,6 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         static readonly VectorI3 chunkSize = Chunk.Size;
 
-        Vector3 inverseChunkSize;
-
         // I/F
         [PropertyIgnored]
         public IResource Resource { get; set; }
@@ -31,9 +29,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void Initialize()
         {
-            inverseChunkSize.X = 1 / (float) chunkSize.X;
-            inverseChunkSize.Y = 1 / (float) chunkSize.Y;
-            inverseChunkSize.Z = 1 / (float) chunkSize.Z;
         }
 
         // I/F
