@@ -169,6 +169,7 @@
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="Noise\Cache.cs" />
     <Compile Include="Noise\Const.cs" />
+    <Compile Include="Noise\Multiply.cs" />
     <Compile Include="Noise\ScalePoint.cs" />
     <Compile Include="Noise\Displace.cs" />
     <Compile Include="Orthograph.cs" />

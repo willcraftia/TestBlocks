@@ -245,6 +245,7 @@
     <Compile Include="Noise\MinkowskiHMetric.cs" />
     <Compile Include="Noise\MinkowskiMetric.cs" />
     <Compile Include="Noise\Multifractal.cs" />
+    <Compile Include="Noise\Multiply.cs" />
     <Compile Include="Noise\Musgrave.cs" />
     <Compile Include="Noise\NoFadeCurve.cs" />
     <Compile Include="Noise\NoiseArray2.cs" />
