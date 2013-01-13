@@ -500,88 +500,162 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             Console.WriteLine("TerrainNoise (INoiseSource) (ComponentBundleDefinition)");
             {
+                // デバッグのし易さのために、各ノイズ インスタンスのコンポーネント名を明示する。
+                var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+
+                // デフォルトでは Perlin.FadeCurve は静的フィールドで共有状態なので、
+                // ここで一つだけビルダへ登録しておく。
+                builder.Add("DefaultFadeCurve", Perlin.DefaultFadeCurve);
+
+                //------------------------------------------------------------
+                //
+                // Lowland
+                //
+
+                // lowlandPerlin
+                var lowlandPerlin = new Perlin
+                {
+                    Name = "Lowland Perlin",
+                    Seed = 100
+                };
+                // lowlandFractal
+                var lowlandFractal = new Billow
+                {
+                    Name = "Lowland Fractal",
+                    OctaveCount = 2,
+                    Source = lowlandPerlin
+                };
+                // lowlandScaleBias
+                var lowlandScaleBias = new ScaleBias
+                {
+                    Name = "Lowland ScaleBias",
+                    Scale = 0.125f,
+                    Bias = -0.75f,
+                    Source = lowlandFractal
+                };
                 // lowlandShape
                 var lowlandShape = new ScalePoint
                 {
                     Name = "Lowland Shape",
                     ScaleY = 0,
-                    Source = new ScaleBias
-                    {
-                        Name = "Lowland ScaleBias",
-                        Scale = 0.125f,
-                        Bias = -0.75f,
-                        Source = new Billow
-                        {
-                            Name = "Lowland Fractal",
-                            OctaveCount = 2,
-                            Source = new Perlin
-                            {
-                                Name = "Lowland Perlin",
-                                Seed = 100
-                            }
-                        }
-                    }
+                    Source = lowlandScaleBias
+                };
+                builder.Add("LowlandPerlin", lowlandPerlin);
+                builder.Add("LowlandFractal", lowlandFractal);
+                builder.Add("LowlandScaleBias", lowlandScaleBias);
+                builder.Add("LowlandShape", lowlandShape);
+
+                //------------------------------------------------------------
+                //
+                // Highland
+                //
+
+                // highlandPerlin
+                var highlandPerlin = new Perlin
+                {
+                    Name = "Highland Perlin",
+                    Seed = 200
+                };
+                // highlandFractal
+                var highlandFractal = new SumFractal
+                {
+                    Name = "Highland Fractal",
+                    OctaveCount = 4,
+                    Frequency = 2,
+                    Source = highlandPerlin
                 };
                 // highlandShape
                 var highlandShape = new ScalePoint
                 {
                     Name = "Highland Shape",
                     ScaleY = 0,
-                    Source = new SumFractal
-                    {
-                        Name = "Highland Fractal",
-                        OctaveCount = 4,
-                        Frequency = 2,
-                        Source = new Perlin
-                        {
-                            Name = "Highland Perlin",
-                            Seed = 200
-                        }
-                    }
+                    Source = highlandFractal
+                };
+                builder.Add("HighlandPerlin", highlandPerlin);
+                builder.Add("HighlandFractal", highlandFractal);
+                builder.Add("HighlandShape", highlandShape);
+
+                //------------------------------------------------------------
+                //
+                // Mountain
+                //
+                
+                // mountainPerlin
+                var mountainPerlin = new Perlin
+                {
+                    Name = "Mountain Perlin",
+                    Seed = 300
+                };
+                // mountainFractal
+                var mountainFractal = new RidgedMultifractal
+                {
+                    Name = "Mountain Fractal",
+                    OctaveCount = 2,
+                    Source = mountainPerlin
+                };
+                // mountainScaleBias
+                var mountainScaleBias = new ScaleBias
+                {
+                    Name = "Mountain ScaleBias",
+                    Scale = 0.5f,
+                    Bias = 0.25f,
+                    Source = mountainFractal
                 };
                 // mountainShape
                 var mountainShape = new ScalePoint
                 {
                     Name = "Mountain Shape",
                     ScaleY = 0,
-                    Source = new ScaleBias
-                    {
-                        Name = "Mountain ScaleBias",
-                        Scale = 0.5f,
-                        Bias = 0.25f,
-                        Source = new RidgedMultifractal
-                        {
-                            Name = "Mountain Fractal",
-                            OctaveCount = 2,
-                            Source = new Perlin
-                            {
-                                Name = "Mountain Perlin",
-                                Seed = 300
-                            }
-                        }
-                    }
+                    Source = mountainScaleBias
+                };
+                builder.Add("MountainPerlin", mountainPerlin);
+                builder.Add("MountainFractal", mountainFractal);
+                builder.Add("MountainScaleBias", mountainScaleBias);
+                builder.Add("MountainShape", mountainShape);
+
+                //------------------------------------------------------------
+                //
+                // Terrain Type
+                //
+
+                // terrainTypePerlin
+                var terrainTypePerlin = new Perlin
+                {
+                    Name = "Terrain Type Perlin",
+                    Seed = 400
+                };
+                // terrainTypeFractal
+                var terrainTypeFractal = new SumFractal
+                {
+                    Name = "Terrain Type Fractal",
+                    Frequency = 0.5f,
+                    Lacunarity = 0.2f,
+                    Source = terrainTypePerlin
+                };
+                // terrainTypeScalePoint
+                var terrainTypeScalePoint = new ScalePoint
+                {
+                    Name = "Terrain Type ScalePoint",
+                    ScaleY = 0,
+                    Source = terrainTypeFractal
                 };
                 // terrainType
                 var terrainType = new Cache
                 {
                     Name = "Terrain Type Cache",
-                    Source = new ScalePoint
-                    {
-                        Name = "Terrain Type ScalePoint",
-                        ScaleY = 0,
-                        Source = new SumFractal
-                        {
-                            Name = "Terrain Type Fractal",
-                            Frequency = 0.5f,
-                            Lacunarity = 0.2f,
-                            Source = new Perlin
-                            {
-                                Name = "Terrain Type Perlin",
-                                Seed = 400
-                            }
-                        }
-                    }
+                    Source = terrainTypeScalePoint
                 };
+                builder.Add("TerrainTypePerlin", terrainTypePerlin);
+                builder.Add("TerrainTypeFractal", terrainTypeFractal);
+                builder.Add("TerrainTypeScalePoint", terrainTypeScalePoint);
+                builder.Add("TerrainType", terrainType);
+
+                //------------------------------------------------------------
+                //
+                // Highland Mountain Select
+                //
+
                 // highlandMountainSelect
                 var highlandMountainSelect = new Select
                 {
@@ -593,6 +667,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Controller = terrainType,
                     EdgeFalloff = 0.2f
                 };
+                builder.Add("HighlandMountainSelect", highlandMountainSelect);
+
+                //------------------------------------------------------------
+                //
+                // Final Terrain
+                //
+
                 // terrain
                 var terrain = new Select
                 {
@@ -604,9 +685,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Controller = terrainType,
                     EdgeFalloff = 0.8f
                 };
-
-                var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
-                var builder = new ComponentBundleBuilder(componentInfoManager);
                 builder.Add("Target", terrain);
 
                 ComponentBundleDefinition biomeBundle;

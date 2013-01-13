@@ -1,182 +1,30 @@
 {
   "Components": [
     {
-      "Name": "Target",
-      "Type": "Select",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Final Terrain Select"
-        },
-        {
-          "Name": "Controller",
-          "Value": "Target_Controller"
-        },
-        {
-          "Name": "LowerSource",
-          "Value": "Target_LowerSource"
-        },
-        {
-          "Name": "UpperSource",
-          "Value": "Target_UpperSource"
-        },
-        {
-          "Name": "EdgeFalloff",
-          "Value": "0.8"
-        },
-        {
-          "Name": "LowerBound",
-          "Value": "0"
-        },
-        {
-          "Name": "UpperBound",
-          "Value": "1000"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller",
-      "Type": "Cache",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Terrain Type Cache"
-        },
-        {
-          "Name": "Source",
-          "Value": "Target_Controller_Source"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_Source",
-      "Type": "ScalePoint",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Terrain Type ScalePoint"
-        },
-        {
-          "Name": "Source",
-          "Value": "Target_Controller_Source_Source"
-        },
-        {
-          "Name": "ScaleX",
-          "Value": "1"
-        },
-        {
-          "Name": "ScaleY",
-          "Value": "0"
-        },
-        {
-          "Name": "ScaleZ",
-          "Value": "1"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_Source_Source",
-      "Type": "SumFractal",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Terrain Type Fractal"
-        },
-        {
-          "Name": "Source",
-          "Value": "Target_Controller_Source_Source_Source"
-        },
-        {
-          "Name": "Hurst",
-          "Value": "0.9"
-        },
-        {
-          "Name": "Frequency",
-          "Value": "0.5"
-        },
-        {
-          "Name": "Lacunarity",
-          "Value": "0.2"
-        },
-        {
-          "Name": "OctaveCount",
-          "Value": "6"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_Source_Source_Source",
-      "Type": "Perlin",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Terrain Type Perlin"
-        },
-        {
-          "Name": "Seed",
-          "Value": "400"
-        },
-        {
-          "Name": "FadeCurve",
-          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
-        }
-      ]
-    },
-    {
-      "Name": "Target_Controller_Source_Source_Source_FadeCurve",
+      "Name": "DefaultFadeCurve",
       "Type": "SCurve3",
       "Properties": null
     },
     {
-      "Name": "Target_LowerSource",
-      "Type": "ScalePoint",
+      "Name": "LowlandPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Lowland Shape"
+          "Value": "Lowland Perlin"
         },
         {
-          "Name": "Source",
-          "Value": "Target_LowerSource_Source"
+          "Name": "Seed",
+          "Value": "100"
         },
         {
-          "Name": "ScaleX",
-          "Value": "1"
-        },
-        {
-          "Name": "ScaleY",
-          "Value": "0"
-        },
-        {
-          "Name": "ScaleZ",
-          "Value": "1"
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
         }
       ]
     },
     {
-      "Name": "Target_LowerSource_Source",
-      "Type": "ScaleBias",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Lowland ScaleBias"
-        },
-        {
-          "Name": "Source",
-          "Value": "Target_LowerSource_Source_Source"
-        },
-        {
-          "Name": "Bias",
-          "Value": "-0.75"
-        },
-        {
-          "Name": "Scale",
-          "Value": "0.125"
-        }
-      ]
-    },
-    {
-      "Name": "Target_LowerSource_Source_Source",
+      "Name": "LowlandFractal",
       "Type": "Billow",
       "Properties": [
         {
@@ -185,7 +33,7 @@
         },
         {
           "Name": "Source",
-          "Value": "Target_LowerSource_Source_Source_Source"
+          "Value": "LowlandPerlin"
         },
         {
           "Name": "Frequency",
@@ -206,68 +54,38 @@
       ]
     },
     {
-      "Name": "Target_LowerSource_Source_Source_Source",
-      "Type": "Perlin",
+      "Name": "LowlandScaleBias",
+      "Type": "ScaleBias",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Lowland Perlin"
+          "Value": "Lowland ScaleBias"
         },
         {
-          "Name": "Seed",
-          "Value": "100"
+          "Name": "Source",
+          "Value": "LowlandFractal"
         },
         {
-          "Name": "FadeCurve",
-          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
+          "Name": "Bias",
+          "Value": "-0.75"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.125"
         }
       ]
     },
     {
-      "Name": "Target_UpperSource",
-      "Type": "Select",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Highland or Mountain Select"
-        },
-        {
-          "Name": "Controller",
-          "Value": "Target_Controller"
-        },
-        {
-          "Name": "LowerSource",
-          "Value": "Target_UpperSource_LowerSource"
-        },
-        {
-          "Name": "UpperSource",
-          "Value": "Target_UpperSource_UpperSource"
-        },
-        {
-          "Name": "EdgeFalloff",
-          "Value": "0.2"
-        },
-        {
-          "Name": "LowerBound",
-          "Value": "0"
-        },
-        {
-          "Name": "UpperBound",
-          "Value": "1000"
-        }
-      ]
-    },
-    {
-      "Name": "Target_UpperSource_LowerSource",
+      "Name": "LowlandShape",
       "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Highland Shape"
+          "Value": "Lowland Shape"
         },
         {
           "Name": "Source",
-          "Value": "Target_UpperSource_LowerSource_Source"
+          "Value": "LowlandScaleBias"
         },
         {
           "Name": "ScaleX",
@@ -284,7 +102,25 @@
       ]
     },
     {
-      "Name": "Target_UpperSource_LowerSource_Source",
+      "Name": "HighlandPerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "200"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "HighlandFractal",
       "Type": "SumFractal",
       "Properties": [
         {
@@ -293,7 +129,7 @@
         },
         {
           "Name": "Source",
-          "Value": "Target_UpperSource_LowerSource_Source_Source"
+          "Value": "HighlandPerlin"
         },
         {
           "Name": "Hurst",
@@ -314,34 +150,16 @@
       ]
     },
     {
-      "Name": "Target_UpperSource_LowerSource_Source_Source",
-      "Type": "Perlin",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Highland Perlin"
-        },
-        {
-          "Name": "Seed",
-          "Value": "200"
-        },
-        {
-          "Name": "FadeCurve",
-          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
-        }
-      ]
-    },
-    {
-      "Name": "Target_UpperSource_UpperSource",
+      "Name": "HighlandShape",
       "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Mountain Shape"
+          "Value": "Highland Shape"
         },
         {
           "Name": "Source",
-          "Value": "Target_UpperSource_UpperSource_Source"
+          "Value": "HighlandFractal"
         },
         {
           "Name": "ScaleX",
@@ -358,29 +176,25 @@
       ]
     },
     {
-      "Name": "Target_UpperSource_UpperSource_Source",
-      "Type": "ScaleBias",
+      "Name": "MountainPerlin",
+      "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Mountain ScaleBias"
+          "Value": "Mountain Perlin"
         },
         {
-          "Name": "Source",
-          "Value": "Target_UpperSource_UpperSource_Source_Source"
+          "Name": "Seed",
+          "Value": "300"
         },
         {
-          "Name": "Bias",
-          "Value": "0.25"
-        },
-        {
-          "Name": "Scale",
-          "Value": "0.5"
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
         }
       ]
     },
     {
-      "Name": "Target_UpperSource_UpperSource_Source_Source",
+      "Name": "MountainFractal",
       "Type": "RidgedMultifractal",
       "Properties": [
         {
@@ -397,7 +211,7 @@
         },
         {
           "Name": "Source",
-          "Value": "Target_UpperSource_UpperSource_Source_Source_Source"
+          "Value": "MountainPerlin"
         },
         {
           "Name": "Hurst",
@@ -418,20 +232,206 @@
       ]
     },
     {
-      "Name": "Target_UpperSource_UpperSource_Source_Source_Source",
+      "Name": "MountainScaleBias",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "MountainFractal"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0.25"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.5"
+        }
+      ]
+    },
+    {
+      "Name": "MountainShape",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain Shape"
+        },
+        {
+          "Name": "Source",
+          "Value": "MountainScaleBias"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "1"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "0"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainTypePerlin",
       "Type": "Perlin",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Mountain Perlin"
+          "Value": "Terrain Type Perlin"
         },
         {
           "Name": "Seed",
-          "Value": "300"
+          "Value": "400"
         },
         {
           "Name": "FadeCurve",
-          "Value": "Target_Controller_Source_Source_Source_FadeCurve"
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainTypeFractal",
+      "Type": "SumFractal",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainTypePerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "0.9"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "0.5"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "0.2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "6"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainTypeScalePoint",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type ScalePoint"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainTypeFractal"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "1"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "0"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainType",
+      "Type": "Cache",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type Cache"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainTypeScalePoint"
+        }
+      ]
+    },
+    {
+      "Name": "HighlandMountainSelect",
+      "Type": "Select",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland or Mountain Select"
+        },
+        {
+          "Name": "Controller",
+          "Value": "TerrainType"
+        },
+        {
+          "Name": "LowerSource",
+          "Value": "HighlandShape"
+        },
+        {
+          "Name": "UpperSource",
+          "Value": "MountainShape"
+        },
+        {
+          "Name": "EdgeFalloff",
+          "Value": "0.2"
+        },
+        {
+          "Name": "LowerBound",
+          "Value": "0"
+        },
+        {
+          "Name": "UpperBound",
+          "Value": "1000"
+        }
+      ]
+    },
+    {
+      "Name": "Target",
+      "Type": "Select",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Final Terrain Select"
+        },
+        {
+          "Name": "Controller",
+          "Value": "TerrainType"
+        },
+        {
+          "Name": "LowerSource",
+          "Value": "LowlandShape"
+        },
+        {
+          "Name": "UpperSource",
+          "Value": "HighlandMountainSelect"
+        },
+        {
+          "Name": "EdgeFalloff",
+          "Value": "0.8"
+        },
+        {
+          "Name": "LowerBound",
+          "Value": "0"
+        },
+        {
+          "Name": "UpperBound",
+          "Value": "1000"
         }
       ]
     }
