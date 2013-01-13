@@ -140,7 +140,6 @@
     <Compile Include="Diagnostics\DebugAppender.cs" />
     <Compile Include="Diagnostics\DebugHorizontalAlignment.cs" />
     <Compile Include="Diagnostics\DebugLayout.cs" />
-    <Compile Include="Diagnostics\DebugMapDisplay.cs" />
     <Compile Include="Diagnostics\DebugVerticalAlignment.cs" />
     <Compile Include="Diagnostics\EnvironmentLog.cs" />
     <Compile Include="Diagnostics\FileTraceListenerManager.cs" />
@@ -152,6 +151,7 @@
     <Compile Include="Diagnostics\Logger.cs" />
     <Compile Include="Diagnostics\LogLevel.cs" />
     <Compile Include="Diagnostics\Monitor.cs" />
+    <Compile Include="Diagnostics\TextureDisplay.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TimeRulerMarkerCollection.cs" />

@@ -49,6 +49,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         TimeRulerMonitorListener monitorListener;
 
+        TextureDisplay textureDisplay;
+
         string helpMessage =
             "[F1] Help\r\n" +
             "[F2] Chunk bounding box\r\n" +
@@ -155,11 +157,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             #endregion
 
-            #region DebugMapDisplay
+            #region テクスチャ ディスプレイ
 
-            var debugMapDisplay = new DebugMapDisplay(this);
-            debugMapDisplay.Visible = false;
-            Components.Add(debugMapDisplay);
+            textureDisplay = new TextureDisplay(this);
+            textureDisplay.Visible = false;
+            Components.Add(textureDisplay);
 
             #endregion
 
@@ -291,8 +293,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (keyboardState.IsKeyUp(Keys.F4) && lastKeyboardState.IsKeyDown(Keys.F4))
                 worldManager.SceneSettings.FogEnabled = !worldManager.SceneSettings.FogEnabled;
             // F5
-            if (DebugMapDisplay.Available && keyboardState.IsKeyUp(Keys.F5) && lastKeyboardState.IsKeyDown(Keys.F5))
-                DebugMapDisplay.Instance.Visible = !DebugMapDisplay.Instance.Visible;
+            if (keyboardState.IsKeyUp(Keys.F5) && lastKeyboardState.IsKeyDown(Keys.F5))
+                textureDisplay.Visible = !textureDisplay.Visible;
 
             //----------------------------------------------------------------
             // キーボード状態の記録

@@ -598,7 +598,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 GraphicsDevice.SetRenderTarget(null);
 
-                if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(renderTarget);
+                TextureDisplay.Add(renderTarget);
             }
         }
 

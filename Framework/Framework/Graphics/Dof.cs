@@ -214,11 +214,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             DrawDepth(context);
             Filter(context);
 
-            if (DebugMapDisplay.Available)
-            {
-                DebugMapDisplay.Instance.Add(depthMap);
-                DebugMapDisplay.Instance.Add(bluredSceneMap);
-            }
+            TextureDisplay.Add(depthMap);
+            TextureDisplay.Add(bluredSceneMap);
 
             Monitor.End(MonitorProcess);
         }

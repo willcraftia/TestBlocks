@@ -351,7 +351,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             DrawNormalDepth(context);
             Filter(context);
 
-            if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(normalDepthMap);
+            TextureDisplay.Add(normalDepthMap);
 
             Monitor.End(MonitorProcess);
         }

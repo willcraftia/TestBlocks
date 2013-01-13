@@ -322,11 +322,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             DrawSsaoMap(context);
             Filter(context);
 
-            if (DebugMapDisplay.Available)
-            {
-                DebugMapDisplay.Instance.Add(normalDepthMap);
-                DebugMapDisplay.Instance.Add(ssaoMap);
-            }
+            TextureDisplay.Add(normalDepthMap);
+            TextureDisplay.Add(ssaoMap);
 
             Monitor.End(MonitorProcess);
         }

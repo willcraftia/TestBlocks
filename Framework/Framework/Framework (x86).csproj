@@ -113,7 +113,7 @@
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="CubicSide.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
-    <Compile Include="Diagnostics\DebugMapDisplay.cs" />
+    <Compile Include="Diagnostics\TextureDisplay.cs" />
     <Compile Include="Diagnostics\IMonitorListener.cs" />
     <Compile Include="Diagnostics\Monitor.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />

@@ -379,7 +379,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             DrawShadowScene(context);
             Filter(context);
 
-            if (DebugMapDisplay.Available) DebugMapDisplay.Instance.Add(shadowSceneMap);
+            TextureDisplay.Add(shadowSceneMap);
 
             Monitor.End(MonitorProcess);
         }
