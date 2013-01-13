@@ -402,7 +402,7 @@
       ]
     },
     {
-      "Name": "Terrain",
+      "Name": "TerrainSelect",
       "Type": "Select",
       "Properties": [
         {
@@ -445,7 +445,7 @@
         },
         {
           "Name": "Source",
-          "Value": "Terrain"
+          "Value": "TerrainSelect"
         },
         {
           "Name": "ScaleX",
@@ -462,12 +462,12 @@
       ]
     },
     {
-      "Name": "Target",
+      "Name": "TerrainShape",
       "Type": "ScaleBias",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Terrain ScaleBias"
+          "Value": "Terrain Shape"
         },
         {
           "Name": "Source",
@@ -480,6 +480,20 @@
         {
           "Name": "Scale",
           "Value": "16"
+        }
+      ]
+    },
+    {
+      "Name": "Target",
+      "Type": "TerrainDensity",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Density"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainShape"
         }
       ]
     }

@@ -535,6 +535,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Source = lowlandFractal
                 };
                 // lowlandShape
+                // Y スケール 0 はハイトマップ化を意味する。
                 var lowlandShape = new ScalePoint
                 {
                     Name = "Lowland Shape",
@@ -566,6 +567,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Source = highlandPerlin
                 };
                 // highlandShape
+                // Y スケール 0 はハイトマップ化を意味する。
                 var highlandShape = new ScalePoint
                 {
                     Name = "Highland Shape",
@@ -603,6 +605,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Source = mountainFractal
                 };
                 // mountainShape
+                // Y スケール 0 はハイトマップ化を意味する。
                 var mountainShape = new ScalePoint
                 {
                     Name = "Mountain Shape",
@@ -616,7 +619,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // 地形形状ノイズ
+                // 地形選択ノイズ
                 //
 
                 // terrainTypePerlin
@@ -634,6 +637,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Source = terrainTypePerlin
                 };
                 // terrainTypeScalePoint
+                // Y スケール 0 はハイトマップ化を意味する。
                 var terrainTypeScalePoint = new ScalePoint
                 {
                     Name = "Terrain Type ScalePoint",
@@ -641,6 +645,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Source = terrainTypeFractal
                 };
                 // terrainType
+                // 地形選択ノイズは同時に複数のモジュールから参照されるためキャッシュ。
                 var terrainType = new Cache
                 {
                     Name = "Terrain Type Cache",
@@ -671,11 +676,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // 最終地形選択
+                // 最終地形
                 //
 
-                // terrain
-                var terrain = new Select
+                // terrainSelect
+                var terrainSelect = new Select
                 {
                     Name = "Terrain Select",
                     LowerSource = lowlandShape,
@@ -686,7 +691,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     EdgeFalloff = 0.8f
                 };
                 // terrainScalePoint
-                // ブロック座標のスケールへ変更。
+                // XZ をブロック空間のスケールへ変更。
                 // 幅スケールは 16 から 32 辺りが妥当。
                 // 小さすぎると微細な高低差が増えすぎる（期待するよりも平地が少なくなりすぎる）。
                 // 大きすぎると高低差が少なくなり過ぎる（期待するよりも平地が多くなりすぎる）。
@@ -695,22 +700,36 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Terrain ScalePoint",
                     ScaleX = 1 / 16f,
                     ScaleZ = 1 / 16f,
-                    Source = terrain
+                    Source = terrainSelect
                 };
-                // terrainScaleBias
-                // ブロック座標の高さスケールとオフセットへ変更。
+                // terrainShape
+                // Y をブロック空間の高さスケールとオフセットへ変更。
                 // 高さスケールは 16 以下が妥当。これ以上は高低差が激しくなり過ぎる。
                 // バイアスとして少しだけ余分に補正が必要（ノイズのフラクタルには [-1,1] に従わないものもあるため）。
-                var terrainScaleBias = new ScaleBias
+                // 最終的に、terrainShape はブロック空間でのハイトマップを表す。
+                var terrainShape = new ScaleBias
                 {
-                    Name = "Terrain ScaleBias",
+                    Name = "Terrain Shape",
                     Scale = 16,
                     Bias = 256 - 16 - 8,
                     Source = terrainScalePoint
                 };
-                builder.Add("Terrain", terrain);
+                builder.Add("TerrainSelect", terrainSelect);
                 builder.Add("TerrainScalePoint", terrainScalePoint);
-                builder.Add("Target", terrainScaleBias);
+                builder.Add("TerrainShape", terrainShape);
+
+                //------------------------------------------------------------
+                //
+                // 密度化
+                //
+
+                // terrainDensity
+                var terrainDensity = new TerrainDensity
+                {
+                    Name = "Terrain Density",
+                    Source = terrainShape
+                };
+                builder.Add("Target", terrainDensity);
 
                 ComponentBundleDefinition biomeBundle;
                 builder.BuildDefinition(out biomeBundle);

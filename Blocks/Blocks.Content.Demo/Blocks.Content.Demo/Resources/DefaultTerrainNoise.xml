@@ -140,7 +140,7 @@
 				<Property Name="UpperBound" Value="1000" />
 			</Properties>
 		</Component>
-		<Component Name="Terrain" Type="Select">
+		<Component Name="TerrainSelect" Type="Select">
 			<Properties>
 				<Property Name="Name" Value="Terrain Select" />
 				<Property Name="Controller" Value="TerrainType" />
@@ -154,18 +154,24 @@
 		<Component Name="TerrainScalePoint" Type="ScalePoint">
 			<Properties>
 				<Property Name="Name" Value="Terrain ScalePoint" />
-				<Property Name="Source" Value="Terrain" />
+				<Property Name="Source" Value="TerrainSelect" />
 				<Property Name="ScaleX" Value="0.0625" />
 				<Property Name="ScaleY" Value="1" />
 				<Property Name="ScaleZ" Value="0.0625" />
 			</Properties>
 		</Component>
-		<Component Name="Target" Type="ScaleBias">
+		<Component Name="TerrainShape" Type="ScaleBias">
 			<Properties>
-				<Property Name="Name" Value="Terrain ScaleBias" />
+				<Property Name="Name" Value="Terrain Shape" />
 				<Property Name="Source" Value="TerrainScalePoint" />
 				<Property Name="Bias" Value="232" />
 				<Property Name="Scale" Value="16" />
+			</Properties>
+		</Component>
+		<Component Name="Target" Type="TerrainDensity">
+			<Properties>
+				<Property Name="Name" Value="Terrain Density" />
+				<Property Name="Source" Value="TerrainShape" />
 			</Properties>
 		</Component>
 	</Components>

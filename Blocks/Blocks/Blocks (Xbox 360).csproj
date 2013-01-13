@@ -155,6 +155,7 @@
     <Compile Include="Models\SkySphere.cs" />
     <Compile Include="Models\SkySphereEffect.cs" />
     <Compile Include="Models\StorageChunkStore.cs" />
+    <Compile Include="Models\TerrainDensity.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Models\TileCatalog.cs" />
     <Compile Include="Models\TimeColor.cs" />

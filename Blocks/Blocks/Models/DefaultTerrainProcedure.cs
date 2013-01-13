@@ -35,33 +35,56 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Generate(Chunk chunk)
         {
             var position = chunk.Position;
+
+            // バイオームを取得。
+            // 選択されるブロックはバイオームに従う。
             var biome = Region.BiomeManager.GetBiome(chunk);
 
             for (int x = 0; x < chunkSize.X; x++)
             {
+                // チャンク空間における相対ブロック位置をブロック空間の位置へ変換。
                 var absoluteX = chunk.CalculateBlockPositionX(x);
 
                 for (int z = 0; z < chunkSize.Z; z++)
                 {
+                    // チャンク空間における相対ブロック位置をブロック空間の位置へ変換。
                     var absoluteZ = chunk.CalculateBlockPositionZ(z);
 
+                    // この XZ  におけるバイオーム要素を取得。
                     var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
 
-                    int height = (int) biome.TerrainNoise.Sample(absoluteX, 0, absoluteZ);
-
+                    bool topBlockExists = false;
                     for (int y = chunkSize.Y - 1; 0 <= y; y--)
                     {
+                        // チャンク空間における相対ブロック位置をブロック空間の位置へ変換。
                         var absoluteY = chunk.CalculateBlockPositionY(y);
 
-                        byte blockIndex = Block.EmptyIndex;
+                        // 地形密度を取得。
+                        var density = biome.TerrainNoise.Sample(absoluteX, absoluteY, absoluteZ);
 
-                        if (height == absoluteY)
+                        byte blockIndex = Block.EmptyIndex;
+                        if (0 < density)
                         {
-                            blockIndex = GetBlockIndexAtTop(biomeElement);
+                            // 密度 1 はブロック有り
+
+                            if (!topBlockExists)
+                            {
+                                // トップ ブロックを検出。
+                                blockIndex = GetBlockIndexAtTop(biomeElement);
+
+                                topBlockExists = true;
+                            }
+                            else
+                            {
+                                blockIndex = GetBlockIndexBelowTop(biomeElement);
+                            }
                         }
-                        else if (absoluteY < height)
+                        else
                         {
-                            blockIndex = GetBlockIndexBelowTop(biomeElement);
+                            // 密度 0 はブロック無し
+                            
+                            // トップ ブロックを見つけていた場合はそれを OFF とする。
+                            topBlockExists = false;
                         }
 
                         chunk[x, y, z] = blockIndex;
