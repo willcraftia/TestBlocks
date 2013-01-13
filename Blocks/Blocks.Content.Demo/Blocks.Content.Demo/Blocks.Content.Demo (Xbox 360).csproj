@@ -64,7 +64,6 @@
     <None Include="Resources\DefaultBlockCatalog.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\DefaultDensityNoise.json" />
     <None Include="Resources\DefaultFlatTerrainProcedure.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

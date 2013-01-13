@@ -1,69 +1,68 @@
 ﻿<Bundle>
 	<Components>
+		<Component Name="DefaultFadeCurve" Type="SCurve3" />
+		<Component Name="HumidityPerlin" Type="Perlin">
+			<Properties>
+				<Property Name="Name" Value="Humidity Perlin" />
+				<Property Name="Seed" Value="100" />
+				<Property Name="FadeCurve" Value="DefaultFadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="HumidityFractal" Type="SumFractal">
+			<Properties>
+				<Property Name="Name" Value="Humidity Fractal" />
+				<Property Name="Source" Value="HumidityPerlin" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="6" />
+			</Properties>
+		</Component>
+		<Component Name="Humidity" Type="ScaleBias">
+			<Properties>
+				<Property Name="Name" Value="Humidity" />
+				<Property Name="Source" Value="HumidityFractal" />
+				<Property Name="Bias" Value="0.5" />
+				<Property Name="Scale" Value="0.5" />
+			</Properties>
+		</Component>
+		<Component Name="TemperaturePerlin" Type="Perlin">
+			<Properties>
+				<Property Name="Name" Value="Temperature Perlin" />
+				<Property Name="Seed" Value="200" />
+				<Property Name="FadeCurve" Value="DefaultFadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="TemperatureFractal" Type="SumFractal">
+			<Properties>
+				<Property Name="Name" Value="Temperature Fractal" />
+				<Property Name="Source" Value="TemperaturePerlin" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="6" />
+			</Properties>
+		</Component>
+		<Component Name="Temperature" Type="ScaleBias">
+			<Properties>
+				<Property Name="Name" Value="Temperature" />
+				<Property Name="Source" Value="TemperatureFractal" />
+				<Property Name="Bias" Value="0.5" />
+				<Property Name="Scale" Value="0.5" />
+			</Properties>
+		</Component>
 		<Component Name="Target" Type="DefaultBiome">
 			<Properties>
-				<Property Name="DensityNoise" Value="title:Resources/DefaultDensityNoise.json" />
 				<Property Name="TerrainNoise" Value="title:Resources/DefaultTerrainNoise.json" />
 				<Property Name="Name" Value="Default Biome" />
-				<Property Name="TemperatureNoise" Value="Target_TemperatureNoise" />
-				<Property Name="HumidityNoise" Value="Target_HumidityNoise" />
+				<Property Name="TemperatureNoise" Value="Temperature" />
+				<Property Name="HumidityNoise" Value="Humidity" />
 				<Property Name="BaseElement" Value="Forest" />
 				<Property Name="DesertRange" Value="Target_DesertRange" />
 				<Property Name="PlainsRange" Value="Target_PlainsRange" />
 				<Property Name="SnowRange" Value="Target_SnowRange" />
 				<Property Name="MountainsRange" Value="Target_MountainsRange" />
 				<Property Name="ForestRange" Value="Target_ForestRange" />
-			</Properties>
-		</Component>
-		<Component Name="Target_TemperatureNoise" Type="ScaleBias">
-			<Properties>
-				<Property Name="Name" Value="Temperature ScaleBias" />
-				<Property Name="Source" Value="Target_TemperatureNoise_Source" />
-				<Property Name="Bias" Value="0.5" />
-				<Property Name="Scale" Value="0.5" />
-			</Properties>
-		</Component>
-		<Component Name="Target_TemperatureNoise_Source" Type="SumFractal">
-			<Properties>
-				<Property Name="Name" Value="Temperature Fractal" />
-				<Property Name="Source" Value="Target_TemperatureNoise_Source_Source" />
-				<Property Name="Hurst" Value="0.9" />
-				<Property Name="Frequency" Value="1" />
-				<Property Name="Lacunarity" Value="2" />
-				<Property Name="OctaveCount" Value="6" />
-			</Properties>
-		</Component>
-		<Component Name="Target_TemperatureNoise_Source_Source" Type="Perlin">
-			<Properties>
-				<Property Name="Name" Value="Temperature Perlin" />
-				<Property Name="Seed" Value="200" />
-				<Property Name="FadeCurve" Value="Target_TemperatureNoise_Source_Source_FadeCurve" />
-			</Properties>
-		</Component>
-		<Component Name="Target_TemperatureNoise_Source_Source_FadeCurve" Type="SCurve3" />
-		<Component Name="Target_HumidityNoise" Type="ScaleBias">
-			<Properties>
-				<Property Name="Name" Value="Humidity ScaleBias" />
-				<Property Name="Source" Value="Target_HumidityNoise_Source" />
-				<Property Name="Bias" Value="0.5" />
-				<Property Name="Scale" Value="0.5" />
-			</Properties>
-		</Component>
-		<Component Name="Target_HumidityNoise_Source" Type="SumFractal">
-			<Properties>
-				<Property Name="Name" Value="Humidity Fractal" />
-				<Property Name="Source" Value="Target_HumidityNoise_Source_Source" />
-				<Property Name="Hurst" Value="0.9" />
-				<Property Name="Frequency" Value="1" />
-				<Property Name="Lacunarity" Value="2" />
-				<Property Name="OctaveCount" Value="6" />
-			</Properties>
-		</Component>
-		<Component Name="Target_HumidityNoise_Source_Source" Type="Perlin">
-			<Properties>
-				<Property Name="Name" Value="Humidity Perlin" />
-				<Property Name="Seed" Value="100" />
-				<Property Name="FadeCurve" Value="Target_TemperatureNoise_Source_Source_FadeCurve" />
 			</Properties>
 		</Component>
 		<Component Name="Target_DesertRange" Type="Range">

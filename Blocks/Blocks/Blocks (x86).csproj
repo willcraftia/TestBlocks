@@ -108,7 +108,6 @@
     <Compile Include="Models\RandomBiomeManager.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
-    <Compile Include="Models\GradientDensity.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
     <Compile Include="Serialization\DofSettingsDefinition.cs" />
     <Compile Include="Serialization\EdgeSettingsDefinition.cs" />

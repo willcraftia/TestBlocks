@@ -80,9 +80,6 @@ namespace Willcraftia.Xna.Blocks.Models
         //
 
         // I/F
-        public INoiseSource DensityNoise { get; set; }
-
-        // I/F
         public INoiseSource TerrainNoise { get; set; }
 
         public string Name { get; set; }

@@ -467,32 +467,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region DensityNoise (INoiseSource) (ComponentBundleDefinition)
-
-            //================================================================
-            // TerrainNoise (INoiseSource) (ComponentBundleDefinition)
-
-            Console.WriteLine("DensityNoise (INoiseSource) (ComponentBundleDefinition)");
-            {
-                // density
-                var density = new GradientDensity();
-
-                var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
-                var builder = new ComponentBundleBuilder(componentInfoManager);
-                builder.Add("Target", density);
-
-                ComponentBundleDefinition biomeBundle;
-                builder.BuildDefinition(out biomeBundle);
-
-                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultDensityNoise", biomeBundle);
-                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultDensityNoise", biomeBundle);
-                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
-                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
-            }
-            Console.WriteLine();
-
-            #endregion
-
             #region TerrainNoise (INoiseSource) (ComponentBundleDefinition)
 
             //================================================================
@@ -750,47 +724,86 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             Console.WriteLine("DefaultBiome (ComponentBundleDefinition)");
             {
+                // デバッグのし易さのために、各ノイズ インスタンスのコンポーネント名を明示する。
+                var componentInfoManager = new ComponentInfoManager(BiomeLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+
+                // デフォルトでは Perlin.FadeCurve は静的フィールドで共有状態なので、
+                // ここで一つだけビルダへ登録しておく。
+                builder.Add("DefaultFadeCurve", Perlin.DefaultFadeCurve);
+
+                //------------------------------------------------------------
+                //
+                // 湿度
+                //
+
+                // humidityPerlin
+                var humidityPerlin = new Perlin
+                {
+                    Name = "Humidity Perlin",
+                    Seed = 100
+                };
+                // humidityFractal
+                var humidityFractal = new SumFractal
+                {
+                    Name = "Humidity Fractal",
+                    Source = humidityPerlin
+                };
+                // humidity
+                var humidity = new ScaleBias
+                {
+                    Name = "Humidity",
+                    Scale = 0.5f,
+                    Bias = 0.5f,
+                    Source = humidityFractal
+                };
+                builder.Add("HumidityPerlin", humidityPerlin);
+                builder.Add("HumidityFractal", humidityFractal);
+                builder.Add("Humidity", humidity);
+
+                //------------------------------------------------------------
+                //
+                // 気温
+                //
+
+                // temperaturePerlin
+                var temperaturePerlin = new Perlin
+                {
+                    Name = "Temperature Perlin",
+                    Seed = 200
+                };
+                // temperatureFractal
+                var temperatureFractal = new SumFractal
+                {
+                    Name = "Temperature Fractal",
+                    Source = temperaturePerlin
+                };
+                // temperature
+                var temperature = new ScaleBias
+                {
+                    Name = "Temperature",
+                    Scale = 0.5f,
+                    Bias = 0.5f,
+                    Source = temperatureFractal
+                };
+                builder.Add("TemperaturePerlin", temperaturePerlin);
+                builder.Add("TemperatureFractal", temperatureFractal);
+                builder.Add("Temperature", temperature);
+
+                //------------------------------------------------------------
+                //
+                // バイオーム
+                //
+
+                // biome
                 var biome = new DefaultBiome
                 {
                     Name = "Default Biome",
-                    HumidityNoise = new ScaleBias
-                    {
-                        Name = "Humidity ScaleBias",
-                        Scale = 0.5f,
-                        Bias = 0.5f,
-                        Source = new SumFractal
-                        {
-                            Name = "Humidity Fractal",
-                            Source = new Perlin
-                            {
-                                Name = "Humidity Perlin",
-                                Seed = 100
-                            }
-                        }
-                    },
-                    TemperatureNoise = new ScaleBias
-                    {
-                        Name = "Temperature ScaleBias",
-                        Scale = 0.5f,
-                        Bias = 0.5f,
-                        Source = new SumFractal
-                        {
-                            Name = "Temperature Fractal",
-                            Source = new Perlin
-                            {
-                                Name = "Temperature Perlin",
-                                Seed = 200
-                            }
-                        }
-                    },
-                    DensityNoise = new MockNoise(),
+                    HumidityNoise = humidity,
+                    TemperatureNoise = temperature,
                     TerrainNoise = new MockNoise()
                 };
-
-                var componentInfoManager = new ComponentInfoManager(BiomeLoader.ComponentTypeRegistory);
-                var builder = new ComponentBundleBuilder(componentInfoManager);
                 builder.Add("Target", biome);
-                builder.AddExternalReference(biome.DensityNoise, "title:Resources/DefaultDensityNoise.json");
                 builder.AddExternalReference(biome.TerrainNoise, "title:Resources/DefaultTerrainNoise.json");
 
                 ComponentBundleDefinition biomeBundle;
