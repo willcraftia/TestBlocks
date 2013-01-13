@@ -13,17 +13,17 @@ namespace Willcraftia.Xna.Framework.Noise
     /// </summary>
     public sealed class ClassicPerlin : INoiseSource, IInitializingObject
     {
+        public static readonly IFadeCurve DefaultFadeCurve = new SCurve3();
+
         const int wrapIndex = 256;
 
         const int modMask = 255;
 
         const int largePower2 = 4096;
 
-        static readonly IFadeCurve defaultFadeCurve = new SCurve3();
-
         int seed = Environment.TickCount;
 
-        IFadeCurve fadeCurve = defaultFadeCurve;
+        IFadeCurve fadeCurve = DefaultFadeCurve;
 
         Random random;
 
@@ -54,7 +54,7 @@ namespace Willcraftia.Xna.Framework.Noise
         public IFadeCurve FadeCurve
         {
             get { return fadeCurve; }
-            set { fadeCurve = value ?? defaultFadeCurve; }
+            set { fadeCurve = value ?? DefaultFadeCurve; }
         }
 
         // I/F
