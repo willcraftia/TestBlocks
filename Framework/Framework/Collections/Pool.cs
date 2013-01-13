@@ -50,6 +50,9 @@ namespace Willcraftia.Xna.Framework.Collections
             while (0 < MaxCapacity && MaxCapacity < TotalObjectCount && 0 < objects.Count)
                 DisposeObject(objects.Dequeue());
 
+            if (0 < MaxCapacity && MaxCapacity <= TotalObjectCount && objects.Count == 0)
+                return null;
+
             if (0 < objects.Count)
                 return objects.Dequeue();
 
