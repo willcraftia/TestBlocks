@@ -510,7 +510,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // Lowland
+                // 低地生成ノイズ
                 //
 
                 // lowlandPerlin
@@ -548,7 +548,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // Highland
+                // 高地生成ノイズ
                 //
 
                 // highlandPerlin
@@ -578,7 +578,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // Mountain
+                // 山地生成ノイズ
                 //
                 
                 // mountainPerlin
@@ -616,7 +616,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // Terrain Type
+                // 地形形状ノイズ
                 //
 
                 // terrainTypePerlin
@@ -653,7 +653,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // Highland Mountain Select
+                // 高地山地選択
                 //
 
                 // highlandMountainSelect
@@ -671,13 +671,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // Final Terrain
+                // 最終地形選択
                 //
 
                 // terrain
                 var terrain = new Select
                 {
-                    Name = "Final Terrain Select",
+                    Name = "Terrain Select",
                     LowerSource = lowlandShape,
                     LowerBound = 0,
                     UpperSource = highlandMountainSelect,
@@ -685,7 +685,32 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Controller = terrainType,
                     EdgeFalloff = 0.8f
                 };
-                builder.Add("Target", terrain);
+                // terrainScalePoint
+                // ブロック座標のスケールへ変更。
+                // 幅スケールは 16 から 32 辺りが妥当。
+                // 小さすぎると微細な高低差が増えすぎる（期待するよりも平地が少なくなりすぎる）。
+                // 大きすぎると高低差が少なくなり過ぎる（期待するよりも平地が多くなりすぎる）。
+                var terrainScalePoint = new ScalePoint
+                {
+                    Name = "Terrain ScalePoint",
+                    ScaleX = 1 / 16f,
+                    ScaleZ = 1 / 16f,
+                    Source = terrain
+                };
+                // terrainScaleBias
+                // ブロック座標の高さスケールとオフセットへ変更。
+                // 高さスケールは 16 以下が妥当。これ以上は高低差が激しくなり過ぎる。
+                // バイアスとして少しだけ余分に補正が必要（ノイズのフラクタルには [-1,1] に従わないものもあるため）。
+                var terrainScaleBias = new ScaleBias
+                {
+                    Name = "Terrain ScaleBias",
+                    Scale = 16,
+                    Bias = 256 - 16 - 8,
+                    Source = terrainScalePoint
+                };
+                builder.Add("Terrain", terrain);
+                builder.Add("TerrainScalePoint", terrainScalePoint);
+                builder.Add("Target", terrainScaleBias);
 
                 ComponentBundleDefinition biomeBundle;
                 builder.BuildDefinition(out biomeBundle);

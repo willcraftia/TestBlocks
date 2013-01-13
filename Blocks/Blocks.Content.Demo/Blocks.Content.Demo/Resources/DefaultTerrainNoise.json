@@ -402,12 +402,12 @@
       ]
     },
     {
-      "Name": "Target",
+      "Name": "Terrain",
       "Type": "Select",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Final Terrain Select"
+          "Value": "Terrain Select"
         },
         {
           "Name": "Controller",
@@ -432,6 +432,54 @@
         {
           "Name": "UpperBound",
           "Value": "1000"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainScalePoint",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain ScalePoint"
+        },
+        {
+          "Name": "Source",
+          "Value": "Terrain"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "0.0625"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "1"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "0.0625"
+        }
+      ]
+    },
+    {
+      "Name": "Target",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainScalePoint"
+        },
+        {
+          "Name": "Bias",
+          "Value": "232"
+        },
+        {
+          "Name": "Scale",
+          "Value": "16"
         }
       ]
     }

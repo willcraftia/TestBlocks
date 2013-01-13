@@ -140,15 +140,32 @@
 				<Property Name="UpperBound" Value="1000" />
 			</Properties>
 		</Component>
-		<Component Name="Target" Type="Select">
+		<Component Name="Terrain" Type="Select">
 			<Properties>
-				<Property Name="Name" Value="Final Terrain Select" />
+				<Property Name="Name" Value="Terrain Select" />
 				<Property Name="Controller" Value="TerrainType" />
 				<Property Name="LowerSource" Value="LowlandShape" />
 				<Property Name="UpperSource" Value="HighlandMountainSelect" />
 				<Property Name="EdgeFalloff" Value="0.8" />
 				<Property Name="LowerBound" Value="0" />
 				<Property Name="UpperBound" Value="1000" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainScalePoint" Type="ScalePoint">
+			<Properties>
+				<Property Name="Name" Value="Terrain ScalePoint" />
+				<Property Name="Source" Value="Terrain" />
+				<Property Name="ScaleX" Value="0.0625" />
+				<Property Name="ScaleY" Value="1" />
+				<Property Name="ScaleZ" Value="0.0625" />
+			</Properties>
+		</Component>
+		<Component Name="Target" Type="ScaleBias">
+			<Properties>
+				<Property Name="Name" Value="Terrain ScaleBias" />
+				<Property Name="Source" Value="TerrainScalePoint" />
+				<Property Name="Bias" Value="232" />
+				<Property Name="Scale" Value="16" />
 			</Properties>
 		</Component>
 	</Components>
