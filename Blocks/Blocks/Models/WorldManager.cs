@@ -33,6 +33,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SceneManager.Settings SceneManagerSettings { get; private set; }
 
+        public ChunkManager ChunkManager { get; private set; }
+
         public RegionManager RegionManager { get; private set; }
 
         public ChunkPartitionManager PartitionManager { get; private set; }
@@ -229,6 +231,11 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             //----------------------------------------------------------------
+            // チャンク マネージャ
+
+            ChunkManager = new ChunkManager(GraphicsDevice, SceneManager);
+
+            //----------------------------------------------------------------
             // リージョン マネージャ
 
             RegionManager = new RegionManager(serviceProvider, SceneManager);
@@ -243,7 +250,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var landscapeSettings = LoadAsset<LandscapeSettings>("title:Resources/LandscapeSettings.json");
 
-            PartitionManager = new ChunkPartitionManager(landscapeSettings.PartitionManager, RegionManager);
+            PartitionManager = new ChunkPartitionManager(landscapeSettings.PartitionManager, ChunkManager, RegionManager);
 
             //----------------------------------------------------------------
             // デフォルト カメラ
@@ -324,6 +331,11 @@ namespace Willcraftia.Xna.Blocks.Models
             LensFlare.Enabled = SceneSettings.SunAboveHorizon;
 
             //----------------------------------------------------------------
+            // チャンク マネージャ
+
+            ChunkManager.Update();
+
+            //----------------------------------------------------------------
             // リージョン マネージャ
 
             RegionManager.Update(gameTime);
@@ -335,7 +347,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // リージョン マネージャ
 
             // チャンク エフェクトを更新。
-            RegionManager.PrepareSharedEffects();
+            RegionManager.PrepareChunkEffects();
 
             //----------------------------------------------------------------
             // シーン マネージャ

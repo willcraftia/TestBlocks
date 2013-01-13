@@ -108,7 +108,7 @@ namespace Willcraftia.Xna.Blocks.Models
             storageContainer.DeleteDirectory(regionDirectory);
         }
 
-        public void GetChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize)
+        public void GetChunkBundle(Stream chunkBundleStream)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
@@ -116,7 +116,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (filePaths.Length == 0) return;
 
             // Chunk holder
-            var chunk = new Chunk(chunkSize);
+            var chunk = new Chunk();
 
             using (var gzipStream = new GZipStream(chunkBundleStream, CompressionMode.Compress, CompressionLevel.Fastest))
             using (var writer = new BinaryWriter(gzipStream))
@@ -136,10 +136,10 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void AddChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize)
+        public void AddChunkBundle(Stream chunkBundleStream)
         {
             // Chunk holder
-            var chunk = new Chunk(chunkSize);
+            var chunk = new Chunk();
 
             using (var gzipStream = new GZipStream(chunkBundleStream, CompressionMode.Decompress, CompressionLevel.Fastest))
             using (var reader = new BinaryReader(gzipStream))

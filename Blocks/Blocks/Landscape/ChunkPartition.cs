@@ -15,16 +15,20 @@ namespace Willcraftia.Xna.Blocks.Landscape
     /// </summary>
     public sealed class ChunkPartition : Partition
     {
-        RegionManager regionManager;
+        ChunkManager chunkManager;
 
-        Region region;
+        RegionManager regionManager;
 
         Chunk chunk;
 
-        public ChunkPartition(RegionManager regionManager)
+        Region region;
+
+        public ChunkPartition(ChunkManager chunkManager, RegionManager regionManager)
         {
+            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
             if (regionManager == null) throw new ArgumentNullException("regionManager");
 
+            this.chunkManager = chunkManager;
             this.regionManager = regionManager;
         }
 
@@ -35,7 +39,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
             if (!regionManager.TryGetRegion(ref position, out region))
                 throw new InvalidOperationException("Region not found: " + position);
 
-            chunk = region.ActivateChunk(ref position);
+            chunk = chunkManager.ActivateChunk(region, ref position);
             if (chunk == null) return false;
 
             return base.ActivateOverride();
@@ -45,7 +49,7 @@ namespace Willcraftia.Xna.Blocks.Landscape
         {
             Debug.Assert(chunk != null);
 
-            if (!region.PassivateChunk(chunk)) return false;
+            if (!chunkManager.PassivateChunk(chunk)) return false;
 
             chunk = null;
             region = null;

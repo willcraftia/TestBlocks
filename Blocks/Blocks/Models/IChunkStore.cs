@@ -23,8 +23,8 @@ namespace Willcraftia.Xna.Blocks.Models
         // ChunkBundle の取得は、エディタのため。
         //
 
-        void GetChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize);
+        void GetChunkBundle(Stream chunkBundleStream);
 
-        void AddChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize);
+        void AddChunkBundle(Stream chunkBundleStream);
     }
 }

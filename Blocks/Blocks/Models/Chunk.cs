@@ -54,6 +54,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMesh translucentMesh;
 
+        public Region Region { get; private set; }
+
         public VectorI3 Position
         {
             get { return position; }
@@ -182,16 +184,17 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return drawing; }
         }
 
-        public Chunk(VectorI3 size)
+        public Chunk()
         {
-            this.size = size;
-
             blockIndices = new byte[size.X * size.Y * size.Z];
         }
 
-        public void OnActivated()
+        public void OnActivated(Region region)
         {
             lock (activeLock) active = true;
+
+            // リージョンをバインド。
+            Region = region;
 
             MeshDirty = true;
         }
@@ -205,6 +208,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             activeNeighbors = CubicSide.Flags.None;
             neighborsReferencedOnUpdate = CubicSide.Flags.None;
+
+            // リージョンをアンバインド。
+            Region = null;
 
             MeshDirty = true;
             DefinitionDirty = false;

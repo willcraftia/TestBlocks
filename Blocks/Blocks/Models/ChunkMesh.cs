@@ -16,7 +16,7 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         static readonly VectorI3 chunkSize = Chunk.Size;
 
-        ChunkEffect effect;
+        GraphicsDevice graphicsDevice;
 
         Matrix world = Matrix.Identity;
 
@@ -33,8 +33,6 @@ namespace Willcraftia.Xna.Blocks.Models
         OcclusionQuery occlusionQuery;
 
         bool occlusionQueryActive;
-
-        public GraphicsDevice GraphicsDevice { get; private set; }
 
         public Chunk Chunk { get; set; }
 
@@ -87,14 +85,13 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public ChunkMesh(ChunkEffect effect)
+        public ChunkMesh(GraphicsDevice graphicsDevice)
         {
-            if (effect == null) throw new ArgumentNullException("effect");
+            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 
-            this.effect = effect;
+            this.graphicsDevice = graphicsDevice;
 
-            GraphicsDevice = effect.GraphicsDevice;
-            occlusionQuery = new OcclusionQuery(GraphicsDevice);
+            occlusionQuery = new OcclusionQuery(graphicsDevice);
         }
 
         public override void PreDraw()
@@ -122,6 +119,8 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // エフェクト
 
+            var effect = Chunk.Region.ChunkEffect;
+
             effect.EnableOcclusionQueryTechnique();
 
             effect.World = world;
@@ -142,6 +141,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             //----------------------------------------------------------------
             // エフェクト
+
+            var effect = Chunk.Region.ChunkEffect;
 
             effect.ResolveCurrentTechnique();
 
@@ -182,9 +183,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 return;
             }
 
-            GraphicsDevice.SetVertexBuffer(vertexBuffer);
-            GraphicsDevice.Indices = indexBuffer;
-            GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
+            graphicsDevice.SetVertexBuffer(vertexBuffer);
+            graphicsDevice.Indices = indexBuffer;
+            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
 
             // 描画ロックを解放。
             Chunk.ExitDraw();

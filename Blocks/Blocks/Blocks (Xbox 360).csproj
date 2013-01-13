@@ -124,6 +124,7 @@
     <Compile Include="Models\ChunkCollection.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\ChunkManager.cs" />
+    <Compile Include="Models\ChunkManagerMonitor.cs" />
     <Compile Include="Models\ChunkMesh.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -151,7 +152,6 @@
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\RegionManager.cs" />
     <Compile Include="Models\RegionManagerMonitor.cs" />
-    <Compile Include="Models\RegionMonitor.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\SkySphere.cs" />

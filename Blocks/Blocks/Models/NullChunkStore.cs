@@ -19,24 +19,14 @@ namespace Willcraftia.Xna.Blocks.Models
             return false;
         }
 
-        public void AddChunk(Chunk chunk)
-        {
-        }
+        public void AddChunk(Chunk chunk) { }
 
-        public void DeleteChunk(Chunk chunk)
-        {
-        }
+        public void DeleteChunk(Chunk chunk) { }
 
-        public void ClearChunks()
-        {
-        }
+        public void ClearChunks() { }
 
-        public void GetChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize)
-        {
-        }
+        public void GetChunkBundle(Stream chunkBundleStream) { }
 
-        public void AddChunkBundle(Stream chunkBundleStream, ref VectorI3 chunkSize)
-        {
-        }
+        public void AddChunkBundle(Stream chunkBundleStream) { }
     }
 }

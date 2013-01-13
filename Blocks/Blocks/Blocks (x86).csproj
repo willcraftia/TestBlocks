@@ -106,7 +106,7 @@
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\NullChunkStore.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
-    <Compile Include="Models\RegionMonitor.cs" />
+    <Compile Include="Models\ChunkManagerMonitor.cs" />
     <Compile Include="Models\SingleBiomeManager.cs" />
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\GradientDensity.cs" />

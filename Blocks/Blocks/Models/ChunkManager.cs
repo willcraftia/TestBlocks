@@ -26,9 +26,9 @@ namespace Willcraftia.Xna.Blocks.Models
         // 最終的には定義ファイルのようなもので定義を変更できるようにする。
         //
 
-        public const ushort VertexCapacity = 8000;
+        public const ushort VertexCapacity = 4000;
 
-        public const ushort IndexCapacity = 11000;
+        public const ushort IndexCapacity = 6 * VertexCapacity / 4;
 
         // 更新の最大試行数。
         public const int UpdateCapacity = 100;
@@ -41,7 +41,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly Vector3 chunkMeshOffset = Chunk.HalfSize.ToVector3();
 
-        Region region;
+        GraphicsDevice graphicsDevice;
+
+        SceneManager sceneManager;
 
         Vector3 inverseChunkSize;
 
@@ -74,11 +76,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool closed;
 
-        public ChunkManager(Region region)
-        {
-            if (region == null) throw new ArgumentNullException("region");
+        public ChunkManagerMonitor Monitor { get; private set; }
 
-            this.region = region;
+        public ChunkManager(GraphicsDevice graphicsDevice, SceneManager sceneManager)
+        {
+            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (sceneManager == null) throw new ArgumentNullException("sceneManager");
+
+            this.graphicsDevice = graphicsDevice;
+            this.sceneManager = sceneManager;
 
             inverseChunkSize.X = 1 / (float) chunkSize.X;
             inverseChunkSize.Y = 1 / (float) chunkSize.Y;
@@ -92,7 +98,9 @@ namespace Willcraftia.Xna.Blocks.Models
             };
             vertexBufferPool = new Pool<VertexBuffer>(CreateVertexBuffer);
             indexBufferPool = new Pool<IndexBuffer>(CreateIndexBuffer);
-            chunkMeshUpdateManager = new ChunkMeshUpdateManager(region, this);
+            chunkMeshUpdateManager = new ChunkMeshUpdateManager(this);
+
+            Monitor = new ChunkManagerMonitor();
         }
 
         public void Update()
@@ -112,14 +120,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            region.Monitor.TotalChunkCount = chunkPool.TotalObjectCount;
-            region.Monitor.ActiveChunkCount = activeChunks.Count;
-            region.Monitor.TotalChunkMeshCount = chunkMeshPool.TotalObjectCount;
-            region.Monitor.PassiveChunkMeshCount = chunkMeshPool.Count;
-            region.Monitor.TotalInterChunkMeshCount = interChunkPool.TotalObjectCount;
-            region.Monitor.PassiveInterChunkMeshCount = interChunkPool.Count;
-            region.Monitor.TotalVertexBufferCount = vertexBufferPool.TotalObjectCount;
-            region.Monitor.PassiveVertexBufferCount = vertexBufferPool.Count;
+            Monitor.TotalChunkCount = chunkPool.TotalObjectCount;
+            Monitor.ActiveChunkCount = activeChunks.Count;
+            Monitor.TotalChunkMeshCount = chunkMeshPool.TotalObjectCount;
+            Monitor.PassiveChunkMeshCount = chunkMeshPool.Count;
+            Monitor.TotalInterChunkCount = interChunkPool.TotalObjectCount;
+            Monitor.PassiveInterChunkCount = interChunkPool.Count;
+            Monitor.TotalBufferCount = vertexBufferPool.TotalObjectCount;
+            Monitor.PassiveBufferCount = vertexBufferPool.Count;
+            Monitor.VertexCapacity = VertexCapacity;
+            Monitor.IndexCapacity = IndexCapacity;
 
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
@@ -207,7 +217,7 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         // 非同期呼び出し。
-        public Chunk ActivateChunk(ref VectorI3 position)
+        public Chunk ActivateChunk(Region region, ref VectorI3 position)
         {
             var chunk = chunkPool.Borrow();
             if (chunk == null) return null;
@@ -222,7 +232,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     procedure.Generate(chunk);
             }
 
-            chunk.OnActivated();
+            chunk.OnActivated(region);
 
             lock (activeChunks) activeChunks.Add(chunk);
 
@@ -257,7 +267,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // 定義に変更があるならば永続化領域を更新。
-            if (chunk.DefinitionDirty) region.ChunkStore.AddChunk(chunk);
+            if (chunk.DefinitionDirty) chunk.Region.ChunkStore.AddChunk(chunk);
 
             chunk.OnPassivated();
             chunk.ExitPassivate();
@@ -292,12 +302,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Chunk CreateChunk()
         {
-            return new Chunk(chunkSize);
+            return new Chunk();
         }
 
         ChunkMesh CreateChunkMesh()
         {
-            return new ChunkMesh(region.ChunkEffect);
+            return new ChunkMesh(graphicsDevice);
         }
 
         InterChunk CreateInterChunk()
@@ -307,12 +317,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         VertexBuffer CreateVertexBuffer()
         {
-            return new VertexBuffer(region.GraphicsDevice, typeof(VertexPositionNormalColorTexture), VertexCapacity, BufferUsage.WriteOnly);
+            return new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalColorTexture), VertexCapacity, BufferUsage.WriteOnly);
         }
 
         IndexBuffer CreateIndexBuffer()
         {
-            return new IndexBuffer(region.GraphicsDevice, IndexElementSize.SixteenBits, IndexCapacity, BufferUsage.WriteOnly);
+            return new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, IndexCapacity, BufferUsage.WriteOnly);
         }
 
         bool BorrowInterChunk(Chunk chunk)
@@ -337,18 +347,18 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunkMesh.VertexBuffer = vertexBufferPool.Borrow();
             chunkMesh.IndexBuffer = indexBufferPool.Borrow();
-            
-            region.SceneManager.AddSceneObject(chunkMesh);
+
+            sceneManager.AddSceneObject(chunkMesh);
             
             return chunkMesh;
         }
 
         void PassivateChunkMesh(ChunkMesh chunkMesh)
         {
-            region.Monitor.TotalChunkVertexCount -= chunkMesh.VertexCount;
-            region.Monitor.TotalChunkIndexCount -= chunkMesh.IndexCount;
+            Monitor.TotalVertexCount -= chunkMesh.VertexCount;
+            Monitor.TotalIndexCount -= chunkMesh.IndexCount;
 
-            region.SceneManager.RemoveSceneObject(chunkMesh);
+            sceneManager.RemoveSceneObject(chunkMesh);
 
             if (chunkMesh.VertexBuffer != null)
             {
@@ -397,18 +407,18 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
                 else
                 {
-                    region.Monitor.TotalChunkVertexCount -= chunk.OpaqueMesh.VertexCount;
-                    region.Monitor.TotalChunkIndexCount -= chunk.OpaqueMesh.IndexCount;
+                    Monitor.TotalVertexCount -= chunk.OpaqueMesh.VertexCount;
+                    Monitor.TotalIndexCount -= chunk.OpaqueMesh.IndexCount;
                 }
 
                 chunk.OpaqueMesh.Position = position;
                 chunk.OpaqueMesh.World = world;
                 interMesh.Opaque.Populate(chunk.OpaqueMesh);
 
-                region.Monitor.TotalChunkVertexCount += chunk.OpaqueMesh.VertexCount;
-                region.Monitor.TotalChunkIndexCount += chunk.OpaqueMesh.IndexCount;
-                region.Monitor.MaxChunkVertexCount = Math.Max(region.Monitor.MaxChunkVertexCount, chunk.OpaqueMesh.VertexCount);
-                region.Monitor.MaxChunkIndexCount = Math.Max(region.Monitor.MaxChunkIndexCount, chunk.OpaqueMesh.IndexCount);
+                Monitor.TotalVertexCount += chunk.OpaqueMesh.VertexCount;
+                Monitor.TotalIndexCount += chunk.OpaqueMesh.IndexCount;
+                Monitor.MaxVertexCount = Math.Max(Monitor.MaxVertexCount, chunk.OpaqueMesh.VertexCount);
+                Monitor.MaxIndexCount = Math.Max(Monitor.MaxIndexCount, chunk.OpaqueMesh.IndexCount);
             }
 
             //----------------------------------------------------------------
@@ -430,18 +440,18 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
                 else
                 {
-                    region.Monitor.TotalChunkVertexCount -= chunk.TranslucentMesh.VertexCount;
-                    region.Monitor.TotalChunkIndexCount -= chunk.TranslucentMesh.IndexCount;
+                    Monitor.TotalVertexCount -= chunk.TranslucentMesh.VertexCount;
+                    Monitor.TotalIndexCount -= chunk.TranslucentMesh.IndexCount;
                 }
 
                 chunk.TranslucentMesh.Position = position;
                 chunk.TranslucentMesh.World = world;
                 interMesh.Translucent.Populate(chunk.TranslucentMesh);
 
-                region.Monitor.TotalChunkVertexCount += chunk.TranslucentMesh.VertexCount;
-                region.Monitor.TotalChunkIndexCount += chunk.TranslucentMesh.IndexCount;
-                region.Monitor.MaxChunkVertexCount = Math.Max(region.Monitor.MaxChunkVertexCount, chunk.TranslucentMesh.VertexCount);
-                region.Monitor.MaxChunkIndexCount = Math.Max(region.Monitor.MaxChunkIndexCount, chunk.TranslucentMesh.IndexCount);
+                Monitor.TotalVertexCount += chunk.TranslucentMesh.VertexCount;
+                Monitor.TotalIndexCount += chunk.TranslucentMesh.IndexCount;
+                Monitor.MaxVertexCount = Math.Max(Monitor.MaxVertexCount, chunk.TranslucentMesh.VertexCount);
+                Monitor.MaxIndexCount = Math.Max(Monitor.MaxIndexCount, chunk.TranslucentMesh.IndexCount);
             }
         }
     }

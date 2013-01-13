@@ -523,26 +523,30 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("W(").AppendNumber(partitionManagerMonitor.ActivatingPartitionCount).Append(") ");
             sb.Append("P(").AppendNumber(partitionManagerMonitor.PassivatingPartitionCount).Append(")").AppendLine();
 
-            var regionMonitor = region.Monitor;
-            sb.Append("Chunk: ").AppendNumber(regionMonitor.ActiveChunkCount).Append("/");
-            sb.AppendNumber(regionMonitor.TotalChunkCount).Append(" ");
-            sb.Append("Mesh: ").AppendNumber(regionMonitor.ActiveChunkMeshCount).Append("/");
-            sb.AppendNumber(regionMonitor.TotalChunkMeshCount).Append(" ");
-            sb.Append("InterMesh: ").AppendNumber(regionMonitor.ActiveInterChunkMeshCount).Append("/");
-            sb.AppendNumber(regionMonitor.TotalInterChunkMeshCount).AppendLine();
+            var chunkManagerMonitor = worldManager.ChunkManager.Monitor;
+            sb.Append("Chunk: ").AppendNumber(chunkManagerMonitor.ActiveChunkCount).Append("/");
+            sb.AppendNumber(chunkManagerMonitor.TotalChunkCount).Append(" ");
+            sb.Append("Mesh: ").AppendNumber(chunkManagerMonitor.ActiveChunkMeshCount).Append("/");
+            sb.AppendNumber(chunkManagerMonitor.TotalChunkMeshCount).Append(" ");
+            sb.Append("InterMesh: ").AppendNumber(chunkManagerMonitor.ActiveInterChunkCount).Append("/");
+            sb.AppendNumber(chunkManagerMonitor.TotalInterChunkCount).AppendLine();
 
-            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(regionMonitor.ActiveVertexBufferCount).Append("/");
-            sb.AppendNumber(regionMonitor.TotalVertexBufferCount).AppendLine();
+            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(chunkManagerMonitor.ActiveBufferCount).Append("/");
+            sb.AppendNumber(chunkManagerMonitor.TotalBufferCount).AppendLine();
 
-            sb.Append("UpdatingChunk: ").AppendNumber(regionMonitor.UpdatingChunkCount).AppendLine();
+            sb.Append("UpdatingChunk: ").AppendNumber(chunkManagerMonitor.UpdatingChunkCount).AppendLine();
 
             sb.Append("ChunkVertex: ");
-            sb.Append("Max(").AppendNumber(regionMonitor.MaxChunkVertexCount).Append(") ");
-            sb.Append("Total(").AppendNumber(regionMonitor.TotalChunkVertexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(chunkManagerMonitor.MaxVertexCount).Append("/");
+            sb.Append(chunkManagerMonitor.VertexCapacity).Append(") ");
+            sb.Append("Total(").AppendNumber(chunkManagerMonitor.TotalVertexCount).Append("/");
+            sb.AppendNumber(chunkManagerMonitor.AllocatedVertexCount).Append(")").AppendLine();
 
             sb.Append("ChunkIndex: ");
-            sb.Append("Max(").AppendNumber(regionMonitor.MaxChunkIndexCount).Append(") ");
-            sb.Append("Total(").AppendNumber(regionMonitor.TotalChunkIndexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(chunkManagerMonitor.MaxIndexCount).Append(".");
+            sb.AppendNumber(chunkManagerMonitor.IndexCapacity).Append(") ");
+            sb.Append("Total(").AppendNumber(chunkManagerMonitor.TotalIndexCount).Append("/");
+            sb.AppendNumber(chunkManagerMonitor.AllocatedIndexCount).Append(")").AppendLine();
 
             var sceneManagerMonitor = worldManager.SceneManager.Monitor;
             sb.Append("SceneObejcts: ").AppendNumber(sceneManagerMonitor.RenderedSceneObjectCount).Append("/");

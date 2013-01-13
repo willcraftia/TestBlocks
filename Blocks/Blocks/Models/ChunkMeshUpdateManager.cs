@@ -54,30 +54,24 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static readonly Vector3 blockMeshOffset = new Vector3(0.5f);
 
-        Region region;
-
         ChunkManager chunkManager;
 
         // TODO
         // プール サイズは、メモリ占有量の観点で決定する。
         Pool<Task> taskPool;
 
-        // TODO 初期容量
-
-        // TODO: HashSet にしたい。
-        List<Chunk> updatingChunks = new List<Chunk>();
+        // 中間チャンク容量を超えないので、これを初期容量とする。
+        List<Chunk> updatingChunks = new List<Chunk>(ChunkManager.InterChunkCapacity);
 
         // 全件を対象に削除判定を行うため、リストではなくキューで管理。
         Queue<Task> activeTasks = new Queue<Task>();
 
         TaskQueue taskQueue = new TaskQueue();
 
-        public ChunkMeshUpdateManager(Region region, ChunkManager chunkManager)
+        public ChunkMeshUpdateManager(ChunkManager chunkManager)
         {
-            if (region == null) throw new ArgumentNullException("region");
             if (chunkManager == null) throw new ArgumentNullException("chunkManager");
 
-            this.region = region;
             this.chunkManager = chunkManager;
 
             taskPool = new Pool<Task>(() => { return new Task(this); });
@@ -107,7 +101,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update()
         {
-            region.Monitor.UpdatingChunkCount = updatingChunks.Count;
+            chunkManager.Monitor.UpdatingChunkCount = updatingChunks.Count;
 
             // Update the task queue.
             taskQueue.Update();
@@ -176,7 +170,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 空ならば頂点は存在しない。
             if (Block.EmptyIndex == blockIndex) return;
 
-            var block = region.BlockCatalog[blockIndex];
+            var block = chunk.Region.BlockCatalog[blockIndex];
 
             // MeshPart が必ずしも平面であるとは限らないが、
             // ここでは平面を仮定して隣接状態を考える。
@@ -200,7 +194,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (nearbyBlockIndex != Block.EmptyIndex)
                 {
                     // 隣接 Block との関係から対象面の要否を判定。
-                    var nearbyBlock = region.BlockCatalog[nearbyBlockIndex.Value];
+                    var nearbyBlock = chunk.Region.BlockCatalog[nearbyBlockIndex.Value];
 
                     // 半透明な連続した流体 Block を並べる際、流体 Block 間の面は不要。
                     // ※流体 Block は常に半透明を仮定して処理。
@@ -255,7 +249,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
 
                 // ブロック情報を取得。
-                var occluderBlock = region.BlockCatalog[occluderBlockIndex.Value];
+                var occluderBlock = chunk.Region.BlockCatalog[occluderBlockIndex.Value];
 
                 // 流体ブロックは光を遮らないものとする。
                 if (occluderBlock.Fluid) continue;

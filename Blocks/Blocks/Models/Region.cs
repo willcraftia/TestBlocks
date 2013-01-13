@@ -16,8 +16,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Region : IAsset, IDisposable
     {
-        ChunkManager chunkManager;
-
         BoundingBoxI bounds;
 
         // I/F
@@ -25,12 +23,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SceneManager SceneManager { get; private set; }
 
-        public GraphicsDevice GraphicsDevice { get; private set; }
-
         public SceneSettings SceneSettings { get; private set; }
 
         public AssetManager AssetManager { get; private set; }
 
+        /// <summary>
+        /// このリージョンに属するチャンクのためのエフェクトを取得します。
+        /// タイル カタログはリージョン毎に定義され、
+        /// チャンクは自身が属するリージョンのタイル カタログを参照する必要があります。
+        /// このため、各リージョンは、自身に属するチャンクのための固有のチャンク エフェクトを管理します。
+        /// </summary>
         public ChunkEffect ChunkEffect { get; private set; }
 
         public string Name { get; set; }
@@ -53,16 +55,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public IChunkStore ChunkStore { get; set; }
 
-        public RegionMonitor Monitor { get; private set; }
-
-        public void Initialize(SceneManager sceneManager, SceneSettings sceneSettings, AssetManager assetManager, ChunkEffect chunkEffect)
+        public void Initialize(SceneManager sceneManager, SceneSettings sceneSettings, AssetManager assetManager, Effect chunkEffect)
         {
             if (sceneManager == null) throw new ArgumentNullException("sceneManager");
             if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");
             if (assetManager == null) throw new ArgumentNullException("assetManager");
+            if (chunkEffect == null) throw new ArgumentNullException("chunkEffect");
 
             SceneManager = sceneManager;
-            GraphicsDevice = sceneManager.GraphicsDevice;
             SceneSettings = sceneSettings;
             AssetManager = assetManager;
 
@@ -70,19 +70,10 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect = new ChunkEffect(chunkEffect);
 
             // タイル カタログのテクスチャをチャンク エフェクトへ設定。
-            chunkEffect.TileMap = TileCatalog.TileMap;
-            chunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
-            chunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
-            chunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
-
-            chunkManager = new ChunkManager(this);
-
-            if (Monitor == null) Monitor = new RegionMonitor();
-        }
-
-        public void Update()
-        {
-            chunkManager.Update();
+            ChunkEffect.TileMap = TileCatalog.TileMap;
+            ChunkEffect.DiffuseMap = TileCatalog.DiffuseColorMap;
+            ChunkEffect.EmissiveMap = TileCatalog.EmissiveColorMap;
+            ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
         }
 
         public bool ContainsPosition(ref VectorI3 position)
@@ -96,24 +87,8 @@ namespace Willcraftia.Xna.Blocks.Models
             return true;
         }
 
-        // 非同期呼び出し。
-        public Chunk ActivateChunk(ref VectorI3 position)
+        public void Update()
         {
-            return chunkManager.ActivateChunk(ref position);
-        }
-
-        // 非同期呼び出し。
-        public bool PassivateChunk(Chunk chunk)
-        {
-            return chunkManager.PassivateChunk(chunk);
-        }
-
-        public void Close()
-        {
-            // チャンク マネージャにクローズ処理を要求。
-            // チャンク マネージャは即座に更新を終えるのではなく、
-            // 更新のために占有しているチャンクの解放を全て待ってから更新を終える。
-            chunkManager.Close();
         }
 
         #region ToString

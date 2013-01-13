@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         SkySphere skySphere;
 
-        ChunkEffect chunkEffect;
+        Effect chunkEffect;
 
         ParticleSystem snowParticleSystem;
 
@@ -84,7 +84,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク エフェクト
 
-            chunkEffect = new ChunkEffect(LoadAsset<Effect>("content:Effects/Chunk"));
+            chunkEffect = LoadAsset<Effect>("content:Effects/Chunk");
 
             //----------------------------------------------------------------
             // 降雪パーティクル
@@ -259,24 +259,22 @@ namespace Willcraftia.Xna.Blocks.Models
             Monitor.OnEndUpdate();
         }
 
-        public void PrepareSharedEffects()
+        public void PrepareChunkEffects()
         {
-            sceneManager.UpdateEffect(chunkEffect);
+            foreach (var region in regions)
+            {
+                sceneManager.UpdateEffect(region.ChunkEffect);
 
-            //----------------------------------------------------------------
-            // ワイヤフレーム設定
-
-            chunkEffect.WireframeEnabled = Wireframe;
-        }
-
-        public void Close()
-        {
-            foreach (var region in regions) region.Close();
+                region.ChunkEffect.WireframeEnabled = Wireframe;
+            }
         }
 
         internal void OnShadowMapUpdated(object sender, EventArgs e)
         {
-            sceneManager.UpdateEffectShadowMap(chunkEffect);
+            foreach (var region in regions)
+            {
+                sceneManager.UpdateEffectShadowMap(region.ChunkEffect);
+            }
         }
 
         T LoadAsset<T>(string uri)
@@ -306,7 +304,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (disposing)
             {
-                chunkEffect.Dispose();
+                assetManager.Dispose();
+                snowParticleSystem.Dispose();
+                rainParticleSystem.Dispose();
             }
 
             disposed = true;
