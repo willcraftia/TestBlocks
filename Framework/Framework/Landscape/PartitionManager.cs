@@ -635,7 +635,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             for (int i = 0; i < count; i++)
             {
                 // 同時非アクティブ化許容数を越えるならば処理終了。
-                if (0 < passivationCapacity && passivationCapacity <= passivatingPartitions.Count)
+                if (passivationCapacity <= passivatingPartitions.Count)
                     break;
 
                 var partition = activePartitions.Dequeue();
@@ -677,7 +677,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             for (int i = 0; i < activationSearchCapacity; i++)
             {
                 // 同時アクティブ化許容数を越えるならば処理終了。
-                if (0 < activationCapacity && activationCapacity <= activatingPartitions.Count)
+                if (activationCapacity <= activatingPartitions.Count)
                     break;
 
                 // index が末尾に到達したら先頭へ戻し、循環したとしてマーク。
@@ -692,13 +692,13 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 var position = eyePosition + minActivePointOffsets[index++];
 
+                // 既にアクティブであるかどうか。
+                if (activePartitions.Contains(ref position)) continue;
+
                 // アクティブ化中あるいは非アクティブ化中かどうか。
                 if (activatingPartitions.Contains(position) ||
                     passivatingPartitions.Contains(position))
                     continue;
-
-                // 既にアクティブであるかどうか。
-                if (activePartitions.Contains(ref position)) continue;
 
                 // アクティブ化可能であるかどうか。
                 if (!CanActivatePartition(ref position)) continue;
