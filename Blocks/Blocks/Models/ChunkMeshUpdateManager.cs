@@ -56,8 +56,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager chunkManager;
 
-        // TODO
-        // プール サイズは、メモリ占有量の観点で決定する。
         Pool<Task> taskPool;
 
         // 中間チャンク容量を超えないので、これを初期容量とする。
@@ -74,7 +72,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.chunkManager = chunkManager;
 
-            taskPool = new Pool<Task>(() => { return new Task(this); });
+            taskPool = new Pool<Task>(() => { return new Task(this); })
+            {
+                // 同時更新許容量を超えることはない。
+                MaxCapacity = ChunkManager.UpdateCapacity
+            };
 
             taskQueue.SlotCount = TaskQueueSlotCount;
         }
