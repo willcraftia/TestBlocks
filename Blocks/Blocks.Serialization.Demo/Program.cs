@@ -66,27 +66,21 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
         static void Main(string[] args)
         {
-            #region Setup
-
-            //================================================================
-            // Setup
+            #region 開始処理
 
             directoryPath = Directory.GetCurrentDirectory() + "/Resources";
             if (!Directory.Exists(directoryPath)) Directory.CreateDirectory(directoryPath);
-            Console.WriteLine("Output: " + directoryPath);
+            Console.WriteLine("出力先: " + directoryPath);
             Console.WriteLine();
 
-            Console.WriteLine("Press Enter to serialize/deserialize resources.");
+            Console.WriteLine("開始するにはエンター キーを押して下さい...");
             Console.ReadLine();
 
             #endregion
 
-            #region TileDefinition
+            #region タイル定義
 
-            //================================================================
-            // TileDefinition
-
-            Console.WriteLine("TileDefinition");
+            Console.WriteLine("タイル定義");
             {
                 var tile = new TileDefinition
                 {
@@ -227,12 +221,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region TileCatalogDefinition
+            #region タイル カタログ定義
 
-            //================================================================
-            // TileCatalogDefinition
-
-            Console.WriteLine("TileCatalogDefinition");
+            Console.WriteLine("タイル カタログ定義");
             {
                 var tileCatalog = new TileCatalogDefinition
                 {
@@ -259,12 +250,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region BlockDefinition
+            #region ブロック定義
 
-            //================================================================
-            // BlockDefinition
-
-            Console.WriteLine("BlockDefinition");
+            Console.WriteLine("ブロック定義");
             {
                 var block = new BlockDefinition
                 {
@@ -431,12 +419,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region BlockCatalogDefinition
+            #region ブロック カタログ定義
 
-            //================================================================
-            // BlockCatalogDefinition
-
-            Console.WriteLine("BlockCatalogDefinition");
+            Console.WriteLine("ブロック カタログ定義");
             {
                 var blockCatalog = new BlockCatalogDefinition
                 {
@@ -467,12 +452,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region TerrainNoise (INoiseSource) (ComponentBundleDefinition)
+            #region 地形ノイズ コンポーネント
 
-            //================================================================
-            // TerrainNoise (INoiseSource) (ComponentBundleDefinition)
-
-            Console.WriteLine("TerrainNoise (INoiseSource) (ComponentBundleDefinition)");
+            Console.WriteLine("地形ノイズ コンポーネント");
             {
                 // デバッグのし易さのために、各ノイズ インスタンスのコンポーネント名を明示する。
                 var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
@@ -717,12 +699,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region DefaultBiome (ComponentBundleDefinition)
+            #region バイオーム コンポーネント
 
-            //================================================================
-            // DefaultBiome (ComponentBundleDefinition)
-
-            Console.WriteLine("DefaultBiome (ComponentBundleDefinition)");
+            Console.WriteLine("バイオーム コンポーネント");
             {
                 // デバッグのし易さのために、各ノイズ インスタンスのコンポーネント名を明示する。
                 var componentInfoManager = new ComponentInfoManager(BiomeLoader.ComponentTypeRegistory);
@@ -818,12 +797,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region BiomeCatalogDefinition
+            #region バイオーム カタログ
 
-            //================================================================
-            // BiomeCatalogDefinition
-
-            Console.WriteLine("BiomeCatalogDefinition");
+            Console.WriteLine("バイオーム カタログ");
             {
                 var biomeCatalog = new BiomeCatalogDefinition
                 {
@@ -845,12 +821,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region SingleBiomeManager (ComponentBundleDefinition)
-
-            //================================================================
-            // SingleBiomeManager (ComponentBundleDefinition)
-
-            Console.WriteLine("SingleBiomeManager (ComponentBundleDefinition)");
+            #region 単一バイオーム マネージャ
+            
+            Console.WriteLine("単一バイオーム コンポーネント");
             {
                 var biomeManager = new SingleBiomeManager
                 {
@@ -875,12 +848,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region FlatTerrainProcedure (ComponentBundleDefinition)
-
-            //================================================================
-            // FlatTerrainProcedure (ComponentBundleDefinition)
-
-            Console.WriteLine("FlatTerrainProcedure (ComponentBundleDefinition)");
+            #region 平坦地形生成コンポーネント
+            
+            Console.WriteLine("平坦地形生成コンポーネント");
             {
                 var procedure = new FlatTerrainProcedure
                 {
@@ -904,12 +874,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region DefaultTerrainProcedure (ComponentBundleDefinition)
+            #region デフォルト地形生成コンポーネント
 
-            //================================================================
-            // DefaultTerrainProcedure (ComponentBundleDefinition)
-
-            Console.WriteLine("DefaultTerrainProcedure (ComponentBundleDefinition)");
+            Console.WriteLine("デフォルト地形生成コンポーネント");
             {
                 var procedure = new DefaultTerrainProcedure
                 {
@@ -932,12 +899,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region RegionDefinition
+            #region リージョン定義
 
-            //================================================================
-            // RegionDefinition
-
-            Console.WriteLine("RegionDefinition");
+            Console.WriteLine("リージョン定義");
             {
                 var region = new RegionDefinition
                 {
@@ -965,12 +929,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region SkySphereDefinition
+            #region スカイ スフィア定義
 
-            //================================================================
-            // SkySphereDefinition
-
-            Console.WriteLine("SkySphereDefinition");
+            Console.WriteLine("スカイ スフィア定義");
             {
                 var skySphere = new SkySphereDefinition
                 {
@@ -986,12 +947,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region GraphicsSettingsDefinition
+            #region グラフィックス設定定義
 
-            //================================================================
-            // GraphicsSettingsDefinition
-
-            Console.WriteLine("GraphicsSettingsDefinition");
+            Console.WriteLine("グラフィックス設定定義");
             {
                 var settings = new GraphicsSettingsDefinition
                 {
@@ -1070,12 +1028,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region LandscapeSettingsDefinition
+            #region 景観設定定義
 
-            //================================================================
-            // LandscapeSettingsDefinition
-
-            Console.WriteLine("LandscapeSettingsDefinition");
+            Console.WriteLine("景観設定定義");
             {
                 var settings = new LandscapeSettingsDefinition
                 {
@@ -1101,12 +1056,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region SceneSettingsDefinition
+            #region シーン設定定義
 
-            //================================================================
-            // SceneSettingsDefinition
-
-            Console.WriteLine("SceneSettingsDefinition");
+            Console.WriteLine("シーン設定定義");
             {
                 var sceneSettings = new SceneSettingsDefinition
                 {
@@ -1153,12 +1105,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region MeshDefinition
+            #region 立方体メッシュ定義
 
-            //================================================================
-            // MeshDefinition
-
-            Console.WriteLine("MeshDefinition (Cube)");
+            Console.WriteLine("立方体メッシュ定義");
             {
                 var cubeMesh = CreateCubeMeshDefinition();
 
@@ -1171,12 +1120,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region  DefaultSnowParticle (ParticleSettingsDefinition)
+            #region 降雪パーティクル定義
 
-            //================================================================
-            // DefaultSnowParticle (ParticleSettingsDefinition)
-
-            Console.WriteLine("DefaultSnowParticle (ParticleSettingsDefinition)");
+            Console.WriteLine("降雪パーティクル");
             {
                 var definition = new ParticleSettingsDefinition
                 {
@@ -1210,12 +1156,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region  DefaultRainParticle (ParticleSettingsDefinition)
+            #region 降雨パーティクル定義
 
-            //================================================================
-            // DefaultRainParticle (ParticleSettingsDefinition)
-
-            Console.WriteLine("DefaultRainParticle (ParticleSettingsDefinition)");
+            Console.WriteLine("降雨パーティクル定義");
             {
                 var definition = new ParticleSettingsDefinition
                 {
@@ -1249,18 +1192,15 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region Exit
+            #region 終了処理
 
-            //================================================================
-            // Exit
-
-            Console.WriteLine("Press Enter to exit.");
+            Console.WriteLine("終了するにはエンター キーを押して下さい...");
             Console.ReadLine();
 
             #endregion
         }
 
-        #region Serialization/Deserialization Helpers
+        #region シリアライゼーション/デシリアライゼーション補助メソッド
 
         static IResource SerializeToJson<T>(string baseFileName, T instance)
         {
@@ -1273,7 +1213,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 serializer.Serialize(stream, instance);
             }
 
-            Console.WriteLine("Serialized: " + Path.GetFileName(resource.AbsoluteUri));
+            Console.WriteLine("シリアライズ: " + Path.GetFileName(resource.AbsoluteUri));
             return resource;
         }
 
@@ -1290,7 +1230,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 serializer.Serialize(stream, instance);
             }
 
-            Console.WriteLine("Serialized: " + Path.GetFileName(resource.AbsoluteUri));
+            Console.WriteLine("シリアライズ: " + Path.GetFileName(resource.AbsoluteUri));
             return resource;
         }
 
@@ -1304,7 +1244,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 result = (T) serializer.Deserialize(stream, null);
             }
-            Console.WriteLine("Deserialized: " + Path.GetFileName(resource.AbsoluteUri));
+            Console.WriteLine("デシリアライズ: " + Path.GetFileName(resource.AbsoluteUri));
             return result;
         }
 
@@ -1317,13 +1257,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 result = (T) serializer.Deserialize(stream, null);
             }
-            Console.WriteLine("Deserialized: " + Path.GetFileName(resource.AbsoluteUri));
+            Console.WriteLine("デシリアライズ: " + Path.GetFileName(resource.AbsoluteUri));
             return result;
         }
 
         #endregion
 
-        #region Utilities
+        #region 立方体メッシュ生成補助メソッド
 
         static MeshDefinition CreateCubeMeshDefinition()
         {
