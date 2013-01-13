@@ -797,9 +797,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region バイオーム カタログ
+            #region バイオーム カタログ定義
 
-            Console.WriteLine("バイオーム カタログ");
+            Console.WriteLine("バイオーム カタログ定義");
             {
                 var biomeCatalog = new BiomeCatalogDefinition
                 {
@@ -821,9 +821,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region 単一バイオーム マネージャ
-            
-            Console.WriteLine("単一バイオーム コンポーネント");
+            #region 単一バイオーム マネージャ コンポーネント
+
+            Console.WriteLine("単一バイオーム マネージャ コンポーネント");
             {
                 var biomeManager = new SingleBiomeManager
                 {
