@@ -118,7 +118,6 @@
     <Compile Include="Diagnostics\Monitor.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
-    <Compile Include="Diagnostics\TimeRulerMarkerCollection.cs" />
     <Compile Include="Diagnostics\TimeRulerMonitorListener.cs" />
     <Compile Include="Graphics\BasicCamera.cs" />
     <Compile Include="Graphics\EffectHelper.cs" />
