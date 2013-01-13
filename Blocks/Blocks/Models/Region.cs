@@ -14,7 +14,7 @@ using Willcraftia.Xna.Framework.IO;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class Region : IAsset
+    public sealed class Region : IAsset, IDisposable
     {
         ChunkManager chunkManager;
 
@@ -65,7 +65,9 @@ namespace Willcraftia.Xna.Blocks.Models
             GraphicsDevice = sceneManager.GraphicsDevice;
             SceneSettings = sceneSettings;
             AssetManager = assetManager;
-            ChunkEffect = chunkEffect;
+
+            // リージョン毎にタイル カタログが異なるため、エフェクトを複製して利用。
+            ChunkEffect = new ChunkEffect(chunkEffect);
 
             // タイル カタログのテクスチャをチャンク エフェクトへ設定。
             chunkEffect.TileMap = TileCatalog.TileMap;
@@ -119,6 +121,35 @@ namespace Willcraftia.Xna.Blocks.Models
         public override string ToString()
         {
             return "[Uri:" + ((Resource != null) ? Resource.AbsoluteUri : string.Empty) + "]";
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~Region()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                ChunkEffect.Dispose();
+            }
+
+            disposed = true;
         }
 
         #endregion
