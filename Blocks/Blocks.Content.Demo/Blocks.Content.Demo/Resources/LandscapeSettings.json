@@ -5,9 +5,9 @@
   "ClusterExtent": 8,
   "InitialActivePartitionCapacity": 5000,
   "InitialActiveClusterCapacity": 50,
-  "InitialActivationCapacity": 20,
+  "InitialActivationCapacity": 10,
   "InitialPassivationCapacity": 1000,
-  "ActivationTaskQueueSlotCount": 20,
+  "ActivationTaskQueueSlotCount": 10,
   "PassivationTaskQueueSlotCount": 20,
   "ActivationSearchCapacity": 100,
   "PassivationSearchCapacity": 200
