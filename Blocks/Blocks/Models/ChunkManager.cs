@@ -77,7 +77,6 @@ namespace Willcraftia.Xna.Blocks.Models
             get { lock (activeChunks) return activeChunks.Count; }
         }
 
-        // TODO: 値を設定
         public int ChunkMeshCount { get; private set; }
 
         public int TotalInterChunkCount
