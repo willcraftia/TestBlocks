@@ -483,7 +483,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // 低地生成ノイズ
+                // 低地形状
                 //
 
                 var lowlandPerlin = new Perlin
@@ -491,12 +491,16 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Lowland Perlin",
                     Seed = 100
                 };
+                builder.Add("LowlandPerlin", lowlandPerlin);
+
                 var lowlandFractal = new Billow
                 {
                     Name = "Lowland Fractal",
                     OctaveCount = 2,
                     Source = lowlandPerlin
                 };
+                builder.Add("LowlandFractal", lowlandFractal);
+
                 var lowlandScaleBias = new ScaleBias
                 {
                     Name = "Lowland ScaleBias",
@@ -504,21 +508,21 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bias = -0.75f,
                     Source = lowlandFractal
                 };
-                // Y スケール 0 はハイトマップ化を意味する。
+                builder.Add("LowlandScaleBias", lowlandScaleBias);
+
+                // Y のスケールを 0 にすることとは、Y に 0 を指定することと同じ。
+                // つまり、出力をハイトマップ上の高さとして扱うということ。
                 var lowlandShape = new ScalePoint
                 {
                     Name = "Lowland Shape",
                     ScaleY = 0,
                     Source = lowlandScaleBias
                 };
-                builder.Add("LowlandPerlin", lowlandPerlin);
-                builder.Add("LowlandFractal", lowlandFractal);
-                builder.Add("LowlandScaleBias", lowlandScaleBias);
                 builder.Add("LowlandShape", lowlandShape);
 
                 //------------------------------------------------------------
                 //
-                // 高地生成ノイズ
+                // 高地形状
                 //
 
                 var highlandPerlin = new Perlin
@@ -526,6 +530,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Highland Perlin",
                     Seed = 200
                 };
+                builder.Add("HighlandPerlin", highlandPerlin);
+
                 var highlandFractal = new SumFractal
                 {
                     Name = "Highland Fractal",
@@ -533,20 +539,19 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Frequency = 2,
                     Source = highlandPerlin
                 };
-                // Y スケール 0 はハイトマップ化を意味する。
+                builder.Add("HighlandFractal", highlandFractal);
+
                 var highlandShape = new ScalePoint
                 {
                     Name = "Highland Shape",
                     ScaleY = 0,
                     Source = highlandFractal
                 };
-                builder.Add("HighlandPerlin", highlandPerlin);
-                builder.Add("HighlandFractal", highlandFractal);
                 builder.Add("HighlandShape", highlandShape);
 
                 //------------------------------------------------------------
                 //
-                // 山地生成ノイズ
+                // 山地形状
                 //
                 
                 var mountainPerlin = new Perlin
@@ -554,12 +559,16 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Mountain Perlin",
                     Seed = 300
                 };
+                builder.Add("MountainPerlin", mountainPerlin);
+
                 var mountainFractal = new RidgedMultifractal
                 {
                     Name = "Mountain Fractal",
                     OctaveCount = 2,
                     Source = mountainPerlin
                 };
+                builder.Add("MountainFractal", mountainFractal);
+
                 var mountainScaleBias = new ScaleBias
                 {
                     Name = "Mountain ScaleBias",
@@ -567,21 +576,19 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bias = 0.25f,
                     Source = mountainFractal
                 };
-                // Y スケール 0 はハイトマップ化を意味する。
+                builder.Add("MountainScaleBias", mountainScaleBias);
+
                 var mountainShape = new ScalePoint
                 {
                     Name = "Mountain Shape",
                     ScaleY = 0,
                     Source = mountainScaleBias
                 };
-                builder.Add("MountainPerlin", mountainPerlin);
-                builder.Add("MountainFractal", mountainFractal);
-                builder.Add("MountainScaleBias", mountainScaleBias);
                 builder.Add("MountainShape", mountainShape);
 
                 //------------------------------------------------------------
                 //
-                // 地形選択ノイズ
+                // 地形形状
                 //
 
                 var terrainTypePerlin = new Perlin
@@ -589,6 +596,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Terrain Type Perlin",
                     Seed = 400
                 };
+                builder.Add("TerrainTypePerlin", terrainTypePerlin);
+
                 var terrainTypeFractal = new SumFractal
                 {
                     Name = "Terrain Type Fractal",
@@ -596,27 +605,27 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Lacunarity = 0.2f,
                     Source = terrainTypePerlin
                 };
-                // Y スケール 0 はハイトマップ化を意味する。
+                builder.Add("TerrainTypeFractal", terrainTypeFractal);
+
                 var terrainTypeScalePoint = new ScalePoint
                 {
                     Name = "Terrain Type ScalePoint",
                     ScaleY = 0,
                     Source = terrainTypeFractal
                 };
+                builder.Add("TerrainTypeScalePoint", terrainTypeScalePoint);
+
                 // 地形選択ノイズは同時に複数のモジュールから参照されるためキャッシュ。
                 var terrainType = new Cache
                 {
                     Name = "Terrain Type Cache",
                     Source = terrainTypeScalePoint
                 };
-                builder.Add("TerrainTypePerlin", terrainTypePerlin);
-                builder.Add("TerrainTypeFractal", terrainTypeFractal);
-                builder.Add("TerrainTypeScalePoint", terrainTypeScalePoint);
                 builder.Add("TerrainType", terrainType);
 
                 //------------------------------------------------------------
                 //
-                // 高地山地選択
+                // 高地山地ブレンド
                 //
 
                 var highlandMountainSelect = new Select
@@ -633,7 +642,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
                 //------------------------------------------------------------
                 //
-                // 最終地形
+                // 最終地形ブレンド
                 //
 
                 var terrainSelect = new Select
@@ -658,6 +667,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Terrain Density Test",
                     Source = terrainSelect
                 };
+                builder.Add("TerrainDensityTest", terrainDensityTest);
+
                 // プロシージャはブロック空間座標で XYZ を指定するため、
                 // これらをノイズ空間のスケールへ変更。
                 //
@@ -680,6 +691,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ScaleZ = 1 / 16f,
                     Source = terrainDensityTest
                 };
+                builder.Add("TerrainScale", terrainScale);
+
                 // 地形の起伏が現れる Y の位置へブロック空間座標を移動。
                 // フラクタル ノイズには [-1, 1] を越える値を返すものもあるため、
                 // 期待する Y の位置よりも少し下へ移動させるよう補正した方が良い。
@@ -694,8 +707,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     DisplaceZ = constZero,
                     Source = terrainScale
                 };
-                builder.Add("TerrainDensityTest", terrainDensityTest);
-                builder.Add("TerrainScale", terrainScale);
                 builder.Add("Target", terrainDensity);
 
                 ComponentBundleDefinition biomeBundle;
