@@ -451,7 +451,7 @@
     },
     {
       "Name": "TerrainDensityTest",
-      "Type": "TerrainDensity",
+      "Type": "TerrainDensityTest",
       "Properties": [
         {
           "Name": "Name",

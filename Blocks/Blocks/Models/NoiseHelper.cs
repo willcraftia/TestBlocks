@@ -52,7 +52,7 @@ namespace Willcraftia.Xna.Blocks.Models
             typeRegistory.SetTypeDefinitionName(typeof(Select));
 
             // Custom controllers.
-            typeRegistory.SetTypeDefinitionName(typeof(TerrainDensity));
+            typeRegistory.SetTypeDefinitionName(typeof(TerrainDensityTest));
         }
     }
 }

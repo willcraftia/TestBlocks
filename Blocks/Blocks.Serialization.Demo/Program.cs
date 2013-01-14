@@ -653,7 +653,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // 密度化
                 //
 
-                var terrainDensityTest = new TerrainDensity
+                var terrainDensityTest = new TerrainDensityTest
                 {
                     Name = "Terrain Density Test",
                     Source = terrainSelect

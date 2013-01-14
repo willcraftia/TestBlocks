@@ -7,7 +7,7 @@ using Willcraftia.Xna.Framework.Noise;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class TerrainDensity : INoiseSource
+    public sealed class TerrainDensityTest : INoiseSource
     {
         INoiseSource source;
 

@@ -157,7 +157,7 @@
 				<Property Name="UpperBound" Value="1000" />
 			</Properties>
 		</Component>
-		<Component Name="TerrainDensityTest" Type="TerrainDensity">
+		<Component Name="TerrainDensityTest" Type="TerrainDensityTest">
 			<Properties>
 				<Property Name="Name" Value="Terrain Density Test" />
 				<Property Name="Source" Value="TerrainSelect" />
