@@ -6,6 +6,20 @@
       "Properties": null
     },
     {
+      "Name": "ConstZero",
+      "Type": "Const",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Const Zero"
+        },
+        {
+          "Name": "Value",
+          "Value": "0"
+        }
+      ]
+    },
+    {
       "Name": "LowlandPerlin",
       "Type": "Perlin",
       "Properties": [
@@ -436,16 +450,30 @@
       ]
     },
     {
-      "Name": "TerrainScalePoint",
-      "Type": "ScalePoint",
+      "Name": "TerrainDensityTest",
+      "Type": "TerrainDensity",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Terrain ScalePoint"
+          "Value": "Terrain Density Test"
         },
         {
           "Name": "Source",
           "Value": "TerrainSelect"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainScale",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Scale"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainDensityTest"
         },
         {
           "Name": "ScaleX",
@@ -453,7 +481,7 @@
         },
         {
           "Name": "ScaleY",
-          "Value": "1"
+          "Value": "0.0625"
         },
         {
           "Name": "ScaleZ",
@@ -462,38 +490,42 @@
       ]
     },
     {
-      "Name": "TerrainShape",
-      "Type": "ScaleBias",
+      "Name": "Target",
+      "Type": "Displace",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Terrain Shape"
+          "Value": "Terrain Offset"
         },
         {
           "Name": "Source",
-          "Value": "TerrainScalePoint"
+          "Value": "TerrainScale"
         },
         {
-          "Name": "Bias",
-          "Value": "232"
+          "Name": "DisplaceX",
+          "Value": "ConstZero"
         },
         {
-          "Name": "Scale",
-          "Value": "16"
+          "Name": "DisplaceY",
+          "Value": "Target_DisplaceY"
+        },
+        {
+          "Name": "DisplaceZ",
+          "Value": "ConstZero"
         }
       ]
     },
     {
-      "Name": "Target",
-      "Type": "TerrainDensity",
+      "Name": "Target_DisplaceY",
+      "Type": "Const",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Terrain Density"
+          "Value": null
         },
         {
-          "Name": "Source",
-          "Value": "TerrainShape"
+          "Name": "Value",
+          "Value": "-232"
         }
       ]
     }

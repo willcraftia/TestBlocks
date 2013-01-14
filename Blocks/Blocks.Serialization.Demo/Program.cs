@@ -460,29 +460,43 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
                 var builder = new ComponentBundleBuilder(componentInfoManager);
 
+                //------------------------------------------------------------
+                //
+                // フェード曲線
+                //
+
                 // デフォルトでは Perlin.FadeCurve は静的フィールドで共有状態なので、
                 // ここで一つだけビルダへ登録しておく。
                 builder.Add("DefaultFadeCurve", Perlin.DefaultFadeCurve);
 
                 //------------------------------------------------------------
                 //
+                // 定数
+                //
+
+                var constZero = new Const
+                {
+                    Name = "Const Zero",
+                    Value = 0
+                };
+                builder.Add("ConstZero", constZero);
+
+                //------------------------------------------------------------
+                //
                 // 低地生成ノイズ
                 //
 
-                // lowlandPerlin
                 var lowlandPerlin = new Perlin
                 {
                     Name = "Lowland Perlin",
                     Seed = 100
                 };
-                // lowlandFractal
                 var lowlandFractal = new Billow
                 {
                     Name = "Lowland Fractal",
                     OctaveCount = 2,
                     Source = lowlandPerlin
                 };
-                // lowlandScaleBias
                 var lowlandScaleBias = new ScaleBias
                 {
                     Name = "Lowland ScaleBias",
@@ -490,7 +504,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bias = -0.75f,
                     Source = lowlandFractal
                 };
-                // lowlandShape
                 // Y スケール 0 はハイトマップ化を意味する。
                 var lowlandShape = new ScalePoint
                 {
@@ -508,13 +521,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // 高地生成ノイズ
                 //
 
-                // highlandPerlin
                 var highlandPerlin = new Perlin
                 {
                     Name = "Highland Perlin",
                     Seed = 200
                 };
-                // highlandFractal
                 var highlandFractal = new SumFractal
                 {
                     Name = "Highland Fractal",
@@ -522,7 +533,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Frequency = 2,
                     Source = highlandPerlin
                 };
-                // highlandShape
                 // Y スケール 0 はハイトマップ化を意味する。
                 var highlandShape = new ScalePoint
                 {
@@ -539,20 +549,17 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // 山地生成ノイズ
                 //
                 
-                // mountainPerlin
                 var mountainPerlin = new Perlin
                 {
                     Name = "Mountain Perlin",
                     Seed = 300
                 };
-                // mountainFractal
                 var mountainFractal = new RidgedMultifractal
                 {
                     Name = "Mountain Fractal",
                     OctaveCount = 2,
                     Source = mountainPerlin
                 };
-                // mountainScaleBias
                 var mountainScaleBias = new ScaleBias
                 {
                     Name = "Mountain ScaleBias",
@@ -560,7 +567,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bias = 0.25f,
                     Source = mountainFractal
                 };
-                // mountainShape
                 // Y スケール 0 はハイトマップ化を意味する。
                 var mountainShape = new ScalePoint
                 {
@@ -578,13 +584,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // 地形選択ノイズ
                 //
 
-                // terrainTypePerlin
                 var terrainTypePerlin = new Perlin
                 {
                     Name = "Terrain Type Perlin",
                     Seed = 400
                 };
-                // terrainTypeFractal
                 var terrainTypeFractal = new SumFractal
                 {
                     Name = "Terrain Type Fractal",
@@ -592,7 +596,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Lacunarity = 0.2f,
                     Source = terrainTypePerlin
                 };
-                // terrainTypeScalePoint
                 // Y スケール 0 はハイトマップ化を意味する。
                 var terrainTypeScalePoint = new ScalePoint
                 {
@@ -600,7 +603,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ScaleY = 0,
                     Source = terrainTypeFractal
                 };
-                // terrainType
                 // 地形選択ノイズは同時に複数のモジュールから参照されるためキャッシュ。
                 var terrainType = new Cache
                 {
@@ -617,7 +619,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // 高地山地選択
                 //
 
-                // highlandMountainSelect
                 var highlandMountainSelect = new Select
                 {
                     Name = "Highland or Mountain Select",
@@ -635,7 +636,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 // 最終地形
                 //
 
-                // terrainSelect
                 var terrainSelect = new Select
                 {
                     Name = "Terrain Select",
@@ -646,45 +646,56 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Controller = terrainType,
                     EdgeFalloff = 0.8f
                 };
-                // terrainScalePoint
-                // XZ をブロック空間のスケールへ変更。
-                // 幅スケールは 16 から 32 辺りが妥当。
-                // 小さすぎると微細な高低差が増えすぎる（期待するよりも平地が少なくなりすぎる）。
-                // 大きすぎると高低差が少なくなり過ぎる（期待するよりも平地が多くなりすぎる）。
-                var terrainScalePoint = new ScalePoint
-                {
-                    Name = "Terrain ScalePoint",
-                    ScaleX = 1 / 16f,
-                    ScaleZ = 1 / 16f,
-                    Source = terrainSelect
-                };
-                // terrainShape
-                // Y をブロック空間の高さスケールとオフセットへ変更。
-                // 高さスケールは 16 以下が妥当。これ以上は高低差が激しくなり過ぎる。
-                // バイアスとして少しだけ余分に補正が必要（ノイズのフラクタルには [-1,1] に従わないものもあるため）。
-                // 最終的に、terrainShape はブロック空間でのハイトマップを表す。
-                var terrainShape = new ScaleBias
-                {
-                    Name = "Terrain Shape",
-                    Scale = 16,
-                    Bias = 256 - 16 - 8,
-                    Source = terrainScalePoint
-                };
                 builder.Add("TerrainSelect", terrainSelect);
-                builder.Add("TerrainScalePoint", terrainScalePoint);
-                builder.Add("TerrainShape", terrainShape);
 
                 //------------------------------------------------------------
                 //
                 // 密度化
                 //
 
-                // terrainDensity
-                var terrainDensity = new TerrainDensity
+                var terrainDensityTest = new TerrainDensity
                 {
-                    Name = "Terrain Density",
-                    Source = terrainShape
+                    Name = "Terrain Density Test",
+                    Source = terrainSelect
                 };
+                // プロシージャはブロック空間座標で XYZ を指定するため、
+                // これらをノイズ空間のスケールへ変更。
+                //
+                // 16 という数値は、チャンク サイズに一致しているものの、
+                // チャンク サイズに一致させるべきものではなく、
+                // 期待する結果へノイズをスケーリングできれば何でも良い。
+                // ただし、ブロック空間座標は int、ノイズ空間は float であるため、
+                // 連続性のあるノイズを抽出するには 1 未満の float のスケールとする必要がある。
+                //
+                // XZ スケールは 16 から 32 辺りが妥当。
+                //      小さすぎると微細な高低差が増えすぎる傾向。
+                //      大きすぎると高低差が少なくなり過ぎる傾向。
+                // Y スケールは 16 以下が妥当。
+                //      16 以上は高低差が激しくなり過ぎる傾向。
+                var terrainScale = new ScalePoint
+                {
+                    Name = "Terrain Scale",
+                    ScaleX = 1 / 16f,
+                    ScaleY = 1 / 16f,
+                    ScaleZ = 1 / 16f,
+                    Source = terrainDensityTest
+                };
+                // 地形の起伏が現れる Y の位置へブロック空間座標を移動。
+                // フラクタル ノイズには [-1, 1] を越える値を返すものもあるため、
+                // 期待する Y の位置よりも少し下へ移動させるよう補正した方が良い。
+                var terrainDensity = new Displace
+                {
+                    Name = "Terrain Offset",
+                    DisplaceX = constZero,
+                    DisplaceY = new Const
+                    {
+                        Value = -(256 - 16 - 8)
+                    },
+                    DisplaceZ = constZero,
+                    Source = terrainScale
+                };
+                builder.Add("TerrainDensityTest", terrainDensityTest);
+                builder.Add("TerrainScale", terrainScale);
                 builder.Add("Target", terrainDensity);
 
                 ComponentBundleDefinition biomeBundle;

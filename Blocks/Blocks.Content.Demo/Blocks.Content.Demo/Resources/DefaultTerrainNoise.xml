@@ -1,6 +1,12 @@
 ﻿<Bundle>
 	<Components>
 		<Component Name="DefaultFadeCurve" Type="SCurve3" />
+		<Component Name="ConstZero" Type="Const">
+			<Properties>
+				<Property Name="Name" Value="Const Zero" />
+				<Property Name="Value" Value="0" />
+			</Properties>
+		</Component>
 		<Component Name="LowlandPerlin" Type="Perlin">
 			<Properties>
 				<Property Name="Name" Value="Lowland Perlin" />
@@ -151,27 +157,34 @@
 				<Property Name="UpperBound" Value="1000" />
 			</Properties>
 		</Component>
-		<Component Name="TerrainScalePoint" Type="ScalePoint">
+		<Component Name="TerrainDensityTest" Type="TerrainDensity">
 			<Properties>
-				<Property Name="Name" Value="Terrain ScalePoint" />
+				<Property Name="Name" Value="Terrain Density Test" />
 				<Property Name="Source" Value="TerrainSelect" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainScale" Type="ScalePoint">
+			<Properties>
+				<Property Name="Name" Value="Terrain Scale" />
+				<Property Name="Source" Value="TerrainDensityTest" />
 				<Property Name="ScaleX" Value="0.0625" />
-				<Property Name="ScaleY" Value="1" />
+				<Property Name="ScaleY" Value="0.0625" />
 				<Property Name="ScaleZ" Value="0.0625" />
 			</Properties>
 		</Component>
-		<Component Name="TerrainShape" Type="ScaleBias">
+		<Component Name="Target" Type="Displace">
 			<Properties>
-				<Property Name="Name" Value="Terrain Shape" />
-				<Property Name="Source" Value="TerrainScalePoint" />
-				<Property Name="Bias" Value="232" />
-				<Property Name="Scale" Value="16" />
+				<Property Name="Name" Value="Terrain Offset" />
+				<Property Name="Source" Value="TerrainScale" />
+				<Property Name="DisplaceX" Value="ConstZero" />
+				<Property Name="DisplaceY" Value="Target_DisplaceY" />
+				<Property Name="DisplaceZ" Value="ConstZero" />
 			</Properties>
 		</Component>
-		<Component Name="Target" Type="TerrainDensity">
+		<Component Name="Target_DisplaceY" Type="Const">
 			<Properties>
-				<Property Name="Name" Value="Terrain Density" />
-				<Property Name="Source" Value="TerrainShape" />
+				<Property Name="Name" />
+				<Property Name="Value" Value="-232" />
 			</Properties>
 		</Component>
 	</Components>
