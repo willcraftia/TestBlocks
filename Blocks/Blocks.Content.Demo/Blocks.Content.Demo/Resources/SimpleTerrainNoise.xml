@@ -1,0 +1,173 @@
+﻿<Bundle>
+	<Components>
+		<Component Name="DefaultFadeCurve" Type="SCurve3" />
+		<Component Name="ConstZero" Type="Const">
+			<Properties>
+				<Property Name="Name" Value="Const Zero" />
+				<Property Name="Value" Value="0" />
+			</Properties>
+		</Component>
+		<Component Name="ConstOne" Type="Const">
+			<Properties>
+				<Property Name="Name" Value="Const One" />
+				<Property Name="Value" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainPerlin" Type="Perlin">
+			<Properties>
+				<Property Name="Name" Value="Terrain Perlin" />
+				<Property Name="Seed" Value="100" />
+				<Property Name="FadeCurve" Value="DefaultFadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainFractal" Type="Billow">
+			<Properties>
+				<Property Name="Name" Value="Terrain Fractal" />
+				<Property Name="Source" Value="TerrainPerlin" />
+				<Property Name="Frequency" Value="1" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="Persistence" Value="0.5" />
+				<Property Name="OctaveCount" Value="2" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainScaleBias" Type="ScaleBias">
+			<Properties>
+				<Property Name="Name" Value="Terrain ScaleBias" />
+				<Property Name="Source" Value="TerrainFractal" />
+				<Property Name="Bias" Value="-0.45" />
+				<Property Name="Scale" Value="0.125" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainShape" Type="ScalePoint">
+			<Properties>
+				<Property Name="Name" Value="Terrain Shape" />
+				<Property Name="Source" Value="TerrainScaleBias" />
+				<Property Name="ScaleX" Value="1" />
+				<Property Name="ScaleY" Value="0" />
+				<Property Name="ScaleZ" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainShapeCache" Type="Cache">
+			<Properties>
+				<Property Name="Name" Value="Terrain Shape Cache" />
+				<Property Name="Source" Value="TerrainShape" />
+			</Properties>
+		</Component>
+		<Component Name="TerrainDensity" Type="TerrainDensityTest">
+			<Properties>
+				<Property Name="Name" Value="Terrain Density" />
+				<Property Name="Source" Value="TerrainShapeCache" />
+			</Properties>
+		</Component>
+		<Component Name="CavePerlin" Type="Perlin">
+			<Properties>
+				<Property Name="Name" Value="Cave Perlin" />
+				<Property Name="Seed" Value="500" />
+				<Property Name="FadeCurve" Value="DefaultFadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="CaveShape" Type="RidgedMultifractal">
+			<Properties>
+				<Property Name="Offset" Value="1" />
+				<Property Name="Gain" Value="2" />
+				<Property Name="Name" Value="Cave Shape" />
+				<Property Name="Source" Value="CavePerlin" />
+				<Property Name="Hurst" Value="1" />
+				<Property Name="Frequency" Value="4" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="CaveAttenuateBias" Type="ScaleBias">
+			<Properties>
+				<Property Name="Name" Value="Cave Attenuate ScaleBias" />
+				<Property Name="Source" Value="TerrainShapeCache" />
+				<Property Name="Bias" Value="0.45" />
+				<Property Name="Scale" Value="1" />
+			</Properties>
+		</Component>
+		<Component Name="CaveShapeAttenuate" Type="Multiply">
+			<Properties>
+				<Property Name="Name" Value="Cave Shape Attenuate" />
+				<Property Name="Source0" Value="CaveShape" />
+				<Property Name="Source1" Value="CaveAttenuateBias" />
+			</Properties>
+		</Component>
+		<Component Name="CavePerturbPerlin" Type="Perlin">
+			<Properties>
+				<Property Name="Name" Value="Cave Perturb Perlin" />
+				<Property Name="Seed" Value="600" />
+				<Property Name="FadeCurve" Value="DefaultFadeCurve" />
+			</Properties>
+		</Component>
+		<Component Name="CavePerturnFractal" Type="SumFractal">
+			<Properties>
+				<Property Name="Name" Value="Cave Perturb Fractal" />
+				<Property Name="Source" Value="CavePerturbPerlin" />
+				<Property Name="Hurst" Value="0.9" />
+				<Property Name="Frequency" Value="3" />
+				<Property Name="Lacunarity" Value="2" />
+				<Property Name="OctaveCount" Value="6" />
+			</Properties>
+		</Component>
+		<Component Name="CavePerturbScaleBias" Type="ScaleBias">
+			<Properties>
+				<Property Name="Name" Value="Cave Perturb ScaleBias" />
+				<Property Name="Source" Value="CavePerturnFractal" />
+				<Property Name="Bias" Value="0" />
+				<Property Name="Scale" Value="0.5" />
+			</Properties>
+		</Component>
+		<Component Name="CavePerturb" Type="Displace">
+			<Properties>
+				<Property Name="Name" Value="Cave Perturb" />
+				<Property Name="Source" Value="CaveShapeAttenuate" />
+				<Property Name="DisplaceX" Value="CavePerturbScaleBias" />
+				<Property Name="DisplaceY" Value="ConstZero" />
+				<Property Name="DisplaceZ" Value="ConstZero" />
+			</Properties>
+		</Component>
+		<Component Name="CaveDensity" Type="Select">
+			<Properties>
+				<Property Name="Name" Value="Cave Density" />
+				<Property Name="Controller" Value="CavePerturb" />
+				<Property Name="LowerSource" Value="ConstOne" />
+				<Property Name="UpperSource" Value="ConstZero" />
+				<Property Name="EdgeFalloff" Value="0" />
+				<Property Name="LowerBound" Value="0.2" />
+				<Property Name="UpperBound" Value="1000" />
+			</Properties>
+		</Component>
+		<Component Name="FinalDensity" Type="Multiply">
+			<Properties>
+				<Property Name="Name" Value="Final Density" />
+				<Property Name="Source0" Value="TerrainDensity" />
+				<Property Name="Source1" Value="CaveDensity" />
+			</Properties>
+		</Component>
+		<Component Name="FinalScale" Type="ScalePoint">
+			<Properties>
+				<Property Name="Name" Value="Final Scale" />
+				<Property Name="Source" Value="FinalDensity" />
+				<Property Name="ScaleX" Value="0.015625" />
+				<Property Name="ScaleY" Value="0.0078125" />
+				<Property Name="ScaleZ" Value="0.015625" />
+			</Properties>
+		</Component>
+		<Component Name="Target" Type="Displace">
+			<Properties>
+				<Property Name="Name" Value="Terrain Offset" />
+				<Property Name="Source" Value="FinalScale" />
+				<Property Name="DisplaceX" Value="ConstZero" />
+				<Property Name="DisplaceY" Value="Target_DisplaceY" />
+				<Property Name="DisplaceZ" Value="ConstZero" />
+			</Properties>
+		</Component>
+		<Component Name="Target_DisplaceY" Type="Const">
+			<Properties>
+				<Property Name="Name" />
+				<Property Name="Value" Value="-256" />
+			</Properties>
+		</Component>
+	</Components>
+</Bundle>

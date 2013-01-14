@@ -95,6 +95,7 @@
     <Content Include="Resources\DefaultRainParticle.png" />
     <Content Include="Resources\DefaultRainParticle.xml" />
     <Content Include="Resources\DefaultSkySphere.xml" />
+    <Content Include="Resources\SimpleTerrainNoise.xml" />
     <None Include="Resources\DefaultSnowParticle.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -137,6 +138,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\SceneSettings.json" />
+    <None Include="Resources\SimpleTerrainNoise.json" />
     <None Include="Resources\SnowBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

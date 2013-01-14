@@ -828,11 +828,257 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 };
                 builder.Add("Target", target);
 
-                ComponentBundleDefinition biomeBundle;
-                builder.BuildDefinition(out biomeBundle);
+                ComponentBundleDefinition bundle;
+                builder.BuildDefinition(out bundle);
 
-                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultTerrainNoise", biomeBundle);
-                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultTerrainNoise", biomeBundle);
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("DefaultTerrainNoise", bundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("DefaultTerrainNoise", bundle);
+                var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
+            }
+            Console.WriteLine();
+
+            #endregion
+
+            #region 地形ノイズ コンポーネント (シンプル版)
+
+            Console.WriteLine("地形ノイズ コンポーネント (シンプル版)");
+            {
+                var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+
+                //------------------------------------------------------------
+                //
+                // フェード曲線
+                //
+
+                // デフォルトでは Perlin.FadeCurve は静的フィールドで共有状態なので、
+                // ここで一つだけビルダへ登録しておく。
+                builder.Add("DefaultFadeCurve", Perlin.DefaultFadeCurve);
+
+                //------------------------------------------------------------
+                //
+                // 定数
+                //
+
+                var constZero = new Const
+                {
+                    Name = "Const Zero",
+                    Value = 0
+                };
+                builder.Add("ConstZero", constZero);
+
+                var constOne = new Const
+                {
+                    Name = "Const One",
+                    Value = 1
+                };
+                builder.Add("ConstOne", constOne);
+
+                //------------------------------------------------------------
+                //
+                // 低地形状
+                //
+
+                var terrainPerlin = new Perlin
+                {
+                    Name = "Terrain Perlin",
+                    Seed = 100
+                };
+                builder.Add("TerrainPerlin", terrainPerlin);
+
+                var terrainFractal = new Billow
+                {
+                    Name = "Terrain Fractal",
+                    OctaveCount = 2,
+                    Source = terrainPerlin
+                };
+                builder.Add("TerrainFractal", terrainFractal);
+
+                var terrainScaleBias = new ScaleBias
+                {
+                    Name = "Terrain ScaleBias",
+                    Scale = 0.125f,
+                    Bias = -0.45f,
+                    Source = terrainFractal
+                };
+                builder.Add("TerrainScaleBias", terrainScaleBias);
+
+                // Y のスケールを 0 にすることとは、Y に 0 を指定することと同じ。
+                // つまり、出力をハイトマップ上の高さとして扱うということ。
+                var terrainShape = new ScalePoint
+                {
+                    Name = "Terrain Shape",
+                    ScaleY = 0,
+                    Source = terrainScaleBias
+                };
+                builder.Add("TerrainShape", terrainShape);
+
+                var terrainShapeCache = new Cache
+                {
+                    Name = "Terrain Shape Cache",
+                    Source = terrainShape
+                };
+                builder.Add("TerrainShapeCache", terrainShapeCache);
+
+                //------------------------------------------------------------
+                //
+                // 地形密度
+                //
+
+                var terrainDensity = new TerrainDensityTest
+                {
+                    Name = "Terrain Density",
+                    Source = terrainShapeCache
+                };
+                builder.Add("TerrainDensity", terrainDensity);
+
+                //------------------------------------------------------------
+                //
+                // 洞窟形状
+                //
+
+                var cavePerlin = new Perlin
+                {
+                    Name = "Cave Perlin",
+                    Seed = 500
+                };
+                builder.Add("CavePerlin", cavePerlin);
+
+                var caveShape = new RidgedMultifractal
+                {
+                    Name = "Cave Shape",
+                    OctaveCount = 1,
+                    Frequency = 4,
+                    Source = cavePerlin
+                };
+                builder.Add("CaveShape", caveShape);
+
+                var caveAttenuateBias = new ScaleBias
+                {
+                    Name = "Cave Attenuate ScaleBias",
+                    Bias = 0.45f,
+                    Source = terrainShapeCache
+                };
+                builder.Add("CaveAttenuateBias", caveAttenuateBias);
+
+                var caveShapeAttenuate = new Multiply
+                {
+                    Name = "Cave Shape Attenuate",
+                    Source0 = caveShape,
+                    Source1 = caveAttenuateBias
+                };
+                builder.Add("CaveShapeAttenuate", caveShapeAttenuate);
+
+                var cavePerturbPerlin = new Perlin
+                {
+                    Name = "Cave Perturb Perlin",
+                    Seed = 600
+                };
+                builder.Add("CavePerturbPerlin", cavePerturbPerlin);
+
+                var cavePerturnFractal = new SumFractal
+                {
+                    Name = "Cave Perturb Fractal",
+                    OctaveCount = 6,
+                    Frequency = 3,
+                    Source = cavePerturbPerlin
+                };
+                builder.Add("CavePerturnFractal", cavePerturnFractal);
+
+                var cavePerturbScaleBias = new ScaleBias
+                {
+                    Name = "Cave Perturb ScaleBias",
+                    Scale = 0.5f,
+                    Source = cavePerturnFractal
+                };
+                builder.Add("CavePerturbScaleBias", cavePerturbScaleBias);
+
+                var cavePerturb = new Displace
+                {
+                    Name = "Cave Perturb",
+                    DisplaceX = cavePerturbScaleBias,
+                    DisplaceY = constZero,
+                    DisplaceZ = constZero,
+                    Source = caveShapeAttenuate
+                };
+                builder.Add("CavePerturb", cavePerturb);
+
+                //------------------------------------------------------------
+                //
+                // 洞窟密度
+                //
+
+                var caveDensity = new Select
+                {
+                    Name = "Cave Density",
+                    LowerBound = 0.2f,
+                    LowerSource = constOne,
+                    UpperBound = 1000,
+                    UpperSource = constZero,
+                    Controller = cavePerturb
+                };
+                builder.Add("CaveDensity", caveDensity);
+
+                //------------------------------------------------------------
+                //
+                // 密度ブレンド
+                //
+
+                var finalDensity = new Multiply
+                {
+                    Name = "Final Density",
+                    Source0 = terrainDensity,
+                    Source1 = caveDensity
+                };
+                builder.Add("FinalDensity", finalDensity);
+
+                //------------------------------------------------------------
+                //
+                // ブロック用座標変換
+                //
+
+                // プロシージャはブロック空間座標で XYZ を指定するため、
+                // これらをノイズ空間のスケールへ変更。
+                //
+                // 16 という数値は、チャンク サイズに一致しているものの、
+                // チャンク サイズに一致させるべきものではなく、
+                // 期待する結果へノイズをスケーリングできれば何でも良い。
+                // ただし、ブロック空間座標は int、ノイズ空間は float であるため、
+                // 連続性のあるノイズを抽出するには 1 未満の float のスケールとする必要がある。
+                //
+                // XZ スケールは 64 辺りが妥当。
+                // Y スケールは 64 以上が妥当。
+                //      64 未満は高低差が少なすぎる傾向。
+                var finalScale = new ScalePoint
+                {
+                    Name = "Final Scale",
+                    ScaleX = 1 / 64f,
+                    ScaleY = 1 / 128f,
+                    ScaleZ = 1 / 64f,
+                    Source = finalDensity
+                };
+                builder.Add("FinalScale", finalScale);
+
+                // 地形の起伏が現れる Y の位置へブロック空間座標を移動。
+                var target = new Displace
+                {
+                    Name = "Terrain Offset",
+                    DisplaceX = constZero,
+                    DisplaceY = new Const
+                    {
+                        Value = -256
+                    },
+                    DisplaceZ = constZero,
+                    Source = finalScale
+                };
+                builder.Add("Target", target);
+
+                ComponentBundleDefinition bundle;
+                builder.BuildDefinition(out bundle);
+
+                var jsonResource = SerializeToJson<ComponentBundleDefinition>("SimpleTerrainNoise", bundle);
+                var xmlResource = SerializeToXml<ComponentBundleDefinition>("SimpleTerrainNoise", bundle);
                 var fromJson = DeserializeFromJson<ComponentBundleDefinition>(jsonResource);
                 var fromXml = DeserializeFromXml<ComponentBundleDefinition>(xmlResource);
             }
