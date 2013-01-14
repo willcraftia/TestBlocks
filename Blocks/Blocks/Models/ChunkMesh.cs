@@ -114,6 +114,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 Occluded = (occlusionQuery.PixelCount == 0);
             }
 
+            // 描画ロックを取得できない場合は終了。
+            if (!EnterDraw()) return;
+
             occlusionQuery.Begin();
 
             //----------------------------------------------------------------
@@ -133,11 +136,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
             occlusionQuery.End();
             occlusionQueryActive = true;
+
+            // 描画ロックを解放。
+            ExitDraw();
         }
 
         public override void Draw()
         {
             if (Occluded) return;
+
+            // 描画ロックを取得できない場合は終了。
+            if (!EnterDraw()) return;
 
             //----------------------------------------------------------------
             // エフェクト
@@ -153,11 +162,17 @@ namespace Willcraftia.Xna.Blocks.Models
             // 描画
 
             DrawCore();
+
+            // 描画ロックを解放。
+            ExitDraw();
         }
 
         public override void Draw(Effect effect)
         {
             if (Occluded) return;
+
+            // 描画ロックを取得できない場合は終了。
+            if (!EnterDraw()) return;
 
             var effectMatrices = effect as IEffectMatrices;
             if (effectMatrices != null) effectMatrices.World = world;
@@ -168,27 +183,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 DrawCore();
             }
+
+            // 描画ロックを解放。
+            ExitDraw();
         }
 
         void DrawCore()
         {
-            // チャンクに描画ロックを要求。
-            if (Chunk == null || !Chunk.EnterDraw()) return;
-
-            // 非同期なメッシュ更新により描画不要になっていないかを検査。
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
-            {
-                // 描画をせずに描画ロックを開放して終了。
-                Chunk.ExitDraw();
-                return;
-            }
-
             graphicsDevice.SetVertexBuffer(vertexBuffer);
             graphicsDevice.Indices = indexBuffer;
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
-
-            // 描画ロックを解放。
-            Chunk.ExitDraw();
         }
 
         public void SetVertices(VertexPositionNormalColorTexture[] vertices, int vertexCount)
@@ -223,6 +227,27 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 IndexCount = 0;
             }
+        }
+
+        bool EnterDraw()
+        {
+            if (Chunk == null || !Chunk.EnterDraw()) return false;
+
+            // 非同期なメッシュ更新により描画不要になっていないかを検査。
+            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+            {
+                // 即座に描画ロックを開放して終了。
+                Chunk.ExitDraw();
+                return false;
+            }
+
+            return true;
+        }
+
+        void ExitDraw()
+        {
+            // 描画ロックを解放。
+            Chunk.ExitDraw();
         }
     }
 }
