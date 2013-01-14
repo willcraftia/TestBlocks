@@ -219,6 +219,7 @@
     <Compile Include="Landscape\ClusterManager.cs" />
     <Compile Include="Landscape\DefaultLandscapeVolume.cs" />
     <Compile Include="Landscape\DomeLandscapeVolume.cs" />
+    <Compile Include="Landscape\FlatLandscapeVolume.cs" />
     <Compile Include="Landscape\ILandscapeVolume.cs" />
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
