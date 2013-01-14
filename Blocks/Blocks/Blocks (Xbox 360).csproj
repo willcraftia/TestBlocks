@@ -143,7 +143,6 @@
     <Compile Include="Models\LandscapeSettings.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />
-    <Compile Include="Models\NearbyChunks.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\NullChunkStore.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />

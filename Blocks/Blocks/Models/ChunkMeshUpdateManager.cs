@@ -45,6 +45,55 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        #region CloseChunks
+
+        struct CloseChunks
+        {
+            public Chunk Top;
+
+            public Chunk Bottom;
+
+            public Chunk Front;
+
+            public Chunk Back;
+
+            public Chunk Left;
+
+            public Chunk Right;
+
+            public Chunk this[CubicSide side]
+            {
+                get
+                {
+                    switch (side.Index)
+                    {
+                        case CubicSide.TopIndex: return Top;
+                        case CubicSide.BottomIndex: return Bottom;
+                        case CubicSide.FrontIndex: return Front;
+                        case CubicSide.BackIndex: return Back;
+                        case CubicSide.LeftIndex: return Left;
+                        case CubicSide.RightIndex: return Right;
+                    }
+                    throw new InvalidOperationException();
+                }
+                set
+                {
+                    switch (side.Index)
+                    {
+                        case CubicSide.TopIndex: Top = value; return;
+                        case CubicSide.BottomIndex: Bottom = value; return;
+                        case CubicSide.FrontIndex: Front = value; return;
+                        case CubicSide.BackIndex: Back = value; return;
+                        case CubicSide.LeftIndex: Left = value; return;
+                        case CubicSide.RightIndex: Right = value; return;
+                    }
+                    throw new InvalidOperationException();
+                }
+            }
+        }
+
+        #endregion
+
         // TODO
         public const int TaskQueueSlotCount = 20;
 
@@ -143,14 +192,14 @@ namespace Willcraftia.Xna.Blocks.Models
             var position = chunk.Position;
 
             // この更新で利用する隣接チャンクを探索。
-            NearbyChunks nearbyChunks;
-            chunkManager.GetNearbyActiveChunks(ref position, out nearbyChunks);
+            CloseChunks closeChunks;
+            GetCloseChunks(ref position, out closeChunks);
 
             // この更新で利用する隣接チャンクを記録。
             var flags = CubicSide.Flags.None;
             foreach (var side in CubicSide.Items)
             {
-                if (nearbyChunks[side] != null)
+                if (closeChunks[side] != null)
                     flags |= side.ToFlags();
             }
             chunk.NeighborsReferencedOnUpdate = flags;
@@ -160,10 +209,26 @@ namespace Willcraftia.Xna.Blocks.Models
             for (blockPosition.Z = 0; blockPosition.Z < chunkSize.Z; blockPosition.Z++)
                 for (blockPosition.Y = 0; blockPosition.Y < chunkSize.Y; blockPosition.Y++)
                     for (blockPosition.X = 0; blockPosition.X < chunkSize.X; blockPosition.X++)
-                        UpdateChunk(chunk, ref nearbyChunks, ref blockPosition);
+                        UpdateChunk(chunk, ref closeChunks, ref blockPosition);
         }
 
-        void UpdateChunk(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 blockPosition)
+        void GetCloseChunks(ref VectorI3 position, out CloseChunks closeChunks)
+        {
+            closeChunks = new CloseChunks();
+
+            foreach (var side in CubicSide.Items)
+            {
+                var closePosition = position + side.Direction;
+
+                Chunk chunk;
+                chunkManager.TryGetChunk(ref closePosition, out chunk);
+
+                closeChunks[side] = chunk;
+            }
+        }
+
+        // blockPosition はチャンク内の相対ブロック座標。
+        void UpdateChunk(Chunk chunk, ref CloseChunks closeChunks, ref VectorI3 blockPosition)
         {
             var blockIndex = chunk[blockPosition.X, blockPosition.Y, blockPosition.Z];
 
@@ -182,30 +247,32 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 対象面が存在しない場合はスキップ。
                 if (meshPart == null) continue;
 
-                // 対象面に隣接する Block を探索。
-                var nearbyBlockPosition = blockPosition + side.Direction;
-                var nearbyBlockIndex = GetNearbyBlockIndex(chunk, ref nearbyChunks, ref nearbyBlockPosition, side);
+                // 対象面に隣接するブロックの座標 (現在のチャンク内での相対ブロック座標)
+                var closeBlockPosition = blockPosition + side.Direction;
+
+                // 対象面に隣接するブロックを探索。
+                var closeBlockIndex = GetBlockIndex(chunk, ref closeChunks, ref closeBlockPosition, side);
 
                 // 未定の場合は面なしとする。
                 // デバッグ上は未定の場合に面を描画したいが、
                 // 未定の場合に面を無視することで相当数の頂点を節約できる。
-                if (nearbyBlockIndex == null) continue;
+                if (closeBlockIndex == null) continue;
 
-                if (nearbyBlockIndex != Block.EmptyIndex)
+                if (closeBlockIndex != Block.EmptyIndex)
                 {
-                    // 隣接 Block との関係から対象面の要否を判定。
-                    var nearbyBlock = chunk.Region.BlockCatalog[nearbyBlockIndex.Value];
+                    // 隣接ブロックとの関係から対象面の要否を判定。
+                    var closeBlock = chunk.Region.BlockCatalog[closeBlockIndex.Value];
 
-                    // 半透明な連続した流体 Block を並べる際、流体 Block 間の面は不要。
-                    // ※流体 Block は常に半透明を仮定して処理。
-                    if (nearbyBlock.Fluid && block.Fluid) continue;
+                    // 半透明な連続した流体ブロックを並べる際、流体ブロック間の面は不要。
+                    // ※流体ブロックは常に半透明を仮定して処理。
+                    if (closeBlock.Fluid && block.Fluid) continue;
 
-                    // 対象面が半透明ではないならば、隣接 Block により不可視面となるため不要。
+                    // 対象面が半透明ではないならば、隣接ブロックにより不可視面となるため不要。
                     if (!block.IsTranslucentTile(side)) continue;
                 }
 
                 // 環境光遮蔽を計算。
-                var ambientOcclusion = CalculateAmbientOcclusion(chunk, ref nearbyChunks, ref nearbyBlockPosition, side);
+                var ambientOcclusion = CalculateAmbientOcclusion(chunk, ref closeChunks, ref closeBlockPosition, side);
 
                 // 環境光遮蔽に基づいた頂点色を計算。
                 // 一切の遮蔽が無い場合は Color.White、
@@ -224,9 +291,9 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        float CalculateAmbientOcclusion(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 nearbyBlockPosition, CubicSide side)
+        float CalculateAmbientOcclusion(Chunk chunk, ref CloseChunks closeChunks, ref VectorI3 closeBlockPosition, CubicSide side)
         {
-            const float occlusionPerFace = 0.1f;
+            const float occlusionPerFace = 1 / 5f;
 
             // 1 は一切遮蔽されていない状態を表す。
             float occlustion = 1;
@@ -240,10 +307,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (mySide == s) continue;
 
                 // 遮蔽対象のブロック位置を算出。
-                var occluderBlockPosition = nearbyBlockPosition + s.Direction;
+                var occluderBlockPosition = closeBlockPosition + s.Direction;
 
                 // 遮蔽対象のブロックのインデックスを取得。
-                var occluderBlockIndex = GetNearbyBlockIndex(chunk, ref nearbyChunks, ref occluderBlockPosition, s);
+                var occluderBlockIndex = GetBlockIndex(chunk, ref closeChunks, ref occluderBlockPosition, s);
 
                 // 未定と空の場合は遮蔽無し。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
@@ -251,11 +318,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 // ブロック情報を取得。
                 var occluderBlock = chunk.Region.BlockCatalog[occluderBlockIndex.Value];
 
+                // 対象とする面が存在しない場合は光を遮らないものとする。
+                if (occluderBlock.Mesh.MeshParts[s.Reverse()] == null) continue;
+
                 // 流体ブロックは光を遮らないものとする。
                 if (occluderBlock.Fluid) continue;
 
                 // 遮蔽面が半透明の場合は光を遮らないものとする。
-                if (occluderBlock.IsTranslucentTile(side.Reverse())) continue;
+                if (occluderBlock.IsTranslucentTile(s.Reverse())) continue;
 
                 // 遮蔽度で減算。
                 occlustion -= occlusionPerFace;
@@ -264,31 +334,30 @@ namespace Willcraftia.Xna.Blocks.Models
             return occlustion;
         }
 
-        byte? GetNearbyBlockIndex(Chunk chunk, ref NearbyChunks nearbyChunks, ref VectorI3 nearbyBlockPosition, CubicSide side)
+        byte? GetBlockIndex(Chunk chunk, ref CloseChunks closeChunks, ref VectorI3 blockPosition, CubicSide side)
         {
-            // 対象面に隣接する Block を探索。
-            if (chunk.Contains(ref nearbyBlockPosition))
+            if (chunk.Contains(ref blockPosition))
             {
-                // 隣接 Block が対象 Chunk に含まれている場合。
-                return chunk[nearbyBlockPosition.X, nearbyBlockPosition.Y, nearbyBlockPosition.Z];
+                // ブロックが対象チャンクに含まれている場合。
+                return chunk[blockPosition.X, blockPosition.Y, blockPosition.Z];
             }
             else
             {
-                // 隣接 Block が隣接 Chunk に含まれている場合。
-                var nearbyChunk = nearbyChunks[side];
+                // ブロックが隣接チャンクに含まれている場合。
+                var closeChunk = closeChunks[side];
                 
-                // 隣接 Chunk がないならば未定として null。
-                if (nearbyChunk == null) return null;
+                // 隣接チャンクがないならば未定として null。
+                if (closeChunk == null) return null;
 
-                // 隣接 Chunk での相対座標を算出。
-                var relativeX = nearbyBlockPosition.X % chunkSize.X;
-                var relativeY = nearbyBlockPosition.Y % chunkSize.Y;
-                var relativeZ = nearbyBlockPosition.Z % chunkSize.Z;
+                // 隣接チャンクにおける相対ブロック座標を算出。
+                var relativeX = blockPosition.X % chunkSize.X;
+                var relativeY = blockPosition.Y % chunkSize.Y;
+                var relativeZ = blockPosition.Z % chunkSize.Z;
                 if (relativeX < 0) relativeX += chunkSize.X;
                 if (relativeY < 0) relativeY += chunkSize.Y;
                 if (relativeZ < 0) relativeZ += chunkSize.Z;
 
-                return nearbyChunk[relativeX, relativeY, relativeZ];
+                return closeChunk[relativeX, relativeY, relativeZ];
             }
         }
 

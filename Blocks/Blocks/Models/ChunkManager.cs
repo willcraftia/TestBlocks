@@ -302,20 +302,10 @@ namespace Willcraftia.Xna.Blocks.Models
             closing = true;
         }
 
-        public void GetNearbyActiveChunks(ref VectorI3 position, out NearbyChunks nearbyChunks)
+        public bool TryGetChunk(ref VectorI3 position, out Chunk result)
         {
-            nearbyChunks = new NearbyChunks();
-
-            foreach (var side in CubicSide.Items)
-            {
-                var nearbyPosition = position + side.Direction;
-
-                Chunk nearbyChunk;
-                lock (activeChunks)
-                    activeChunks.TryGetItem(ref nearbyPosition, out nearbyChunk);
-
-                nearbyChunks[side] = nearbyChunk;
-            }
+            lock (activeChunks)
+                return activeChunks.TryGetItem(ref position, out result);
         }
 
         Chunk CreateChunk()

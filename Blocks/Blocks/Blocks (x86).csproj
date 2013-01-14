@@ -102,7 +102,6 @@
     <Compile Include="Models\Image2D.cs" />
     <Compile Include="Models\InterChunk.cs" />
     <Compile Include="Models\InterChunkMesh.cs" />
-    <Compile Include="Models\NearbyChunks.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\NullChunkStore.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
