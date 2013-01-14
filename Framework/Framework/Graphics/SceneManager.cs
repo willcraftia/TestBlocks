@@ -741,6 +741,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void DrawLensFlare()
         {
+            if (activeDirectionalLight == null) return;
+
             GraphicsDevice.SetRenderTarget(renderTarget);
 
             LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
