@@ -373,26 +373,31 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 ChunkMesh = chunkMesh
             };
-            disposingChunkMeshes.Enqueue(disposingChunkMesh);
+
+            lock (disposingChunkMeshes)
+                disposingChunkMeshes.Enqueue(disposingChunkMesh);
 
             ChunkMeshCount--;
         }
 
         void TryDisposeChunkMeshes()
         {
-            var count = disposingChunkMeshes.Count;
-            for (int i = 0; i < count; i++)
+            lock (disposingChunkMeshes)
             {
-                var disposingChunkMesh = disposingChunkMeshes.Dequeue();
-                // 3 フレーム程待機。
-                if (disposingChunkMesh.Age < 3)
+                var count = disposingChunkMeshes.Count;
+                for (int i = 0; i < count; i++)
                 {
-                    disposingChunkMesh.Age++;
-                    disposingChunkMeshes.Enqueue(disposingChunkMesh);
-                }
-                else
-                {
-                    disposingChunkMesh.ChunkMesh.Dispose();
+                    var disposingChunkMesh = disposingChunkMeshes.Dequeue();
+                    // 3 フレーム程待機。
+                    if (disposingChunkMesh.Age < 3)
+                    {
+                        disposingChunkMesh.Age++;
+                        disposingChunkMeshes.Enqueue(disposingChunkMesh);
+                    }
+                    else
+                    {
+                        disposingChunkMesh.ChunkMesh.Dispose();
+                    }
                 }
             }
         }
