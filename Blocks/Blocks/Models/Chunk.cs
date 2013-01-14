@@ -30,8 +30,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Vector3 worldPosition;
 
-        BoundingBox boundingBox;
-
         byte[] blockIndices;
 
         volatile bool active;
@@ -66,25 +64,12 @@ namespace Willcraftia.Xna.Blocks.Models
                 worldPosition.X = position.X * size.X;
                 worldPosition.Y = position.Y * size.Y;
                 worldPosition.Z = position.Z * size.Z;
-
-                boundingBox.Min = worldPosition;
-                boundingBox.Max = new Vector3
-                {
-                    X = worldPosition.X + size.X,
-                    Y = worldPosition.Y + size.Y,
-                    Z = worldPosition.Z + size.Z
-                };
             }
         }
 
         public Vector3 WorldPosition
         {
             get { return worldPosition; }
-        }
-
-        public BoundingBox BoundingBox
-        {
-            get { return boundingBox; }
         }
 
         public byte this[int x, int y, int z]
