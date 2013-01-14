@@ -512,7 +512,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 {
                     Name = "Lowland ScaleBias",
                     Scale = 0.125f,
-                    Bias = -0.75f,
+                    Bias = -0.45f,
                     Source = lowlandFractal
                 };
                 builder.Add("LowlandScaleBias", lowlandScaleBias);
