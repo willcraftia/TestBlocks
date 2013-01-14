@@ -16,17 +16,53 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkMeshUpdateManager
     {
+        #region CloseChunks
+
+        sealed class CloseChunks
+        {
+            Chunk[, ,] chunks = new Chunk[3, 3, 3];
+
+            public Chunk this[int x, int y, int z]
+            {
+                get { return chunks[x + 1, y + 1, z + 1]; }
+                set { chunks[x + 1, y + 1, z + 1] = value; }
+            }
+
+            public Chunk this[CubicSide side]
+            {
+                get
+                {
+                    var direction = side.Direction;
+                    return this[direction.X, direction.Y, direction.Z];
+                }
+                set
+                {
+                    var direction = side.Direction;
+                    this[direction.X, direction.Y, direction.Z] = value;
+                }
+            }
+
+            public void Clear()
+            {
+                Array.Clear(chunks, 0, chunks.Length);
+            }
+        }
+
+        #endregion
+
         #region Task
 
         class Task
         {
             ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-            public Chunk Chunk { get; set; }
+            CloseChunks closeChunks = new CloseChunks();
 
-            public bool Completed { get; set; }
+            public Chunk Chunk;
 
-            public Action ExecuteAction { get; private set; }
+            public bool Completed;
+
+            public Action ExecuteAction;
 
             public Task(ChunkMeshUpdateManager chunkMeshUpdateManager)
             {
@@ -37,58 +73,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             public void Execute()
             {
-                chunkMeshUpdateManager.UpdateChunk(Chunk);
+                chunkMeshUpdateManager.UpdateChunk(Chunk, closeChunks);
+                closeChunks.Clear();
 
                 Completed = true;
-            }
-        }
-
-        #endregion
-
-        #region CloseChunks
-
-        struct CloseChunks
-        {
-            public Chunk Top;
-
-            public Chunk Bottom;
-
-            public Chunk Front;
-
-            public Chunk Back;
-
-            public Chunk Left;
-
-            public Chunk Right;
-
-            public Chunk this[CubicSide side]
-            {
-                get
-                {
-                    switch (side.Index)
-                    {
-                        case CubicSide.TopIndex: return Top;
-                        case CubicSide.BottomIndex: return Bottom;
-                        case CubicSide.FrontIndex: return Front;
-                        case CubicSide.BackIndex: return Back;
-                        case CubicSide.LeftIndex: return Left;
-                        case CubicSide.RightIndex: return Right;
-                    }
-                    throw new InvalidOperationException();
-                }
-                set
-                {
-                    switch (side.Index)
-                    {
-                        case CubicSide.TopIndex: Top = value; return;
-                        case CubicSide.BottomIndex: Bottom = value; return;
-                        case CubicSide.FrontIndex: Front = value; return;
-                        case CubicSide.BackIndex: Back = value; return;
-                        case CubicSide.LeftIndex: Left = value; return;
-                        case CubicSide.RightIndex: Right = value; return;
-                    }
-                    throw new InvalidOperationException();
-                }
             }
         }
 
@@ -183,19 +171,16 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        void UpdateChunk(Chunk chunk)
+        void UpdateChunk(Chunk chunk, CloseChunks closeChunks)
         {
             Debug.Assert(chunk.Active);
             Debug.Assert(chunk.Updating);
             Debug.Assert(chunk.MeshDirty);
 
-            var position = chunk.Position;
+            // この更新で利用する近接チャンク集合を構築。
+            BuildCloseChunks(chunk, closeChunks);
 
-            // この更新で利用する隣接チャンクを探索。
-            CloseChunks closeChunks;
-            GetCloseChunks(ref position, out closeChunks);
-
-            // この更新で利用する隣接チャンクを記録。
+            // 面隣接チャンクをこの更新で利用するものとしてチャンクで記録。
             var flags = CubicSide.Flags.None;
             foreach (var side in CubicSide.Items)
             {
@@ -209,26 +194,50 @@ namespace Willcraftia.Xna.Blocks.Models
             for (blockPosition.Z = 0; blockPosition.Z < chunkSize.Z; blockPosition.Z++)
                 for (blockPosition.Y = 0; blockPosition.Y < chunkSize.Y; blockPosition.Y++)
                     for (blockPosition.X = 0; blockPosition.X < chunkSize.X; blockPosition.X++)
-                        UpdateChunk(chunk, ref closeChunks, ref blockPosition);
+                        UpdateChunk(chunk, closeChunks, ref blockPosition);
         }
 
-        void GetCloseChunks(ref VectorI3 position, out CloseChunks closeChunks)
+        /// <summary>
+        /// 近接チャンク集合を構築します。
+        /// </summary>
+        /// <param name="chunk">中心となるチャンク。</param>
+        /// <param name="closeChunks">近接チャンク集合。</param>
+        void BuildCloseChunks(Chunk chunk, CloseChunks closeChunks)
         {
-            closeChunks = new CloseChunks();
+            var centerPosition = chunk.Position;
 
-            foreach (var side in CubicSide.Items)
+            for (int z = -1; z <= 1; z++)
             {
-                var closePosition = position + side.Direction;
+                for (int y = -1; y <= 1; y++)
+                {
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        // 8 つの隅は不要。
+                        if (x != 0 && y != 0 && z != 0) continue;
 
-                Chunk chunk;
-                chunkManager.TryGetChunk(ref closePosition, out chunk);
+                        // 中心には自身を設定。
+                        if (x == 0 && y == 0 && z == 0)
+                        {
+                            closeChunks[0, 0, 0] = chunk;
+                            continue;
+                        }
 
-                closeChunks[side] = chunk;
+                        var closePosition = centerPosition;
+                        closePosition.X += x;
+                        closePosition.Y += y;
+                        closePosition.Z += z;
+
+                        Chunk closeChunk;
+                        chunkManager.TryGetChunk(ref closePosition, out closeChunk);
+
+                        closeChunks[x, y, z] = closeChunk;
+                    }
+                }
             }
         }
 
         // blockPosition はチャンク内の相対ブロック座標。
-        void UpdateChunk(Chunk chunk, ref CloseChunks closeChunks, ref VectorI3 blockPosition)
+        void UpdateChunk(Chunk chunk, CloseChunks closeChunks, ref VectorI3 blockPosition)
         {
             var blockIndex = chunk[blockPosition.X, blockPosition.Y, blockPosition.Z];
 
@@ -247,20 +256,21 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 対象面が存在しない場合はスキップ。
                 if (meshPart == null) continue;
 
-                // 対象面に隣接するブロックの座標 (現在のチャンク内での相対ブロック座標)
+                // 面隣接ブロックの座標 (現在のチャンク内での相対ブロック座標)
                 var closeBlockPosition = blockPosition + side.Direction;
 
-                // 対象面に隣接するブロックを探索。
-                var closeBlockIndex = GetBlockIndex(chunk, ref closeChunks, ref closeBlockPosition, side);
+                // 面隣接ブロックを探索。
+                var closeBlockIndex = GetBlockIndex(chunk, closeChunks, ref closeBlockPosition, side);
 
                 // 未定の場合は面なしとする。
-                // デバッグ上は未定の場合に面を描画したいが、
-                // 未定の場合に面を無視することで相当数の頂点を節約できる。
+                // 正確な描画には面なしとすべきではないが、
+                // 未定の場合に面を無視することで膨大な数の頂点を節約できる。
+                // このように節約しない場合、メモリ不足へ容易に到達する。
                 if (closeBlockIndex == null) continue;
 
                 if (closeBlockIndex != Block.EmptyIndex)
                 {
-                    // 隣接ブロックとの関係から対象面の要否を判定。
+                    // 面隣接ブロックとの関係から対象面の要否を判定。
                     var closeBlock = chunk.Region.BlockCatalog[closeBlockIndex.Value];
 
                     // 半透明な連続した流体ブロックを並べる際、流体ブロック間の面は不要。
@@ -272,7 +282,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // 環境光遮蔽を計算。
-                var ambientOcclusion = CalculateAmbientOcclusion(chunk, ref closeChunks, ref closeBlockPosition, side);
+                var ambientOcclusion = CalculateAmbientOcclusion(chunk, closeChunks, ref closeBlockPosition, side);
 
                 // 環境光遮蔽に基づいた頂点色を計算。
                 // 一切の遮蔽が無い場合は Color.White、
@@ -291,7 +301,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        float CalculateAmbientOcclusion(Chunk chunk, ref CloseChunks closeChunks, ref VectorI3 closeBlockPosition, CubicSide side)
+        float CalculateAmbientOcclusion(Chunk chunk, CloseChunks closeChunks, ref VectorI3 closeBlockPosition, CubicSide side)
         {
             const float occlusionPerFace = 1 / 5f;
 
@@ -300,7 +310,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var mySide = side.Reverse();
 
-            // 隣接ブロック位置の各方向に隣接ブロックが存在する場合、遮蔽有りと判定。
+            // 面隣接ブロックに対して面隣接ブロックが存在する場合、遮蔽有りと判定。
             foreach (var s in CubicSide.Items)
             {
                 // 自身に対する方向はスキップ。
@@ -310,7 +320,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var occluderBlockPosition = closeBlockPosition + s.Direction;
 
                 // 遮蔽対象のブロックのインデックスを取得。
-                var occluderBlockIndex = GetBlockIndex(chunk, ref closeChunks, ref occluderBlockPosition, s);
+                var occluderBlockIndex = GetBlockIndex(chunk, closeChunks, ref occluderBlockPosition, s);
 
                 // 未定と空の場合は遮蔽無し。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
@@ -318,13 +328,13 @@ namespace Willcraftia.Xna.Blocks.Models
                 // ブロック情報を取得。
                 var occluderBlock = chunk.Region.BlockCatalog[occluderBlockIndex.Value];
 
-                // 対象とする面が存在しない場合は光を遮らないものとする。
+                // 対象とする面が存在しない場合は遮蔽無しとする。
                 if (occluderBlock.Mesh.MeshParts[s.Reverse()] == null) continue;
 
-                // 流体ブロックは光を遮らないものとする。
+                // 流体ブロックは遮蔽無しとする。
                 if (occluderBlock.Fluid) continue;
 
-                // 遮蔽面が半透明の場合は光を遮らないものとする。
+                // 遮蔽面が半透明の場合は遮蔽無しとする。
                 if (occluderBlock.IsTranslucentTile(s.Reverse())) continue;
 
                 // 遮蔽度で減算。
@@ -334,9 +344,13 @@ namespace Willcraftia.Xna.Blocks.Models
             return occlustion;
         }
 
-        byte? GetBlockIndex(Chunk chunk, ref CloseChunks closeChunks, ref VectorI3 blockPosition, CubicSide side)
+        byte? GetBlockIndex(Chunk chunk, CloseChunks closeChunks, ref VectorI3 blockPosition, CubicSide side)
         {
-            if (chunk.Contains(ref blockPosition))
+            var x = (blockPosition.X < 0) ? -1 : (blockPosition.X < chunkSize.X) ? 0 : 1;
+            var y = (blockPosition.Y < 0) ? -1 : (blockPosition.Y < chunkSize.Y) ? 0 : 1;
+            var z = (blockPosition.Z < 0) ? -1 : (blockPosition.Z < chunkSize.Z) ? 0 : 1;
+
+            if (x == 0 && y == 0 && z == 0)
             {
                 // ブロックが対象チャンクに含まれている場合。
                 return chunk[blockPosition.X, blockPosition.Y, blockPosition.Z];
@@ -344,7 +358,7 @@ namespace Willcraftia.Xna.Blocks.Models
             else
             {
                 // ブロックが隣接チャンクに含まれている場合。
-                var closeChunk = closeChunks[side];
+                var closeChunk = closeChunks[x, y, z];
                 
                 // 隣接チャンクがないならば未定として null。
                 if (closeChunk == null) return null;

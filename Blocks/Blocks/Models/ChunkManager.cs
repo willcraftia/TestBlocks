@@ -22,6 +22,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
     public sealed class ChunkManager
     {
+        #region DisposingChunkMesh
+
+        struct DisposingChunkMesh
+        {
+            public int Age;
+
+            public ChunkMesh ChunkMesh;
+        }
+
+        #endregion
+
         public const string MonitorUpdate = "ChunkManager.Update";
 
         // TODO
@@ -35,7 +46,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const int InitialActiveChunkCapacity = 5000;
 
-        public const int InterChunkCapacity = 20;
+        public const int InterChunkCapacity = 10;
 
         static readonly VectorI3 chunkSize = Chunk.Size;
 
@@ -62,6 +73,8 @@ namespace Willcraftia.Xna.Blocks.Models
         Pool<InterChunk> interChunkPool;
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
+
+        Queue<DisposingChunkMesh> disposingChunkMeshes = new Queue<DisposingChunkMesh>();
 
         bool closing;
 
@@ -142,6 +155,9 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             DiagnosticsMonitor.Begin(MonitorUpdate);
+
+            // チャンク メッシュ破棄キューを処理。
+            TryDisposeChunkMeshes();
 
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
@@ -352,10 +368,33 @@ namespace Willcraftia.Xna.Blocks.Models
 
             sceneManager.RemoveSceneObject(chunkMesh);
 
-            // 明示的に破棄。
-            chunkMesh.Dispose();
+            // GPU で描画中の可能性があるため、破棄キューへ入れて待機させる。
+            var disposingChunkMesh = new DisposingChunkMesh
+            {
+                ChunkMesh = chunkMesh
+            };
+            disposingChunkMeshes.Enqueue(disposingChunkMesh);
 
             ChunkMeshCount--;
+        }
+
+        void TryDisposeChunkMeshes()
+        {
+            var count = disposingChunkMeshes.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var disposingChunkMesh = disposingChunkMeshes.Dequeue();
+                // 3 フレーム程待機。
+                if (disposingChunkMesh.Age < 3)
+                {
+                    disposingChunkMesh.Age++;
+                    disposingChunkMeshes.Enqueue(disposingChunkMesh);
+                }
+                else
+                {
+                    disposingChunkMesh.ChunkMesh.Dispose();
+                }
+            }
         }
 
         void UpdateChunkMesh(Chunk chunk)
