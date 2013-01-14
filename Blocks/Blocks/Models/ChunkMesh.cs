@@ -12,23 +12,27 @@ using Willcraftia.Xna.Framework.Diagnostics;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkMesh : ShadowCaster
+    public sealed class ChunkMesh : ShadowCaster, IDisposable
     {
+        //
+        // メモ
+        //
+        // 過去、頂点バッファとインデックス バッファをプーリングしていたが、
+        // チャンク メッシュの頂点数には非常に大きなばらつきがあるため、
+        // チャンク メッシュの構築毎に、頂点バッファとインデックス バッファを必要十分なサイズで確保する。
+        // また、チャンク メッシュの破棄では、頂点バッファとインデックス バッファも破棄する。
+        //
+        // 過去、チャンク メッシュ自体もプーリングしていたが、
+        // 頂点バッファとインデックス バッファのプーリングを行わないならば、
+        // チャンク メッシュのプーリングの意味もほぼ失われるため、
+        // チャンク メッシュのプーリングも行わない。
+        //
+
         static readonly VectorI3 chunkSize = Chunk.Size;
 
         GraphicsDevice graphicsDevice;
 
         Matrix world = Matrix.Identity;
-
-        VertexBuffer vertexBuffer;
-
-        IndexBuffer indexBuffer;
-
-        int vertexCount;
-
-        int indexCount;
-
-        int primitiveCount;
 
         OcclusionQuery occlusionQuery;
 
@@ -42,48 +46,15 @@ namespace Willcraftia.Xna.Blocks.Models
             set { world = value; }
         }
 
-        public VertexBuffer VertexBuffer
-        {
-            get { return vertexBuffer; }
-            set
-            {
-                vertexBuffer = value;
-                VertexCount = 0;
-            }
-        }
+        public VertexBuffer VertexBuffer { get; private set; }
 
-        public IndexBuffer IndexBuffer
-        {
-            get { return indexBuffer; }
-            set
-            {
-                indexBuffer = value;
-                IndexCount = 0;
-            }
-        }
+        public IndexBuffer IndexBuffer { get; private set; }
 
-        public int VertexCount
-        {
-            get { return vertexCount; }
-            set
-            {
-                if (value < 0) throw new ArgumentOutOfRangeException("value");
+        public int VertexCount { get; private set; }
 
-                vertexCount = value;
-            }
-        }
+        public int IndexCount { get; private set; }
 
-        public int IndexCount
-        {
-            get { return indexCount; }
-            internal set
-            {
-                if (value < 0 || ushort.MaxValue < value) throw new ArgumentOutOfRangeException("value");
-
-                indexCount = value;
-                primitiveCount = indexCount / 3;
-            }
-        }
+        public int PrimitiveCount { get; private set; }
 
         public ChunkMesh(GraphicsDevice graphicsDevice)
         {
@@ -188,27 +159,17 @@ namespace Willcraftia.Xna.Blocks.Models
             ExitDraw();
         }
 
-        void DrawCore()
-        {
-            graphicsDevice.SetVertexBuffer(vertexBuffer);
-            graphicsDevice.Indices = indexBuffer;
-            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, vertexCount, 0, primitiveCount);
-        }
-
         public void SetVertices(VertexPositionNormalColorTexture[] vertices, int vertexCount)
         {
             if (vertices == null) throw new ArgumentNullException("vertices");
             if (vertexCount < 0 || vertices.Length < vertexCount) throw new ArgumentOutOfRangeException("vertexCount");
-            if (VertexBuffer == null) throw new InvalidOperationException("VertexBuffer is null.");
 
-            if (vertexCount != 0 && vertices.Length != 0)
+            VertexCount = vertexCount;
+
+            if (vertexCount != 0)
             {
+                VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.WriteOnly);
                 VertexBuffer.SetData(vertices, 0, vertexCount);
-                this.vertexCount = vertexCount;
-            }
-            else
-            {
-                this.vertexCount = 0;
             }
         }
 
@@ -216,16 +177,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (indices == null) throw new ArgumentNullException("indices");
             if (indexCount < 0 || indices.Length < indexCount) throw new ArgumentOutOfRangeException("vertexCount");
-            if (IndexBuffer == null) throw new InvalidOperationException("IndexBuffer is null.");
 
-            if (indexCount != 0 && indices.Length != 0)
+            IndexCount = indexCount;
+            PrimitiveCount = indexCount / 3;
+
+            if (indexCount != 0)
             {
+                IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.WriteOnly);
                 IndexBuffer.SetData(indices, 0, indexCount);
-                IndexCount = indexCount;
-            }
-            else
-            {
-                IndexCount = 0;
             }
         }
 
@@ -234,7 +193,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (Chunk == null || !Chunk.EnterDraw()) return false;
 
             // 非同期なメッシュ更新により描画不要になっていないかを検査。
-            if (vertexBuffer == null || indexBuffer == null || vertexCount == 0 || indexCount == 0)
+            if (disposed || VertexBuffer == null || IndexBuffer == null || VertexCount == 0 || IndexCount == 0)
             {
                 // 即座に描画ロックを開放して終了。
                 Chunk.ExitDraw();
@@ -249,5 +208,42 @@ namespace Willcraftia.Xna.Blocks.Models
             // 描画ロックを解放。
             Chunk.ExitDraw();
         }
+
+        void DrawCore()
+        {
+            graphicsDevice.SetVertexBuffer(VertexBuffer);
+            graphicsDevice.Indices = IndexBuffer;
+            graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VertexCount, 0, PrimitiveCount);
+        }
+
+        #region IDisposable
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        bool disposed;
+
+        ~ChunkMesh()
+        {
+            Dispose(false);
+        }
+
+        void Dispose(bool disposing)
+        {
+            if (disposed) return;
+
+            if (disposing)
+            {
+                if (VertexBuffer != null) VertexBuffer.Dispose();
+                if (IndexBuffer != null) IndexBuffer.Dispose();
+            }
+
+            disposed = true;
+        }
+
+        #endregion
     }
 }

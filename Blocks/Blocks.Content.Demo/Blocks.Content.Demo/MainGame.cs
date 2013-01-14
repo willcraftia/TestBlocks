@@ -358,25 +358,17 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var chunkManager = worldManager.ChunkManager;
             sb.Append("Chunk: ").AppendNumber(chunkManager.ActiveChunkCount).Append("/");
             sb.AppendNumber(chunkManager.TotalChunkCount).Append(" ");
-            sb.Append("Mesh: ").AppendNumber(chunkManager.ActiveChunkMeshCount).Append("/");
-            sb.AppendNumber(chunkManager.TotalChunkMeshCount).Append(" ");
-            sb.Append("InterMesh: ").AppendNumber(chunkManager.ActiveInterChunkCount).Append("/");
+            sb.Append("Mesh: ").AppendNumber(chunkManager.ChunkMeshCount).Append(" ");
+            sb.Append("Inter: ").AppendNumber(chunkManager.ActiveInterChunkCount).Append("/");
             sb.AppendNumber(chunkManager.TotalInterChunkCount).AppendLine();
 
-            sb.Append("VertexBuffer(IndexBuffer): ").AppendNumber(chunkManager.ActiveBufferCount).Append("/");
-            sb.AppendNumber(chunkManager.TotalBufferCount).AppendLine();
-
             sb.Append("ChunkVertex: ");
-            sb.Append("Max(").AppendNumber(chunkManager.MaxVertexCount).Append("/");
-            sb.Append(ChunkManager.VertexCapacity).Append(") ");
-            sb.Append("Total(").AppendNumber(chunkManager.TotalVertexCount).Append("/");
-            sb.AppendNumber(chunkManager.AllocatedVertexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(chunkManager.MaxVertexCount).Append(") ");
+            sb.Append("Total(").AppendNumber(chunkManager.TotalVertexCount).Append(")").AppendLine();
 
             sb.Append("ChunkIndex: ");
-            sb.Append("Max(").AppendNumber(chunkManager.MaxIndexCount).Append(".");
-            sb.AppendNumber(ChunkManager.IndexCapacity).Append(") ");
-            sb.Append("Total(").AppendNumber(chunkManager.TotalIndexCount).Append("/");
-            sb.AppendNumber(chunkManager.AllocatedIndexCount).Append(")").AppendLine();
+            sb.Append("Max(").AppendNumber(chunkManager.MaxIndexCount).Append(") ");
+            sb.Append("Total(").AppendNumber(chunkManager.TotalIndexCount).Append(")").AppendLine();
 
             var sceneManager = worldManager.SceneManager;
             sb.Append("SceneObejcts: ").AppendNumber(sceneManager.RenderedSceneObjectCount).Append("/");
