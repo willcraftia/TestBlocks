@@ -65,15 +65,6 @@ namespace Willcraftia.Xna.Blocks.Models
             occlusionQuery = new OcclusionQuery(graphicsDevice);
         }
 
-        public override void PreDraw()
-        {
-            // ワールド行列を更新。
-            Matrix world;
-            Matrix.CreateTranslation(ref Position, out world);
-
-            base.PreDraw();
-        }
-
         public override void UpdateOcclusion()
         {
             Occluded = false;
@@ -168,7 +159,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (vertexCount != 0)
             {
-                VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.WriteOnly);
+                VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.None);
                 VertexBuffer.SetData(vertices, 0, vertexCount);
             }
         }
@@ -183,7 +174,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (indexCount != 0)
             {
-                IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.WriteOnly);
+                IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
                 IndexBuffer.SetData(indices, 0, indexCount);
             }
         }
