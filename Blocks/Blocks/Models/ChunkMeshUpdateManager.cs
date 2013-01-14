@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Blocks.Models
         #endregion
 
         // TODO
-        public const int TaskQueueSlotCount = 50;
+        public const int TaskQueueSlotCount = 20;
 
         static readonly VectorI3 chunkSize = Chunk.Size;
 

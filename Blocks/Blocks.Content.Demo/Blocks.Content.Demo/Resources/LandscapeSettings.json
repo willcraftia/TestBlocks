@@ -7,8 +7,8 @@
   "InitialActiveClusterCapacity": 50,
   "InitialActivationCapacity": 100,
   "InitialPassivationCapacity": 1000,
-  "ActivationTaskQueueSlotCount": 50,
-  "PassivationTaskQueueSlotCount": 50,
+  "ActivationTaskQueueSlotCount": 20,
+  "PassivationTaskQueueSlotCount": 20,
   "ActivationSearchCapacity": 100,
   "PassivationSearchCapacity": 200
 }

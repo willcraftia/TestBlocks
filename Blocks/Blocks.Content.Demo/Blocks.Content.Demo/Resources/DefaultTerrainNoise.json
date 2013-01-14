@@ -20,6 +20,20 @@
       ]
     },
     {
+      "Name": "ConstOne",
+      "Type": "Const",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Const One"
+        },
+        {
+          "Name": "Value",
+          "Value": "1"
+        }
+      ]
+    },
+    {
       "Name": "LowlandPerlin",
       "Type": "Perlin",
       "Properties": [
@@ -81,7 +95,7 @@
         },
         {
           "Name": "Bias",
-          "Value": "-0.75"
+          "Value": "-0.45"
         },
         {
           "Name": "Scale",
@@ -450,12 +464,12 @@
       ]
     },
     {
-      "Name": "TerrainDensityTest",
-      "Type": "TerrainDensityTest",
+      "Name": "TerrainSelectCache",
+      "Type": "Cache",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Terrain Density Test"
+          "Value": "Terrain Select Cache"
         },
         {
           "Name": "Source",
@@ -464,16 +478,274 @@
       ]
     },
     {
-      "Name": "TerrainScale",
+      "Name": "TerrainDensity",
+      "Type": "TerrainDensityTest",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Density"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainSelectCache"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "500"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "CaveShape",
+      "Type": "RidgedMultifractal",
+      "Properties": [
+        {
+          "Name": "Offset",
+          "Value": "1"
+        },
+        {
+          "Name": "Gain",
+          "Value": "2"
+        },
+        {
+          "Name": "Name",
+          "Value": "Cave Shape"
+        },
+        {
+          "Name": "Source",
+          "Value": "CavePerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "1"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "4"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "CaveAttenuateBias",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Attenuate ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainSelectCache"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0.45"
+        },
+        {
+          "Name": "Scale",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "CaveShapeAttenuate",
+      "Type": "Multiply",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Shape Attenuate"
+        },
+        {
+          "Name": "Source0",
+          "Value": "CaveShape"
+        },
+        {
+          "Name": "Source1",
+          "Value": "CaveAttenuateBias"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturbPerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "600"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturnFractal",
+      "Type": "SumFractal",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "CavePerturbPerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "0.9"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "3"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "6"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturbScaleBias",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "CavePerturnFractal"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.5"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturb",
+      "Type": "Displace",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb"
+        },
+        {
+          "Name": "Source",
+          "Value": "CaveShapeAttenuate"
+        },
+        {
+          "Name": "DisplaceX",
+          "Value": "CavePerturbScaleBias"
+        },
+        {
+          "Name": "DisplaceY",
+          "Value": "ConstZero"
+        },
+        {
+          "Name": "DisplaceZ",
+          "Value": "ConstZero"
+        }
+      ]
+    },
+    {
+      "Name": "CaveDensity",
+      "Type": "Select",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Density"
+        },
+        {
+          "Name": "Controller",
+          "Value": "CavePerturb"
+        },
+        {
+          "Name": "LowerSource",
+          "Value": "ConstOne"
+        },
+        {
+          "Name": "UpperSource",
+          "Value": "ConstZero"
+        },
+        {
+          "Name": "EdgeFalloff",
+          "Value": "0"
+        },
+        {
+          "Name": "LowerBound",
+          "Value": "0.2"
+        },
+        {
+          "Name": "UpperBound",
+          "Value": "1000"
+        }
+      ]
+    },
+    {
+      "Name": "FinalDensity",
+      "Type": "Multiply",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Final Density"
+        },
+        {
+          "Name": "Source0",
+          "Value": "TerrainDensity"
+        },
+        {
+          "Name": "Source1",
+          "Value": "CaveDensity"
+        }
+      ]
+    },
+    {
+      "Name": "FinalScale",
       "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Terrain Scale"
+          "Value": "Final Scale"
         },
         {
           "Name": "Source",
-          "Value": "TerrainDensityTest"
+          "Value": "FinalDensity"
         },
         {
           "Name": "ScaleX",
@@ -499,7 +771,7 @@
         },
         {
           "Name": "Source",
-          "Value": "TerrainScale"
+          "Value": "FinalScale"
         },
         {
           "Name": "DisplaceX",

@@ -481,6 +481,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 };
                 builder.Add("ConstZero", constZero);
 
+                var constOne = new Const
+                {
+                    Name = "Const One",
+                    Value = 1
+                };
+                builder.Add("ConstOne", constOne);
+
                 //------------------------------------------------------------
                 //
                 // 低地形状
@@ -657,17 +664,129 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 };
                 builder.Add("TerrainSelect", terrainSelect);
 
-                //------------------------------------------------------------
-                //
-                // 密度化
-                //
-
-                var terrainDensityTest = new TerrainDensityTest
+                var terrainSelectCache = new Cache
                 {
-                    Name = "Terrain Density Test",
+                    Name = "Terrain Select Cache",
                     Source = terrainSelect
                 };
-                builder.Add("TerrainDensityTest", terrainDensityTest);
+                builder.Add("TerrainSelectCache", terrainSelectCache);
+
+                //------------------------------------------------------------
+                //
+                // 地形密度
+                //
+
+                var terrainDensity = new TerrainDensityTest
+                {
+                    Name = "Terrain Density",
+                    Source = terrainSelectCache
+                };
+                builder.Add("TerrainDensity", terrainDensity);
+
+                //------------------------------------------------------------
+                //
+                // 洞窟形状
+                //
+
+                var cavePerlin = new Perlin
+                {
+                    Name = "Cave Perlin",
+                    Seed = 500
+                };
+                builder.Add("CavePerlin", cavePerlin);
+
+                var caveShape = new RidgedMultifractal
+                {
+                    Name = "Cave Shape",
+                    OctaveCount = 1,
+                    Frequency = 4,
+                    Source = cavePerlin
+                };
+                builder.Add("CaveShape", caveShape);
+
+                var caveAttenuateBias = new ScaleBias
+                {
+                    Name = "Cave Attenuate ScaleBias",
+                    Bias = 0.45f,
+                    Source = terrainSelectCache
+                };
+                builder.Add("CaveAttenuateBias", caveAttenuateBias);
+
+                var caveShapeAttenuate = new Multiply
+                {
+                    Name = "Cave Shape Attenuate",
+                    Source0 = caveShape,
+                    Source1 = caveAttenuateBias
+                };
+                builder.Add("CaveShapeAttenuate", caveShapeAttenuate);
+
+                var cavePerturbPerlin = new Perlin
+                {
+                    Name = "Cave Perturb Perlin",
+                    Seed = 600
+                };
+                builder.Add("CavePerturbPerlin", cavePerturbPerlin);
+
+                var cavePerturnFractal = new SumFractal
+                {
+                    Name = "Cave Perturb Fractal",
+                    OctaveCount = 6,
+                    Frequency = 3,
+                    Source = cavePerturbPerlin
+                };
+                builder.Add("CavePerturnFractal", cavePerturnFractal);
+
+                var cavePerturbScaleBias = new ScaleBias
+                {
+                    Name = "Cave Perturb ScaleBias",
+                    Scale = 0.5f,
+                    Source = cavePerturnFractal
+                };
+                builder.Add("CavePerturbScaleBias", cavePerturbScaleBias);
+
+                var cavePerturb = new Displace
+                {
+                    Name = "Cave Perturb",
+                    DisplaceX = cavePerturbScaleBias,
+                    DisplaceY = constZero,
+                    DisplaceZ = constZero,
+                    Source = caveShapeAttenuate
+                };
+                builder.Add("CavePerturb", cavePerturb);
+
+                //------------------------------------------------------------
+                //
+                // 洞窟密度
+                //
+
+                var caveDensity = new Select
+                {
+                    Name = "Cave Density",
+                    LowerBound = 0.2f,
+                    LowerSource = constOne,
+                    UpperBound = 1000,
+                    UpperSource = constZero,
+                    Controller = cavePerturb
+                };
+                builder.Add("CaveDensity", caveDensity);
+
+                //------------------------------------------------------------
+                //
+                // 密度ブレンド
+                //
+
+                var finalDensity = new Multiply
+                {
+                    Name = "Final Density",
+                    Source0 = terrainDensity,
+                    Source1 = caveDensity
+                };
+                builder.Add("FinalDensity", finalDensity);
+
+                //------------------------------------------------------------
+                //
+                // ブロック用座標変換
+                //
 
                 // プロシージャはブロック空間座標で XYZ を指定するため、
                 // これらをノイズ空間のスケールへ変更。
@@ -683,20 +802,20 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 //      大きすぎると高低差が少なくなり過ぎる傾向。
                 // Y スケールは 16 以下が妥当。
                 //      16 以上は高低差が激しくなり過ぎる傾向。
-                var terrainScale = new ScalePoint
+                var finalScale = new ScalePoint
                 {
-                    Name = "Terrain Scale",
+                    Name = "Final Scale",
                     ScaleX = 1 / 16f,
                     ScaleY = 1 / 16f,
                     ScaleZ = 1 / 16f,
-                    Source = terrainDensityTest
+                    Source = finalDensity
                 };
-                builder.Add("TerrainScale", terrainScale);
+                builder.Add("FinalScale", finalScale);
 
                 // 地形の起伏が現れる Y の位置へブロック空間座標を移動。
                 // フラクタル ノイズには [-1, 1] を越える値を返すものもあるため、
                 // 期待する Y の位置よりも少し下へ移動させるよう補正した方が良い。
-                var terrainDensity = new Displace
+                var target = new Displace
                 {
                     Name = "Terrain Offset",
                     DisplaceX = constZero,
@@ -705,9 +824,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                         Value = -(256 - 16 - 8)
                     },
                     DisplaceZ = constZero,
-                    Source = terrainScale
+                    Source = finalScale
                 };
-                builder.Add("Target", terrainDensity);
+                builder.Add("Target", target);
 
                 ComponentBundleDefinition biomeBundle;
                 builder.BuildDefinition(out biomeBundle);

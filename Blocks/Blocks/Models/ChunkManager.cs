@@ -35,7 +35,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const int InitialActiveChunkCapacity = 5000;
 
-        public const int InterChunkCapacity = 50;
+        public const int InterChunkCapacity = 20;
 
         static readonly VectorI3 chunkSize = Chunk.Size;
 

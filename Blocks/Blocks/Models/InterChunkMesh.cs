@@ -16,7 +16,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // 実行で最適と思われる値を調べて決定する。
         // 恐らくは、最大頂点数となりうる構造は確定できるため、事前に算出できるはずだが、
         // その算出アルゴリズムが分からない。
-        public const ushort VertexCapacity = 15000;
+        public const ushort VertexCapacity = 20000;
 
         public const ushort IndexCapacity = 6 * VertexCapacity / 4;
 
