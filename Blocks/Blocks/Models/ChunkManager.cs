@@ -9,12 +9,16 @@ using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Landscape;
+using Willcraftia.Xna.Framework.Threading;
 using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
+    /// <summary>
+    /// チャンクをパーティションとして管理するパーティション マネージャの実装です。
+    /// </summary>
     public sealed class ChunkManager : PartitionManager
     {
         // TODO
@@ -24,61 +28,116 @@ namespace Willcraftia.Xna.Blocks.Models
         //
 
         // 更新の最大試行数。
-        public const int UpdateCapacity = 100;
+        public const int ChunkMeshUpdateSearchCapacity = 100;
 
-        public const int InitialActiveChunkCapacity = 5000;
-
-        public const int InterChunkCapacity = 10;
+        public const int ChunkVerticesBuilderCapacity = 10;
 
         static readonly VectorI3 chunkSize = Chunk.Size;
 
         static readonly Vector3 chunkMeshOffset = Chunk.HalfSize.ToVector3();
 
+        /// <summary>
+        /// グラフィックス デバイス。
+        /// </summary>
         GraphicsDevice graphicsDevice;
 
+        /// <summary>
+        /// リージョン マネージャ。
+        /// </summary>
         RegionManager regionManager;
 
+        /// <summary>
+        /// シーン マネージャ。
+        /// チャンク メッシュをシーン オブジェクトとして登録するために必要。
+        /// </summary>
         SceneManager sceneManager;
 
+        /// <summary>
+        /// 1 / chunkSize。
+        /// </summary>
         Vector3 inverseChunkSize;
 
-        // 中間チャンクを取得できなければメッシュ更新は行えないため、
-        // 容量は中間チャンクの総数で良い。
-        Queue<Chunk> updatingChunks = new Queue<Chunk>(InterChunkCapacity);
+        /// <summary>
+        /// 頂点ビルダ実行待ちチャンクのキュー。
+        /// </summary>
+        Queue<Chunk> buildVerticesQueue = new Queue<Chunk>(ChunkVerticesBuilderCapacity);
 
-        Pool<InterChunk> interChunkPool;
+        /// <summary>
+        /// 頂点バッファ反映待ちチャンクのキュー。
+        /// </summary>
+        Queue<Chunk> updateBufferQueue = new Queue<Chunk>(ChunkVerticesBuilderCapacity);
 
-        ChunkMeshUpdateManager chunkMeshUpdateManager;
+        /// <summary>
+        /// 頂点ビルダのプール。
+        /// </summary>
+        Pool<ChunkVerticesBuilder> verticesBuilderPool;
 
-        Queue<ChunkMesh> disposingChunkMeshes = new Queue<ChunkMesh>();
+        /// <summary>
+        /// 頂点ビルダの処理を非同期に実行するためのタスク キュー。
+        /// </summary>
+        TaskQueue verticesBuilderTaskQueue;
 
+        /// <summary>
+        /// 破棄待ちチャンク メッシュのキュー。
+        /// </summary>
+        Queue<ChunkMesh> disposeMeshQueue = new Queue<ChunkMesh>();
+
+        /// <summary>
+        /// チャンク メッシュの数を取得します。
+        /// </summary>
         public int ChunkMeshCount { get; private set; }
 
-        public int TotalInterChunkCount
+        /// <summary>
+        /// 頂点ビルダの総数を取得します。
+        /// </summary>
+        public int TotalChunkVerticesBuilderCount
         {
-            get { return interChunkPool.TotalObjectCount; }
+            get { return verticesBuilderPool.TotalObjectCount; }
         }
 
-        public int PassiveInterChunkCount
+        /// <summary>
+        /// 未使用の頂点ビルダの数を取得します。
+        /// </summary>
+        public int PassiveChunkVerticesBuilderCount
         {
-            get { return interChunkPool.Count; }
+            get { return verticesBuilderPool.Count; }
         }
 
-        public int ActiveInterChunkCount
+        /// <summary>
+        /// 使用中の頂点ビルダの数を取得します。
+        /// </summary>
+        public int ActiveChunkVerticesBuilderCount
         {
-            get { return TotalInterChunkCount - PassiveInterChunkCount; }
+            get { return TotalChunkVerticesBuilderCount - PassiveChunkVerticesBuilderCount; }
         }
 
+        /// <summary>
+        /// 頂点の総数を取得します。
+        /// </summary>
         public int TotalVertexCount { get; private set; }
 
+        /// <summary>
+        /// インデックスの総数を取得します。
+        /// </summary>
         public int TotalIndexCount { get; private set; }
 
-        // ゲームを通しての最大を記録する。
+        /// <summary>
+        /// 処理全体を通じて最も大きな頂点バッファのサイズを取得します。
+        /// </summary>
         public int MaxVertexCount { get; private set; }
 
-        // ゲームを通しての最大を記録する。
+        /// <summary>
+        /// 処理全体を通じて最も大きなインデックス バッファのサイズを取得します。
+        /// </summary>
         public int MaxIndexCount { get; private set; }
 
+        /// <summary>
+        /// インスタンスを生成します。
+        /// </summary>
+        /// <param name="settings">パーティション設定。</param>
+        /// <param name="graphicsDevice">グラフィックス デバイス。</param>
+        /// <param name="regionManager">リージョン マネージャ。</param>
+        /// <param name="sceneManager">シーン マネージャ。</param>
         public ChunkManager(Settings settings, GraphicsDevice graphicsDevice, RegionManager regionManager, SceneManager sceneManager)
             : base(settings)
         {
@@ -94,11 +153,14 @@ namespace Willcraftia.Xna.Blocks.Models
             inverseChunkSize.Y = 1 / (float) chunkSize.Y;
             inverseChunkSize.Z = 1 / (float) chunkSize.Z;
 
-            interChunkPool = new Pool<InterChunk>(CreateInterChunk)
+            verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreateInterChunkMeshTask)
             {
-                MaxCapacity = InterChunkCapacity
+                MaxCapacity = ChunkVerticesBuilderCapacity
             };
-            chunkMeshUpdateManager = new ChunkMeshUpdateManager(this);
+            verticesBuilderTaskQueue = new TaskQueue
+            {
+                SlotCount = ChunkVerticesBuilderCapacity
+            };
         }
 
         /// <summary>
@@ -122,32 +184,37 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク メッシュの破棄、新たなメッシュ更新の開始、メッシュ更新完了の監視を行います。
         /// </summary>
-        protected override void UpdatePartitionsOverride()
+        /// <param name="gameTime">ゲーム時間。</param>
+        protected override void UpdatePartitionsOverride(GameTime gameTime)
         {
             // 破棄要求を受けたチャンク メッシュを処理。
-            CheckDisposingChunkMeshes();
+            CheckDisposingChunkMeshes(gameTime);
 
             // メッシュ更新が必要なチャンクを探索して更新要求を追加。
             // ただし、クローズが開始したら行わない。
-            if (!Closing) CheckDirtyChunkMeshes();
+            if (!Closing) CheckDirtyChunkMeshes(gameTime);
+
+            // 頂点ビルダのタスク キューを更新。
+            verticesBuilderTaskQueue.Update();
 
             // メッシュ更新完了を監視。
             // メッシュ更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
-            CheckChunkMeshesUpdated();
+            CheckChunkMeshesUpdated(gameTime);
 
-            base.UpdatePartitionsOverride();
+            base.UpdatePartitionsOverride(gameTime);
         }
 
         /// <summary>
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
-        void CheckDirtyChunkMeshes()
+        /// <param name="gameTime">ゲーム時間。</param>
+        void CheckDirtyChunkMeshes(GameTime gameTime)
         {
             // メッシュ更新が必要なチャンクを探索。
             int activePartitionCount = ActivePartitions.Count;
             int trials = 0;
-            while (0 < activePartitionCount && trials < UpdateCapacity && trials < activePartitionCount)
+            while (0 < activePartitionCount && trials < ChunkMeshUpdateSearchCapacity && trials < activePartitionCount)
             {
                 // TODO
                 // 視点位置の近隣を優先するためのアルゴリズムは無いのだろうか？
@@ -163,19 +230,22 @@ namespace Willcraftia.Xna.Blocks.Models
 
                     if (chunk.MeshDirty)
                     {
-                        if (!updatingChunks.Contains(chunk))
+                        if (!buildVerticesQueue.Contains(chunk) && !updateBufferQueue.Contains(chunk))
                         {
-                            chunk.InterChunk = interChunkPool.Borrow();
-
-                            if (chunk.InterChunk != null)
+                            var verticesBuilder = verticesBuilderPool.Borrow();
+                            if (verticesBuilder != null)
                             {
-                                chunk.InterChunk.Completed = false;
-                                chunkMeshUpdateManager.EnqueueChunk(chunk);
-                                updatingChunks.Enqueue(chunk);
+                                // 頂点ビルダを初期化。
+                                InitializeInterVerticesBuilder(verticesBuilder, chunk);
+
+                                // 頂点ビルダを登録。
+                                verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
+
+                                buildVerticesQueue.Enqueue(chunk);
                             }
                             else
                             {
-                                // 中間チャンク枯渇の場合は次フレーム以降の再更新判定に期待。
+                                // プール枯渇の場合は次フレーム以降の再更新判定に期待。
                                 chunk.ExitUpdate();
                             }
                         }
@@ -193,37 +263,108 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// チャンク メッシュ更新の完了を監視し、
-        /// 完了しているならば頂点バッファへの反映を試みます。
+        /// 頂点ビルダを初期化します。
         /// </summary>
-        void CheckChunkMeshesUpdated()
+        /// <param name="verticesBuilder">頂点ビルダ。</param>
+        /// <param name="chunk">チャンク。</param>
+        void InitializeInterVerticesBuilder(ChunkVerticesBuilder verticesBuilder, Chunk chunk)
         {
-            int count = updatingChunks.Count;
-            for (int i = 0; i < count; i++)
+            verticesBuilder.Chunk = chunk;
+            chunk.VerticesBuilder = verticesBuilder;
+
+            // 完了フラグを初期化。
+            verticesBuilder.Completed = false;
+
+            // 隣接チャンク集合を初期化。
+            var centerPosition = chunk.Position;
+            for (int z = -1; z <= 1; z++)
             {
-                var chunk = updatingChunks.Dequeue();
-
-                if (chunk.InterChunk.Completed)
+                for (int y = -1; y <= 1; y++)
                 {
-                    // 中間チャンク更新完了ならば頂点バッファを更新。
-                    if (!Closing) UpdateChunkMesh(chunk);
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        // 8 つの隅は不要。
+                        if (x != 0 && y != 0 && z != 0) continue;
 
-                    // 中間チャンクは不要となるためプールへ返却。
-                    ReturnInterChunk(chunk.InterChunk);
-                    chunk.InterChunk = null;
+                        // 中心には自身を設定。
+                        if (x == 0 && y == 0 && z == 0)
+                        {
+                            verticesBuilder.CloseChunks[0, 0, 0] = chunk;
+                            continue;
+                        }
 
-                    chunk.MeshDirty = false;
-                    chunk.ExitUpdate();
-                }
-                else
-                {
-                    // 未完ならば更新キューへ戻す。
-                    updatingChunks.Enqueue(chunk);
+                        var closePosition = centerPosition;
+                        closePosition.X += x;
+                        closePosition.Y += y;
+                        closePosition.Z += z;
+
+                        Chunk closeChunk;
+                        TryGetChunk(ref closePosition, out closeChunk);
+
+                        verticesBuilder.CloseChunks[x, y, z] = closeChunk;
+                    }
                 }
             }
 
-            chunkMeshUpdateManager.Update();
+            // このフレームで収集できた面隣接チャンクを記録。
+            var flags = CubicSide.Flags.None;
+            foreach (var side in CubicSide.Items)
+            {
+                if (chunk.VerticesBuilder.CloseChunks[side] != null)
+                    flags |= side.ToFlags();
+            }
+            chunk.NeighborsReferencedOnUpdate = flags;
+        }
 
+        /// <summary>
+        /// チャンク メッシュ更新の完了を監視し、
+        /// 完了しているならば頂点バッファへの反映を試みます。
+        /// </summary>
+        /// <param name="gameTime">ゲーム時間。</param>
+        void CheckChunkMeshesUpdated(GameTime gameTime)
+        {
+            // 頂点ビルダの監視。
+            int count = buildVerticesQueue.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var chunk = buildVerticesQueue.Dequeue();
+
+                if (!chunk.VerticesBuilder.Completed)
+                {
+                    // 未完ならば更新キューへ戻す。
+                    buildVerticesQueue.Enqueue(chunk);
+                    continue;
+                }
+
+                if (Closing)
+                {
+                    // クローズ中ならば頂点バッファ反映をスキップして更新ロックを解放。
+                    ReleaseVerticesBuilder(chunk.VerticesBuilder);
+
+                    chunk.MeshDirty = false;
+                    chunk.ExitUpdate();
+                    continue;
+                }
+
+                // 頂点バッファ更新キューへ追加。
+                updateBufferQueue.Enqueue(chunk);
+            }
+
+            // 頂点バッファへの反映。
+            if (0 < updateBufferQueue.Count && !gameTime.IsRunningSlowly)
+            {
+                // 各フレームでひとつずつバッファへ反映。
+                var chunk = updateBufferQueue.Dequeue();
+
+                UpdateChunkMesh(chunk);
+
+                // 頂点ビルダを解放。
+                ReleaseVerticesBuilder(chunk.VerticesBuilder);
+
+                // 更新ロックを解放。
+                chunk.MeshDirty = false;
+                chunk.ExitUpdate();
+            }
         }
 
         /// <summary>
@@ -236,7 +377,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <returns>
         /// true (指定の位置にチャンクが存在した場合)、false (それ以外の場合)。
         /// </returns>
-        public bool TryGetChunk(ref VectorI3 position, out Chunk result)
+        bool TryGetChunk(ref VectorI3 position, out Chunk result)
         {
             Partition partition;
             if (ActivePartitions.TryGetPartition(ref position, out partition))
@@ -252,25 +393,28 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 中間チャンク プールにおける中間チャンク生成で呼び出されます。
+        /// 頂点ビルダ プールのインスタンス生成メソッドです。
         /// </summary>
-        /// <returns>中間チャンク。</returns>
-        InterChunk CreateInterChunk()
+        /// <returns>頂点ビルダ。</returns>
+        ChunkVerticesBuilder CreateInterChunkMeshTask()
         {
-            return new InterChunk();
+            return new ChunkVerticesBuilder();
         }
 
         /// <summary>
-        /// 中間チャンクをプールへ戻します。
+        /// 頂点ビルダをプールへ戻します。
         /// </summary>
-        /// <param name="interChunk"></param>
-        internal void ReturnInterChunk(InterChunk interChunk)
+        /// <param name="builder"></param>
+        internal void ReleaseVerticesBuilder(ChunkVerticesBuilder builder)
         {
-            if (interChunk == null) throw new ArgumentNullException("interChunk");
+            if (builder == null) throw new ArgumentNullException("builder");
 
-            interChunk.Opaque.Clear();
-            interChunk.Translucent.Clear();
-            interChunkPool.Return(interChunk);
+            builder.Chunk.VerticesBuilder = null;
+            builder.Chunk = null;
+            builder.CloseChunks.Clear();
+            builder.Opaque.Clear();
+            builder.Translucent.Clear();
+            verticesBuilderPool.Return(builder);
         }
 
         /// <summary>
@@ -303,21 +447,22 @@ namespace Willcraftia.Xna.Blocks.Models
             sceneManager.RemoveSceneObject(chunkMesh);
 
             // 破棄を待機する。
-            lock (disposingChunkMeshes)
-                disposingChunkMeshes.Enqueue(chunkMesh);
+            lock (disposeMeshQueue)
+                disposeMeshQueue.Enqueue(chunkMesh);
         }
 
         /// <summary>
         /// 破棄要求の出されたチャンク メッシュを破棄します。
         /// </summary>
-        void CheckDisposingChunkMeshes()
+        /// <param name="gameTime">ゲーム時間。</param>
+        void CheckDisposingChunkMeshes(GameTime gameTime)
         {
-            lock (disposingChunkMeshes)
+            lock (disposeMeshQueue)
             {
-                var count = disposingChunkMeshes.Count;
+                var count = disposeMeshQueue.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    var chunkMesh = disposingChunkMeshes.Dequeue();
+                    var chunkMesh = disposeMeshQueue.Dequeue();
 
                     TotalVertexCount -= chunkMesh.VertexCount;
                     TotalIndexCount -= chunkMesh.IndexCount;
@@ -330,12 +475,12 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// チャンク メッシュの頂点バッファを更新します。
+        /// チャンクに関連付けられた頂点ビルダの結果で頂点バッファを更新します。
         /// </summary>
-        /// <param name="chunk"></param>
+        /// <param name="chunk">チャンク。</param>
         void UpdateChunkMesh(Chunk chunk)
         {
-            var interMesh = chunk.InterChunk;
+            var builder = chunk.VerticesBuilder;
 
             // メッシュに設定するワールド座標。
             // チャンクの中心をメッシュの位置とする。
@@ -348,7 +493,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // 不透明メッシュ
 
-            if (interMesh.Opaque.VertexCount == 0 || interMesh.Opaque.IndexCount == 0)
+            if (builder.Opaque.VertexCount == 0 || builder.Opaque.IndexCount == 0)
             {
                 if (chunk.OpaqueMesh != null)
                 {
@@ -370,7 +515,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 chunk.OpaqueMesh.Position = position;
                 chunk.OpaqueMesh.World = world;
-                interMesh.Opaque.Populate(chunk.OpaqueMesh);
+                builder.Opaque.Populate(chunk.OpaqueMesh);
 
                 TotalVertexCount += chunk.OpaqueMesh.VertexCount;
                 TotalIndexCount += chunk.OpaqueMesh.IndexCount;
@@ -381,7 +526,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // 半透明メッシュ
 
-            if (interMesh.Translucent.VertexCount == 0 || interMesh.Translucent.IndexCount == 0)
+            if (builder.Translucent.VertexCount == 0 || builder.Translucent.IndexCount == 0)
             {
                 if (chunk.TranslucentMesh != null)
                 {
@@ -403,7 +548,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 chunk.TranslucentMesh.Position = position;
                 chunk.TranslucentMesh.World = world;
-                interMesh.Translucent.Populate(chunk.TranslucentMesh);
+                builder.Translucent.Populate(chunk.TranslucentMesh);
 
                 TotalVertexCount += chunk.TranslucentMesh.VertexCount;
                 TotalIndexCount += chunk.TranslucentMesh.IndexCount;

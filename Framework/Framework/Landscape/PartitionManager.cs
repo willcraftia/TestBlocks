@@ -384,8 +384,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションのアクティブ化と非アクティブ化を行います。
         /// </summary>
+        /// <param name="gameTime">ゲーム時間。</param>
         /// <param name="eyeWorldPosition">ワールド空間での視点の位置。</param>
-        public void Update(Vector3 eyeWorldPosition)
+        public void Update(GameTime gameTime, Vector3 eyeWorldPosition)
         {
             if (Closed) return;
 
@@ -403,13 +404,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                 activationTaskQueue.Update();
                 passivationTaskQueue.Update();
 
-                CheckPassivationCompleted();
-                CheckActivationCompleted();
+                CheckPassivationCompleted(gameTime);
+                CheckActivationCompleted(gameTime);
 
-                PassivatePartitions();
-                ActivatePartitions();
+                PassivatePartitions(gameTime);
+                ActivatePartitions(gameTime);
 
-                UpdatePartitions();
+                UpdatePartitions(gameTime);
             }
             else
             {
@@ -422,13 +423,13 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // 非アクティブ化中のパーティションを処理。
                 passivationTaskQueue.Update();
-                CheckPassivationCompleted();
+                CheckPassivationCompleted(gameTime);
 
                 // アクティブなパーティションを全て非アクティブ化。
-                PassivatePartitions();
+                PassivatePartitions(gameTime);
 
                 // パーティション内部でも必要に応じてクローズのための更新を行う。
-                UpdatePartitions();
+                UpdatePartitions(gameTime);
 
                 // 全ての非アクティブ化が完了していればクローズ完了。
                 if (passivatingPartitions.Count == 0 && ActivePartitions.Count == 0)
@@ -501,7 +502,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション更新処理で呼び出されます。
         /// </summary>
-        protected virtual void UpdatePartitionsOverride() { }
+        /// <param name="gameTime">ゲーム時間。</param>
+        protected virtual void UpdatePartitionsOverride(GameTime gameTime) { }
 
         /// <summary>
         /// 非同期に実行されている非アクティブ化の完了を検査します。
@@ -511,7 +513,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化が取り消されている場合には、
         /// 対象のパーティションは非アクティブ化中リストから削除され、アクティブ リストへ戻されます。
         /// </summary>
-        void CheckPassivationCompleted()
+        /// <param name="gameTime">ゲーム時間。</param>
+        void CheckPassivationCompleted(GameTime gameTime)
         {
             int partitionCount = passivatingPartitions.Count;
             for (int i = 0; i < partitionCount; i++)
@@ -556,7 +559,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// アクティブ化が取り消されている場合には、
         /// 対象のパーティションはアクティブ化中リストから削除され、プールへ戻されます。
         /// </summary>
-        void CheckActivationCompleted()
+        /// <param name="gameTime">ゲーム時間。</param>
+        void CheckActivationCompleted(GameTime gameTime)
         {
             int partitionCount = activatingPartitions.Count;
             for (int i = 0; i < partitionCount; i++)
@@ -658,7 +662,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// なお、同時に非アクティブ化可能なパーティションの数には上限があり、
         /// 上限に到達した場合には、このフレームでの非アクティブ化は保留されます。
         /// </summary>
-        void PassivatePartitions()
+        /// <param name="gameTime">ゲーム時間。</param>
+        void PassivatePartitions(GameTime gameTime)
         {
             int count = Math.Min(ActivePartitions.Count, passivationSearchCapacity);
             for (int i = 0; i < count; i++)
@@ -702,7 +707,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// なお、同時にアクティブ化可能なパーティションの数には上限があり、
         /// 上限に到達した場合には、このフレームでのアクティブ化は保留されます。
         /// </summary>
-        void ActivatePartitions()
+        /// <param name="gameTime">ゲーム時間。</param>
+        void ActivatePartitions(GameTime gameTime)
         {
             int index = activationSearchOffset;
             bool cycled = false;
@@ -765,12 +771,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションを更新します。
         /// </summary>
-        void UpdatePartitions()
+        /// <param name="gameTime">ゲーム時間。</param>
+        void UpdatePartitions(GameTime gameTime)
         {
             // TODO
             // モニタ
 
-            UpdatePartitionsOverride();
+            UpdatePartitionsOverride(gameTime);
         }
 
         /// <summary>

@@ -324,7 +324,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク マネージャ
 
-            ChunkManager.Update(SceneManager.ActiveCamera.View.Position);
+            ChunkManager.Update(gameTime, SceneManager.ActiveCamera.View.Position);
 
             //----------------------------------------------------------------
             // リージョン マネージャ

@@ -80,6 +80,7 @@
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
+    <Compile Include="Models\CloseChunks.cs" />
     <Compile Include="Models\GraphicsSettings.cs" />
     <Compile Include="Models\LandscapeSettings.cs" />
     <Compile Include="Models\SceneSettings.cs" />
@@ -100,8 +101,8 @@
     <Compile Include="Models\IBiome.cs" />
     <Compile Include="Models\IBiomeManager.cs" />
     <Compile Include="Models\Image2D.cs" />
-    <Compile Include="Models\InterChunk.cs" />
-    <Compile Include="Models\InterChunkMesh.cs" />
+    <Compile Include="Models\ChunkVerticesBuilder.cs" />
+    <Compile Include="Models\ChunkVertices.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\NullChunkStore.cs" />
     <Compile Include="Models\RandomBiomeManager.cs" />
@@ -120,7 +121,6 @@
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\BlockCatalog.cs" />
     <Compile Include="Models\ChunkMesh.cs" />
-    <Compile Include="Models\ChunkMeshUpdateManager.cs" />
     <Compile Include="Models\IChunkStore.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />

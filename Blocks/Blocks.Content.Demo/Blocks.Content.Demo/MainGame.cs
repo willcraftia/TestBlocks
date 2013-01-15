@@ -356,8 +356,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("P(").AppendNumber(chunkManager.PassivatingPartitionCount).Append(")").AppendLine();
 
             sb.Append("Mesh: ").AppendNumber(chunkManager.ChunkMeshCount).Append(" ");
-            sb.Append("Inter: ").AppendNumber(chunkManager.ActiveInterChunkCount).Append("/");
-            sb.AppendNumber(chunkManager.TotalInterChunkCount).AppendLine();
+            sb.Append("Inter: ").AppendNumber(chunkManager.ActiveChunkVerticesBuilderCount).Append("/");
+            sb.AppendNumber(chunkManager.TotalChunkVerticesBuilderCount).AppendLine();
 
             sb.Append("ChunkVertex: ");
             sb.Append("Max(").AppendNumber(chunkManager.MaxVertexCount).Append(") ");

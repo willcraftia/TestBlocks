@@ -124,7 +124,9 @@
     <Compile Include="Models\ChunkMesh.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\ChunkMeshUpdateManager.cs" />
+    <Compile Include="Models\ChunkVertices.cs" />
+    <Compile Include="Models\ChunkVerticesBuilder.cs" />
+    <Compile Include="Models\CloseChunks.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\DefinedBiomeManager.cs" />
@@ -135,8 +137,6 @@
     <Compile Include="Models\IChunkProcedure.cs" />
     <Compile Include="Models\IChunkStore.cs" />
     <Compile Include="Models\Image2D.cs" />
-    <Compile Include="Models\InterChunk.cs" />
-    <Compile Include="Models\InterChunkMesh.cs" />
     <Compile Include="Models\LandscapeSettings.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />

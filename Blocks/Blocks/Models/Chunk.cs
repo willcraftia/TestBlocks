@@ -146,7 +146,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public InterChunk InterChunk { get; set; }
+        public ChunkVerticesBuilder VerticesBuilder { get; internal set; }
 
         public bool Active
         {
@@ -375,10 +375,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 chunkManager.DisposeChunkMesh(TranslucentMesh);
                 TranslucentMesh = null;
             }
-            if (InterChunk != null)
+            if (VerticesBuilder != null)
             {
-                chunkManager.ReturnInterChunk(InterChunk);
-                InterChunk = null;
+                chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
+                VerticesBuilder = null;
             }
 
             // 定義に変更があるならば永続化領域を更新。
