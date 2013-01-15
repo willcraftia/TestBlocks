@@ -42,6 +42,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         byte[] blockIndices;
 
+        object activeLock = new object();
+
         volatile bool active;
 
         volatile bool updating;
@@ -50,13 +52,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         volatile bool passivating;
 
-        volatile CubicSide.Flags activeNeighbors;
+        CubicSide.Flags activeNeighbors;
 
-        volatile CubicSide.Flags neighborsReferencedOnUpdate;
-
-        object activeLock = new object();
-
-        object activeNeighborsLock = new object();
+        CubicSide.Flags neighborsReferencedOnUpdate;
 
         ChunkMesh opaqueMesh;
 
@@ -394,10 +392,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 非アクティブな場合、通知を無視。
             if (!active) return;
 
-            lock (activeNeighborsLock)
-            {
-                activeNeighbors |= side.ToFlags();
-            }
+            activeNeighbors |= side.ToFlags();
 
             base.OnNeighborActivated(neighbor, side);
         }
@@ -407,14 +402,11 @@ namespace Willcraftia.Xna.Blocks.Models
             // 非アクティブな場合、通知を無視。
             if (!active) return;
 
-            lock (activeNeighborsLock)
-            {
-                var flag = side.ToFlags();
+            var flag = side.ToFlags();
 
-                Debug.Assert((activeNeighbors & flag) == flag);
+            Debug.Assert((activeNeighbors & flag) == flag);
 
-                activeNeighbors ^= flag;
-            }
+            activeNeighbors ^= flag;
 
             base.OnNeighborPassivated(neighbor, side);
         }
