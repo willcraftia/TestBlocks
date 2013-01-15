@@ -22,17 +22,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
     public sealed class ChunkManager
     {
-        #region DisposingChunkMesh
-
-        struct DisposingChunkMesh
-        {
-            public int Age;
-
-            public ChunkMesh ChunkMesh;
-        }
-
-        #endregion
-
         public const string MonitorUpdate = "ChunkManager.Update";
 
         // TODO
@@ -74,7 +63,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
-        Queue<DisposingChunkMesh> disposingChunkMeshes = new Queue<DisposingChunkMesh>();
+        Queue<ChunkMesh> disposingChunkMeshes = new Queue<ChunkMesh>();
 
         bool closing;
 
@@ -157,7 +146,7 @@ namespace Willcraftia.Xna.Blocks.Models
             DiagnosticsMonitor.Begin(MonitorUpdate);
 
             // チャンク メッシュ破棄キューを処理。
-            TryDisposeChunkMeshes();
+            DisposeChunkMeshes();
 
             // 長時間のロックを避けるために、一時的に作業リストへコピー。
             lock (activeChunks)
@@ -368,36 +357,22 @@ namespace Willcraftia.Xna.Blocks.Models
 
             sceneManager.RemoveSceneObject(chunkMesh);
 
-            // GPU で描画中の可能性があるため、破棄キューへ入れて待機させる。
-            var disposingChunkMesh = new DisposingChunkMesh
-            {
-                ChunkMesh = chunkMesh
-            };
-
+            // 破棄キューへ入れて待機させる。
             lock (disposingChunkMeshes)
-                disposingChunkMeshes.Enqueue(disposingChunkMesh);
+                disposingChunkMeshes.Enqueue(chunkMesh);
 
             ChunkMeshCount--;
         }
 
-        void TryDisposeChunkMeshes()
+        void DisposeChunkMeshes()
         {
             lock (disposingChunkMeshes)
             {
                 var count = disposingChunkMeshes.Count;
                 for (int i = 0; i < count; i++)
                 {
-                    var disposingChunkMesh = disposingChunkMeshes.Dequeue();
-                    // 3 フレーム程待機。
-                    if (disposingChunkMesh.Age < 3)
-                    {
-                        disposingChunkMesh.Age++;
-                        disposingChunkMeshes.Enqueue(disposingChunkMesh);
-                    }
-                    else
-                    {
-                        disposingChunkMesh.ChunkMesh.Dispose();
-                    }
+                    var chunkMesh = disposingChunkMeshes.Dequeue();
+                    chunkMesh.Dispose();
                 }
             }
         }
