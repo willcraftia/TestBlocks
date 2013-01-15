@@ -185,9 +185,6 @@ namespace Willcraftia.Xna.Blocks.Models
             if (!regionManager.TryGetRegion(ref position, out region))
                 throw new InvalidOperationException("Region not found: " + position);
 
-            // TODO
-            // パーティション マネージャで行えるのでは？
-
             // ワールド空間における位置を算出。
             worldPosition.X = position.X * size.X;
             worldPosition.Y = position.Y * size.Y;
