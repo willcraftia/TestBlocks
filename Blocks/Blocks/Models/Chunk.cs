@@ -18,51 +18,107 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class Chunk : Partition
     {
+        /// <summary>
+        /// チャンク マネージャ。
+        /// </summary>
         ChunkManager chunkManager;
 
+        /// <summary>
+        /// リージョン マネージャ。
+        /// </summary>
         RegionManager regionManager;
 
+        /// <summary>
+        /// チャンクが属するリージョン。
+        /// </summary>
         Region region;
 
+        /// <summary>
+        /// チャンクのサイズ。
+        /// </summary>
         VectorI3 size;
 
-        Vector3 worldPosition;
-
+        /// <summary>
+        /// チャンクが参照するブロックのインデックス。
+        /// </summary>
         byte[] blockIndices;
 
+        /// <summary>
+        /// Active プロパティの同期のためのロック オブジェクト。
+        /// </summary>
         object activeLock = new object();
 
+        /// <summary>
+        /// チャンクがアクティブであるか否かを示す値。
+        /// </summary>
+        /// <value>
+        /// true (アクティブな場合)、false (それ以外の場合)。
+        /// </value>
         volatile bool active;
 
+        /// <summary>
+        /// 更新ロック中であるか否かを示す値。
+        /// </summary>
+        /// <value>
+        /// true (更新ロック中の場合)、false (それ以外の場合)。
+        /// </value>
         volatile bool updating;
 
+        // TODO
         volatile bool drawing;
 
+        /// <summary>
+        /// 非アクティブ化ロック中であるか否かを示す値。
+        /// </summary>
+        /// <value>
+        /// true (非アクティブ化ロック中の場合)、false (それ以外の場合)。
+        /// </value>
         volatile bool passivating;
 
+        /// <summary>
+        /// アクティブな隣接チャンクのフラグ。
+        /// </summary>
         CubicSide.Flags activeNeighbors;
 
+        /// <summary>
+        /// メッシュ更新時に参照された隣接チャンクのフラグ。
+        /// </summary>
         CubicSide.Flags neighborsReferencedOnUpdate;
 
+        /// <summary>
+        /// 不透明メッシュ。
+        /// </summary>
         ChunkMesh opaqueMesh;
 
+        /// <summary>
+        /// 半透明メッシュ。
+        /// </summary>
         ChunkMesh translucentMesh;
 
+        /// <summary>
+        /// チャンクのサイズを取得します。
+        /// </summary>
         public VectorI3 Size
         {
             get { return size; }
         }
 
+        /// <summary>
+        /// チャンクが属するリージョンを取得します。
+        /// </summary>
         public Region Region
         {
             get { return region; }
         }
 
-        public Vector3 WorldPosition
-        {
-            get { return worldPosition; }
-        }
-
+        /// <summary>
+        /// ブロックのインデックスを取得または設定します。
+        /// ブロック位置は、チャンク空間における相対座標で指定します。
+        /// </summary>
+        /// <param name="x">チャンク空間における相対ブロック位置 X。</param>
+        /// <param name="y">チャンク空間における相対ブロック位置 Y。</param>
+        /// <param name="z">チャンク空間における相対ブロック位置 Z。</param>
+        /// <returns></returns>
         public byte this[int x, int y, int z]
         {
             get
@@ -88,16 +144,25 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// ブロックの総数を取得します。
+        /// </summary>
         public int Count
         {
             get { return blockIndices.Length; }
         }
 
+        /// <summary>
+        /// アクティブな隣接チャンクをフラグで取得します。
+        /// </summary>
         public CubicSide.Flags ActiveNeighbors
         {
             get { return activeNeighbors; }
         }
 
+        /// <summary>
+        /// メッシュ更新時に参照された隣接チャンクをフラグで取得します。
+        /// </summary>
         public CubicSide.Flags NeighborsReferencedOnUpdate
         {
             get { return neighborsReferencedOnUpdate; }
@@ -109,8 +174,18 @@ namespace Willcraftia.Xna.Blocks.Models
         // false の場合はキャッシュの更新が不要である。
         public bool DefinitionDirty { get; set; }
 
+        /// <summary>
+        /// メッシュ更新が必要であるか否かを示す値を取得または設定します。
+        /// チャンクからのブロック参照を変更した場合などに true へ設定します。
+        /// </summary>
+        /// <value>
+        /// true (メッシュ更新が必要な場合)、false (それ以外の場合)。
+        /// </value>
         public bool MeshDirty { get; set; }
 
+        /// <summary>
+        /// 不透明メッシュを取得または設定します。
+        /// </summary>
         public ChunkMesh OpaqueMesh
         {
             get { return opaqueMesh; }
@@ -124,6 +199,9 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// 半透明メッシュを取得または設定します。
+        /// </summary>
         public ChunkMesh TranslucentMesh
         {
             get { return translucentMesh; }
@@ -137,8 +215,17 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// メッシュ更新のための頂点ビルダを取得または設定します。
+        /// </summary>
         public ChunkVerticesBuilder VerticesBuilder { get; internal set; }
 
+        /// <summary>
+        /// チャンクがアクティブであるか否かを示す値を取得します。
+        /// </summary>
+        /// <value>
+        /// true (アクティブな場合)、false (それ以外の場合)。
+        /// </value>
         public bool Active
         {
             get { return active; }
@@ -150,16 +237,32 @@ namespace Willcraftia.Xna.Blocks.Models
         // Updating には関与したくない。
         // 逆に、更新中は Drawing には関与したくない。
 
+        /// <summary>
+        /// 更新ロック中であるか否かを示す値を取得します。
+        /// 更新ロック中の場合、Busy プロパティも true となり、
+        /// 更新ロックが解放されるまで非アクティブ化されない状態となります。
+        /// </summary>
+        /// <value>
+        /// true (更新ロック中の場合)、false (それ以外の場合)。
+        /// </value>
         public bool Updating
         {
             get { return updating; }
         }
 
+        // TODO
+        // 描画ロックって必要？
+        // 描画中に非アクティブ化することはもうなくなったはず。
         public bool Drawing
         {
             get { return drawing; }
         }
 
+        /// <summary>
+        /// インスタンスを生成します。
+        /// </summary>
+        /// <param name="chunkManager">チャンク マネージャ。</param>
+        /// <param name="regionManager">リージョン マネージャ。</param>
         public Chunk(ChunkManager chunkManager, RegionManager regionManager)
         {
             if (chunkManager == null) throw new ArgumentNullException("chunkManager");
@@ -173,6 +276,10 @@ namespace Willcraftia.Xna.Blocks.Models
             blockIndices = new byte[size.X * size.Y * size.Z];
         }
 
+        /// <summary>
+        /// チャンクが属するリージョンを探索して関連付けます。
+        /// </summary>
+        /// <returns></returns>
         protected override bool InitializeOverride()
         {
             // 対象リージョンの取得。
@@ -180,16 +287,14 @@ namespace Willcraftia.Xna.Blocks.Models
             if (!regionManager.TryGetRegion(ref position, out region))
                 throw new InvalidOperationException("Region not found: " + position);
 
-            // ワールド空間における位置を算出。
-            worldPosition.X = position.X * size.X;
-            worldPosition.Y = position.Y * size.Y;
-            worldPosition.Z = position.Z * size.Z;
-
             MeshDirty = true;
 
             return base.InitializeOverride();
         }
 
+        /// <summary>
+        /// 内部状態を初期化します。
+        /// </summary>
         protected override void ReleaseOverride()
         {
             Array.Clear(blockIndices, 0, blockIndices.Length);
@@ -205,6 +310,9 @@ namespace Willcraftia.Xna.Blocks.Models
             base.ReleaseOverride();
         }
 
+        /// <summary>
+        /// Active プロパティを true に設定します。
+        /// </summary>
         protected override void OnActivated()
         {
             lock (activeLock) active = true;
@@ -212,6 +320,9 @@ namespace Willcraftia.Xna.Blocks.Models
             base.OnActivated();
         }
 
+        /// <summary>
+        /// Active プロパティを false に設定します。
+        /// </summary>
         protected override void OnPassivated()
         {
             lock (activeLock) active = false;
@@ -332,6 +443,13 @@ namespace Willcraftia.Xna.Blocks.Models
             passivating = false;
         }
 
+        /// <summary>
+        /// リージョンが提供するチャンク ストアに永続化されている場合、
+        /// チャンク ストアからチャンクをロードします。
+        /// リージョンが提供するチャンク ストアに永続化されていない場合、
+        /// リージョンが提供するチャンク プロシージャから自動生成します。
+        /// </summary>
+        /// <returns></returns>
         protected override bool ActivateOverride()
         {
             Debug.Assert(region != null);
@@ -348,6 +466,11 @@ namespace Willcraftia.Xna.Blocks.Models
             return base.ActivateOverride();
         }
 
+        /// <summary>
+        /// チャンクをチャンク ストアへ永続化します。
+        /// また、関連付けられているメッシュを開放します。
+        /// </summary>
+        /// <returns></returns>
         protected override bool PassivateOverride()
         {
             Debug.Assert(region != null);
@@ -379,6 +502,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return base.PassivateOverride();
         }
 
+        /// <summary>
+        /// ActiveNeighbors プロパティへアクティブ化された隣接パーティションの方向フラグを追加します。
+        /// </summary>
         public override void OnNeighborActivated(Partition neighbor, CubicSide side)
         {
             // 非アクティブな場合、通知を無視。
@@ -389,6 +515,9 @@ namespace Willcraftia.Xna.Blocks.Models
             base.OnNeighborActivated(neighbor, side);
         }
 
+        /// <summary>
+        /// ActiveNeighbors プロパティから非アクティブ化された隣接パーティションの方向フラグを削除します。
+        /// </summary>
         public override void OnNeighborPassivated(Partition neighbor, CubicSide side)
         {
             // 非アクティブな場合、通知を無視。

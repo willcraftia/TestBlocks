@@ -16,9 +16,14 @@ namespace Willcraftia.Xna.Framework.Landscape
     public abstract class Partition : IDisposable
     {
         /// <summary>
-        /// パーティション空間でのパーティションの位置。
+        /// パーティション空間におけるパーティションの位置。
         /// </summary>
         protected VectorI3 position;
+
+        /// <summary>
+        /// ワールド空間におけるパーティションの位置。
+        /// </summary>
+        protected Vector3 worldPosition;
 
         /// <summary>
         /// 非アクティブ化を制御するためのフラグ。
@@ -52,14 +57,19 @@ namespace Willcraftia.Xna.Framework.Landscape
         volatile bool passivationCanceled;
 
         /// <summary>
-        /// パーティションの位置を取得します。
+        /// パーティション空間におけるパーティションの位置を取得します。
         /// </summary>
-        /// <value>
-        /// パーティション空間でのパーティションの位置。
-        /// </value>
         public VectorI3 Position
         {
             get { return position; }
+        }
+
+        /// <summary>
+        /// ワールド空間におけるパーティションの位置を取得します。
+        /// </summary>
+        public Vector3 WorldPosition
+        {
+            get { return worldPosition; }
         }
 
         /// <summary>
@@ -169,13 +179,15 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// アクティブ化が要求されるまえに呼び出されます。
         /// 戻り値が false を返す場合、パーティションのアクティブ化は取り消されます。
         /// </summary>
-        /// <param name="position">パーティションの座標。</param>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
+        /// <param name="worldPosition">ワールド空間におけるパーティションの位置。</param>
         /// <returns>
         /// true (初期化に成功した場合)、false (それ以外の場合)。
         /// </returns>
-        internal bool Initialize(ref VectorI3 position)
+        internal bool Initialize(VectorI3 position, Vector3 worldPosition)
         {
             this.position = position;
+            this.worldPosition = worldPosition;
 
             activationCompleted = false;
             activationCanceled = false;

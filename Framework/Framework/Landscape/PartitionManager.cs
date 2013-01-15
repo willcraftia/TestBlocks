@@ -747,7 +747,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (partition == null) break;
 
                 // パーティションを初期化。
-                if (partition.Initialize(ref position))
+                var worldPosition = new Vector3
+                {
+                    X = position.X * partitionSize.X,
+                    Y = position.Y * partitionSize.Y,
+                    Z = position.Z * partitionSize.Z,
+                };
+                if (partition.Initialize(position, worldPosition))
                 {
                     // アクティブ化キューへ追加。
                     activatingPartitions.Enqueue(partition);
