@@ -1,9 +1,16 @@
-﻿<LandscapeSettingsDefinition>
+﻿<ChunkSettingsDefinition>
+	<ChunkSize>
+		<X>16</X>
+		<Y>16</Y>
+		<Z>16</Z>
+	</ChunkSize>
+	<MeshUpdateSearchCapacity>100</MeshUpdateSearchCapacity>
+	<VerticesBuilderCount>10</VerticesBuilderCount>
 	<MinActiveRange>10</MinActiveRange>
 	<MaxActiveRange>12</MaxActiveRange>
-	<PartitionPoolMaxCapacity>0</PartitionPoolMaxCapacity>
+	<ChunkPoolMaxCapacity>0</ChunkPoolMaxCapacity>
 	<ClusterExtent>8</ClusterExtent>
-	<InitialActivePartitionCapacity>5000</InitialActivePartitionCapacity>
+	<InitialActiveChunkCapacity>5000</InitialActiveChunkCapacity>
 	<InitialActiveClusterCapacity>50</InitialActiveClusterCapacity>
 	<InitialActivationCapacity>100</InitialActivationCapacity>
 	<InitialPassivationCapacity>1000</InitialPassivationCapacity>
@@ -11,4 +18,4 @@
 	<PassivationTaskQueueSlotCount>50</PassivationTaskQueueSlotCount>
 	<ActivationSearchCapacity>100</ActivationSearchCapacity>
 	<PassivationSearchCapacity>200</PassivationSearchCapacity>
-</LandscapeSettingsDefinition>
+</ChunkSettingsDefinition>

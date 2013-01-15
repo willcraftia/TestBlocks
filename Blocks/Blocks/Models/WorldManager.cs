@@ -74,7 +74,7 @@ namespace Willcraftia.Xna.Blocks.Models
             spriteBatch = new SpriteBatch(graphicsDevice);
             assetManager = new AssetManager(serviceProvider);
             assetManager.RegisterLoader(typeof(GraphicsSettings), new GraphicsSettingsLoader());
-            assetManager.RegisterLoader(typeof(LandscapeSettings), new LandscapeSettingsLoader());
+            assetManager.RegisterLoader(typeof(ChunkSettings), new ChunkSettingsLoader());
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
         }
 
@@ -243,9 +243,9 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク マネージャ
 
-            var landscapeSettings = LoadAsset<LandscapeSettings>("title:Resources/LandscapeSettings.json");
+            var chunkSettings = LoadAsset<ChunkSettings>("title:Resources/ChunkSettings.json");
 
-            ChunkManager = new ChunkManager(landscapeSettings.PartitionManager, GraphicsDevice, RegionManager, SceneManager);
+            ChunkManager = new ChunkManager(chunkSettings, GraphicsDevice, RegionManager, SceneManager);
 
             //----------------------------------------------------------------
             // デフォルト カメラ
@@ -258,7 +258,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 最小アクティブ範囲を超えない位置へ FarPlaneDistance を設定。
             // パーティション (チャンク) のサイズを掛けておく。
-            defaultCamera.Projection.FarPlaneDistance = (landscapeSettings.MinActiveRange - 1) * 16;
+            defaultCamera.Projection.FarPlaneDistance = (chunkSettings.MinActiveRange - 1) * 16;
 
             // 念のためここで一度更新。
             defaultCamera.Update();

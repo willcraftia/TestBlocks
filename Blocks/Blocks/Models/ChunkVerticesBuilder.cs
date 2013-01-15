@@ -12,13 +12,13 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkVerticesBuilder
     {
-        static readonly VectorI3 chunkSize = Chunk.Size;
-
-        static readonly Vector3 chunkMeshOffset = Chunk.HalfSize.ToVector3();
-
         static readonly Vector3 blockMeshOffset = new Vector3(0.5f);
 
         volatile bool completed;
+
+        VectorI3 chunkSize;
+
+        Vector3 chunkMeshOffset;
 
         public Chunk Chunk { get; internal set; }
 
@@ -52,8 +52,17 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(Chunk.Updating);
             Debug.Assert(Chunk.MeshDirty);
 
+            chunkSize = Chunk.Size;
+
+            var halfChunkSize = chunkSize;
+            halfChunkSize.X /= 2;
+            halfChunkSize.Y /= 2;
+            halfChunkSize.Z /= 2;
+
+            chunkMeshOffset = halfChunkSize.ToVector3();
+
             // メッシュを更新。
-            VectorI3 blockPosition = new VectorI3();
+            var blockPosition = new VectorI3();
             for (blockPosition.Z = 0; blockPosition.Z < chunkSize.Z; blockPosition.Z++)
                 for (blockPosition.Y = 0; blockPosition.Y < chunkSize.Y; blockPosition.Y++)
                     for (blockPosition.X = 0; blockPosition.X < chunkSize.X; blockPosition.X++)

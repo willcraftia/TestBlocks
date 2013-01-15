@@ -12,23 +12,26 @@ using Willcraftia.Xna.Blocks.Serialization;
 
 namespace Willcraftia.Xna.Blocks.Content
 {
-    public sealed class LandscapeSettingsLoader : IAssetLoader
+    public sealed class ChunkSettingsLoader : IAssetLoader
     {
-        DefinitionSerializer serializer = new DefinitionSerializer(typeof(LandscapeSettingsDefinition));
+        DefinitionSerializer serializer = new DefinitionSerializer(typeof(ChunkSettingsDefinition));
 
         public object Load(IResource resource)
         {
-            var definition = (LandscapeSettingsDefinition) serializer.Deserialize(resource);
+            var definition = (ChunkSettingsDefinition) serializer.Deserialize(resource);
 
-            var settings = new LandscapeSettings
+            var settings = new ChunkSettings
             {
+                ChunkSize = definition.ChunkSize,
+                MeshUpdateSearchCapacity = definition.MeshUpdateSearchCapacity,
+                VerticesBuilderCount = definition.VerticesBuilderCount,
                 MinActiveRange = definition.MinActiveRange,
                 MaxActiveRange = definition.MaxActiveRange,
             };
 
-            settings.PartitionManager.PartitionPoolMaxCapacity = definition.PartitionPoolMaxCapacity;
+            settings.PartitionManager.PartitionPoolMaxCapacity = definition.ChunkPoolMaxCapacity;
             settings.PartitionManager.ClusterExtent = definition.ClusterExtent;
-            settings.PartitionManager.InitialActivePartitionCapacity = definition.InitialActivePartitionCapacity;
+            settings.PartitionManager.InitialActivePartitionCapacity = definition.InitialActiveChunkCapacity;
             settings.PartitionManager.InitialActiveClusterCapacity = definition.InitialActiveClusterCapacity;
             settings.PartitionManager.InitialActivationCapacity = definition.InitialActivationCapacity;
             settings.PartitionManager.InitialPassivationCapacity = definition.InitialPassivationCapacity;
@@ -37,7 +40,7 @@ namespace Willcraftia.Xna.Blocks.Content
             settings.PartitionManager.ActivationSearchCapacity = definition.ActivationSearchCapacity;
             settings.PartitionManager.PassivationSearchCapacity = definition.PassivationSearchCapacity;
 
-            settings.PartitionManager.PartitionSize = Chunk.Size.ToVector3();
+            settings.PartitionManager.PartitionSize = definition.ChunkSize.ToVector3();
             settings.PartitionManager.MinLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, settings.MinActiveRange);
             settings.PartitionManager.MaxLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, settings.MaxActiveRange);
 
@@ -46,15 +49,18 @@ namespace Willcraftia.Xna.Blocks.Content
 
         public void Save(IResource resource, object asset)
         {
-            var settings = asset as LandscapeSettings;
+            var settings = asset as ChunkSettings;
 
-            var definition = new LandscapeSettingsDefinition
+            var definition = new ChunkSettingsDefinition
             {
+                ChunkSize = settings.ChunkSize,
+                MeshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity,
+                VerticesBuilderCount = settings.VerticesBuilderCount,
                 MinActiveRange = settings.MinActiveRange,
                 MaxActiveRange = settings.MaxActiveRange,
-                PartitionPoolMaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity,
+                ChunkPoolMaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity,
                 ClusterExtent = settings.PartitionManager.ClusterExtent,
-                InitialActivePartitionCapacity = settings.PartitionManager.InitialActivePartitionCapacity,
+                InitialActiveChunkCapacity = settings.PartitionManager.InitialActivePartitionCapacity,
                 InitialActiveClusterCapacity = settings.PartitionManager.InitialActiveClusterCapacity,
                 InitialActivationCapacity = settings.PartitionManager.InitialActivationCapacity,
                 InitialPassivationCapacity = settings.PartitionManager.InitialPassivationCapacity,

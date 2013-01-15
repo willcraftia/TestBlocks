@@ -28,8 +28,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // チャンク メッシュのプーリングも行わない。
         //
 
-        static readonly VectorI3 chunkSize = Chunk.Size;
-
         GraphicsDevice graphicsDevice;
 
         Matrix world = Matrix.Identity;

@@ -1415,17 +1415,20 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
 
             #endregion
 
-            #region 景観設定定義
+            #region チャンク定義
 
-            Console.WriteLine("景観設定定義");
+            Console.WriteLine("チャンク定義");
             {
-                var settings = new LandscapeSettingsDefinition
+                var settings = new ChunkSettingsDefinition
                 {
+                    ChunkSize = new VectorI3(16),
+                    MeshUpdateSearchCapacity = 100,
+                    VerticesBuilderCount = 10,
                     MinActiveRange = 10,
                     MaxActiveRange = 12,
-                    PartitionPoolMaxCapacity = 0,
+                    ChunkPoolMaxCapacity = 0,
                     ClusterExtent = 8,
-                    InitialActivePartitionCapacity = 5000,
+                    InitialActiveChunkCapacity = 5000,
                     InitialActiveClusterCapacity = 50,
                     InitialActivationCapacity = 100,
                     InitialPassivationCapacity = 1000,
@@ -1434,10 +1437,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ActivationTaskQueueSlotCount = 50,
                     PassivationTaskQueueSlotCount = 50
                 };
-                var jsonResource = SerializeToJson<LandscapeSettingsDefinition>("LandscapeSettings", settings);
-                var xmlResource = SerializeToXml<LandscapeSettingsDefinition>("LandscapeSettings", settings);
-                var fromJson = DeserializeFromJson<LandscapeSettingsDefinition>(jsonResource);
-                var fromXml = DeserializeFromXml<LandscapeSettingsDefinition>(xmlResource);
+                var jsonResource = SerializeToJson<ChunkSettingsDefinition>("ChunkSettings", settings);
+                var xmlResource = SerializeToXml<ChunkSettingsDefinition>("ChunkSettings", settings);
+                var fromJson = DeserializeFromJson<ChunkSettingsDefinition>(jsonResource);
+                var fromXml = DeserializeFromXml<ChunkSettingsDefinition>(xmlResource);
             }
             Console.WriteLine();
 

@@ -1,0 +1,21 @@
+{
+  "ChunkSize": {
+    "X": 16,
+    "Y": 16,
+    "Z": 16
+  },
+  "MeshUpdateSearchCapacity": 100,
+  "VerticesBuilderCount": 10,
+  "MinActiveRange": 10,
+  "MaxActiveRange": 12,
+  "ChunkPoolMaxCapacity": 0,
+  "ClusterExtent": 8,
+  "InitialActiveChunkCapacity": 5000,
+  "InitialActiveClusterCapacity": 50,
+  "InitialActivationCapacity": 100,
+  "InitialPassivationCapacity": 1000,
+  "ActivationTaskQueueSlotCount": 50,
+  "PassivationTaskQueueSlotCount": 50,
+  "ActivationSearchCapacity": 100,
+  "PassivationSearchCapacity": 200
+}

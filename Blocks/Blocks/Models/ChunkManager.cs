@@ -21,20 +21,20 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class ChunkManager : PartitionManager
     {
-        // TODO
-        //
-        // 実行で最適と思われる値を調べて決定するが、
-        // 最終的には定義ファイルのようなもので定義を変更できるようにする。
-        //
+        /// <summary>
+        /// メッシュ更新の最大試行数。
+        /// </summary>
+        int meshUpdateSearchCapacity;
 
-        // 更新の最大試行数。
-        public const int ChunkMeshUpdateSearchCapacity = 100;
+        /// <summary>
+        /// 頂点ビルダの総数。
+        /// </summary>
+        int verticesBuilderCount;
 
-        public const int ChunkVerticesBuilderCapacity = 10;
-
-        static readonly VectorI3 chunkSize = Chunk.Size;
-
-        static readonly Vector3 chunkMeshOffset = Chunk.HalfSize.ToVector3();
+        /// <summary>
+        /// チャンク サイズ。
+        /// </summary>
+        VectorI3 chunkSize;
 
         /// <summary>
         /// グラフィックス デバイス。
@@ -53,6 +53,11 @@ namespace Willcraftia.Xna.Blocks.Models
         SceneManager sceneManager;
 
         /// <summary>
+        /// チャンク メッシュのオフセット。
+        /// </summary>
+        Vector3 chunkMeshOffset;
+
+        /// <summary>
         /// 1 / chunkSize。
         /// </summary>
         Vector3 inverseChunkSize;
@@ -60,7 +65,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 頂点ビルダ実行待ちチャンクのキュー。
         /// </summary>
-        Queue<Chunk> buildVerticesQueue = new Queue<Chunk>(ChunkVerticesBuilderCapacity);
+        Queue<Chunk> buildVerticesQueue;
 
         /// <summary>
         /// 頂点ビルダのプール。
@@ -76,6 +81,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 破棄待ちチャンク メッシュのキュー。
         /// </summary>
         Queue<ChunkMesh> disposeMeshQueue = new Queue<ChunkMesh>();
+
+        /// <summary>
+        /// チャンクのサイズを取得します。
+        /// </summary>
+        public VectorI3 ChunkSize
+        {
+            get { return chunkSize; }
+        }
 
         /// <summary>
         /// チャンク メッシュの数を取得します。
@@ -129,20 +142,31 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="settings">パーティション設定。</param>
+        /// <param name="settings">チャンク設定。</param>
         /// <param name="graphicsDevice">グラフィックス デバイス。</param>
         /// <param name="regionManager">リージョン マネージャ。</param>
         /// <param name="sceneManager">シーン マネージャ。</param>
-        public ChunkManager(Settings settings, GraphicsDevice graphicsDevice, RegionManager regionManager, SceneManager sceneManager)
-            : base(settings)
+        public ChunkManager(ChunkSettings settings, GraphicsDevice graphicsDevice, RegionManager regionManager, SceneManager sceneManager)
+            : base(settings.PartitionManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (regionManager == null) throw new ArgumentNullException("regionManager");
             if (sceneManager == null) throw new ArgumentNullException("sceneManager");
 
+            chunkSize = settings.ChunkSize;
             this.graphicsDevice = graphicsDevice;
             this.regionManager = regionManager;
             this.sceneManager = sceneManager;
+
+            meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
+            verticesBuilderCount = settings.VerticesBuilderCount;
+
+            var halfChunkSize = chunkSize;
+            halfChunkSize.X /= 2;
+            halfChunkSize.Y /= 2;
+            halfChunkSize.Z /= 2;
+
+            chunkMeshOffset = halfChunkSize.ToVector3();
 
             inverseChunkSize.X = 1 / (float) chunkSize.X;
             inverseChunkSize.Y = 1 / (float) chunkSize.Y;
@@ -150,12 +174,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreateInterChunkMeshTask)
             {
-                MaxCapacity = ChunkVerticesBuilderCapacity
+                MaxCapacity = verticesBuilderCount
             };
             verticesBuilderTaskQueue = new TaskQueue
             {
-                SlotCount = ChunkVerticesBuilderCapacity
+                SlotCount = verticesBuilderCount
             };
+
+            buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
         }
 
         /// <summary>
@@ -209,11 +235,11 @@ namespace Willcraftia.Xna.Blocks.Models
             // メッシュ更新が必要なチャンクを探索。
             var activePartitionCount = ActivePartitions.Count;
             
-            var searchCapacity = ChunkMeshUpdateSearchCapacity;
+            var searchCapacity = meshUpdateSearchCapacity;
             if (gameTime.IsRunningSlowly) searchCapacity /= 2;
 
             int trials = 0;
-            while (0 < activePartitionCount && trials < ChunkMeshUpdateSearchCapacity && trials < activePartitionCount)
+            while (0 < activePartitionCount && trials < meshUpdateSearchCapacity && trials < activePartitionCount)
             {
                 // TODO
                 // 視点位置の近隣を優先するためのアルゴリズムは無いのだろうか？

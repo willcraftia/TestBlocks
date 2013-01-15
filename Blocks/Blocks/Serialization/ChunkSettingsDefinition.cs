@@ -1,22 +1,29 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Serialization
 {
-    public struct LandscapeSettingsDefinition
+    public struct ChunkSettingsDefinition
     {
+        public VectorI3 ChunkSize;
+
+        public int MeshUpdateSearchCapacity;
+
+        public int VerticesBuilderCount;
+
         public int MinActiveRange;
 
         public int MaxActiveRange;
 
-        public int PartitionPoolMaxCapacity;
+        public int ChunkPoolMaxCapacity;
 
         public int ClusterExtent;
 
-        public int InitialActivePartitionCapacity;
+        public int InitialActiveChunkCapacity;
 
         public int InitialActiveClusterCapacity;
 

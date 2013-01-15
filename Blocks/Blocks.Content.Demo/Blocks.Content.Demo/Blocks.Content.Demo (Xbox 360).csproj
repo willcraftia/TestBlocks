@@ -46,6 +46,7 @@
     <None Include="GameThumbnail.png">
       <XnaPlatformSpecific>true</XnaPlatformSpecific>
     </None>
+    <None Include="Resources\ChunkSettings.json" />
     <None Include="Resources\Cube.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -91,6 +92,7 @@
   <ItemGroup>
     <Content Include="Game.ico" />
     <Content Include="GameThumbnail.png" />
+    <Content Include="Resources\ChunkSettings.xml" />
     <Content Include="Resources\DefaultDensityNoise.xml" />
     <Content Include="Resources\DefaultRainParticle.png" />
     <Content Include="Resources\DefaultRainParticle.xml" />
@@ -103,7 +105,6 @@
     <Content Include="Resources\DefaultTerrainNoise.xml" />
     <Content Include="Resources\DefaultTerrainProcedure.xml" />
     <Content Include="Resources\GraphicsSettings.xml" />
-    <Content Include="Resources\LandscapeSettings.xml" />
     <Content Include="Resources\SceneSettings.xml" />
     <None Include="Resources\DirtBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -124,7 +125,6 @@
     <None Include="Resources\GrassTopTile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\LandscapeSettings.json" />
     <None Include="Resources\MantleBlock.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

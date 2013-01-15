@@ -18,25 +18,13 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class Chunk : Partition
     {
-        // TODO
-        // 定数値である必要はない。
-        public static VectorI3 Size
-        {
-            get { return new VectorI3(16); }
-        }
-
-        public static VectorI3 HalfSize
-        {
-            get { return new VectorI3(8); }
-        }
-
         ChunkManager chunkManager;
 
         RegionManager regionManager;
 
         Region region;
 
-        VectorI3 size = Size;
+        VectorI3 size;
 
         Vector3 worldPosition;
 
@@ -59,6 +47,11 @@ namespace Willcraftia.Xna.Blocks.Models
         ChunkMesh opaqueMesh;
 
         ChunkMesh translucentMesh;
+
+        public VectorI3 Size
+        {
+            get { return size; }
+        }
 
         public Region Region
         {
@@ -174,6 +167,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.chunkManager = chunkManager;
             this.regionManager = regionManager;
+
+            size = chunkManager.ChunkSize;
 
             blockIndices = new byte[size.X * size.Y * size.Z];
         }

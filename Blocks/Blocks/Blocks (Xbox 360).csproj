@@ -100,9 +100,9 @@
     <Compile Include="Content\BlockCatalogLoader.cs" />
     <Compile Include="Content\BlockLoader.cs" />
     <Compile Include="Content\ChunkProcedureLoader.cs" />
+    <Compile Include="Content\ChunkSettingsLoader.cs" />
     <Compile Include="Content\GraphicsSettingsLoader.cs" />
     <Compile Include="Content\Image2DLoader.cs" />
-    <Compile Include="Content\LandscapeSettingsLoader.cs" />
     <Compile Include="Content\MeshLoader.cs" />
     <Compile Include="Content\NoiseLoader.cs" />
     <Compile Include="Content\ParticleSettingsLoader.cs" />
@@ -124,6 +124,7 @@
     <Compile Include="Models\ChunkMesh.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\ChunkSettings.cs" />
     <Compile Include="Models\ChunkVertices.cs" />
     <Compile Include="Models\ChunkVerticesBuilder.cs" />
     <Compile Include="Models\CloseChunks.cs" />
@@ -137,7 +138,6 @@
     <Compile Include="Models\IChunkProcedure.cs" />
     <Compile Include="Models\IChunkStore.cs" />
     <Compile Include="Models\Image2D.cs" />
-    <Compile Include="Models\LandscapeSettings.cs" />
     <Compile Include="Models\Mesh.cs" />
     <Compile Include="Models\MeshPart.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
@@ -162,13 +162,13 @@
     <Compile Include="Serialization\BlockDefinition.cs" />
     <Compile Include="Serialization\BloomSettingsDefinition.cs" />
     <Compile Include="Serialization\BlurSettingsDefinition.cs" />
+    <Compile Include="Serialization\ChunkSettingsDefinition.cs" />
     <Compile Include="Serialization\ChunkStoreTypes.cs" />
     <Compile Include="Serialization\DefinitionSerializer.cs" />
     <Compile Include="Serialization\DofSettingsDefinition.cs" />
     <Compile Include="Serialization\EdgeSettingsDefinition.cs" />
     <Compile Include="Serialization\GraphicsSettingsDefinition.cs" />
     <Compile Include="Serialization\IndexedUriDefinition.cs" />
-    <Compile Include="Serialization\LandscapeSettingsDefinition.cs" />
     <Compile Include="Serialization\MeshDefinition.cs" />
     <Compile Include="Serialization\MeshPartDefinition.cs" />
     <Compile Include="Serialization\ParticleSettingsDefinition.cs" />
