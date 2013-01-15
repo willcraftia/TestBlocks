@@ -34,8 +34,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public void Generate(Chunk chunk)
         {
-            var position = chunk.Position;
-
             // バイオームを取得。
             // 選択されるブロックはバイオームに従う。
             var biome = Region.BiomeManager.GetBiome(chunk);
