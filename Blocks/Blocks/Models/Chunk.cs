@@ -64,16 +64,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </value>
         volatile bool updating;
 
-        // TODO
-        volatile bool drawing;
-
         /// <summary>
-        /// 非アクティブ化ロック中であるか否かを示す値。
+        /// 描画ロック中であるか否かを示す値。
         /// </summary>
         /// <value>
-        /// true (非アクティブ化ロック中の場合)、false (それ以外の場合)。
+        /// true (描画ロック中の場合)、false (それ以外の場合)。
         /// </value>
-        volatile bool passivating;
+        volatile bool drawing;
 
         /// <summary>
         /// アクティブな隣接チャンクのフラグ。
@@ -347,7 +344,6 @@ namespace Willcraftia.Xna.Blocks.Models
             try
             {
                 if (!active) return false;
-                if (passivating) return false;
 
                 updating = true;
 
@@ -388,7 +384,6 @@ namespace Willcraftia.Xna.Blocks.Models
             try
             {
                 if (!active) return false;
-                if (passivating) return false;
 
                 drawing = true;
                 return true;
@@ -405,42 +400,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public void ExitDraw()
         {
             drawing = false;
-        }
-
-        /// <summary>
-        /// 非アクティブ化ロックの取得を試行します。
-        /// 他のスレッドがロック中の場合、非アクティブな場合、更新ロック中の場合、描画ロック中の場合は、
-        /// 非アクティブ化ロックの取得に失敗します。
-        /// 非アクティブ化ロックの取得に成功した場合には、
-        /// 必ず ExitPassivate メソッドでロックを解放しなければなりません。
-        /// </summary>
-        /// <returns>
-        /// true (非アクティブ化ロックを取得できた場合)、false (それ以外の場合)。
-        /// </returns>
-        public bool EnterPassivate()
-        {
-            if (!Monitor.TryEnter(activeLock)) return false;
-
-            try
-            {
-                if (!active) return false;
-                if (updating || drawing) return false;
-
-                passivating = true;
-                return true;
-            }
-            finally
-            {
-                Monitor.Exit(activeLock);
-            }
-        }
-
-        /// <summary>
-        /// EnterPassivate メソッドで取得した描画ロックを開放します。
-        /// </summary>
-        public void ExitPassivate()
-        {
-            passivating = false;
         }
 
         /// <summary>
@@ -475,29 +434,33 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(region != null);
             Debug.Assert(active);
+            Debug.Assert(!updating);
 
-            if (!EnterPassivate()) return false;
-
-            if (OpaqueMesh != null)
+            // 更新ロック中の場合は非アクティブ化が行われないが、
+            // 非アクティブ化中に更新ロックを取得しようとすると、ここでのロックにより失敗する。
+            // また、非アクティブ化中に描画ロックを取得しようとした場合も失敗する。
+            // 一方で、ここでのロックは描画ロック中に対する完全待機となる。
+            lock (activeLock)
             {
-                chunkManager.DisposeChunkMesh(OpaqueMesh);
-                OpaqueMesh = null;
-            }
-            if (TranslucentMesh != null)
-            {
-                chunkManager.DisposeChunkMesh(TranslucentMesh);
-                TranslucentMesh = null;
-            }
-            if (VerticesBuilder != null)
-            {
-                chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
-                VerticesBuilder = null;
-            }
+                if (OpaqueMesh != null)
+                {
+                    chunkManager.DisposeChunkMesh(OpaqueMesh);
+                    OpaqueMesh = null;
+                }
+                if (TranslucentMesh != null)
+                {
+                    chunkManager.DisposeChunkMesh(TranslucentMesh);
+                    TranslucentMesh = null;
+                }
+                if (VerticesBuilder != null)
+                {
+                    chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
+                    VerticesBuilder = null;
+                }
 
-            // 定義に変更があるならば永続化領域を更新。
-            if (DefinitionDirty) Region.ChunkStore.AddChunk(this);
-
-            ExitPassivate();
+                // 定義に変更があるならば永続化領域を更新。
+                if (DefinitionDirty) Region.ChunkStore.AddChunk(this);
+            }
 
             return base.PassivateOverride();
         }
