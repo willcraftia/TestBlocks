@@ -144,15 +144,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         void CheckDirtyChunkMeshes()
         {
-            // TODO
-            // パーティション マネージャではアクティブ パーティションをキューで管理している。
-            // これはパーティション更新には不都合である。
-
             // メッシュ更新が必要なチャンクを探索。
             int activePartitionCount = ActivePartitions.Count;
             int trials = 0;
             while (0 < activePartitionCount && trials < UpdateCapacity && trials < activePartitionCount)
             {
+                // TODO
+                // 視点位置の近隣を優先するためのアルゴリズムは無いのだろうか？
                 var chunk = ActivePartitions.Dequeue() as Chunk;
 
                 if (chunk.EnterUpdate())
