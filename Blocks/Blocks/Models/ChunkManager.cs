@@ -63,11 +63,6 @@ namespace Willcraftia.Xna.Blocks.Models
         Queue<Chunk> buildVerticesQueue = new Queue<Chunk>(ChunkVerticesBuilderCapacity);
 
         /// <summary>
-        /// 頂点バッファ反映待ちチャンクのキュー。
-        /// </summary>
-        Queue<Chunk> updateBufferQueue = new Queue<Chunk>(ChunkVerticesBuilderCapacity);
-
-        /// <summary>
         /// 頂点ビルダのプール。
         /// </summary>
         Pool<ChunkVerticesBuilder> verticesBuilderPool;
@@ -212,7 +207,11 @@ namespace Willcraftia.Xna.Blocks.Models
         void CheckDirtyChunkMeshes(GameTime gameTime)
         {
             // メッシュ更新が必要なチャンクを探索。
-            int activePartitionCount = ActivePartitions.Count;
+            var activePartitionCount = ActivePartitions.Count;
+            
+            var searchCapacity = ChunkMeshUpdateSearchCapacity;
+            if (gameTime.IsRunningSlowly) searchCapacity /= 2;
+
             int trials = 0;
             while (0 < activePartitionCount && trials < ChunkMeshUpdateSearchCapacity && trials < activePartitionCount)
             {
@@ -230,7 +229,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                     if (chunk.MeshDirty)
                     {
-                        if (!buildVerticesQueue.Contains(chunk) && !updateBufferQueue.Contains(chunk))
+                        if (!buildVerticesQueue.Contains(chunk))
                         {
                             var verticesBuilder = verticesBuilderPool.Borrow();
                             if (verticesBuilder != null)
@@ -275,7 +274,10 @@ namespace Willcraftia.Xna.Blocks.Models
             // 完了フラグを初期化。
             verticesBuilder.Completed = false;
 
-            // 隣接チャンク集合を初期化。
+            // 隣接チャンク集合を構築。
+            // 非同期処理からアクティブ チャンクを探索する場合、
+            // 全アクティブ チャンクに対する同期化を必要とする問題があるが、
+            // この問題を回避するために非同期処理に入る前に探索している。
             var centerPosition = chunk.Position;
             for (int z = -1; z <= 1; z++)
             {
@@ -336,27 +338,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                if (Closing)
-                {
-                    // クローズ中ならば頂点バッファ反映をスキップして更新ロックを解放。
-                    ReleaseVerticesBuilder(chunk.VerticesBuilder);
-
-                    chunk.MeshDirty = false;
-                    chunk.ExitUpdate();
-                    continue;
-                }
-
-                // 頂点バッファ更新キューへ追加。
-                updateBufferQueue.Enqueue(chunk);
-            }
-
-            // 頂点バッファへの反映。
-            if (0 < updateBufferQueue.Count && !gameTime.IsRunningSlowly)
-            {
-                // 各フレームでひとつずつバッファへ反映。
-                var chunk = updateBufferQueue.Dequeue();
-
-                UpdateChunkMesh(chunk);
+                // クローズ中は頂点バッファ反映をスキップ。
+                if (!Closing) UpdateChunkMesh(chunk);
 
                 // 頂点ビルダを解放。
                 ReleaseVerticesBuilder(chunk.VerticesBuilder);
