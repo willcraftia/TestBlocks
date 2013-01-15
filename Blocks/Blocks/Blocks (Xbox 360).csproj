@@ -111,8 +111,6 @@
     <Compile Include="Content\SkySphereLoader.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
     <Compile Include="Content\TileLoader.cs" />
-    <Compile Include="Landscape\ChunkPartition.cs" />
-    <Compile Include="Landscape\ChunkPartitionManager.cs" />
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
     <Compile Include="Models\BiomeElement.cs" />
@@ -121,7 +119,6 @@
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
     <Compile Include="Models\Chunk.cs" />
-    <Compile Include="Models\ChunkCollection.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\ChunkManager.cs" />
     <Compile Include="Models\ChunkMesh.cs">
@@ -199,6 +196,7 @@
       <Name>Framework %28Xbox 360%29</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

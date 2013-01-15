@@ -16,15 +16,20 @@ namespace Willcraftia.Xna.Framework.Landscape
     public abstract class Partition : IDisposable
     {
         /// <summary>
+        /// パーティション空間でのパーティションの位置。
+        /// </summary>
+        protected VectorI3 position;
+
+        /// <summary>
+        /// 非アクティブ化を制御するためのフラグ。
+        /// </summary>
+        volatile bool busy;
+
+        /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
         /// </summary>
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
-
-        /// <summary>
-        /// パーティション空間でのパーティションの位置。
-        /// </summary>
-        VectorI3 position;
 
         /// <summary>
         /// アクティブ化が完了しているか否かを示す値。
@@ -55,6 +60,20 @@ namespace Willcraftia.Xna.Framework.Landscape
         public VectorI3 Position
         {
             get { return position; }
+        }
+
+        /// <summary>
+        /// パーティションが何らかの処理により占有状態にあるか否かを示す値を取得または設定します。
+        /// このプロパティが true を返す場合、
+        /// パーティションが非アクティブ化対象となっても非アクティブ化されません。
+        /// </summary>
+        /// <value>
+        /// true (パーティションが何らかの処理により占有状態にある場合)、false (それ以外の場合)。
+        /// </value>
+        public bool Busy
+        {
+            get { return busy; }
+            protected set { busy = value; }
         }
 
         /// <summary>
@@ -148,9 +167,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションを初期化します。
         /// このメソッドは、パーティション プールから取り出され、
         /// アクティブ化が要求されるまえに呼び出されます。
+        /// 戻り値が false を返す場合、パーティションのアクティブ化は取り消されます。
         /// </summary>
         /// <param name="position">パーティションの座標。</param>
-        internal void Initialize(ref VectorI3 position)
+        /// <returns>
+        /// true (初期化に成功した場合)、false (それ以外の場合)。
+        /// </returns>
+        internal bool Initialize(ref VectorI3 position)
         {
             this.position = position;
 
@@ -159,7 +182,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             passivationCompleted = false;
             passivationCanceled = false;
 
-            InitializeOverride();
+            return InitializeOverride();
         }
 
         /// <summary>
@@ -170,6 +193,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void Release()
         {
             position = VectorI3.Zero;
+
+            activationCompleted = false;
+            activationCanceled = false;
+            passivationCompleted = false;
+            passivationCanceled = false;
 
             ReleaseOverride();
         }
@@ -225,7 +253,30 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションの初期化で呼び出されます。
         /// </summary>
-        protected virtual void InitializeOverride() { }
+        /// <returns>
+        /// true (初期化に成功した場合)、false (それ以外の場合)。
+        /// </returns>
+        protected virtual bool InitializeOverride() { return true; }
+
+        /// <summary>
+        /// アクティブ化の開始直前で呼び出されます。
+        /// </summary>
+        protected internal virtual void OnActivating() { }
+
+        /// <summary>
+        /// アクティブ化の完了直後で呼び出されます。
+        /// </summary>
+        protected internal virtual void OnActivated() { }
+
+        /// <summary>
+        /// 非アクティブ化の開始直前で呼び出されます。
+        /// </summary>
+        protected internal virtual void OnPassivating() { }
+
+        /// <summary>
+        /// 非アクティブ化の完了直後で呼び出されます。
+        /// </summary>
+        protected internal virtual void OnPassivated() { }
 
         /// <summary>
         /// アクティブ化を試行する際に呼び出されます。

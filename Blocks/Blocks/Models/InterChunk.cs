@@ -14,6 +14,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public InterChunkMesh Opaque { get; private set; }
 
+        public Chunk Chunk { get; set; }
+
         public bool Completed
         {
             get { return completed; }

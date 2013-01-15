@@ -9,7 +9,6 @@ using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Landscape;
-using Willcraftia.Xna.Blocks.Landscape;
 using Willcraftia.Xna.Blocks.Content;
 
 #endregion
@@ -39,8 +38,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public ChunkManager ChunkManager { get; private set; }
 
         public RegionManager RegionManager { get; private set; }
-
-        public ChunkPartitionManager PartitionManager { get; private set; }
 
         public GraphicsSettings GraphicsSettings { get; private set; }
 
@@ -234,11 +231,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             //----------------------------------------------------------------
-            // チャンク マネージャ
-
-            ChunkManager = new ChunkManager(GraphicsDevice, SceneManager);
-
-            //----------------------------------------------------------------
             // リージョン マネージャ
 
             RegionManager = new RegionManager(serviceProvider, SceneManager);
@@ -249,11 +241,11 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.ShadowMapUpdated += RegionManager.OnShadowMapUpdated;
 
             //----------------------------------------------------------------
-            // パーティション マネージャ
+            // チャンク マネージャ
 
             var landscapeSettings = LoadAsset<LandscapeSettings>("title:Resources/LandscapeSettings.json");
 
-            PartitionManager = new ChunkPartitionManager(landscapeSettings.PartitionManager, ChunkManager, RegionManager);
+            ChunkManager = new ChunkManager(landscapeSettings.PartitionManager, GraphicsDevice, RegionManager, SceneManager);
 
             //----------------------------------------------------------------
             // デフォルト カメラ
@@ -298,12 +290,6 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.ActiveCamera.Update();
 
             //----------------------------------------------------------------
-            // パーティション マネージャ
-
-            var cameraPosition = SceneManager.ActiveCamera.View.Position;
-            PartitionManager.Update(ref cameraPosition);
-
-            //----------------------------------------------------------------
             // シーン設定
 
             SceneSettings.Update(gameTime);
@@ -338,7 +324,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク マネージャ
 
-            ChunkManager.Update();
+            ChunkManager.Update(SceneManager.ActiveCamera.View.Position);
 
             //----------------------------------------------------------------
             // リージョン マネージャ

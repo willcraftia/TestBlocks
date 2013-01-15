@@ -3,27 +3,20 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
-using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
-using Willcraftia.Xna.Framework.IO;
-using Willcraftia.Xna.Framework.Threading;
+using Willcraftia.Xna.Framework.Landscape;
+using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    using DiagnosticsMonitor = Willcraftia.Xna.Framework.Diagnostics.Monitor;
-
-    public sealed class ChunkManager
+    public sealed class ChunkManager : PartitionManager
     {
-        public const string MonitorUpdate = "ChunkManager.Update";
-
         // TODO
         //
         // 実行で最適と思われる値を調べて決定するが、
@@ -43,41 +36,21 @@ namespace Willcraftia.Xna.Blocks.Models
 
         GraphicsDevice graphicsDevice;
 
+        RegionManager regionManager;
+
         SceneManager sceneManager;
 
         Vector3 inverseChunkSize;
 
-        ChunkCollection activeChunks = new ChunkCollection(InitialActiveChunkCapacity);
-
-        Queue<Chunk> updatingChunks = new Queue<Chunk>(UpdateCapacity);
-
-        // 更新の開始インデックス。
-        int updateOffset = 0;
-
-        // チャンク数はパーティション数に等しい。
-        // このため、ここでは最大チャンク数を決定できない。
-
-        ConcurrentPool<Chunk> chunkPool;
+        // 中間チャンクを取得できなければメッシュ更新は行えないため、
+        // 容量は中間チャンクの総数で良い。
+        Queue<Chunk> updatingChunks = new Queue<Chunk>(InterChunkCapacity);
 
         Pool<InterChunk> interChunkPool;
 
         ChunkMeshUpdateManager chunkMeshUpdateManager;
 
         Queue<ChunkMesh> disposingChunkMeshes = new Queue<ChunkMesh>();
-
-        bool closing;
-
-        bool closed;
-
-        public int TotalChunkCount
-        {
-            get { return chunkPool.TotalObjectCount; }
-        }
-
-        public int ActiveChunkCount
-        {
-            get { lock (activeChunks) return activeChunks.Count; }
-        }
 
         public int ChunkMeshCount { get; private set; }
 
@@ -106,19 +79,21 @@ namespace Willcraftia.Xna.Blocks.Models
         // ゲームを通しての最大を記録する。
         public int MaxIndexCount { get; private set; }
 
-        public ChunkManager(GraphicsDevice graphicsDevice, SceneManager sceneManager)
+        public ChunkManager(Settings settings, GraphicsDevice graphicsDevice, RegionManager regionManager, SceneManager sceneManager)
+            : base(settings)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (regionManager == null) throw new ArgumentNullException("regionManager");
             if (sceneManager == null) throw new ArgumentNullException("sceneManager");
 
             this.graphicsDevice = graphicsDevice;
+            this.regionManager = regionManager;
             this.sceneManager = sceneManager;
 
             inverseChunkSize.X = 1 / (float) chunkSize.X;
             inverseChunkSize.Y = 1 / (float) chunkSize.Y;
             inverseChunkSize.Z = 1 / (float) chunkSize.Z;
 
-            chunkPool = new ConcurrentPool<Chunk>(CreateChunk);
             interChunkPool = new Pool<InterChunk>(CreateInterChunk)
             {
                 MaxCapacity = InterChunkCapacity
@@ -126,102 +101,114 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkMeshUpdateManager = new ChunkMeshUpdateManager(this);
         }
 
-        public void Update()
+        /// <summary>
+        /// チャンクをパーティションとして生成します。
+        /// </summary>
+        protected override Partition CreatePartition()
         {
-            if (closed) return;
+            return new Chunk(this, regionManager);
+        }
 
-            if (closing)
+        /// <summary>
+        /// 指定の位置を含むリージョンがある場合、アクティブ化可能であると判定します。
+        /// </summary>
+        protected override bool CanActivatePartition(ref VectorI3 position)
+        {
+            if (!regionManager.RegionExists(ref position)) return false;
+
+            return base.CanActivatePartition(ref position);
+        }
+
+        /// <summary>
+        /// チャンク メッシュの破棄、新たなメッシュ更新の開始、メッシュ更新完了の監視を行います。
+        /// </summary>
+        protected override void UpdatePartitionsOverride()
+        {
+            // 破棄要求を受けたチャンク メッシュを処理。
+            CheckDisposingChunkMeshes();
+
+            // メッシュ更新が必要なチャンクを探索して更新要求を追加。
+            // ただし、クローズが開始したら行わない。
+            if (!Closing) CheckDirtyChunkMeshes();
+
+            // メッシュ更新完了を監視。
+            // メッシュ更新中はチャンクの更新ロックを取得したままであるため、
+            // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
+            CheckChunkMeshesUpdated();
+
+            base.UpdatePartitionsOverride();
+        }
+
+        /// <summary>
+        /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
+        /// </summary>
+        void CheckDirtyChunkMeshes()
+        {
+            // TODO
+            // パーティション マネージャではアクティブ パーティションをキューで管理している。
+            // これはパーティション更新には不都合である。
+
+            // メッシュ更新が必要なチャンクを探索。
+            int activePartitionCount = ActivePartitions.Count;
+            int trials = 0;
+            while (0 < activePartitionCount && trials < UpdateCapacity && trials < activePartitionCount)
             {
-                lock (activeChunks)
+                var chunk = ActivePartitions.Dequeue() as Chunk;
+
+                if (chunk.EnterUpdate())
                 {
-                    if (activeChunks.Count == 0)
+                    // 現在の隣接チャンクのアクティブ状態が前回のメッシュ更新時のアクティブ状態と異なるならば、
+                    // 新たにアクティブ化された隣接チャンクを考慮してメッシュを更新するために、
+                    // 強制的にチャンクを Dirty とする。
+                    if (chunk.ActiveNeighbors != chunk.NeighborsReferencedOnUpdate)
+                        chunk.MeshDirty = true;
+
+                    if (chunk.MeshDirty)
                     {
-                        closing = false;
-                        closed = true;
-                        return;
+                        if (!updatingChunks.Contains(chunk))
+                        {
+                            chunk.InterChunk = interChunkPool.Borrow();
+
+                            if (chunk.InterChunk != null)
+                            {
+                                chunk.InterChunk.Completed = false;
+                                chunkMeshUpdateManager.EnqueueChunk(chunk);
+                                updatingChunks.Enqueue(chunk);
+                            }
+                            else
+                            {
+                                // 中間チャンク枯渇の場合は次フレーム以降の再更新判定に期待。
+                                chunk.ExitUpdate();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        chunk.ExitUpdate();
                     }
                 }
+
+                ActivePartitions.Enqueue(chunk);
+
+                trials++;
             }
+        }
 
-            DiagnosticsMonitor.Begin(MonitorUpdate);
-
-            // チャンク メッシュ破棄キューを処理。
-            DisposeChunkMeshes();
-
-            // 長時間のロックを避けるために、一時的に作業リストへコピー。
-            lock (activeChunks)
-            {
-                // アクティブ チャンクが無いならば更新処理終了。
-                if (activeChunks.Count == 0)
-                {
-                    DiagnosticsMonitor.End(MonitorUpdate);
-                    return;
-                }
-
-                int index = updateOffset;
-                bool cycled = false;
-                while (updatingChunks.Count < UpdateCapacity)
-                {
-                    if (activeChunks.Count <= index)
-                    {
-                        index = 0;
-                        cycled = true;
-                    }
-
-                    if (cycled && updateOffset <= index) break;
-
-                    var chunk = activeChunks[index++];
-                    updatingChunks.Enqueue(chunk);
-                }
-
-                updateOffset = index;
-            }
-
-            Debug.Assert(updatingChunks.Count <= UpdateCapacity);
-
+        /// <summary>
+        /// チャンク メッシュ更新の完了を監視し、
+        /// 完了しているならば頂点バッファへの反映を試みます。
+        /// </summary>
+        void CheckChunkMeshesUpdated()
+        {
             int count = updatingChunks.Count;
             for (int i = 0; i < count; i++)
             {
                 var chunk = updatingChunks.Dequeue();
 
-                if (!chunk.EnterUpdate()) continue;
-
-                // 現在の隣接チャンクのアクティブ状態が前回のメッシュ更新時のアクティブ状態と異なるならば、
-                // 新たにアクティブ化された隣接チャンクを考慮してメッシュを更新するために、
-                // 強制的にチャンクを Dirty とする。
-                if (chunk.ActiveNeighbors != chunk.NeighborsReferencedOnUpdate)
-                    chunk.MeshDirty = true;
-
-                if (!chunk.MeshDirty)
+                if (chunk.InterChunk.Completed)
                 {
-                    chunk.ExitUpdate();
-                    continue;
-                }
-
-                if (chunk.InterChunk == null)
-                {
-                    // 中間チャンク未設定ならば設定を試行。
-
-                    if (closing)
-                    {
-                        // クローズが開始したならば新規の更新要求は破棄。
-                        chunk.ExitUpdate();
-                    }
-                    else if (BorrowInterChunk(chunk))
-                    {
-                        chunk.InterChunk.Completed = false;
-                        chunkMeshUpdateManager.EnqueueChunk(chunk);
-                    }
-                    else
-                    {
-                        // 中間チャンクが枯渇しているため更新を次回の試行に委ねる。
-                        chunk.ExitUpdate();
-                    }
-                }
-                else if (chunk.InterChunk.Completed)
-                {
-                    // 中間チャンクが更新完了ならば Mesh を更新。
-                    UpdateChunkMesh(chunk);
+                    // 中間チャンク更新完了ならば頂点バッファを更新。
+                    if (!Closing) UpdateChunkMesh(chunk);
 
                     // 中間チャンクは不要となるためプールへ返却。
                     ReturnInterChunk(chunk.InterChunk);
@@ -230,114 +217,71 @@ namespace Willcraftia.Xna.Blocks.Models
                     chunk.MeshDirty = false;
                     chunk.ExitUpdate();
                 }
+                else
+                {
+                    // 未完ならば更新キューへ戻す。
+                    updatingChunks.Enqueue(chunk);
+                }
             }
-
-            Debug.Assert(updatingChunks.Count == 0);
 
             chunkMeshUpdateManager.Update();
 
-            DiagnosticsMonitor.End(MonitorUpdate);
         }
 
-        // 非同期呼び出し。
-        public Chunk ActivateChunk(Region region, ref VectorI3 position)
-        {
-            var chunk = chunkPool.Borrow();
-            if (chunk == null) return null;
-
-            Debug.Assert(!chunk.Active);
-
-            if (!region.ChunkStore.GetChunk(ref position, chunk))
-            {
-                chunk.Position = position;
-
-                foreach (var procedure in region.ChunkProcesures)
-                    procedure.Generate(chunk);
-            }
-
-            chunk.OnActivated(region);
-
-            lock (activeChunks) activeChunks.Add(chunk);
-
-            return chunk;
-        }
-
-        // 非同期呼び出し。
-        public bool PassivateChunk(Chunk chunk)
-        {
-            if (chunk == null) throw new ArgumentNullException("chunk");
-
-            Debug.Assert(chunk.Active);
-
-            if (!chunk.EnterPassivate()) return false;
-
-            lock (activeChunks) activeChunks.Remove(chunk);
-
-            if (chunk.OpaqueMesh != null)
-            {
-                DisposeChunkMesh(chunk.OpaqueMesh);
-                chunk.OpaqueMesh = null;
-            }
-            if (chunk.TranslucentMesh != null)
-            {
-                DisposeChunkMesh(chunk.TranslucentMesh);
-                chunk.TranslucentMesh = null;
-            }
-            if (chunk.InterChunk != null)
-            {
-                ReturnInterChunk(chunk.InterChunk);
-                chunk.InterChunk = null;
-            }
-
-            // 定義に変更があるならば永続化領域を更新。
-            if (chunk.DefinitionDirty) chunk.Region.ChunkStore.AddChunk(chunk);
-
-            chunk.OnPassivated();
-            chunk.ExitPassivate();
-
-            chunkPool.Return(chunk);
-
-            return true;
-        }
-
-        public void Close()
-        {
-            if (closing || closed) return;
-
-            closing = true;
-        }
-
+        /// <summary>
+        /// 指定の位置にあるチャンクの取得を試行します。
+        /// </summary>
+        /// <param name="position">パーティション空間におけるチャンクの位置。</param>
+        /// <param name="result">
+        /// 指定の位置にあるチャンク、あるいは、そのようなチャンクが無い場合は null。
+        /// </param>
+        /// <returns>
+        /// true (指定の位置にチャンクが存在した場合)、false (それ以外の場合)。
+        /// </returns>
         public bool TryGetChunk(ref VectorI3 position, out Chunk result)
         {
-            lock (activeChunks)
-                return activeChunks.TryGetItem(ref position, out result);
+            Partition partition;
+            if (ActivePartitions.TryGetPartition(ref position, out partition))
+            {
+                result = partition as Chunk;
+                return true;
+            }
+            else
+            {
+                result = null;
+                return false;
+            }
         }
 
-        Chunk CreateChunk()
-        {
-            return new Chunk();
-        }
-
+        /// <summary>
+        /// 中間チャンク プールにおける中間チャンク生成で呼び出されます。
+        /// </summary>
+        /// <returns>中間チャンク。</returns>
         InterChunk CreateInterChunk()
         {
             return new InterChunk();
         }
 
-        bool BorrowInterChunk(Chunk chunk)
+        /// <summary>
+        /// 中間チャンクをプールへ戻します。
+        /// </summary>
+        /// <param name="interChunk"></param>
+        internal void ReturnInterChunk(InterChunk interChunk)
         {
-            if (chunk.InterChunk == null)
-                chunk.InterChunk = interChunkPool.Borrow();
+            if (interChunk == null) throw new ArgumentNullException("interChunk");
 
-            return chunk.InterChunk != null;
-        }
-
-        void ReturnInterChunk(InterChunk interChunk)
-        {
             interChunk.Opaque.Clear();
             interChunk.Translucent.Clear();
             interChunkPool.Return(interChunk);
         }
 
+        /// <summary>
+        /// チャンク メッシュを生成します。
+        /// </summary>
+        /// <param name="translucent">
+        /// true (半透明の場合)、false (それ以外の場合)。
+        /// </param>
+        /// <returns>チャンク メッシュ。</returns>
         ChunkMesh CreateChunkMesh(bool translucent)
         {
             var chunkMesh = new ChunkMesh(graphicsDevice);
@@ -350,21 +294,25 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunkMesh;
         }
 
-        void DisposeChunkMesh(ChunkMesh chunkMesh)
+        /// <summary>
+        /// チャンク メッシュを破棄します。
+        /// ここでは破棄要求をキューに入れるのみであり、
+        /// Dispose メソッド呼び出しは Update メソッド内で処理されます。
+        /// </summary>
+        /// <param name="chunkMesh">チャンク メッシュ。</param>
+        internal void DisposeChunkMesh(ChunkMesh chunkMesh)
         {
-            TotalVertexCount -= chunkMesh.VertexCount;
-            TotalIndexCount -= chunkMesh.IndexCount;
-
             sceneManager.RemoveSceneObject(chunkMesh);
 
-            // 破棄キューへ入れて待機させる。
+            // 破棄を待機する。
             lock (disposingChunkMeshes)
                 disposingChunkMeshes.Enqueue(chunkMesh);
-
-            ChunkMeshCount--;
         }
 
-        void DisposeChunkMeshes()
+        /// <summary>
+        /// 破棄要求の出されたチャンク メッシュを破棄します。
+        /// </summary>
+        void CheckDisposingChunkMeshes()
         {
             lock (disposingChunkMeshes)
             {
@@ -372,11 +320,21 @@ namespace Willcraftia.Xna.Blocks.Models
                 for (int i = 0; i < count; i++)
                 {
                     var chunkMesh = disposingChunkMeshes.Dequeue();
+
+                    TotalVertexCount -= chunkMesh.VertexCount;
+                    TotalIndexCount -= chunkMesh.IndexCount;
+
                     chunkMesh.Dispose();
+
+                    ChunkMeshCount--;
                 }
             }
         }
 
+        /// <summary>
+        /// チャンク メッシュの頂点バッファを更新します。
+        /// </summary>
+        /// <param name="chunk"></param>
         void UpdateChunkMesh(Chunk chunk)
         {
             var interMesh = chunk.InterChunk;

@@ -38,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool occlusionQueryActive;
 
-        public Chunk Chunk { get; set; }
+        public Chunk Chunk { get; internal set; }
 
         public Matrix World
         {

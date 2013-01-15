@@ -248,15 +248,15 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // アプリケーション終了
 
             // TODO
-            if (!worldManager.PartitionManager.Closing && !worldManager.PartitionManager.Closed &&
+            if (!worldManager.ChunkManager.Closing && !worldManager.ChunkManager.Closed &&
                 keyboardState.IsKeyDown(Keys.Escape))
             {
-                worldManager.PartitionManager.Close();
+                worldManager.ChunkManager.Close();
 
-                logger.Info("Wait until all partitions are passivated...");
+                logger.Info("Wait until all chunks are passivated...");
             }
 
-            if (worldManager.PartitionManager.Closed)
+            if (worldManager.ChunkManager.Closed)
                 Exit();
 
             //----------------------------------------------------------------
@@ -348,16 +348,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(graphics.PreferredBackBufferWidth).Append('x');
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
 
-            var partitionManager = worldManager.PartitionManager;
-            sb.Append("Partition: ");
-            sb.Append("A(").AppendNumber(partitionManager.ActiveClusterCount).Append(":");
-            sb.AppendNumber(partitionManager.ActivePartitionCount).Append(") ");
-            sb.Append("W(").AppendNumber(partitionManager.ActivatingPartitionCount).Append(") ");
-            sb.Append("P(").AppendNumber(partitionManager.PassivatingPartitionCount).Append(")").AppendLine();
-
             var chunkManager = worldManager.ChunkManager;
-            sb.Append("Chunk: ").AppendNumber(chunkManager.ActiveChunkCount).Append("/");
-            sb.AppendNumber(chunkManager.TotalChunkCount).Append(" ");
+            sb.Append("Chunk: ");
+            sb.Append("A(").AppendNumber(chunkManager.ActiveClusterCount).Append(":");
+            sb.AppendNumber(chunkManager.ActivePartitionCount).Append(") ");
+            sb.Append("W(").AppendNumber(chunkManager.ActivatingPartitionCount).Append(") ");
+            sb.Append("P(").AppendNumber(chunkManager.PassivatingPartitionCount).Append(")").AppendLine();
+
             sb.Append("Mesh: ").AppendNumber(chunkManager.ChunkMeshCount).Append(" ");
             sb.Append("Inter: ").AppendNumber(chunkManager.ActiveInterChunkCount).Append("/");
             sb.AppendNumber(chunkManager.TotalInterChunkCount).AppendLine();

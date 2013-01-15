@@ -110,48 +110,54 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void GetChunkBundle(Stream chunkBundleStream)
         {
-            var storageContainer = StorageManager.RequiredCurrentStorageContainer;
+            // TODO
+            throw new NotImplementedException();
 
-            var filePaths = GetChunkFilePaths();
-            if (filePaths.Length == 0) return;
+            //var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
-            // Chunk holder
-            var chunk = new Chunk();
+            //var filePaths = GetChunkFilePaths();
+            //if (filePaths.Length == 0) return;
 
-            using (var gzipStream = new GZipStream(chunkBundleStream, CompressionMode.Compress, CompressionLevel.Fastest))
-            using (var writer = new BinaryWriter(gzipStream))
-            {
-                foreach (var filePath in filePaths)
-                {
-                    using (var chunkStream = storageContainer.OpenFile(filePath, FileMode.Open))
-                    using (var chunkReader = new BinaryReader(chunkStream))
-                    {
-                        // read a chunk.
-                        chunk.Read(chunkReader);
-                    }
+            //// Chunk holder
+            //var chunk = new Chunk();
 
-                    // write this chunk to the chunk bundle.
-                    chunk.Write(writer);
-                }
-            }
+            //using (var gzipStream = new GZipStream(chunkBundleStream, CompressionMode.Compress, CompressionLevel.Fastest))
+            //using (var writer = new BinaryWriter(gzipStream))
+            //{
+            //    foreach (var filePath in filePaths)
+            //    {
+            //        using (var chunkStream = storageContainer.OpenFile(filePath, FileMode.Open))
+            //        using (var chunkReader = new BinaryReader(chunkStream))
+            //        {
+            //            // read a chunk.
+            //            chunk.Read(chunkReader);
+            //        }
+
+            //        // write this chunk to the chunk bundle.
+            //        chunk.Write(writer);
+            //    }
+            //}
         }
 
         public void AddChunkBundle(Stream chunkBundleStream)
         {
-            // Chunk holder
-            var chunk = new Chunk();
+            // TODO
+            throw new NotImplementedException();
 
-            using (var gzipStream = new GZipStream(chunkBundleStream, CompressionMode.Decompress, CompressionLevel.Fastest))
-            using (var reader = new BinaryReader(gzipStream))
-            {
-                while (-1 < reader.PeekChar())
-                {
-                    // read a chunk from the chunk bundle.
-                    chunk.Read(reader);
-                    // add this chunk to the store.
-                    AddChunk(chunk);
-                }
-            }
+            //// Chunk holder
+            //var chunk = new Chunk();
+
+            //using (var gzipStream = new GZipStream(chunkBundleStream, CompressionMode.Decompress, CompressionLevel.Fastest))
+            //using (var reader = new BinaryReader(gzipStream))
+            //{
+            //    while (-1 < reader.PeekChar())
+            //    {
+            //        // read a chunk from the chunk bundle.
+            //        chunk.Read(reader);
+            //        // add this chunk to the store.
+            //        AddChunk(chunk);
+            //    }
+            //}
         }
 
         string[] GetChunkFilePaths()

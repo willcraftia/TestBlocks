@@ -6,14 +6,20 @@ using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Landscape;
+using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class Chunk
+    /// <summary>
+    /// 一定領域に含まれるブロックを一纏めで管理するクラスです。
+    /// </summary>
+    public sealed class Chunk : Partition
     {
-        // チャンク サイズは頂点数に密接に関係するため定数値とする。
+        // TODO
+        // 定数値である必要はない。
         public static VectorI3 Size
         {
             get { return new VectorI3(16); }
@@ -24,9 +30,13 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return new VectorI3(8); }
         }
 
-        VectorI3 size = Size;
+        ChunkManager chunkManager;
 
-        VectorI3 position;
+        RegionManager regionManager;
+
+        Region region;
+
+        VectorI3 size = Size;
 
         Vector3 worldPosition;
 
@@ -52,19 +62,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkMesh translucentMesh;
 
-        public Region Region { get; private set; }
-
-        public VectorI3 Position
+        public Region Region
         {
-            get { return position; }
-            set
-            {
-                position = value;
-
-                worldPosition.X = position.X * size.X;
-                worldPosition.Y = position.Y * size.Y;
-                worldPosition.Z = position.Z * size.Z;
-            }
+            get { return region; }
         }
 
         public Vector3 WorldPosition
@@ -123,7 +123,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public ChunkMesh OpaqueMesh
         {
             get { return opaqueMesh; }
-            set
+            internal set
             {
                 if (opaqueMesh != null) opaqueMesh.Chunk = null;
 
@@ -136,7 +136,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public ChunkMesh TranslucentMesh
         {
             get { return translucentMesh; }
-            set
+            internal set
             {
                 if (translucentMesh != null) translucentMesh.Chunk = null;
 
@@ -169,36 +169,64 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return drawing; }
         }
 
-        public Chunk()
+        public Chunk(ChunkManager chunkManager, RegionManager regionManager)
         {
+            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
+            if (regionManager == null) throw new ArgumentNullException("regionManager");
+
+            this.chunkManager = chunkManager;
+            this.regionManager = regionManager;
+
             blockIndices = new byte[size.X * size.Y * size.Z];
         }
 
-        public void OnActivated(Region region)
+        protected override bool InitializeOverride()
         {
-            lock (activeLock) active = true;
+            // 対象リージョンの取得。
+            var position = Position;
+            if (!regionManager.TryGetRegion(ref position, out region))
+                throw new InvalidOperationException("Region not found: " + position);
 
-            // リージョンをバインド。
-            Region = region;
+            // TODO
+            // パーティション マネージャで行えるのでは？
+
+            // ワールド空間における位置を算出。
+            worldPosition.X = position.X * size.X;
+            worldPosition.Y = position.Y * size.Y;
+            worldPosition.Z = position.Z * size.Z;
 
             MeshDirty = true;
+
+            return base.InitializeOverride();
         }
 
-        public void OnPassivated()
+        protected override void ReleaseOverride()
         {
-            lock (activeLock) active = false;
-
-            // この後、チャンクはプールへ戻されるため、チャンクの状態を初期化しておく。
             Array.Clear(blockIndices, 0, blockIndices.Length);
 
             activeNeighbors = CubicSide.Flags.None;
             neighborsReferencedOnUpdate = CubicSide.Flags.None;
 
-            // リージョンをアンバインド。
-            Region = null;
+            region = null;
 
             MeshDirty = true;
             DefinitionDirty = false;
+
+            base.ReleaseOverride();
+        }
+
+        protected override void OnActivated()
+        {
+            lock (activeLock) active = true;
+
+            base.OnActivated();
+        }
+
+        protected override void OnPassivated()
+        {
+            lock (activeLock) active = false;
+
+            base.OnPassivated();
         }
 
         /// <summary>
@@ -221,6 +249,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (passivating) return false;
 
                 updating = true;
+
+                // 更新中は非アクティブ化を拒否。
+                Busy = true;
+
                 return true;
             }
             finally
@@ -235,6 +267,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public void ExitUpdate()
         {
             updating = false;
+            Busy = false;
         }
 
         /// <summary>
@@ -309,32 +342,69 @@ namespace Willcraftia.Xna.Blocks.Models
             passivating = false;
         }
 
-        /// <summary>
-        /// 隣接チャンクのアクティブ化が完了した場合に呼び出されます。
-        /// </summary>
-        /// <param name="side">アクティブ化が完了した隣接チャンクの方向。</param>
-        public void OnNeighborActivated(CubicSide side)
+        protected override bool ActivateOverride()
         {
-            // パーティションがパーティション マネージャで完全に非アクティブになる前に
-            // チャンクはチャンク マネージャで非アクティブになる。
-            // このため、非アクティブな場合、パーティションからの通知を無視しなければならない。
+            Debug.Assert(region != null);
+            Debug.Assert(!active);
+
+            var position = Position;
+
+            if (!region.ChunkStore.GetChunk(ref position, this))
+            {
+                foreach (var procedure in region.ChunkProcesures)
+                    procedure.Generate(this);
+            }
+
+            return base.ActivateOverride();
+        }
+
+        protected override bool PassivateOverride()
+        {
+            Debug.Assert(region != null);
+            Debug.Assert(active);
+
+            if (!EnterPassivate()) return false;
+
+            if (OpaqueMesh != null)
+            {
+                chunkManager.DisposeChunkMesh(OpaqueMesh);
+                OpaqueMesh = null;
+            }
+            if (TranslucentMesh != null)
+            {
+                chunkManager.DisposeChunkMesh(TranslucentMesh);
+                TranslucentMesh = null;
+            }
+            if (InterChunk != null)
+            {
+                chunkManager.ReturnInterChunk(InterChunk);
+                InterChunk = null;
+            }
+
+            // 定義に変更があるならば永続化領域を更新。
+            if (DefinitionDirty) Region.ChunkStore.AddChunk(this);
+
+            ExitPassivate();
+
+            return base.PassivateOverride();
+        }
+
+        public override void OnNeighborActivated(Partition neighbor, CubicSide side)
+        {
+            // 非アクティブな場合、通知を無視。
             if (!active) return;
 
             lock (activeNeighborsLock)
             {
                 activeNeighbors |= side.ToFlags();
             }
+
+            base.OnNeighborActivated(neighbor, side);
         }
 
-        /// <summary>
-        /// 隣接チャンクが非アクティブ化が完了した場合に呼び出されます。
-        /// </summary>
-        /// <param name="side">非アクティブ化が完了した隣接チャンクの方向。</param>
-        public void OnNeighborPassivated(CubicSide side)
+        public override void OnNeighborPassivated(Partition neighbor, CubicSide side)
         {
-            // パーティションがパーティション マネージャで完全に非アクティブになる前に
-            // チャンクはチャンク マネージャで非アクティブになる。
-            // このため、非アクティブな場合、パーティションからの通知を無視しなければならない。
+            // 非アクティブな場合、通知を無視。
             if (!active) return;
 
             lock (activeNeighborsLock)
@@ -345,11 +415,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 activeNeighbors ^= flag;
             }
-        }
 
-        public void CreateWorldMatrix(out Matrix result)
-        {
-            Matrix.CreateTranslation(ref worldPosition, out result);
+            base.OnNeighborPassivated(neighbor, side);
         }
 
         public int CalculateBlockPositionX(int x)
@@ -369,14 +436,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Read(BinaryReader reader)
         {
-            var p = new VectorI3();
+            //var p = new VectorI3();
 
-            p.X = reader.ReadInt32();
-            p.Y = reader.ReadInt32();
-            p.Z = reader.ReadInt32();
-
-            // BoundingBox/WorldPosition を同時に更新しなければならない。
-            Position = p;
+            //p.X = reader.ReadInt32();
+            //p.Y = reader.ReadInt32();
+            //p.Z = reader.ReadInt32();
 
             for (int i = 0; i < blockIndices.Length; i++)
                 blockIndices[i] = reader.ReadByte();
@@ -386,9 +450,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Write(BinaryWriter writer)
         {
-            writer.Write(position.X);
-            writer.Write(position.Y);
-            writer.Write(position.Z);
+            //writer.Write(position.X);
+            //writer.Write(position.Y);
+            //writer.Write(position.Z);
 
             for (int i = 0; i < blockIndices.Length; i++)
                 writer.Write(blockIndices[i]);
