@@ -64,6 +64,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         /// <summary>
         /// 頂点ビルダ実行待ちチャンクのキュー。
+        /// このキューではチャンクそのものではなく、その位置を管理する。
+        /// 頂点ビルダ実行判定では、管理している位置からアクティブ リストを参照し、
+        /// 処理対象のチャンクを取得するという手順を採る。
+        /// つまり、非アクティブ化が開始したチャンクは、
+        /// その開始によりアクティブ リストから除外されるため、
+        /// 頂点ビルダ実行判定からも除外される。
+        /// </summary>
+        Queue<VectorI3> waitBuildVerticesQueue;
+
+        /// <summary>
+        /// 頂点ビルダ実行中チャンクのキュー。
         /// </summary>
         Queue<Chunk> buildVerticesQueue;
 
@@ -181,6 +192,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 SlotCount = verticesBuilderCount
             };
 
+            waitBuildVerticesQueue = new Queue<VectorI3>();
             buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
         }
 
@@ -227,63 +239,70 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
+        /// チャンクのメッシュ更新要求を追加します。
+        /// </summary>
+        /// <param name="chunkPosition">チャンクの位置。</param>
+        internal void RequestUpdateMesh(VectorI3 chunkPosition)
+        {
+            if (!waitBuildVerticesQueue.Contains(chunkPosition))
+                waitBuildVerticesQueue.Enqueue(chunkPosition);
+        }
+
+        /// <summary>
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
         void CheckDirtyChunkMeshes(GameTime gameTime)
         {
             // メッシュ更新が必要なチャンクを探索。
-            var activePartitionCount = ActivePartitions.Count;
-            
+
             var searchCapacity = meshUpdateSearchCapacity;
             if (gameTime.IsRunningSlowly) searchCapacity /= 2;
 
-            int trials = 0;
-            while (0 < activePartitionCount && trials < meshUpdateSearchCapacity && trials < activePartitionCount)
+            int count = waitBuildVerticesQueue.Count;
+            for (int i = 0; i < count && i < meshUpdateSearchCapacity; i++)
             {
-                // TODO
-                // 視点位置の近隣を優先するためのアルゴリズムは無いのだろうか？
-                var chunk = ActivePartitions.Dequeue() as Chunk;
+                var chunkPosition = waitBuildVerticesQueue.Peek();
+
+                // アクティブ チャンクを取得。
+                // 存在しない場合はメッシュ更新要求を取り消す。
+                Chunk chunk;
+                if (!TryGetChunk(ref chunkPosition, out chunk))
+                {
+                    waitBuildVerticesQueue.Dequeue();
+                    continue;
+                }
 
                 if (chunk.EnterUpdate())
                 {
-                    // 現在の隣接チャンクのアクティブ状態が前回のメッシュ更新時のアクティブ状態と異なるならば、
-                    // 新たにアクティブ化された隣接チャンクを考慮してメッシュを更新するために、
-                    // 強制的にチャンクを Dirty とする。
-                    if (chunk.ActiveNeighbors != chunk.NeighborsReferencedOnUpdate)
-                        chunk.MeshDirty = true;
-
-                    if (chunk.MeshDirty)
+                    if (!buildVerticesQueue.Contains(chunk))
                     {
-                        if (!buildVerticesQueue.Contains(chunk))
+                        var verticesBuilder = verticesBuilderPool.Borrow();
+                        if (verticesBuilder != null)
                         {
-                            var verticesBuilder = verticesBuilderPool.Borrow();
-                            if (verticesBuilder != null)
-                            {
-                                // 頂点ビルダを初期化。
-                                InitializeInterVerticesBuilder(verticesBuilder, chunk);
+                            // 頂点ビルダを初期化。
+                            InitializeInterVerticesBuilder(verticesBuilder, chunk);
 
-                                // 頂点ビルダを登録。
-                                verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
+                            // 頂点ビルダを登録。
+                            verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
 
-                                buildVerticesQueue.Enqueue(chunk);
-                            }
-                            else
-                            {
-                                // プール枯渇の場合は次フレーム以降の再更新判定に期待。
-                                chunk.ExitUpdate();
-                            }
+                            buildVerticesQueue.Enqueue(chunk);
+                            waitBuildVerticesQueue.Dequeue();
+                        }
+                        else
+                        {
+                            // プール枯渇の場合は次フレームでの再更新判定に期待。
+                            chunk.ExitUpdate();
+                            break;
                         }
                     }
-                    else
-                    {
-                        chunk.ExitUpdate();
-                    }
                 }
-
-                ActivePartitions.Enqueue(chunk);
-
-                trials++;
+                else
+                {
+                    // 更新ロックを取れないという事は、他のスレッドで更新ロックが取られたということ。
+                    // これは、その更新の結果でメッシュを更新すれば良いので、現在の更新要求は取り消す。
+                    waitBuildVerticesQueue.Dequeue();
+                }
             }
         }
 

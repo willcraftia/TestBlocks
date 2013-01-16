@@ -50,7 +50,6 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(Chunk != null);
             Debug.Assert(Chunk.Active);
             Debug.Assert(Chunk.Updating);
-            Debug.Assert(Chunk.MeshDirty);
 
             chunkSize = Chunk.Size;
 
