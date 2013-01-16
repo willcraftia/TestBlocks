@@ -407,7 +407,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <returns>頂点ビルダ。</returns>
         ChunkVerticesBuilder CreateInterChunkMeshTask()
         {
-            return new ChunkVerticesBuilder();
+            return new ChunkVerticesBuilder(chunkSize);
         }
 
         /// <summary>

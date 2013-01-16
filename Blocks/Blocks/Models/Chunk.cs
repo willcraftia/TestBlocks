@@ -274,6 +274,51 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
+        /// 指定のチャンク サイズで起こりうる最大の頂点数を計算します。
+        /// </summary>
+        /// <param name="chunkSize">チャンク サイズ。</param>
+        /// <returns>最大頂点数。</returns>
+        public static int CalculateMaxVertexCount(VectorI3 chunkSize)
+        {
+            // ブロックが交互に配置されるチャンクで頂点数が最大であると考える。
+            //
+            //      16 * 16 * 16 で考えた場合は以下の通り。
+            //
+            //          各 Y について 8 * 8 = 64 ブロック
+            //          全 Y で 64 * 16 = 1024 ブロック
+            //          ブロックは 4 * 6 = 24 頂点
+            //          計 1024 * 24 = 24576 頂点
+            //          インデックスは 4 頂点に対して 6
+            //          計 (24576 / 4) * 6 = 36864 インデックス
+            //
+            //      16 * 256 * 16 で考えた場合は以下の通り。
+            //
+            //          各 Y について 8 * 8 = 64 ブロック
+            //          全 Y で 64 * 256 = 16384 ブロック
+            //          ブロックは 4 * 6 = 24 頂点
+            //          計 16384 * 24 = 393216 頂点
+            //          インデックスは 4 頂点に対して 6
+            //          計 (393216 / 4) * 6 = 589824 インデックス
+
+            int x = chunkSize.X / 2;
+            int z = chunkSize.Z / 2;
+            int xz = x * z;
+            int blocks = xz * chunkSize.Y;
+            const int perBlock = 4 * 6;
+            return blocks * perBlock;
+        }
+
+        /// <summary>
+        /// 指定の頂点数に対して必要となるインデックス数を計算します。
+        /// </summary>
+        /// <param name="vertexCount">頂点数。</param>
+        /// <returns>インデックス数。</returns>
+        public static int CalculateIndexCount(int vertexCount)
+        {
+            return (vertexCount / 4) * 6;
+        }
+
+        /// <summary>
         /// チャンクが属するリージョンを探索して関連付けます。
         /// </summary>
         /// <returns></returns>

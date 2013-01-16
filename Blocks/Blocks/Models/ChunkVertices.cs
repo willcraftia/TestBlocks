@@ -15,24 +15,15 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class ChunkVertices
     {
-        // TODO
-        //
-        // 実行で最適と思われる値を調べて決定する。
-        // 恐らくは、最大頂点数となりうる構造は確定できるため、事前に算出できるはずだが、
-        // その算出アルゴリズムが分からない。
-        public const ushort VertexCapacity = 20000;
-
-        public const ushort IndexCapacity = 6 * VertexCapacity / 4;
-
         /// <summary>
         /// 頂点情報。
         /// </summary>
-        VertexPositionNormalColorTexture[] vertices = new VertexPositionNormalColorTexture[VertexCapacity];
+        VertexPositionNormalColorTexture[] vertices;
 
         /// <summary>
         /// インデックス情報。
         /// </summary>
-        ushort[] indices = new ushort[IndexCapacity];
+        ushort[] indices;
 
         /// <summary>
         /// 全頂点を内包する BoundingBox。
@@ -43,6 +34,16 @@ namespace Willcraftia.Xna.Blocks.Models
         /// BoundingBox のコーナを取得するために用いるバッファ。
         /// </summary>
         Vector3[] corners = new Vector3[8];
+
+        /// <summary>
+        /// 設定可能な頂点数を取得します。
+        /// </summary>
+        public int VertexCapacity { get; private set; }
+
+        /// <summary>
+        /// 設定可能なインデックス数を取得します。
+        /// </summary>
+        public int IndexCapacity { get; private set; }
 
         /// <summary>
         /// 頂点数を取得します。
@@ -57,8 +58,18 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        public ChunkVertices()
+        /// <param name="chunkSize">チャンクのサイズ。</param>
+        public ChunkVertices(VectorI3 chunkSize)
         {
+            if (chunkSize.X < 1 || chunkSize.Y < 1 || chunkSize.Z < 1)
+                throw new ArgumentOutOfRangeException("chunkSize");
+
+            VertexCapacity = Chunk.CalculateMaxVertexCount(chunkSize);
+            IndexCapacity = Chunk.CalculateIndexCount(VertexCapacity);
+
+            if (ushort.MaxValue < IndexCapacity)
+                throw new ArgumentException("The indices over the limit of ushort needed.", "chunkSize");
+
             vertices = new VertexPositionNormalColorTexture[VertexCapacity];
             indices = new ushort[IndexCapacity];
         }

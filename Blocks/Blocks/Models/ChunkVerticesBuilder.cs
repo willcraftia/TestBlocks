@@ -36,11 +36,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Action ExecuteAction { get; private set; }
 
-        public ChunkVerticesBuilder()
+        public ChunkVerticesBuilder(VectorI3 chunkSize)
         {
             CloseChunks = new CloseChunks();
-            Opaque = new ChunkVertices();
-            Translucent = new ChunkVertices();
+            Opaque = new ChunkVertices(chunkSize);
+            Translucent = new ChunkVertices(chunkSize);
             ExecuteAction = new Action(Execute);
         }
 
