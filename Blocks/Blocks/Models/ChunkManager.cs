@@ -447,13 +447,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク メッシュを生成します。
         /// </summary>
+        /// <param name="chunkEffect">チャンクのエフェクト。</param>
         /// <param name="translucent">
         /// true (半透明の場合)、false (それ以外の場合)。
         /// </param>
         /// <returns>チャンク メッシュ。</returns>
-        ChunkMesh CreateChunkMesh(bool translucent)
+        ChunkMesh CreateChunkMesh(ChunkEffect chunkEffect, bool translucent)
         {
-            var chunkMesh = new ChunkMesh(graphicsDevice);
+            var chunkMesh = new ChunkMesh(chunkEffect);
             chunkMesh.Translucent = translucent;
 
             sceneManager.AddSceneObject(chunkMesh);
@@ -517,6 +518,9 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix world;
             Matrix.CreateTranslation(ref position, out world);
 
+            // メッシュに設定するエフェクト。
+            var chunkEffect = chunk.Region.ChunkEffect;
+
             //----------------------------------------------------------------
             // 不透明メッシュ
 
@@ -532,7 +536,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (chunk.OpaqueMesh == null)
                 {
-                    chunk.OpaqueMesh = CreateChunkMesh(false);
+                    chunk.OpaqueMesh = CreateChunkMesh(chunkEffect, false);
                 }
                 else
                 {
@@ -565,7 +569,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (chunk.TranslucentMesh == null)
                 {
-                    chunk.TranslucentMesh = CreateChunkMesh(true);
+                    chunk.TranslucentMesh = CreateChunkMesh(chunkEffect, true);
                 }
                 else
                 {

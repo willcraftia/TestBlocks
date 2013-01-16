@@ -14,19 +14,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkMesh : ShadowCaster, IDisposable
     {
-        //
-        // メモ
-        //
-        // 過去、頂点バッファとインデックス バッファをプーリングしていたが、
-        // チャンク メッシュの頂点数には非常に大きなばらつきがあるため、
-        // チャンク メッシュの構築毎に、頂点バッファとインデックス バッファを必要十分なサイズで確保する。
-        // また、チャンク メッシュの破棄では、頂点バッファとインデックス バッファも破棄する。
-        //
-        // 過去、チャンク メッシュ自体もプーリングしていたが、
-        // 頂点バッファとインデックス バッファのプーリングを行わないならば、
-        // チャンク メッシュのプーリングの意味もほぼ失われるため、
-        // チャンク メッシュのプーリングも行わない。
-        //
+        ChunkEffect chunkEffect;
 
         GraphicsDevice graphicsDevice;
 
@@ -35,8 +23,6 @@ namespace Willcraftia.Xna.Blocks.Models
         OcclusionQuery occlusionQuery;
 
         bool occlusionQueryActive;
-
-        public Chunk Chunk { get; internal set; }
 
         public Matrix World
         {
@@ -54,11 +40,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public int PrimitiveCount { get; private set; }
 
-        public ChunkMesh(GraphicsDevice graphicsDevice)
+        public ChunkMesh(ChunkEffect chunkEffect)
         {
-            if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
+            if (chunkEffect == null) throw new ArgumentNullException("chunkEffect");
 
-            this.graphicsDevice = graphicsDevice;
+            this.chunkEffect = chunkEffect;
+            this.graphicsDevice = chunkEffect.GraphicsDevice;
 
             occlusionQuery = new OcclusionQuery(graphicsDevice);
         }
@@ -74,20 +61,15 @@ namespace Willcraftia.Xna.Blocks.Models
                 Occluded = (occlusionQuery.PixelCount == 0);
             }
 
-            // 描画ロックを取得できない場合は終了。
-            if (!EnterDraw()) return;
-
             occlusionQuery.Begin();
 
             //----------------------------------------------------------------
             // エフェクト
 
-            var effect = Chunk.Region.ChunkEffect;
+            chunkEffect.EnableOcclusionQueryTechnique();
 
-            effect.EnableOcclusionQueryTechnique();
-
-            effect.World = world;
-            effect.CurrentTechnique.Passes[0].Apply();
+            chunkEffect.World = world;
+            chunkEffect.CurrentTechnique.Passes[0].Apply();
 
             //----------------------------------------------------------------
             // 描画
@@ -96,43 +78,29 @@ namespace Willcraftia.Xna.Blocks.Models
 
             occlusionQuery.End();
             occlusionQueryActive = true;
-
-            // 描画ロックを解放。
-            ExitDraw();
         }
 
         public override void Draw()
         {
             if (Occluded) return;
 
-            // 描画ロックを取得できない場合は終了。
-            if (!EnterDraw()) return;
-
             //----------------------------------------------------------------
             // エフェクト
 
-            var effect = Chunk.Region.ChunkEffect;
+            chunkEffect.ResolveCurrentTechnique();
 
-            effect.ResolveCurrentTechnique();
-
-            effect.World = world;
-            effect.CurrentTechnique.Passes[0].Apply();
+            chunkEffect.World = world;
+            chunkEffect.CurrentTechnique.Passes[0].Apply();
 
             //----------------------------------------------------------------
             // 描画
 
             DrawCore();
-
-            // 描画ロックを解放。
-            ExitDraw();
         }
 
         public override void Draw(Effect effect)
         {
             if (Occluded) return;
-
-            // 描画ロックを取得できない場合は終了。
-            if (!EnterDraw()) return;
 
             var effectMatrices = effect as IEffectMatrices;
             if (effectMatrices != null) effectMatrices.World = world;
@@ -143,9 +111,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 DrawCore();
             }
-
-            // 描画ロックを解放。
-            ExitDraw();
         }
 
         public void SetVertices(VertexPositionNormalColorTexture[] vertices, int vertexCount)
@@ -175,27 +140,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
                 IndexBuffer.SetData(indices, 0, indexCount);
             }
-        }
-
-        bool EnterDraw()
-        {
-            if (Chunk == null || !Chunk.EnterDraw()) return false;
-
-            // 非同期なメッシュ更新により描画不要になっていないかを検査。
-            if (disposed || VertexBuffer == null || IndexBuffer == null || VertexCount == 0 || IndexCount == 0)
-            {
-                // 即座に描画ロックを開放して終了。
-                Chunk.ExitDraw();
-                return false;
-            }
-
-            return true;
-        }
-
-        void ExitDraw()
-        {
-            // 描画ロックを解放。
-            Chunk.ExitDraw();
         }
 
         void DrawCore()

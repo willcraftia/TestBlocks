@@ -65,14 +65,6 @@ namespace Willcraftia.Xna.Blocks.Models
         volatile bool updating;
 
         /// <summary>
-        /// 描画ロック中であるか否かを示す値。
-        /// </summary>
-        /// <value>
-        /// true (描画ロック中の場合)、false (それ以外の場合)。
-        /// </value>
-        volatile bool drawing;
-
-        /// <summary>
         /// 非アクティブ化ロック中であるか否かを示す値。
         /// </summary>
         /// <value>
@@ -184,14 +176,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public ChunkMesh OpaqueMesh
         {
             get { return opaqueMesh; }
-            internal set
-            {
-                if (opaqueMesh != null) opaqueMesh.Chunk = null;
-
-                opaqueMesh = value;
-
-                if (opaqueMesh != null) opaqueMesh.Chunk = this;
-            }
+            internal set { opaqueMesh = value; }
         }
 
         /// <summary>
@@ -200,14 +185,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public ChunkMesh TranslucentMesh
         {
             get { return translucentMesh; }
-            internal set
-            {
-                if (translucentMesh != null) translucentMesh.Chunk = null;
-
-                translucentMesh = value;
-
-                if (translucentMesh != null) translucentMesh.Chunk = this;
-            }
+            internal set { translucentMesh = value; }
         }
 
         /// <summary>
@@ -243,14 +221,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public bool Updating
         {
             get { return updating; }
-        }
-
-        // TODO
-        // 描画ロックって必要？
-        // 描画中に非アクティブ化することはもうなくなったはず。
-        public bool Drawing
-        {
-            get { return drawing; }
         }
 
         /// <summary>
@@ -421,42 +391,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 描画ロックの取得を試行します。
-        /// 他のスレッドがロック中の場合、非アクティブな場合、非アクティブ化中の場合は、
-        /// 描画ロックの取得に失敗します。
-        /// 描画ロックの取得に成功した場合には、
-        /// 必ず ExitDraw メソッドでロックを解放しなければなりません。
-        /// </summary>
-        /// <returns>
-        /// true (描画ロックを取得できた場合)、false (それ以外の場合)。
-        /// </returns>
-        public bool EnterDraw()
-        {
-            if (!Monitor.TryEnter(activeLock)) return false;
-
-            try
-            {
-                if (!active) return false;
-                if (passivating) return false;
-
-                drawing = true;
-                return true;
-            }
-            finally
-            {
-                Monitor.Exit(activeLock);
-            }
-        }
-
-        /// <summary>
-        /// EnterDraw メソッドで取得した描画ロックを開放します。
-        /// </summary>
-        public void ExitDraw()
-        {
-            drawing = false;
-        }
-
-        /// <summary>
         /// 非アクティブ化ロックの取得を試行します。
         /// 他のスレッドがロック中の場合、非アクティブな場合、更新ロック中の場合、描画ロック中の場合は、
         /// 非アクティブ化ロックの取得に失敗します。
@@ -473,7 +407,7 @@ namespace Willcraftia.Xna.Blocks.Models
             try
             {
                 if (!active) return false;
-                if (updating || drawing) return false;
+                if (updating) return false;
 
                 passivating = true;
                 return true;
