@@ -390,7 +390,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 ReleaseVerticesBuilder(chunk.VerticesBuilder);
 
                 // 更新ロックを解放。
-                chunk.MeshDirty = false;
                 chunk.ExitUpdate();
             }
         }

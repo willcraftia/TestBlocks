@@ -144,7 +144,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 var index = x + y * size.X + z * size.X * size.Y;
                 blockIndices[index] = value;
 
-                MeshDirty = true;
                 DefinitionDirty = true;
             }
         }
@@ -178,15 +177,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // true の場合は非アクティブ化でキャッシュを更新。
         // false の場合はキャッシュの更新が不要である。
         public bool DefinitionDirty { get; set; }
-
-        /// <summary>
-        /// メッシュ更新が必要であるか否かを示す値を取得または設定します。
-        /// チャンクからのブロック参照を変更した場合などに true へ設定します。
-        /// </summary>
-        /// <value>
-        /// true (メッシュ更新が必要な場合)、false (それ以外の場合)。
-        /// </value>
-        public bool MeshDirty { get; set; }
 
         /// <summary>
         /// 不透明メッシュを取得または設定します。
@@ -327,6 +317,16 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
+        /// メッシュの更新を要求します。
+        /// ブロックの状態を変更した場合、このメソッドを呼び出し、
+        /// メッシュの更新をチャンク マネージャへ依頼します。
+        /// </summary>
+        public void RequestUpdateMesh()
+        {
+            chunkManager.RequestUpdateMesh(position);
+        }
+
+        /// <summary>
         /// チャンクが属するリージョンを探索して関連付けます。
         /// </summary>
         /// <returns></returns>
@@ -336,8 +336,6 @@ namespace Willcraftia.Xna.Blocks.Models
             var position = Position;
             if (!regionManager.TryGetRegion(ref position, out region))
                 throw new InvalidOperationException("Region not found: " + position);
-
-            MeshDirty = true;
 
             return base.InitializeOverride();
         }
@@ -354,7 +352,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             region = null;
 
-            MeshDirty = true;
             DefinitionDirty = false;
 
             base.ReleaseOverride();
@@ -366,6 +363,8 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override void OnActivated()
         {
             lock (activeLock) active = true;
+
+            RequestUpdateMesh();
 
             base.OnActivated();
         }
@@ -563,7 +562,7 @@ namespace Willcraftia.Xna.Blocks.Models
             activeNeighbors |= side.ToFlags();
 
             // メッシュ更新要求を追加。
-            chunkManager.RequestUpdateMesh(position);
+            RequestUpdateMesh();
 
             base.OnNeighborActivated(neighbor, side);
         }
@@ -583,7 +582,7 @@ namespace Willcraftia.Xna.Blocks.Models
             activeNeighbors ^= flag;
 
             // メッシュ更新要求を追加。
-            chunkManager.RequestUpdateMesh(position);
+            RequestUpdateMesh();
 
             base.OnNeighborPassivated(neighbor, side);
         }
@@ -613,8 +612,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             for (int i = 0; i < blockIndices.Length; i++)
                 blockIndices[i] = reader.ReadByte();
-
-            MeshDirty = true;
         }
 
         public void Write(BinaryWriter writer)
