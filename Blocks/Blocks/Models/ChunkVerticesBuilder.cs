@@ -38,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkVerticesBuilder(VectorI3 chunkSize)
         {
-            CloseChunks = new CloseChunks();
+            CloseChunks = new CloseChunks(chunkSize);
             Opaque = new ChunkVertices(chunkSize);
             Translucent = new ChunkVertices(chunkSize);
             ExecuteAction = new Action(Execute);
@@ -94,7 +94,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var closeBlockPosition = blockPosition + side.Direction;
 
                 // 面隣接ブロックを探索。
-                var closeBlockIndex = GetBlockIndex(ref closeBlockPosition, side);
+                var closeBlockIndex = CloseChunks.GetBlockIndex(ref closeBlockPosition);
 
                 // 未定の場合は面なしとする。
                 // 正確な描画には面なしとすべきではないが、
@@ -154,7 +154,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var occluderBlockPosition = closeBlockPosition + s.Direction;
 
                 // 遮蔽対象のブロックのインデックスを取得。
-                var occluderBlockIndex = GetBlockIndex(ref occluderBlockPosition, s);
+                var occluderBlockIndex = CloseChunks.GetBlockIndex(ref occluderBlockPosition);
 
                 // 未定と空の場合は遮蔽無し。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
@@ -176,46 +176,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             return occlustion;
-        }
-
-        byte? GetBlockIndex(ref VectorI3 blockPosition, CubicSide side)
-        {
-            var x = (blockPosition.X < 0) ? -1 : (blockPosition.X < chunkSize.X) ? 0 : 1;
-            var y = (blockPosition.Y < 0) ? -1 : (blockPosition.Y < chunkSize.Y) ? 0 : 1;
-            var z = (blockPosition.Z < 0) ? -1 : (blockPosition.Z < chunkSize.Z) ? 0 : 1;
-
-            if (x == 0 && y == 0 && z == 0)
-            {
-                // ブロックが対象チャンクに含まれている場合。
-                return Chunk[blockPosition.X, blockPosition.Y, blockPosition.Z];
-            }
-            else
-            {
-                // メモ
-                //
-                // 実際には、隣接チャンク集合には、
-                // ゲーム スレッドにて非アクティブ化されてしまったものも含まれる可能性がある。
-                // しかし、それら全てを同期することは負荷が高いため、
-                // ここでは無視している。
-                // なお、非アクティブ化されたものが含まれる場合、
-                // 再度、メッシュ更新要求が発生するはずである。
-
-                // ブロックが隣接チャンクに含まれている場合。
-                var closeChunk = CloseChunks[x, y, z];
-
-                // 隣接チャンクがないならば未定として null。
-                if (closeChunk == null) return null;
-
-                // 隣接チャンクにおける相対ブロック座標を算出。
-                var relativeX = blockPosition.X % chunkSize.X;
-                var relativeY = blockPosition.Y % chunkSize.Y;
-                var relativeZ = blockPosition.Z % chunkSize.Z;
-                if (relativeX < 0) relativeX += chunkSize.X;
-                if (relativeY < 0) relativeY += chunkSize.Y;
-                if (relativeZ < 0) relativeZ += chunkSize.Z;
-
-                return closeChunk[relativeX, relativeY, relativeZ];
-            }
         }
 
         void AddMesh(ref VectorI3 blockPosition, ref Color color, MeshPart source, ChunkVertices destination)
