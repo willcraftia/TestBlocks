@@ -73,16 +73,6 @@ namespace Willcraftia.Xna.Blocks.Models
         volatile bool passivating;
 
         /// <summary>
-        /// アクティブな隣接チャンクのフラグ。
-        /// </summary>
-        CubicSide.Flags activeNeighbors;
-
-        /// <summary>
-        /// メッシュ更新時に参照された隣接チャンクのフラグ。
-        /// </summary>
-        CubicSide.Flags neighborsReferencedOnUpdate;
-
-        /// <summary>
         /// 不透明メッシュ。
         /// </summary>
         ChunkMesh opaqueMesh;
@@ -148,23 +138,6 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return blockIndices.Length; }
         }
 
-        /// <summary>
-        /// アクティブな隣接チャンクをフラグで取得します。
-        /// </summary>
-        public CubicSide.Flags ActiveNeighbors
-        {
-            get { return activeNeighbors; }
-        }
-
-        /// <summary>
-        /// メッシュ更新時に参照された隣接チャンクをフラグで取得します。
-        /// </summary>
-        public CubicSide.Flags NeighborsReferencedOnUpdate
-        {
-            get { return neighborsReferencedOnUpdate; }
-            set { neighborsReferencedOnUpdate = value; }
-        }
-
         // 外部からブロックを設定した場合などに true とする。
         // true の場合は非アクティブ化でキャッシュを更新。
         // false の場合はキャッシュの更新が不要である。
@@ -203,12 +176,6 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             get { return active; }
         }
-
-        // Updating と Drawing は個別にフラグを持つ必要がある。
-        // 例えば、Updating = true 中に Drawing = true となった場合、
-        // 描画の終了では Drawing = false としたいだけであり、
-        // Updating には関与したくない。
-        // 逆に、更新中は Drawing には関与したくない。
 
         /// <summary>
         /// 更新ロック中であるか否かを示す値を取得します。
@@ -317,9 +284,6 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Array.Clear(blockIndices, 0, blockIndices.Length);
 
-            activeNeighbors = CubicSide.Flags.None;
-            neighborsReferencedOnUpdate = CubicSide.Flags.None;
-
             region = null;
 
             DefinitionDirty = false;
@@ -392,7 +356,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         /// <summary>
         /// 非アクティブ化ロックの取得を試行します。
-        /// 他のスレッドがロック中の場合、非アクティブな場合、更新ロック中の場合、描画ロック中の場合は、
+        /// 他のスレッドがロック中の場合、非アクティブな場合、更新ロック中の場合は、
         /// 非アクティブ化ロックの取得に失敗します。
         /// 非アクティブ化ロックの取得に成功した場合には、
         /// 必ず ExitPassivate メソッドでロックを解放しなければなりません。
@@ -400,7 +364,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <returns>
         /// true (非アクティブ化ロックを取得できた場合)、false (それ以外の場合)。
         /// </returns>
-        public bool EnterPassivate()
+        bool EnterPassivate()
         {
             if (!Monitor.TryEnter(activeLock)) return false;
 
@@ -419,9 +383,9 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// EnterPassivate メソッドで取得した描画ロックを開放します。
+        /// EnterPassivate メソッドで取得した非アクティブ化ロックを開放します。
         /// </summary>
-        public void ExitPassivate()
+        void ExitPassivate()
         {
             passivating = false;
         }
@@ -486,14 +450,12 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// ActiveNeighbors プロパティへアクティブ化された隣接パーティションの方向フラグを追加します。
+        /// メッシュ更新をチャンク マネージャへ要求します。
         /// </summary>
         public override void OnNeighborActivated(Partition neighbor, CubicSide side)
         {
             // 非アクティブな場合、通知を無視。
             if (!active) return;
-
-            activeNeighbors |= side.ToFlags();
 
             // メッシュ更新要求を追加。
             RequestUpdateMesh();
@@ -502,18 +464,12 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// ActiveNeighbors プロパティから非アクティブ化された隣接パーティションの方向フラグを削除します。
+        /// メッシュ更新をチャンク マネージャへ要求します。
         /// </summary>
         public override void OnNeighborPassivated(Partition neighbor, CubicSide side)
         {
             // 非アクティブな場合、通知を無視。
             if (!active) return;
-
-            var flag = side.ToFlags();
-
-            Debug.Assert((activeNeighbors & flag) == flag);
-
-            activeNeighbors ^= flag;
 
             // メッシュ更新要求を追加。
             RequestUpdateMesh();

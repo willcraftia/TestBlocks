@@ -352,15 +352,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     }
                 }
             }
-
-            // このフレームで収集できた面隣接チャンクを記録。
-            var flags = CubicSide.Flags.None;
-            foreach (var side in CubicSide.Items)
-            {
-                if (chunk.VerticesBuilder.CloseChunks[side] != null)
-                    flags |= side.ToFlags();
-            }
-            chunk.NeighborsReferencedOnUpdate = flags;
         }
 
         /// <summary>

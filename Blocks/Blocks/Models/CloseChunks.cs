@@ -33,25 +33,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 立方体面方向に対応したチャンクを取得または設定します。
-        /// </summary>
-        /// <param name="side">立方体面方向。</param>
-        /// <returns>チャンク。</returns>
-        public Chunk this[CubicSide side]
-        {
-            get
-            {
-                var direction = side.Direction;
-                return this[direction.X, direction.Y, direction.Z];
-            }
-            set
-            {
-                var direction = side.Direction;
-                this[direction.X, direction.Y, direction.Z] = value;
-            }
-        }
-
-        /// <summary>
         /// 状態を初期化します。
         /// </summary>
         public void Clear()
