@@ -111,8 +111,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     // ※流体ブロックは常に半透明を仮定して処理。
                     if (closeBlock.Fluid && block.Fluid) continue;
 
-                    // 対象面が半透明ではないならば、隣接ブロックにより不可視面となるため不要。
-                    if (!block.IsTranslucentTile(side)) continue;
+                    // 隣接ブロックが半透明ではないならば、不可視面となるため不要。
+                    if (!closeBlock.Translucent) continue;
                 }
 
                 // 環境光遮蔽を計算。
@@ -124,7 +124,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var vertexColor = new Color(ambientOcclusion, ambientOcclusion, ambientOcclusion);
 
                 // メッシュを追加。
-                if (block.Fluid || block.IsTranslucentTile(side))
+                if (block.Fluid || block.Translucent)
                 {
                     AddMesh(ref blockPosition, ref vertexColor, meshPart, Translucent);
                 }
@@ -144,7 +144,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var mySide = side.Reverse();
 
-            // 面隣接ブロックに対して面隣接ブロックが存在する場合、遮蔽有りと判定。
+            // 面隣接ブロックに対して面隣接ブロックが存在する場合、遮蔽と判定。
             foreach (var s in CubicSide.Items)
             {
                 // 自身に対する方向はスキップ。
@@ -156,20 +156,20 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 遮蔽対象のブロックのインデックスを取得。
                 var occluderBlockIndex = CloseChunks.GetBlockIndex(ref occluderBlockPosition);
 
-                // 未定と空の場合は遮蔽無し。
+                // 未定と空の場合は非遮蔽。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
 
                 // ブロック情報を取得。
                 var occluderBlock = Chunk.Region.BlockCatalog[occluderBlockIndex.Value];
 
-                // 対象とする面が存在しない場合は遮蔽無しとする。
+                // 対象とする面が存在しない場合は非遮蔽。
                 if (occluderBlock.Mesh.MeshParts[s.Reverse()] == null) continue;
 
-                // 流体ブロックは遮蔽無しとする。
+                // 流体ブロックは非遮蔽。
                 if (occluderBlock.Fluid) continue;
 
-                // 遮蔽面が半透明の場合は遮蔽無しとする。
-                if (occluderBlock.IsTranslucentTile(s.Reverse())) continue;
+                // 半透明ブロックは非遮蔽。
+                if (occluderBlock.Translucent) continue;
 
                 // 遮蔽度で減算。
                 occlustion -= occlusionPerFace;

@@ -44,6 +44,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 DynamicFriction = definition.DynamicFriction,
                 Restitution = definition.Restitution
             };
+
             block.Tiles[CubicSide.Top] = Load<Tile>(resource, definition.TopTile);
             block.Tiles[CubicSide.Bottom] = Load<Tile>(resource, definition.BottomTile);
             block.Tiles[CubicSide.Front] = Load<Tile>(resource, definition.FrontTile);
@@ -51,6 +52,18 @@ namespace Willcraftia.Xna.Blocks.Content
             block.Tiles[CubicSide.Left] = Load<Tile>(resource, definition.LeftTile);
             block.Tiles[CubicSide.Right] = Load<Tile>(resource, definition.RightTile);
             block.BuildMesh();
+
+            // 1 つでも半透明タイルを含んでいたら半透明ブロックとする。
+            bool translucent = false;
+            foreach (var tile in block.Tiles)
+            {
+                if (tile.Translucent)
+                {
+                    translucent = true;
+                    break;
+                }
+            }
+            block.Translucent = translucent;
 
             return block;
         }

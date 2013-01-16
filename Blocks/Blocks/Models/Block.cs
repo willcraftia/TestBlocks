@@ -32,6 +32,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public CubicCollection<Tile> Tiles { get; private set; }
 
+        // 1 つでも半透明タイルを参照したら、ブロック自体を半透明とする。
+        // エディタでは、これをユーザへ強制する。
+        public bool Translucent { get; set; }
+
         public bool Fluid { get; set; }
 
         public bool ShadowCasting { get; set; }
@@ -60,12 +64,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public void BuildMesh()
         {
             Mesh = BlockMesh.Create(this);
-        }
-
-        public bool IsTranslucentTile(CubicSide side)
-        {
-            var tile = Tiles[side];
-            return tile != null && tile.Translucent;
         }
 
         #region ToString
