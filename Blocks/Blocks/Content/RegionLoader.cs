@@ -163,6 +163,16 @@ namespace Willcraftia.Xna.Blocks.Content
             }
 
             return list;
+
+            // 最大頂点チャンクのテスト用。
+            // 消してはダメ！
+
+            //var list = new List<IChunkProcedure>(0);
+            //var procedure = new MaxVerticesChunkProcedure();
+            //procedure.Region = region;
+            //procedure.Initialize();
+            //list.Add(procedure);
+            //return list;
         }
 
         string[] ToUri(IResource baseResource, List<IChunkProcedure> procedures)
