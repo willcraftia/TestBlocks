@@ -2,7 +2,6 @@
 
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
@@ -29,9 +28,24 @@ namespace Willcraftia.Xna.Blocks.Models
         Region region;
 
         /// <summary>
-        /// チャンクが参照するブロックのインデックス。
+        /// チャンク データ。
+        /// 
+        /// 初めて空ブロック以外が設定される際には、
+        /// チャンク マネージャでプーリングされているデータを借り、
+        /// このフィールドへ設定します。
+        /// 一方、全てが空ブロックになる際には、
+        /// このフィールドに設定されていたデータをチャンク マネージャへ返却し、
+        /// このフィールドには null を設定します。
+        /// 
+        /// この仕組により、空 (そら) を表すチャンクではメモリが節約され、
+        /// また、null の場合にメッシュ更新を要求しないことで、無駄なメッシュ更新を回避できます。
         /// </summary>
-        byte[] blockIndices;
+        ChunkData data;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        bool dataChanged;
 
         /// <summary>
         /// Active プロパティの同期のためのロック オブジェクト。
@@ -100,38 +114,36 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             get
             {
-                if (x < 0 || manager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || manager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || manager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
+                if (data == null) return Block.EmptyIndex;
 
-                var index = x + y * manager.ChunkSize.X + z * manager.ChunkSize.X * manager.ChunkSize.Y;
-                return blockIndices[index];
+                return data[x, y, z];
             }
             set
             {
-                if (x < 0 || manager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || manager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || manager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
+                if (data == null)
+                {
+                    // データが null で空ブロックを設定しようとする場合は、
+                    // データに変更がないため、即座に処理を終えます。
+                    if (value == Block.EmptyIndex) return;
 
-                var index = x + y * manager.ChunkSize.X + z * manager.ChunkSize.X * manager.ChunkSize.Y;
-                blockIndices[index] = value;
+                    // 非空ブロックを設定しようとする場合は、
+                    // チャンク マネージャからデータを借りる必要があります。
+                    data = manager.BorrowChunkData();
+                    dataChanged = true;
+                }
 
-                DefinitionDirty = true;
+                data[x, y, z] = value;
+
+                if (data.SolidCount == 0)
+                {
+                    // 全てが空ブロックになったならば、
+                    // データをチャンク マネージャへ返します。
+                    manager.ReturnChunkData(data);
+                    data = null;
+                    dataChanged = true;
+                }
             }
         }
-
-        /// <summary>
-        /// ブロックの総数を取得します。
-        /// </summary>
-        public int Count
-        {
-            get { return blockIndices.Length; }
-        }
-
-        // 外部からブロックを設定した場合などに true とする。
-        // true の場合は非アクティブ化でキャッシュを更新。
-        // false の場合はキャッシュの更新が不要である。
-        public bool DefinitionDirty { get; set; }
 
         /// <summary>
         /// 不透明メッシュを取得または設定します。
@@ -181,6 +193,18 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
+        /// 非空ブロックの総数を取得します。
+        /// </summary>
+        public int SolidCount
+        {
+            get
+            {
+                if (data == null) return 0;
+                return data.SolidCount;
+            }
+        }
+
+        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="manager">チャンク マネージャ。</param>
@@ -189,8 +213,6 @@ namespace Willcraftia.Xna.Blocks.Models
             if (manager == null) throw new ArgumentNullException("manager");
 
             this.manager = manager;
-
-            blockIndices = new byte[manager.ChunkSize.X * manager.ChunkSize.Y * manager.ChunkSize.Z];
         }
 
         /// <summary>
@@ -266,11 +288,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void ReleaseOverride()
         {
-            Array.Clear(blockIndices, 0, blockIndices.Length);
+            if (data != null)
+            {
+                manager.ReturnChunkData(data);
+                data = null;
+            }
 
             region = null;
-
-            DefinitionDirty = false;
 
             base.ReleaseOverride();
         }
@@ -282,7 +306,9 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             lock (activeLock) active = true;
 
-            RequestUpdateMesh();
+            // メッシュ更新要求を追加。
+            // データが空の場合は更新するメッシュが無い。
+            if (data != null) RequestUpdateMesh();
 
             base.OnActivated();
         }
@@ -386,8 +412,24 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(region != null);
             Debug.Assert(!active);
 
-            if (!region.ChunkStore.GetChunk(ref Position, this))
+            var d = manager.BorrowChunkData();
+
+            if (region.ChunkStore.GetChunk(Position, d))
             {
+                if (d.SolidCount == 0)
+                {
+                    // 全てが空ブロックならば返却。
+                    manager.ReturnChunkData(d);
+                }
+                else
+                {
+                    // 空ブロック以外を含むならば自身へバインド。
+                    data = d;
+                }
+            }
+            else
+            {
+                // 永続化されていないならば自動生成。
                 foreach (var procedure in region.ChunkProcesures)
                     procedure.Generate(this);
             }
@@ -423,8 +465,17 @@ namespace Willcraftia.Xna.Blocks.Models
                 VerticesBuilder = null;
             }
 
-            // 定義に変更があるならば永続化領域を更新。
-            if (DefinitionDirty) Region.ChunkStore.AddChunk(this);
+            if (data != null)
+            {
+                // データに変更があるならば永続化。
+                if (data.Dirty) Region.ChunkStore.AddChunk(Position, data);
+                manager.ReturnChunkData(data);
+            }
+            else
+            {
+                // 空ではない状態から空になっている場合は空データで永続化。
+                if (dataChanged) Region.ChunkStore.AddChunk(Position, manager.EmptyChunkData);
+            }
 
             ExitPassivate();
 
@@ -440,7 +491,8 @@ namespace Willcraftia.Xna.Blocks.Models
             if (!active) return;
 
             // メッシュ更新要求を追加。
-            RequestUpdateMesh();
+            // データが空の場合は更新するメッシュが無い。
+            if (data != null) RequestUpdateMesh();
 
             base.OnNeighborActivated(neighbor, side);
         }
@@ -454,7 +506,8 @@ namespace Willcraftia.Xna.Blocks.Models
             if (!active) return;
 
             // メッシュ更新要求を追加。
-            RequestUpdateMesh();
+            // データが空の場合は更新するメッシュが無い。
+            if (data != null) RequestUpdateMesh();
 
             base.OnNeighborPassivated(neighbor, side);
         }
@@ -472,28 +525,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public int CalculateBlockPositionZ(int z)
         {
             return Position.Z * manager.ChunkSize.Z + z;
-        }
-
-        public void Read(BinaryReader reader)
-        {
-            //var p = new VectorI3();
-
-            //p.X = reader.ReadInt32();
-            //p.Y = reader.ReadInt32();
-            //p.Z = reader.ReadInt32();
-
-            for (int i = 0; i < blockIndices.Length; i++)
-                blockIndices[i] = reader.ReadByte();
-        }
-
-        public void Write(BinaryWriter writer)
-        {
-            //writer.Write(position.X);
-            //writer.Write(position.Y);
-            //writer.Write(position.Z);
-
-            for (int i = 0; i < blockIndices.Length; i++)
-                writer.Write(blockIndices[i]);
         }
 
         public bool Contains(ref VectorI3 blockPosition)

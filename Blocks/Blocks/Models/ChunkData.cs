@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.IO;
 using Willcraftia.Xna.Framework;
 
 #endregion
@@ -13,11 +14,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンク マネージャ。
         /// </summary>
         ChunkManager chunkManager;
-
-        /// <summary>
-        /// チャンクのサイズ。
-        /// </summary>
-        VectorI3 size;
 
         /// <summary>
         /// チャンクが参照するブロックのインデックス。
@@ -36,25 +32,34 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             get
             {
-                if (x < 0 || size.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || size.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || size.Z < z) throw new ArgumentOutOfRangeException("z");
+                if (x < 0 || chunkManager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
+                if (y < 0 || chunkManager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
+                if (z < 0 || chunkManager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
 
-                var index = x + y * size.X + z * size.X * size.Y;
+                var index = x + y * chunkManager.ChunkSize.X + z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
                 return blockIndices[index];
             }
             set
             {
-                if (x < 0 || size.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || size.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || size.Z < z) throw new ArgumentOutOfRangeException("z");
+                if (x < 0 || chunkManager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
+                if (y < 0 || chunkManager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
+                if (z < 0 || chunkManager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
 
-                var index = x + y * size.X + z * size.X * size.Y;
+                var index = x + y * chunkManager.ChunkSize.X + z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
 
                 if (blockIndices[index] == value) return;
 
                 blockIndices[index] = value;
                 Dirty = true;
+
+                if (value != Block.EmptyIndex)
+                {
+                    SolidCount++;
+                }
+                else
+                {
+                    SolidCount--;
+                }
             }
         }
 
@@ -66,7 +71,18 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return blockIndices.Length; }
         }
 
-        public bool Dirty { get; set; }
+        /// <summary>
+        /// 非空ブロックの総数を取得します。
+        /// </summary>
+        public int SolidCount { get; private set; }
+
+        /// <summary>
+        /// ブロックのインデックス配列に変更があったか否かを示す値を取得または設定します。
+        /// </summary>
+        /// <value>
+        /// true (ブロックのインデックス配列に変更があった場合)、false (それ以外の場合)。
+        /// </value>
+        public bool Dirty { get; private set; }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -78,14 +94,38 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.chunkManager = chunkManager;
 
-            size = chunkManager.ChunkSize;
-
-            blockIndices = new byte[size.X * size.Y * size.Z];
+            blockIndices = new byte[chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y * chunkManager.ChunkSize.Z];
         }
 
+        /// <summary>
+        /// 初期化します。
+        /// </summary>
         public void Clear()
         {
             Array.Clear(blockIndices, 0, blockIndices.Length);
+            SolidCount = 0;
+        }
+
+        public void Read(BinaryReader reader)
+        {
+            //var p = new VectorI3();
+
+            //p.X = reader.ReadInt32();
+            //p.Y = reader.ReadInt32();
+            //p.Z = reader.ReadInt32();
+
+            for (int i = 0; i < blockIndices.Length; i++)
+                blockIndices[i] = reader.ReadByte();
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            //writer.Write(position.X);
+            //writer.Write(position.Y);
+            //writer.Write(position.Z);
+
+            for (int i = 0; i < blockIndices.Length; i++)
+                writer.Write(blockIndices[i]);
         }
     }
 }

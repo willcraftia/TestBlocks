@@ -10,11 +10,11 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public interface IChunkStore
     {
-        bool GetChunk(ref VectorI3 position, Chunk chunk);
+        bool GetChunk(VectorI3 position, ChunkData data);
 
-        void AddChunk(Chunk chunk);
+        void AddChunk(VectorI3 position, ChunkData data);
 
-        void DeleteChunk(Chunk chunk);
+        void DeleteChunk(VectorI3 position);
 
         void ClearChunks();
 

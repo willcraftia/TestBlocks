@@ -143,6 +143,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public int MaxIndexCount { get; private set; }
 
+        internal ChunkData EmptyChunkData { get; private set; }
+
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
@@ -174,6 +176,7 @@ namespace Willcraftia.Xna.Blocks.Models
             inverseChunkSize.Z = 1 / (float) ChunkSize.Z;
 
             chunkDataPool = new ConcurrentPool<ChunkData>(CreateData);
+            EmptyChunkData = new ChunkData(this);
 
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreateVerticesBuilder)
             {
@@ -242,6 +245,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         internal void ReturnChunkData(ChunkData data)
         {
+            data.Clear();
             chunkDataPool.Return(data);
         }
 

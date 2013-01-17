@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Blocks.Models
             regionDirectory = b.ToString();
         }
 
-        public bool GetChunk(ref VectorI3 position, Chunk chunk)
+        public bool GetChunk(VectorI3 position, ChunkData data)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePath = ResolveFilePath(position);
@@ -62,7 +62,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 using (var stream = storageContainer.OpenFile(filePath, FileMode.Open))
                 using (var reader = new BinaryReader(stream))
                 {
-                    chunk.Read(reader);
+                    data.Read(reader);
                 }
 
                 result = true;
@@ -71,7 +71,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return result;
         }
 
-        public void AddChunk(Chunk chunk)
+        public void AddChunk(VectorI3 position, ChunkData data)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
@@ -80,19 +80,19 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (!storageContainer.DirectoryExists(regionDirectory))
                 storageContainer.CreateDirectory(regionDirectory);
-            
-            var filePath = ResolveFilePath(chunk.Position);
+
+            var filePath = ResolveFilePath(position);
             using (var stream = storageContainer.CreateFile(filePath))
             using (var writer = new BinaryWriter(stream))
             {
-                chunk.Write(writer);
+                data.Write(writer);
             }
         }
 
-        public void DeleteChunk(Chunk chunk)
+        public void DeleteChunk(VectorI3 position)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-            var filePath = ResolveFilePath(chunk.Position);
+            var filePath = ResolveFilePath(position);
 
             storageContainer.DeleteFile(filePath);
         }
