@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 #endregion
 
@@ -38,15 +39,21 @@ namespace Willcraftia.Xna.Framework.Landscape
             get { return clusterManager.Count; }
         }
 
+        public ICollection<Cluster> Clusters
+        {
+            get { return clusterManager.Clusters; }
+        }
+
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="clusterExtent">クラスタの領域幅。</param>
+        /// <param name="clusterSize">パーティション空間におけるクラスタのサイズ。</param>
+        /// <param name="partitionSize">ワールド空間におけるパーティションのサイズ。</param>
         /// <param name="clusterCapacity">クラスタの初期容量。</param>
         /// <param name="partitionCapacity">パーティションの初期容量。</param>
-        public ClusteredPartitionQueue(int clusterExtent, int clusterCapacity, int partitionCapacity)
+        public ClusteredPartitionQueue(VectorI3 clusterSize, Vector3 partitionSize, int clusterCapacity, int partitionCapacity)
         {
-            clusterManager = new ClusterManager(clusterExtent, clusterCapacity);
+            clusterManager = new ClusterManager(clusterSize, partitionSize, clusterCapacity);
             partitionQueue = new Queue<Partition>(partitionCapacity);
         }
 

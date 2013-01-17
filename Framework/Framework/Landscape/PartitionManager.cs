@@ -28,7 +28,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             int partitionPoolMaxCapacity = 0;
 
-            int clusterExtent = 8;
+            VectorI3 clusterSize = new VectorI3(8);
 
             int initialActivePartitionCapacity = 5000;
 
@@ -69,14 +69,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            public int ClusterExtent
+            public VectorI3 ClusterSize
             {
-                get { return clusterExtent; }
+                get { return clusterSize; }
                 set
                 {
-                    if (value < 1) throw new ArgumentOutOfRangeException("value");
+                    if (value.X < 1 || value.Y < 1 || value.Z < 1) throw new ArgumentOutOfRangeException("value");
 
-                    clusterExtent = value;
+                    clusterSize = value;
                 }
             }
 
@@ -353,7 +353,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
 
             ActivePartitions = new ClusteredPartitionQueue(
-                settings.ClusterExtent,
+                settings.ClusterSize,
+                settings.PartitionSize,
                 settings.InitialActiveClusterCapacity,
                 settings.InitialActivePartitionCapacity);
 
@@ -457,6 +458,23 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             Closing = true;
             OnClosing();
+        }
+
+        /// <summary>
+        /// 境界錐台と交差するパーティションを収集します。
+        /// </summary>
+        /// <param name="frustum">境界錐台。</param>
+        /// <param name="collector">収集先パーティションのコレクション。</param>
+        public void CollectPartitions(BoundingFrustum frustum, ICollection<Partition> collector)
+        {
+            foreach (var cluster in ActivePartitions.Clusters)
+            {
+                bool intersected;
+                frustum.Intersects(ref cluster.BoundingBox, out intersected);
+
+                // クラスタが境界錐台と交差するなら、クラスタに含まれるパーティションを収集。
+                if (intersected) cluster.CollectPartitions(frustum, collector);
+            }
         }
 
         /// <summary>
@@ -747,13 +765,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (partition == null) break;
 
                 // パーティションを初期化。
-                var worldPosition = new Vector3
-                {
-                    X = position.X * partitionSize.X,
-                    Y = position.Y * partitionSize.Y,
-                    Z = position.Z * partitionSize.Z,
-                };
-                if (partition.Initialize(position, worldPosition))
+                if (partition.Initialize(position, partitionSize))
                 {
                     // アクティブ化キューへ追加。
                     activatingPartitions.Enqueue(partition);

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 #endregion
 
@@ -21,35 +22,91 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// クラスタ空間におけるクラスタの位置。
         /// </summary>
-        public VectorI3 Position;
+        internal VectorI3 Position;
 
         /// <summary>
-        /// 領域幅。
+        /// ワールド空間におけるクラスタの位置。
         /// </summary>
-        int extent;
+        internal Vector3 PositionWorld;
+
+        /// <summary>
+        /// ワールド空間におけるクラスタの境界ボックス。
+        /// </summary>
+        internal BoundingBox BoundingBox;
+
+        /// <summary>
+        /// クラスタ マネージャ。
+        /// </summary>
+        ClusterManager manager;
 
         /// <summary>
         /// パーティションの位置をキーとするパーティションのディクショナリ。
         /// </summary>
-        Dictionary<VectorI3, Partition> partitionMap;
+        Dictionary<VectorI3, Partition> partitions;
 
         /// <summary>
         /// パーティション数を取得します。
         /// </summary>
         public int Count
         {
-            get { return partitionMap.Count; }
+            get { return partitions.Count; }
         }
 
         /// <summary>
-        /// 指定の領域幅でクラスタを生成します。
+        /// インスタンスを生成します。
         /// </summary>
-        /// <param name="extent">領域幅。</param>
-        public Cluster(int extent)
+        /// <param name="manager">クラスタ マネージャ。</param>
+        internal Cluster(ClusterManager manager)
         {
-            this.extent = extent;
+            if (manager == null) throw new ArgumentNullException("manager");
 
-            partitionMap = new Dictionary<VectorI3, Partition>(extent * extent * extent);
+            this.manager = manager;
+
+            var size = manager.Size;
+            partitions = new Dictionary<VectorI3, Partition>(size.X * size.Y * size.Z);
+        }
+
+        /// <summary>
+        /// 指定の位置にあるクラスタとして初期化します。
+        /// </summary>
+        /// <param name="position">クラスタ空間におけるクラスタの位置。</param>
+        internal void Initialize(VectorI3 position)
+        {
+            Position = position;
+
+            var sizeWorld = manager.SizeWorld;
+            PositionWorld.X = Position.X * sizeWorld.X;
+            PositionWorld.Y = Position.Y * sizeWorld.Y;
+            PositionWorld.Z = Position.Z * sizeWorld.Z;
+
+            BoundingBox.Min = PositionWorld;
+            BoundingBox.Max = PositionWorld + sizeWorld;
+        }
+
+        /// <summary>
+        /// クラスタを開放します。
+        /// </summary>
+        internal void Release()
+        {
+            Position = VectorI3.Zero;
+            PositionWorld = Vector3.Zero;
+            BoundingBox = BoundingBoxHelper.Empty;
+        }
+
+        /// <summary>
+        /// 境界錐台と交差するパーティションを収集します。
+        /// </summary>
+        /// <param name="frustum">境界錐台。</param>
+        /// <param name="collector">収集先パーティションのコレクション。</param>
+        public void CollectPartitions(BoundingFrustum frustum, ICollection<Partition> collector)
+        {
+            foreach (var partition in partitions.Values)
+            {
+                bool intersected;
+                frustum.Intersects(ref partition.BoundingBox, out intersected);
+
+                if (intersected) collector.Add(partition);
+            }
         }
 
         /// <summary>
@@ -61,7 +118,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public bool ContainsPartition(ref VectorI3 position)
         {
-            return partitionMap.ContainsKey(position);
+            return partitions.ContainsKey(position);
         }
 
         /// <summary>
@@ -71,7 +128,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>パーティション。</returns>
         public Partition GetPartition(ref VectorI3 position)
         {
-            return partitionMap[position];
+            return partitions[position];
         }
 
         /// <summary>
@@ -86,25 +143,25 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public bool TryGetPartition(ref VectorI3 position, out Partition result)
         {
-            return partitionMap.TryGetValue(position, out result);
+            return partitions.TryGetValue(position, out result);
         }
 
         /// <summary>
         /// クラスタへパーティションを追加します。
         /// </summary>
         /// <param name="partition">パーティション。</param>
-        public void AddPartition(Partition partition)
+        internal void AddPartition(Partition partition)
         {
-            partitionMap[partition.Position] = partition;
+            partitions[partition.Position] = partition;
         }
 
         /// <summary>
         /// クラスタからパーティションを削除します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
-        public void RemovePartition(ref VectorI3 position)
+        internal void RemovePartition(ref VectorI3 position)
         {
-            partitionMap.Remove(position);
+            partitions.Remove(position);
         }
     }
 }

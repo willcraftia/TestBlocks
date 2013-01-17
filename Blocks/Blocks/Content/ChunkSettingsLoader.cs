@@ -30,7 +30,7 @@ namespace Willcraftia.Xna.Blocks.Content
             };
 
             settings.PartitionManager.PartitionPoolMaxCapacity = definition.ChunkPoolMaxCapacity;
-            settings.PartitionManager.ClusterExtent = definition.ClusterExtent;
+            settings.PartitionManager.ClusterSize = definition.ClusterSize;
             settings.PartitionManager.InitialActivePartitionCapacity = definition.InitialActiveChunkCapacity;
             settings.PartitionManager.InitialActiveClusterCapacity = definition.InitialActiveClusterCapacity;
             settings.PartitionManager.InitialActivationCapacity = definition.InitialActivationCapacity;
@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 MinActiveRange = settings.MinActiveRange,
                 MaxActiveRange = settings.MaxActiveRange,
                 ChunkPoolMaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity,
-                ClusterExtent = settings.PartitionManager.ClusterExtent,
+                ClusterSize = settings.PartitionManager.ClusterSize,
                 InitialActiveChunkCapacity = settings.PartitionManager.InitialActivePartitionCapacity,
                 InitialActiveClusterCapacity = settings.PartitionManager.InitialActiveClusterCapacity,
                 InitialActivationCapacity = settings.PartitionManager.InitialActivationCapacity,

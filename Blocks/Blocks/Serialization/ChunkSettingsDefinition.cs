@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public int ChunkPoolMaxCapacity;
 
-        public int ClusterExtent;
+        public VectorI3 ClusterSize;
 
         public int InitialActiveChunkCapacity;
 

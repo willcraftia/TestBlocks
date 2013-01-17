@@ -5,16 +5,20 @@
 		<Z>16</Z>
 	</ChunkSize>
 	<MeshUpdateSearchCapacity>100</MeshUpdateSearchCapacity>
-	<VerticesBuilderCount>10</VerticesBuilderCount>
+	<VerticesBuilderCount>5</VerticesBuilderCount>
 	<MinActiveRange>10</MinActiveRange>
 	<MaxActiveRange>12</MaxActiveRange>
 	<ChunkPoolMaxCapacity>0</ChunkPoolMaxCapacity>
-	<ClusterExtent>8</ClusterExtent>
+	<ClusterSize>
+		<X>8</X>
+		<Y>8</Y>
+		<Z>8</Z>
+	</ClusterSize>
 	<InitialActiveChunkCapacity>5000</InitialActiveChunkCapacity>
 	<InitialActiveClusterCapacity>50</InitialActiveClusterCapacity>
-	<InitialActivationCapacity>100</InitialActivationCapacity>
+	<InitialActivationCapacity>3</InitialActivationCapacity>
 	<InitialPassivationCapacity>1000</InitialPassivationCapacity>
-	<ActivationTaskQueueSlotCount>50</ActivationTaskQueueSlotCount>
+	<ActivationTaskQueueSlotCount>3</ActivationTaskQueueSlotCount>
 	<PassivationTaskQueueSlotCount>50</PassivationTaskQueueSlotCount>
 	<ActivationSearchCapacity>100</ActivationSearchCapacity>
 	<PassivationSearchCapacity>200</PassivationSearchCapacity>

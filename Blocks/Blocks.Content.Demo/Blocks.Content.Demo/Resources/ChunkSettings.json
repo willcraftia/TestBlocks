@@ -9,7 +9,11 @@
   "MinActiveRange": 10,
   "MaxActiveRange": 12,
   "ChunkPoolMaxCapacity": 0,
-  "ClusterExtent": 8,
+  "ClusterSize": {
+    "X": 8,
+    "Y": 8,
+    "Z": 8
+  },
   "InitialActiveChunkCapacity": 5000,
   "InitialActiveClusterCapacity": 50,
   "InitialActivationCapacity": 3,

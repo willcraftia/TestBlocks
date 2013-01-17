@@ -1423,18 +1423,18 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 {
                     ChunkSize = new VectorI3(16),
                     MeshUpdateSearchCapacity = 100,
-                    VerticesBuilderCount = 10,
+                    VerticesBuilderCount = 5,
                     MinActiveRange = 10,
                     MaxActiveRange = 12,
                     ChunkPoolMaxCapacity = 0,
-                    ClusterExtent = 8,
+                    ClusterSize = new VectorI3(8),
                     InitialActiveChunkCapacity = 5000,
                     InitialActiveClusterCapacity = 50,
-                    InitialActivationCapacity = 100,
+                    InitialActivationCapacity = 3,
                     InitialPassivationCapacity = 1000,
                     ActivationSearchCapacity = 100,
                     PassivationSearchCapacity = 200,
-                    ActivationTaskQueueSlotCount = 50,
+                    ActivationTaskQueueSlotCount = 3,
                     PassivationTaskQueueSlotCount = 50
                 };
                 var jsonResource = SerializeToJson<ChunkSettingsDefinition>("ChunkSettings", settings);

@@ -23,7 +23,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// ワールド空間におけるパーティションの位置。
         /// </summary>
-        protected Vector3 worldPosition;
+        protected Vector3 positionWorld;
+
+        /// <summary>
+        /// ワールド空間におけるパーティションの境界ボックス。
+        /// </summary>
+        protected internal BoundingBox BoundingBox;
 
         /// <summary>
         /// 非アクティブ化を制御するためのフラグ。
@@ -67,9 +72,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// ワールド空間におけるパーティションの位置を取得します。
         /// </summary>
-        public Vector3 WorldPosition
+        public Vector3 PositionWorld
         {
-            get { return worldPosition; }
+            get { return positionWorld; }
         }
 
         /// <summary>
@@ -180,14 +185,23 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 戻り値が false を返す場合、パーティションのアクティブ化は取り消されます。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <param name="worldPosition">ワールド空間におけるパーティションの位置。</param>
+        /// <param name="partitionSize">ワールド空間におけるパーティションのサイズ。</param>
         /// <returns>
         /// true (初期化に成功した場合)、false (それ以外の場合)。
         /// </returns>
-        internal bool Initialize(VectorI3 position, Vector3 worldPosition)
+        internal bool Initialize(VectorI3 position, Vector3 partitionSize)
         {
             this.position = position;
-            this.worldPosition = worldPosition;
+
+            positionWorld = new Vector3
+            {
+                X = position.X * partitionSize.X,
+                Y = position.Y * partitionSize.Y,
+                Z = position.Z * partitionSize.Z,
+            };
+
+            BoundingBox.Min = positionWorld;
+            BoundingBox.Max = positionWorld + partitionSize;
 
             activationCompleted = false;
             activationCanceled = false;

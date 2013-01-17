@@ -503,7 +503,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // メッシュに設定するワールド座標。
             // チャンクの中心をメッシュの位置とする。
-            var position = chunk.WorldPosition + chunkMeshOffset;
+            var position = chunk.PositionWorld + chunkMeshOffset;
 
             // メッシュに設定するワールド行列。
             Matrix world;

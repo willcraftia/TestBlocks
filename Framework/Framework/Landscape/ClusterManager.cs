@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
 
 #endregion
@@ -14,14 +15,14 @@ namespace Willcraftia.Xna.Framework.Landscape
     public sealed class ClusterManager
     {
         /// <summary>
-        /// クラスタの領域幅。
+        /// パーティション空間におけるクラスタのサイズ。
         /// </summary>
-        int extent;
+        VectorI3 size;
 
         /// <summary>
-        /// 1 / extent。
+        /// ワールド空間におけるクラスタのサイズ。
         /// </summary>
-        float inverseExtent;
+        Vector3 sizeWorld;
 
         /// <summary>
         /// クラスタのプール。
@@ -31,31 +32,61 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// クラスタの位置をキーとするクラスタのディクショナリ。
         /// </summary>
-        Dictionary<VectorI3, Cluster> clusterMap;
+        Dictionary<VectorI3, Cluster> clusters;
+
+        /// <summary>
+        /// パーティション空間におけるクラスタのサイズを取得します。
+        /// </summary>
+        public VectorI3 Size
+        {
+            get { return size; }
+        }
+
+        /// <summary>
+        /// ワールド空間におけるクラスタのサイズを取得します。
+        /// </summary>
+        public Vector3 SizeWorld
+        {
+            get { return sizeWorld; }
+        }
 
         /// <summary>
         /// クラスタ数を取得します。
         /// </summary>
         public int Count
         {
-            get { return clusterMap.Count; }
+            get { return clusters.Count; }
+        }
+
+        public ICollection<Cluster> Clusters
+        {
+            get { return clusters.Values; }
         }
 
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="extent">領域幅。</param>
+        /// <param name="size">パーティション空間におけるクラスタのサイズ。</param>
+        /// <param name="partitionSize">ワールド空間におけるパーティションのサイズ。</param>
         /// <param name="capacity">クラスタの初期容量。</param>
-        public ClusterManager(int extent, int capacity)
+        public ClusterManager(VectorI3 size, Vector3 partitionSize, int capacity)
         {
-            if (extent < 1) throw new ArgumentOutOfRangeException("extent");
+            if (size.X < 1 || size.Y < 1 || size.X < 1) throw new ArgumentOutOfRangeException("size");
+            if (partitionSize.X < 0 || partitionSize.Y < 0 || partitionSize.X < 0)
+                throw new ArgumentOutOfRangeException("size");
+            if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
 
-            this.extent = extent;
+            this.size = size;
 
-            inverseExtent = 1 / (float) extent;
+            sizeWorld = new Vector3
+            {
+                X = size.X * partitionSize.X,
+                Y = size.Y * partitionSize.Y,
+                Z = size.Z * partitionSize.Z,
+            };
 
             clusterPool = new Pool<Cluster>(CreateCluster);
-            clusterMap = new Dictionary<VectorI3, Cluster>(capacity);
+            clusters = new Dictionary<VectorI3, Cluster>(capacity);
         }
 
         /// <summary>
@@ -74,7 +105,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションが存在するか否かを検査します。
         /// </summary>
-        /// <param name="position">パーティションの位置。</param>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
@@ -84,7 +115,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             CalculateClusterPosition(ref position, out clusterPosition);
 
             Cluster cluster;
-            if (!clusterMap.TryGetValue(clusterPosition, out cluster))
+            if (!clusters.TryGetValue(clusterPosition, out cluster))
                 return false;
 
             return cluster.ContainsPartition(ref position);
@@ -93,7 +124,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションを取得します。
         /// </summary>
-        /// <param name="position">パーティションの位置。</param>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         /// <returns>パーティション。</returns>
         public Partition GetPartition(ref VectorI3 position)
         {
@@ -104,7 +135,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションの取得を試行します。
         /// </summary>
-        /// <param name="position">パーティションの位置。</param>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         /// <param name="result">
         /// パーティション、あるいは、パーティションが存在しない場合は null。
         /// </param>
@@ -133,10 +164,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             CalculateClusterPosition(partition, out clusterPosition);
 
             Cluster cluster;
-            if (!clusterMap.TryGetValue(clusterPosition, out cluster))
+            if (!clusters.TryGetValue(clusterPosition, out cluster))
             {
                 cluster = clusterPool.Borrow();
-                clusterMap[clusterPosition] = cluster;
+                cluster.Initialize(clusterPosition);
+                clusters[clusterPosition] = cluster;
             }
 
             cluster.AddPartition(partition);
@@ -145,21 +177,21 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションを削除します。
         /// </summary>
-        /// <param name="position">パーティションの位置。</param>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         public void RemovePartition(ref VectorI3 position)
         {
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref position, out clusterPosition);
 
             Cluster cluster;
-            if (!clusterMap.TryGetValue(clusterPosition, out cluster))
+            if (!clusters.TryGetValue(clusterPosition, out cluster))
                 return;
 
             cluster.RemovePartition(ref position);
 
             if (cluster.Count == 0)
             {
-                clusterMap.Remove(clusterPosition);
+                clusters.Remove(clusterPosition);
                 clusterPool.Return(cluster);
             }
         }
@@ -179,27 +211,27 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public void Clear()
         {
-            clusterMap.Clear();
+            clusters.Clear();
             clusterPool.Clear();
         }
 
         /// <summary>
         /// パーティションの位置からクラスタを取得します。
         /// </summary>
-        /// <param name="position">パーティションの位置。</param>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         /// <returns>クラスタ。</returns>
         Cluster GetCluster(ref VectorI3 position)
         {
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref position, out clusterPosition);
 
-            return clusterMap[clusterPosition];
+            return clusters[clusterPosition];
         }
 
         /// <summary>
         /// パーティションの位置からクラスタの取得を試行します。
         /// </summary>
-        /// <param name="position">パーティションの位置。</param>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         /// <param name="result">
         /// クラスタ、あるいは、クラスタが存在しない場合は null。
         /// </param>
@@ -211,21 +243,21 @@ namespace Willcraftia.Xna.Framework.Landscape
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref position, out clusterPosition);
 
-            return clusterMap.TryGetValue(clusterPosition, out result);
+            return clusters.TryGetValue(clusterPosition, out result);
         }
 
         /// <summary>
         /// パーティションが属するクラスタの位置を算出します。
         /// </summary>
-        /// <param name="partition">パーティションの位置。</param>
-        /// <param name="result">クラスタの位置。</param>
+        /// <param name="partition">パーティション空間におけるパーティションの位置。</param>
+        /// <param name="result">クラスタ空間におけるクラスタの位置。</param>
         void CalculateClusterPosition(ref VectorI3 position, out VectorI3 result)
         {
             result = new VectorI3
             {
-                X = MathExtension.Floor(position.X * inverseExtent),
-                Y = MathExtension.Floor(position.Y * inverseExtent),
-                Z = MathExtension.Floor(position.Z * inverseExtent)
+                X = MathExtension.Floor(position.X / (float) size.X),
+                Y = MathExtension.Floor(position.Y / (float) size.Y),
+                Z = MathExtension.Floor(position.Z / (float) size.Z)
             };
         }
 
@@ -233,7 +265,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションが属するクラスタの位置を算出します。
         /// </summary>
         /// <param name="partition">パーティション。</param>
-        /// <param name="result">クラスタの位置。</param>
+        /// <param name="result">クラスタ空間におけるクラスタの位置。</param>
         void CalculateClusterPosition(Partition partition, out VectorI3 result)
         {
             var position = partition.Position;
@@ -247,7 +279,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>クラスタ。</returns>
         Cluster CreateCluster()
         {
-            return new Cluster(extent);
+            return new Cluster(this);
         }
     }
 }
