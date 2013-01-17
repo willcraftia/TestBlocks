@@ -230,15 +230,15 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Tile Catalog",
                     Entries = new IndexedUriDefinition[]
                 {
-                    new IndexedUriDefinition { Index = 0, Uri = "DefaultTile.json" },
-                    new IndexedUriDefinition { Index = 1, Uri = "DirtTile.json" },
-                    new IndexedUriDefinition { Index = 2, Uri = "GrassBottomTile.json" },
-                    new IndexedUriDefinition { Index = 3, Uri = "GrassSideTile.json" },
-                    new IndexedUriDefinition { Index = 4, Uri = "GrassTopTile.json" },
-                    new IndexedUriDefinition { Index = 5, Uri = "MantleTile.json" },
-                    new IndexedUriDefinition { Index = 6, Uri = "SandTile.json" },
-                    new IndexedUriDefinition { Index = 7, Uri = "SnowTile.json" },
-                    new IndexedUriDefinition { Index = 8, Uri = "StoneTile.json" }
+                    new IndexedUriDefinition { Index = 1, Uri = "DefaultTile.json" },
+                    new IndexedUriDefinition { Index = 2, Uri = "DirtTile.json" },
+                    new IndexedUriDefinition { Index = 3, Uri = "GrassBottomTile.json" },
+                    new IndexedUriDefinition { Index = 4, Uri = "GrassSideTile.json" },
+                    new IndexedUriDefinition { Index = 5, Uri = "GrassTopTile.json" },
+                    new IndexedUriDefinition { Index = 6, Uri = "MantleTile.json" },
+                    new IndexedUriDefinition { Index = 7, Uri = "SandTile.json" },
+                    new IndexedUriDefinition { Index = 8, Uri = "SnowTile.json" },
+                    new IndexedUriDefinition { Index = 9, Uri = "StoneTile.json" }
                 }
                 };
                 var jsonResource = SerializeToJson<TileCatalogDefinition>("DefaultTileCatalog", tileCatalog);
@@ -428,20 +428,20 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Name = "Default Block Catalog",
                     Entries = new IndexedUriDefinition[]
                     {
-                        new IndexedUriDefinition { Index = 0, Uri = "DefaultBlock.json" },
-                        new IndexedUriDefinition { Index = 1, Uri = "DirtBlock.json" },
-                        new IndexedUriDefinition { Index = 2, Uri = "GrassBlock.json" },
-                        new IndexedUriDefinition { Index = 3, Uri = "MantleBlock.json" },
-                        new IndexedUriDefinition { Index = 4, Uri = "SandBlock.json" },
-                        new IndexedUriDefinition { Index = 5, Uri = "SnowBlock.json" },
-                        new IndexedUriDefinition { Index = 6, Uri = "StoneBlock.json" }
+                        new IndexedUriDefinition { Index = 1, Uri = "DefaultBlock.json" },
+                        new IndexedUriDefinition { Index = 2, Uri = "DirtBlock.json" },
+                        new IndexedUriDefinition { Index = 3, Uri = "GrassBlock.json" },
+                        new IndexedUriDefinition { Index = 4, Uri = "MantleBlock.json" },
+                        new IndexedUriDefinition { Index = 5, Uri = "SandBlock.json" },
+                        new IndexedUriDefinition { Index = 6, Uri = "SnowBlock.json" },
+                        new IndexedUriDefinition { Index = 7, Uri = "StoneBlock.json" }
                     },
-                    Dirt = 1,
-                    Grass = 2,
-                    Mantle = 3,
-                    Sand = 4,
-                    Snow = 5,
-                    Stone = 6
+                    Dirt = 2,
+                    Grass = 3,
+                    Mantle = 4,
+                    Sand = 5,
+                    Snow = 6,
+                    Stone = 7
                 };
                 var jsonResource = SerializeToJson<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);
                 var xmlResource = SerializeToXml<BlockCatalogDefinition>("DefaultBlockCatalog", blockCatalog);

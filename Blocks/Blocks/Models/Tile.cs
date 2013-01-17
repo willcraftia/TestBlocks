@@ -15,7 +15,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const float InverseSize = 1 / 16f;
 
-        public const byte EmptyIndex = byte.MaxValue;
+        public const byte EmptyIndex = 0;
 
         Vector3 diffuseColor;
 
@@ -55,11 +55,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         public byte SpecularPower { get; set; }
-
-        public Tile()
-        {
-            Index = EmptyIndex;
-        }
 
         public void GetTexCoordOffset(out Vector2 offset)
         {

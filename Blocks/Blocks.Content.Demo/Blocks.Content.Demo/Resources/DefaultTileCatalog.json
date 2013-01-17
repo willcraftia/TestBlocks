@@ -2,39 +2,39 @@
   "Name": "Default Tile Catalog",
   "Entries": [
     {
-      "Index": 0,
+      "Index": 1,
       "Uri": "DefaultTile.json"
     },
     {
-      "Index": 1,
+      "Index": 2,
       "Uri": "DirtTile.json"
     },
     {
-      "Index": 2,
+      "Index": 3,
       "Uri": "GrassBottomTile.json"
     },
     {
-      "Index": 3,
+      "Index": 4,
       "Uri": "GrassSideTile.json"
     },
     {
-      "Index": 4,
+      "Index": 5,
       "Uri": "GrassTopTile.json"
     },
     {
-      "Index": 5,
+      "Index": 6,
       "Uri": "MantleTile.json"
     },
     {
-      "Index": 6,
+      "Index": 7,
       "Uri": "SandTile.json"
     },
     {
-      "Index": 7,
+      "Index": 8,
       "Uri": "SnowTile.json"
     },
     {
-      "Index": 8,
+      "Index": 9,
       "Uri": "StoneTile.json"
     }
   ]

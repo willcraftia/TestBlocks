@@ -12,7 +12,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Block : IAsset
     {
-        public const byte EmptyIndex = byte.MaxValue;
+        public const byte EmptyIndex = 0;
 
         // MEMO
         //
@@ -57,7 +57,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Block()
         {
-            Index = EmptyIndex;
             Tiles = new CubicCollection<Tile>();
         }
 
