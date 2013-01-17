@@ -14,9 +14,8 @@ using Willcraftia.Xna.Framework.Threading;
 namespace Willcraftia.Xna.Framework.Landscape
 {
     /// <summary>
-    /// パーティションのアクティブ状態を管理するクラスです。
+    /// パーティションを管理するクラスです。
     /// このクラスは、必要に応じてパーティションをアクティブ化し、また、非アクティブ化します。
-    /// このクラスは、パーティションの描画に関与しません。
     /// </summary>
     public abstract class PartitionManager : IDisposable
     {
@@ -199,7 +198,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         public const string MonitorUpdate = "PartitionManager.Update";
 
         /// <summary>
-        /// ワールド空間でのパーティションのサイズ。
+        /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
         Vector3 partitionSize;
 
