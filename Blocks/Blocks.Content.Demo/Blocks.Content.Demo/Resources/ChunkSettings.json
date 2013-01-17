@@ -5,7 +5,7 @@
     "Z": 16
   },
   "MeshUpdateSearchCapacity": 100,
-  "VerticesBuilderCount": 10,
+  "VerticesBuilderCount": 5,
   "MinActiveRange": 10,
   "MaxActiveRange": 12,
   "ChunkPoolMaxCapacity": 0,
