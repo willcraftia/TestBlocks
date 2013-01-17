@@ -361,7 +361,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.Begin(MonitorDrawNormalDepth);
 
             var viewerCamera = context.ActiveCamera;
-            var visibleSceneObjects = context.VisibleSceneObjects;
 
             //----------------------------------------------------------------
             // 内部カメラの準備
@@ -393,11 +392,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.SetRenderTarget(normalDepthMap);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-            foreach (var sceneObject in visibleSceneObjects)
+            // 不透明オブジェクトのみ対象。
+            foreach (var opaque in context.OpaqueObjects)
             {
                 // 専用カメラの視錐台に含まれるもののみを描画。
-                if (IsVisibleObject(sceneObject))
-                    sceneObject.Draw(normalDepthMapEffect);
+                if (IsVisibleObject(opaque))
+                    opaque.Draw(normalDepthMapEffect);
             }
 
             GraphicsDevice.SetRenderTarget(null);

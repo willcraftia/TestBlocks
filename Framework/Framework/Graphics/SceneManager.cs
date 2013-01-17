@@ -60,15 +60,21 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             // I/F
-            public ShadowMap ShadowMap
+            public IEnumerable<SceneObject> OpaqueObjects
             {
-                get { return sceneManager.ShadowMap; }
+                get { return sceneManager.OpaqueObjects; }
             }
 
             // I/F
-            public IEnumerable<SceneObject> VisibleSceneObjects
+            public IEnumerable<SceneObject> TranslucentObjects
             {
-                get { return sceneManager.visibleSceneObjects; }
+                get { return sceneManager.TranslucentObjects; }
+            }
+
+            // I/F
+            public ShadowMap ShadowMap
+            {
+                get { return sceneManager.ShadowMap; }
             }
 
             // I/F
@@ -91,22 +97,18 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const int InitialSceneObjectCapacity = 1000;
-
         public const int InitialCameraCapacity = 10;
 
         public const int InitialDirectionalLightCapacity = 10;
 
-        public const int InitialVisibleObjectCapacity = 500;
+        public const int InitialSceneObjectCapacity = 500;
 
-        public const int InitialShadowCasterCapacity = 1000;
+        public const int InitialShadowCasterCapacity = 500;
 
         public const int InitialParticleSystemCapacity = 10;
 
         public const int InitialPostProcessorCapacity = 10;
 
-        public const string MonitorClassifySceneObjects = "SceneManager.ClassifySceneObjects";
-        
         public const string MonitorDrawShadowMap = "SceneManager.DrawShadowMap";
         
         public const string MonitorDrawScene = "SceneManager.DrawScene";
@@ -129,8 +131,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         public event EventHandler ShadowMapUpdated = delegate { };
 
-        List<SceneObject> sceneObjects = new List<SceneObject>(InitialSceneObjectCapacity);
-
         SceneObject skySphere;
 
         string activeCameraName;
@@ -144,16 +144,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         DirectionalLight activeDirectionalLight;
 
         Vector3 fogColor;
-
-        Queue<SceneObject> workingSceneObjects = new Queue<SceneObject>(InitialSceneObjectCapacity);
-
-        List<SceneObject> visibleSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
-
-        List<SceneObject> opaqueSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
-
-        List<SceneObject> translucentSceneObjects = new List<SceneObject>(InitialVisibleObjectCapacity);
-
-        List<ShadowCaster> activeShadowCasters = new List<ShadowCaster>(InitialShadowCasterCapacity);
 
         Vector3[] frustumCorners = new Vector3[8];
 
@@ -274,17 +264,21 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
+        public SceneObjectCollection OpaqueObjects { get; private set; }
+
+        public SceneObjectCollection TranslucentObjects { get; private set; }
+
+        public ShadowCasterCollection ShadowCasters { get; private set; }
+
         public bool SssmEnabled { get; set; }
 
-        public int TotalSceneObjectCount { get; internal set; }
-
-        public int VisibleSceneObjectCount { get; internal set; }
+        public int SceneObjectCount { get; internal set; }
 
         public int OccludedSceneObjectCount { get; internal set; }
 
         public int RenderedSceneObjectCount
         {
-            get { return VisibleSceneObjectCount - OccludedSceneObjectCount; }
+            get { return SceneObjectCount - OccludedSceneObjectCount; }
         }
 
         public SceneManager(Settings settings, GraphicsDevice graphicsDevice)
@@ -301,6 +295,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             DirectionalLights = new DirectionalLightCollection(InitialDirectionalLightCapacity);
             ParticleSystems = new ParticleSystemCollection(InitialParticleSystemCapacity);
             PostProcessors = new PostProcessorCollection(InitialPostProcessorCapacity);
+            OpaqueObjects = new SceneObjectCollection(this, InitialSceneObjectCapacity);
+            TranslucentObjects = new SceneObjectCollection(this, InitialSceneObjectCapacity);
+            ShadowCasters = new ShadowCasterCollection(this, InitialShadowCasterCapacity);
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -333,37 +330,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 #endif
         }
 
-        public void AddSceneObject(SceneObject sceneObject)
-        {
-            if (sceneObject == null) throw new ArgumentNullException("sceneObject");
-
-            lock (sceneObjects)
-            {
-                sceneObject.Context = this;
-                sceneObjects.Add(sceneObject);
-            }
-        }
-
-        public void RemoveSceneObject(SceneObject sceneObject)
-        {
-            if (sceneObject == null) throw new ArgumentNullException("sceneObject");
-
-            lock (sceneObjects)
-            {
-                sceneObjects.Remove(sceneObject);
-                sceneObject.Context = null;
-            }
-        }
-
-        public void ClearSceneObjects()
-        {
-            lock (sceneObjects)
-            {
-                foreach (var sceneObject in sceneObjects) sceneObject.Context = null;
-                sceneObjects.Clear();
-            }
-        }
-
         public void Draw(GameTime gameTime)
         {
             if (gameTime == null) throw new ArgumentNullException("gameTime");
@@ -372,15 +338,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             activeCamera.Frustum.GetCorners(frustumCorners);
             frustumSphere = BoundingSphere.CreateFromPoints(frustumCorners);
 
-            // 収集リストを初期化。
-            visibleSceneObjects.Clear();
-            opaqueSceneObjects.Clear();
-            translucentSceneObjects.Clear();
-            activeShadowCasters.Clear();
-
             // カウンタをリセット。
-            TotalSceneObjectCount = 0;
-            VisibleSceneObjectCount = 0;
+            SceneObjectCount = 0;
             OccludedSceneObjectCount = 0;
 
 #if DEBUG || TRACE
@@ -389,31 +348,18 @@ namespace Willcraftia.Xna.Framework.Graphics
             debugBoundingBoxEffect.Projection = activeCamera.Projection.Matrix;
 #endif
 
-            // 長時間のロックの回避。
-            lock (sceneObjects)
-            {
-                foreach (var sceneObject in sceneObjects)
-                    workingSceneObjects.Enqueue(sceneObject);
-            }
-
-            TotalSceneObjectCount = workingSceneObjects.Count;
-
-            //----------------------------------------------------------------
-            // 可視オブジェクトの収集と種類による分類
-
-            ClassifySceneObjects();
+            SceneObjectCount = OpaqueObjects.Count + TranslucentObjects.Count;
 
             // 視点からの距離でソート。
             DistanceComparer.Instance.EyePosition = activeCamera.View.Position;
-            visibleSceneObjects.Sort(DistanceComparer.Instance);
-            opaqueSceneObjects.Sort(DistanceComparer.Instance);
-            translucentSceneObjects.Sort(DistanceComparer.Instance);
+            OpaqueObjects.Sort(DistanceComparer.Instance);
+            TranslucentObjects.Sort(DistanceComparer.Instance);
 
             //----------------------------------------------------------------
             // シャドウ マップ
 
             shadowMapAvailable = false;
-            if (ShadowMap != null && activeShadowCasters.Count != 0 &&
+            if (ShadowMap != null && ShadowCasters.Count != 0 &&
                 activeDirectionalLight != null && activeDirectionalLight.Enabled)
             {
                 DrawShadowMap();
@@ -462,6 +408,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
+
+            //----------------------------------------------------------------
+            // 後処理
+
+            // 分類リストを初期化。
+            OpaqueObjects.Clear();
+            TranslucentObjects.Clear();
+            ShadowCasters.Clear();
         }
 
         public void UpdateEffect(Effect effect)
@@ -545,55 +499,6 @@ namespace Willcraftia.Xna.Framework.Graphics
             return sceneObject.BoundingBox.Intersects(activeCamera.Frustum);
         }
 
-        bool IsActiveShadowCaster(ShadowCaster shadowCaster)
-        {
-            if (shadowCaster.Translucent) return false;
-            if (!shadowCaster.CastShadow) return false;
-
-            return true;
-        }
-
-        void ClassifySceneObjects()
-        {
-            Monitor.Begin(MonitorClassifySceneObjects);
-
-            // 可視オブジェクトの収集と種類による分類。
-            while (workingSceneObjects.Count != 0)
-            {
-                var sceneObject = workingSceneObjects.Dequeue();
-
-                bool shouldPreDraw = false;
-
-                if (IsVisibleObject(sceneObject))
-                {
-                    visibleSceneObjects.Add(sceneObject);
-                    shouldPreDraw = true;
-
-                    if (sceneObject.Translucent)
-                    {
-                        translucentSceneObjects.Add(sceneObject);
-                    }
-                    else
-                    {
-                        opaqueSceneObjects.Add(sceneObject);
-                    }
-
-                    VisibleSceneObjectCount++;
-                }
-
-                var shadowCaster = sceneObject as ShadowCaster;
-                if (shadowCaster != null && IsActiveShadowCaster(shadowCaster))
-                {
-                    activeShadowCasters.Add(shadowCaster);
-                    shouldPreDraw = true;
-                }
-
-                if (shouldPreDraw) sceneObject.PreDraw();
-            }
-
-            Monitor.End(MonitorClassifySceneObjects);
-        }
-
         void DrawShadowMap()
         {
             Monitor.Begin(MonitorDrawShadowMap);
@@ -606,7 +511,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 投影オブジェクトを収集
 
-            foreach (var shadowCaster in activeShadowCasters)
+            foreach (var shadowCaster in ShadowCasters)
                 ShadowMap.TryAddShadowCaster(shadowCaster);
 
             //----------------------------------------------------------------
@@ -636,10 +541,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = colorWriteDisable;
 
-            foreach (var opaque in opaqueSceneObjects)
+            foreach (var opaque in OpaqueObjects)
                 opaque.UpdateOcclusion();
 
-            foreach (var translucent in translucentSceneObjects)
+            foreach (var translucent in TranslucentObjects)
                 translucent.UpdateOcclusion();
 
             Monitor.End(MonitorOcclusionQuery);
@@ -656,7 +561,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            foreach (var opaque in opaqueSceneObjects)
+            foreach (var opaque in OpaqueObjects)
             {
                 if (opaque.Occluded)
                 {
@@ -672,7 +577,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            foreach (var translucent in translucentSceneObjects)
+            foreach (var translucent in TranslucentObjects)
             {
                 if (translucent.Occluded)
                 {
@@ -687,10 +592,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // スカイ スフィア
 
             if (SkySphere != null && SkySphere.Visible)
-            {
-                SkySphere.PreDraw();
                 SkySphere.Draw();
-            }
 
             Monitor.End(MonitorDrawSceneObjects);
 
@@ -758,10 +660,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
             GraphicsDevice.SetRenderTarget(renderTarget);
 
-            foreach (var sceneObject in visibleSceneObjects)
-            {
-                DebugDrawBoundingBox(sceneObject);
-            }
+            foreach (var opaque in OpaqueObjects)
+                DebugDrawBoundingBox(opaque);
+
+            foreach (var translucent in TranslucentObjects)
+                DebugDrawBoundingBox(translucent);
 
             GraphicsDevice.SetRenderTarget(null);
         }

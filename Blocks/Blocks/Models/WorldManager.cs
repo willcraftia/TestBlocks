@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
@@ -28,6 +29,8 @@ namespace Willcraftia.Xna.Blocks.Models
         AssetManager assetManager;
 
         BasicCamera defaultCamera = new BasicCamera("Default");
+
+        List<Chunk> visibleChunks = new List<Chunk>();
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -245,7 +248,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var chunkSettings = LoadAsset<ChunkSettings>("title:Resources/ChunkSettings.json");
 
-            ChunkManager = new ChunkManager(chunkSettings, GraphicsDevice, RegionManager, SceneManager);
+            ChunkManager = new ChunkManager(chunkSettings, GraphicsDevice, RegionManager);
 
             //----------------------------------------------------------------
             // デフォルト カメラ
@@ -337,6 +340,25 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Draw(GameTime gameTime)
         {
             //----------------------------------------------------------------
+            // 視錐台に含まれるチャンクを収集してシーン マネージャへ追加
+
+            ChunkManager.CollectPartitions(SceneManager.ActiveCamera.Frustum, visibleChunks);
+
+            foreach (var chunk in visibleChunks)
+            {
+                if (chunk.OpaqueMesh != null)
+                {
+                    SceneManager.OpaqueObjects.Add(chunk.OpaqueMesh);
+
+                    if (chunk.OpaqueMesh.CastShadow)
+                        SceneManager.ShadowCasters.Add(chunk.OpaqueMesh);
+                }
+                
+                if (chunk.TranslucentMesh != null)
+                    SceneManager.TranslucentObjects.Add(chunk.TranslucentMesh);
+            }
+
+            //----------------------------------------------------------------
             // リージョン マネージャ
 
             // チャンク エフェクトを更新。
@@ -347,6 +369,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
             SceneManager.BackgroundColor = SceneSettings.CurrentSkyColor;
             SceneManager.Draw(gameTime);
+
+            //----------------------------------------------------------------
+            // 後処理
+
+            visibleChunks.Clear();
         }
 
         T LoadAsset<T>(string uri)

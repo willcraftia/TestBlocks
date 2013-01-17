@@ -124,6 +124,8 @@
     <Compile Include="Graphics\IEffectEye.cs" />
     <Compile Include="Graphics\IEffectShadowMap.cs" />
     <Compile Include="Graphics\Scanline.cs" />
+    <Compile Include="Graphics\SceneObjectCollection.cs" />
+    <Compile Include="Graphics\ShadowCasterCollection.cs" />
     <Compile Include="Graphics\SsaoMapBlur.cs" />
     <Compile Include="Graphics\Bloom.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />

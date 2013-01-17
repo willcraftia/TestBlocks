@@ -465,7 +465,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="frustum">境界錐台。</param>
         /// <param name="collector">収集先パーティションのコレクション。</param>
-        public void CollectPartitions(BoundingFrustum frustum, ICollection<Partition> collector)
+        public void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
         {
             foreach (var cluster in ActivePartitions.Clusters)
             {

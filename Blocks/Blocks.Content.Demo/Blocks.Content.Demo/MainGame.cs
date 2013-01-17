@@ -147,13 +147,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             
             monitorListener.CreateMarker(MonitorDraw, 2, Color.White);
 
-            monitorListener.CreateMarker(SceneManager.MonitorClassifySceneObjects, 3, Color.Cyan);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, 3, Color.Orange);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, 3, Color.Green);
-            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, 3, Color.Red);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, 3, Color.Yellow);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, 3, Color.Magenta);
-            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, 3, Color.LawnGreen);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, 3, Color.Cyan);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, 3, Color.Orange);
+            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, 3, Color.Green);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, 3, Color.Red);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, 3, Color.Yellow);
+            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, 3, Color.Magenta);
 
             #endregion
 
@@ -369,8 +368,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             var sceneManager = worldManager.SceneManager;
             sb.Append("SceneObejcts: ").AppendNumber(sceneManager.RenderedSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManager.VisibleSceneObjectCount).Append("/");
-            sb.AppendNumber(sceneManager.TotalSceneObjectCount).AppendLine();
+            sb.AppendNumber(sceneManager.SceneObjectCount).AppendLine();
 
             if (worldManager.ShadowMap != null)
             {

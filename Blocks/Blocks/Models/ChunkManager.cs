@@ -47,12 +47,6 @@ namespace Willcraftia.Xna.Blocks.Models
         RegionManager regionManager;
 
         /// <summary>
-        /// シーン マネージャ。
-        /// チャンク メッシュをシーン オブジェクトとして登録するために必要。
-        /// </summary>
-        SceneManager sceneManager;
-
-        /// <summary>
         /// チャンク メッシュのオフセット。
         /// </summary>
         Vector3 chunkMeshOffset;
@@ -156,18 +150,15 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="settings">チャンク設定。</param>
         /// <param name="graphicsDevice">グラフィックス デバイス。</param>
         /// <param name="regionManager">リージョン マネージャ。</param>
-        /// <param name="sceneManager">シーン マネージャ。</param>
-        public ChunkManager(ChunkSettings settings, GraphicsDevice graphicsDevice, RegionManager regionManager, SceneManager sceneManager)
+        public ChunkManager(ChunkSettings settings, GraphicsDevice graphicsDevice, RegionManager regionManager)
             : base(settings.PartitionManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (regionManager == null) throw new ArgumentNullException("regionManager");
-            if (sceneManager == null) throw new ArgumentNullException("sceneManager");
 
             chunkSize = settings.ChunkSize;
             this.graphicsDevice = graphicsDevice;
             this.regionManager = regionManager;
-            this.sceneManager = sceneManager;
 
             meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
             verticesBuilderCount = settings.VerticesBuilderCount;
@@ -448,8 +439,6 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunkMesh = new ChunkMesh(chunkEffect);
             chunkMesh.Translucent = translucent;
 
-            sceneManager.AddSceneObject(chunkMesh);
-
             ChunkMeshCount++;
 
             return chunkMesh;
@@ -463,8 +452,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="chunkMesh">チャンク メッシュ。</param>
         internal void DisposeChunkMesh(ChunkMesh chunkMesh)
         {
-            sceneManager.RemoveSceneObject(chunkMesh);
-
             // 破棄を待機する。
             lock (disposeMeshQueue)
                 disposeMeshQueue.Enqueue(chunkMesh);

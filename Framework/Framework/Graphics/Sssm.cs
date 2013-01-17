@@ -390,7 +390,6 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             var camera = context.ActiveCamera;
             var shadowMap = context.ShadowMap;
-            var visibleSceneObjects = context.VisibleSceneObjects;
 
             //----------------------------------------------------------------
             // エフェクト
@@ -410,8 +409,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.SetRenderTarget(shadowSceneMap);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-            foreach (var sceneObject in visibleSceneObjects)
-                sceneObject.Draw(shadowSceneEffect);
+            foreach (var opaque in context.OpaqueObjects)
+                opaque.Draw(shadowSceneEffect);
+
+            foreach (var translucent in context.TranslucentObjects)
+                translucent.Draw(shadowSceneEffect);
 
             GraphicsDevice.SetRenderTarget(null);
 

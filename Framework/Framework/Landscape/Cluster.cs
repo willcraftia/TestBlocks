@@ -98,14 +98,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="frustum">境界錐台。</param>
         /// <param name="collector">収集先パーティションのコレクション。</param>
-        public void CollectPartitions(BoundingFrustum frustum, ICollection<Partition> collector)
+        public void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
         {
             foreach (var partition in partitions.Values)
             {
                 bool intersected;
                 frustum.Intersects(ref partition.BoundingBox, out intersected);
 
-                if (intersected) collector.Add(partition);
+                if (intersected) collector.Add(partition as T);
             }
         }
 

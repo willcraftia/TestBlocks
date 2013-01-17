@@ -109,10 +109,31 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             return list.GetEnumerator();
         }
+
         // I/F
         IEnumerator IEnumerable.GetEnumerator()
         {
             return list.GetEnumerator();
+        }
+
+        public void Sort()
+        {
+            list.Sort();
+        }
+
+        public void Sort(Comparison<T> comparison)
+        {
+            list.Sort(comparison);
+        }
+
+        public void Sort(IComparer<T> comparer)
+        {
+            list.Sort(comparer);
+        }
+
+        public void Sort(int index, int count, IComparer<T> comparer)
+        {
+            list.Sort(index, count, comparer);
         }
 
         protected virtual void ClearOverride()
