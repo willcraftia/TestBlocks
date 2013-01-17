@@ -98,8 +98,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public bool ContainsPartition(Partition partition)
         {
-            var position = partition.Position;
-            return ContainsPartition(ref position);
+            return ContainsPartition(ref partition.Position);
         }
 
         /// <summary>
@@ -202,8 +201,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="partition">パーティション。</param>
         public void RemovePartition(Partition partition)
         {
-            var position = partition.Position;
-            RemovePartition(ref position);
+            RemovePartition(ref partition.Position);
         }
 
         /// <summary>
@@ -268,8 +266,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="result">クラスタ空間におけるクラスタの位置。</param>
         void CalculateClusterPosition(Partition partition, out VectorI3 result)
         {
-            var position = partition.Position;
-            CalculateClusterPosition(ref position, out result);
+            CalculateClusterPosition(ref partition.Position, out result);
         }
 
         /// <summary>

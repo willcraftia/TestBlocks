@@ -18,17 +18,17 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション空間におけるパーティションの位置。
         /// </summary>
-        protected VectorI3 position;
+        public VectorI3 Position;
 
         /// <summary>
         /// ワールド空間におけるパーティションの位置。
         /// </summary>
-        protected Vector3 positionWorld;
+        public Vector3 PositionWorld;
 
         /// <summary>
         /// ワールド空間におけるパーティションの境界ボックス。
         /// </summary>
-        protected internal BoundingBox BoundingBox;
+        public BoundingBox BoundingBox;
 
         /// <summary>
         /// 非アクティブ化を制御するためのフラグ。
@@ -60,22 +60,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化が取り消されているか否かを示す値。
         /// </summary>
         volatile bool passivationCanceled;
-
-        /// <summary>
-        /// パーティション空間におけるパーティションの位置を取得します。
-        /// </summary>
-        public VectorI3 Position
-        {
-            get { return position; }
-        }
-
-        /// <summary>
-        /// ワールド空間におけるパーティションの位置を取得します。
-        /// </summary>
-        public Vector3 PositionWorld
-        {
-            get { return positionWorld; }
-        }
 
         /// <summary>
         /// パーティションが何らかの処理により占有状態にあるか否かを示す値を取得または設定します。
@@ -174,7 +158,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal bool IsInLandscapeVolume(ILandscapeVolume volume)
         {
             bool result;
-            volume.Contains(ref position, out result);
+            volume.Contains(ref Position, out result);
             return result;
         }
 
@@ -191,17 +175,17 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         internal bool Initialize(VectorI3 position, Vector3 partitionSize)
         {
-            this.position = position;
+            Position = position;
 
-            positionWorld = new Vector3
+            PositionWorld = new Vector3
             {
                 X = position.X * partitionSize.X,
                 Y = position.Y * partitionSize.Y,
                 Z = position.Z * partitionSize.Z,
             };
 
-            BoundingBox.Min = positionWorld;
-            BoundingBox.Max = positionWorld + partitionSize;
+            BoundingBox.Min = PositionWorld;
+            BoundingBox.Max = PositionWorld + partitionSize;
 
             activationCompleted = false;
             activationCanceled = false;
@@ -218,7 +202,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void Release()
         {
-            position = VectorI3.Zero;
+            Position = VectorI3.Zero;
 
             activationCompleted = false;
             activationCanceled = false;

@@ -80,7 +80,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // I/F
             public RenderTarget2D Source
             {
-                get { return sceneManager.renderTarget; }
+                get { return sceneManager.RenderTarget; }
             }
 
             // I/F
@@ -150,8 +150,6 @@ namespace Willcraftia.Xna.Framework.Graphics
         BoundingSphere frustumSphere;
 
         bool shadowMapAvailable;
-
-        RenderTarget2D renderTarget;
 
         RenderTarget2D postProcessRenderTarget;
 
@@ -270,6 +268,14 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public ShadowCasterCollection ShadowCasters { get; private set; }
 
+        /// <summary>
+        /// レンダ ターゲットを取得します。
+        /// シーン マネージャは、このレンダ ターゲットへ最終的なシーンを描画します。
+        /// 呼び出し元は、シーン マネージャの描画が完了したら、
+        /// このレンダ ターゲットをスクリーンへ反映させる必要があります。
+        /// </summary>
+        public RenderTarget2D RenderTarget { get; private set; }
+
         public bool SssmEnabled { get; set; }
 
         public int SceneObjectCount { get; internal set; }
@@ -308,7 +314,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             var format = pp.BackBufferFormat;
             var depthFormat = pp.DepthStencilFormat;
             var multiSampleCount = pp.MultiSampleCount;
-            renderTarget = new RenderTarget2D(GraphicsDevice, width, height,
+            RenderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
 
             //----------------------------------------------------------------
@@ -398,16 +404,9 @@ namespace Willcraftia.Xna.Framework.Graphics
                 DrawLensFlare();
 
             //----------------------------------------------------------------
-            // デバッグのための BoundingBox 描画
+            // シーン オブジェクトの境界ボックスの描画
 
             DebugDrawBoundingBoxes();
-
-            //----------------------------------------------------------------
-            // レンダ ターゲットの反映
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
-            spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
-            spriteBatch.End();
 
             //----------------------------------------------------------------
             // 後処理
@@ -528,8 +527,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             Monitor.Begin(MonitorDrawScene);
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            
-            GraphicsDevice.SetRenderTarget(renderTarget);
+
+            GraphicsDevice.SetRenderTarget(RenderTarget);
             GraphicsDevice.Clear(new Color(BackgroundColor));
 
             //================================================================
@@ -605,7 +604,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Monitor.Begin(MonitorDrawParticles);
 
-            GraphicsDevice.SetRenderTarget(renderTarget);
+            GraphicsDevice.SetRenderTarget(RenderTarget);
 
             foreach (var particleSystem in ParticleSystems)
             {
@@ -636,8 +635,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void SwapRenderTargets()
         {
-            var temp = renderTarget;
-            renderTarget = postProcessRenderTarget;
+            var temp = RenderTarget;
+            RenderTarget = postProcessRenderTarget;
             postProcessRenderTarget = temp;
         }
 
@@ -645,7 +644,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (activeDirectionalLight == null) return;
 
-            GraphicsDevice.SetRenderTarget(renderTarget);
+            GraphicsDevice.SetRenderTarget(RenderTarget);
 
             LensFlare.Draw(activeCamera, activeDirectionalLight.Direction);
 
@@ -658,7 +657,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (!DebugBoundingBoxVisible) return;
 
             GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-            GraphicsDevice.SetRenderTarget(renderTarget);
+            GraphicsDevice.SetRenderTarget(RenderTarget);
 
             foreach (var opaque in OpaqueObjects)
                 DebugDrawBoundingBox(opaque);

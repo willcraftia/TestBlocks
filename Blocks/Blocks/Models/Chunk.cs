@@ -260,7 +260,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public void RequestUpdateMesh()
         {
-            chunkManager.RequestUpdateMesh(position);
+            chunkManager.RequestUpdateMesh(Position);
         }
 
         /// <summary>
@@ -270,9 +270,8 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override bool InitializeOverride()
         {
             // 対象リージョンの取得。
-            var position = Position;
-            if (!regionManager.TryGetRegion(ref position, out region))
-                throw new InvalidOperationException("Region not found: " + position);
+            if (!regionManager.TryGetRegion(ref Position, out region))
+                throw new InvalidOperationException("Region not found: " + Position);
 
             return base.InitializeOverride();
         }
@@ -402,9 +401,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(region != null);
             Debug.Assert(!active);
 
-            var position = Position;
-
-            if (!region.ChunkStore.GetChunk(ref position, this))
+            if (!region.ChunkStore.GetChunk(ref Position, this))
             {
                 foreach (var procedure in region.ChunkProcesures)
                     procedure.Generate(this);
@@ -479,17 +476,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public int CalculateBlockPositionX(int x)
         {
-            return position.X * size.X + x;
+            return Position.X * size.X + x;
         }
 
         public int CalculateBlockPositionY(int y)
         {
-            return position.Y * size.Y + y;
+            return Position.Y * size.Y + y;
         }
 
         public int CalculateBlockPositionZ(int z)
         {
-            return position.Z * size.Z + z;
+            return Position.Z * size.Z + z;
         }
 
         public void Read(BinaryReader reader)

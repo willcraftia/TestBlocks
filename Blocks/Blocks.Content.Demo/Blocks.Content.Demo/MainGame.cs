@@ -284,7 +284,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 helpVisible = !helpVisible;
             // F2
             if (keyboardState.IsKeyUp(Keys.F2) && lastKeyboardState.IsKeyDown(Keys.F2))
-                SceneManager.DebugBoundingBoxVisible = !SceneManager.DebugBoundingBoxVisible;
+                worldManager.DebugChunkBoundingBoxVisible = !worldManager.DebugChunkBoundingBoxVisible;
             // F3
             if (keyboardState.IsKeyUp(Keys.F3) && lastKeyboardState.IsKeyDown(Keys.F3))
                 RegionManager.Wireframe = !RegionManager.Wireframe;
