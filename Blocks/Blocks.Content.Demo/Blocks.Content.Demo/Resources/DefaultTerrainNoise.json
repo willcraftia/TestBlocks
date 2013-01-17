@@ -343,11 +343,11 @@
         },
         {
           "Name": "Frequency",
-          "Value": "0.5"
+          "Value": "0.7"
         },
         {
           "Name": "Lacunarity",
-          "Value": "0.2"
+          "Value": "0.7"
         },
         {
           "Name": "OctaveCount",
