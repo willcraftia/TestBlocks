@@ -21,22 +21,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク マネージャ。
         /// </summary>
-        ChunkManager chunkManager;
-
-        /// <summary>
-        /// リージョン マネージャ。
-        /// </summary>
-        RegionManager regionManager;
+        ChunkManager manager;
 
         /// <summary>
         /// チャンクが属するリージョン。
         /// </summary>
         Region region;
-
-        /// <summary>
-        /// チャンクのサイズ。
-        /// </summary>
-        VectorI3 size;
 
         /// <summary>
         /// チャンクが参照するブロックのインデックス。
@@ -87,7 +77,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public VectorI3 Size
         {
-            get { return size; }
+            get { return manager.ChunkSize; }
         }
 
         /// <summary>
@@ -110,20 +100,20 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             get
             {
-                if (x < 0 || size.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || size.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || size.Z < z) throw new ArgumentOutOfRangeException("z");
+                if (x < 0 || manager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
+                if (y < 0 || manager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
+                if (z < 0 || manager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
 
-                var index = x + y * size.X + z * size.X * size.Y;
+                var index = x + y * manager.ChunkSize.X + z * manager.ChunkSize.X * manager.ChunkSize.Y;
                 return blockIndices[index];
             }
             set
             {
-                if (x < 0 || size.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || size.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || size.Z < z) throw new ArgumentOutOfRangeException("z");
+                if (x < 0 || manager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
+                if (y < 0 || manager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
+                if (z < 0 || manager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
 
-                var index = x + y * size.X + z * size.X * size.Y;
+                var index = x + y * manager.ChunkSize.X + z * manager.ChunkSize.X * manager.ChunkSize.Y;
                 blockIndices[index] = value;
 
                 DefinitionDirty = true;
@@ -193,19 +183,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="chunkManager">チャンク マネージャ。</param>
-        /// <param name="regionManager">リージョン マネージャ。</param>
-        public Chunk(ChunkManager chunkManager, RegionManager regionManager)
+        /// <param name="manager">チャンク マネージャ。</param>
+        public Chunk(ChunkManager manager)
         {
-            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
-            if (regionManager == null) throw new ArgumentNullException("regionManager");
+            if (manager == null) throw new ArgumentNullException("manager");
 
-            this.chunkManager = chunkManager;
-            this.regionManager = regionManager;
+            this.manager = manager;
 
-            size = chunkManager.ChunkSize;
-
-            blockIndices = new byte[size.X * size.Y * size.Z];
+            blockIndices = new byte[manager.ChunkSize.X * manager.ChunkSize.Y * manager.ChunkSize.Z];
         }
 
         /// <summary>
@@ -260,7 +245,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public void RequestUpdateMesh()
         {
-            chunkManager.RequestUpdateMesh(Position);
+            manager.RequestUpdateMesh(Position);
         }
 
         /// <summary>
@@ -270,7 +255,7 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override bool InitializeOverride()
         {
             // 対象リージョンの取得。
-            if (!regionManager.TryGetRegion(ref Position, out region))
+            if (!manager.TryGetRegion(ref Position, out region))
                 throw new InvalidOperationException("Region not found: " + Position);
 
             return base.InitializeOverride();
@@ -424,17 +409,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (OpaqueMesh != null)
             {
-                chunkManager.DisposeChunkMesh(OpaqueMesh);
+                manager.DisposeChunkMesh(OpaqueMesh);
                 OpaqueMesh = null;
             }
             if (TranslucentMesh != null)
             {
-                chunkManager.DisposeChunkMesh(TranslucentMesh);
+                manager.DisposeChunkMesh(TranslucentMesh);
                 TranslucentMesh = null;
             }
             if (VerticesBuilder != null)
             {
-                chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
+                manager.ReleaseVerticesBuilder(VerticesBuilder);
                 VerticesBuilder = null;
             }
 
@@ -476,17 +461,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public int CalculateBlockPositionX(int x)
         {
-            return Position.X * size.X + x;
+            return Position.X * manager.ChunkSize.X + x;
         }
 
         public int CalculateBlockPositionY(int y)
         {
-            return Position.Y * size.Y + y;
+            return Position.Y * manager.ChunkSize.Y + y;
         }
 
         public int CalculateBlockPositionZ(int z)
         {
-            return Position.Z * size.Z + z;
+            return Position.Z * manager.ChunkSize.Z + z;
         }
 
         public void Read(BinaryReader reader)
@@ -513,9 +498,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool Contains(ref VectorI3 blockPosition)
         {
-            return 0 <= blockPosition.X && blockPosition.X < size.X &&
-                0 <= blockPosition.Y && blockPosition.Y < size.Y &&
-                0 <= blockPosition.Z && blockPosition.Z < size.Z;
+            return 0 <= blockPosition.X && blockPosition.X < manager.ChunkSize.X &&
+                0 <= blockPosition.Y && blockPosition.Y < manager.ChunkSize.Y &&
+                0 <= blockPosition.Z && blockPosition.Z < manager.ChunkSize.Z;
         }
     }
 }

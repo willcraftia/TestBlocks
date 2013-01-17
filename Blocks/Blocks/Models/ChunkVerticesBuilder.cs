@@ -43,9 +43,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         volatile bool completed;
 
-        VectorI3 chunkSize;
-
-        Vector3 chunkMeshOffset;
+        ChunkManager manager;
 
         SpaceTypes[, ,] spaceMap;
 
@@ -65,13 +63,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Action ExecuteAction { get; private set; }
 
-        public ChunkVerticesBuilder(VectorI3 chunkSize)
+        public ChunkVerticesBuilder(ChunkManager manager)
         {
-            CloseChunks = new CloseChunks(chunkSize);
-            Opaque = new ChunkVertices(chunkSize);
-            Translucent = new ChunkVertices(chunkSize);
+            if (manager == null) throw new ArgumentNullException("manager");
+
+            this.manager = manager;
+
+            CloseChunks = new CloseChunks(manager.ChunkSize);
+            Opaque = new ChunkVertices(manager.ChunkSize);
+            Translucent = new ChunkVertices(manager.ChunkSize);
             ExecuteAction = new Action(Execute);
-            spaceMap = new SpaceTypes[chunkSize.X, chunkSize.Y, chunkSize.Z];
+            spaceMap = new SpaceTypes[manager.ChunkSize.X, manager.ChunkSize.Y, manager.ChunkSize.Z];
         }
 
         void Execute()
@@ -81,16 +83,9 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(Chunk.Active);
             Debug.Assert(Chunk.Updating);
 
-            chunkSize = Chunk.Size;
-
-            var halfChunkSize = chunkSize;
-            halfChunkSize.X /= 2;
-            halfChunkSize.Y /= 2;
-            halfChunkSize.Z /= 2;
-
-            chunkMeshOffset = halfChunkSize.ToVector3();
-
             Array.Clear(spaceMap, 0, spaceMap.Length);
+
+            var chunkSize = manager.ChunkSize;
 
             // 解放状態マップを構築。
             var position = new VectorI3();
@@ -136,6 +131,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 呼び出し元で隣接位置の探索を試行。
                 if (!block.Fluid && !block.Translucent) return false;
             }
+
+            var chunkSize = manager.ChunkSize;
 
             // 空、流体、半透明ブロックである場合。
             if (position.X == 0 || position.X == (chunkSize.X - 1) ||
@@ -231,6 +228,8 @@ namespace Willcraftia.Xna.Blocks.Models
             if (Block.EmptyIndex == blockIndex) return;
 
             var block = Chunk.Region.BlockCatalog[blockIndex];
+
+            var chunkSize = manager.ChunkSize;
 
             // MeshPart が必ずしも平面であるとは限らないが、
             // ここでは平面を仮定して隣接状態を考える。
@@ -369,7 +368,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 vertex.Position += blockMeshOffset;
 
                 // チャンク メッシュはチャンクの中心位置を原点とするため、半チャンク移動。
-                vertex.Position -= chunkMeshOffset;
+                vertex.Position -= manager.ChunkMeshOffset;
 
                 destination.AddVertex(ref vertex);
             }

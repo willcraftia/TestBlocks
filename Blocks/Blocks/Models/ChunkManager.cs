@@ -22,6 +22,21 @@ namespace Willcraftia.Xna.Blocks.Models
     public sealed class ChunkManager : PartitionManager
     {
         /// <summary>
+        /// チャンク サイズ。
+        /// </summary>
+        public readonly VectorI3 ChunkSize;
+
+        /// <summary>
+        /// 半チャンク サイズ。
+        /// </summary>
+        public readonly VectorI3 HalfChunkSize;
+
+        /// <summary>
+        /// チャンク メッシュのオフセット。
+        /// </summary>
+        public readonly Vector3 ChunkMeshOffset;
+
+        /// <summary>
         /// メッシュ更新の最大試行数。
         /// </summary>
         int meshUpdateSearchCapacity;
@@ -30,11 +45,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 頂点ビルダの総数。
         /// </summary>
         int verticesBuilderCount;
-
-        /// <summary>
-        /// チャンク サイズ。
-        /// </summary>
-        VectorI3 chunkSize;
 
         /// <summary>
         /// グラフィックス デバイス。
@@ -47,14 +57,11 @@ namespace Willcraftia.Xna.Blocks.Models
         RegionManager regionManager;
 
         /// <summary>
-        /// チャンク メッシュのオフセット。
-        /// </summary>
-        Vector3 chunkMeshOffset;
-
-        /// <summary>
         /// 1 / chunkSize。
         /// </summary>
         Vector3 inverseChunkSize;
+
+        ConcurrentPool<ChunkData> chunkDataPool;
 
         /// <summary>
         /// 頂点ビルダ実行待ちチャンクのキュー。
@@ -86,14 +93,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 破棄待ちチャンク メッシュのキュー。
         /// </summary>
         Queue<ChunkMesh> disposeMeshQueue = new Queue<ChunkMesh>();
-
-        /// <summary>
-        /// チャンクのサイズを取得します。
-        /// </summary>
-        public VectorI3 ChunkSize
-        {
-            get { return chunkSize; }
-        }
 
         /// <summary>
         /// チャンク メッシュの数を取得します。
@@ -156,25 +155,27 @@ namespace Willcraftia.Xna.Blocks.Models
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
             if (regionManager == null) throw new ArgumentNullException("regionManager");
 
-            chunkSize = settings.ChunkSize;
+            ChunkSize = settings.ChunkSize;
             this.graphicsDevice = graphicsDevice;
             this.regionManager = regionManager;
 
             meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
             verticesBuilderCount = settings.VerticesBuilderCount;
 
-            var halfChunkSize = chunkSize;
-            halfChunkSize.X /= 2;
-            halfChunkSize.Y /= 2;
-            halfChunkSize.Z /= 2;
+            HalfChunkSize = ChunkSize;
+            HalfChunkSize.X /= 2;
+            HalfChunkSize.Y /= 2;
+            HalfChunkSize.Z /= 2;
 
-            chunkMeshOffset = halfChunkSize.ToVector3();
+            ChunkMeshOffset = HalfChunkSize.ToVector3();
 
-            inverseChunkSize.X = 1 / (float) chunkSize.X;
-            inverseChunkSize.Y = 1 / (float) chunkSize.Y;
-            inverseChunkSize.Z = 1 / (float) chunkSize.Z;
+            inverseChunkSize.X = 1 / (float) ChunkSize.X;
+            inverseChunkSize.Y = 1 / (float) ChunkSize.Y;
+            inverseChunkSize.Z = 1 / (float) ChunkSize.Z;
 
-            verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreateInterChunkMeshTask)
+            chunkDataPool = new ConcurrentPool<ChunkData>(CreateData);
+
+            verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreateVerticesBuilder)
             {
                 MaxCapacity = verticesBuilderCount
             };
@@ -192,7 +193,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override Partition CreatePartition()
         {
-            return new Chunk(this, regionManager);
+            return new Chunk(this);
         }
 
         /// <summary>
@@ -227,6 +228,21 @@ namespace Willcraftia.Xna.Blocks.Models
             CheckChunkMeshesUpdated(gameTime);
 
             base.UpdatePartitionsOverride(gameTime);
+        }
+
+        internal bool TryGetRegion(ref VectorI3 position, out Region result)
+        {
+            return regionManager.TryGetRegion(ref position, out result);
+        }
+
+        internal ChunkData BorrowChunkData()
+        {
+            return chunkDataPool.Borrow();
+        }
+
+        internal void ReturnChunkData(ChunkData data)
+        {
+            chunkDataPool.Return(data);
         }
 
         /// <summary>
@@ -401,13 +417,18 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        ChunkData CreateData()
+        {
+            return new ChunkData(this);
+        }
+
         /// <summary>
         /// 頂点ビルダ プールのインスタンス生成メソッドです。
         /// </summary>
         /// <returns>頂点ビルダ。</returns>
-        ChunkVerticesBuilder CreateInterChunkMeshTask()
+        ChunkVerticesBuilder CreateVerticesBuilder()
         {
-            return new ChunkVerticesBuilder(chunkSize);
+            return new ChunkVerticesBuilder(this);
         }
 
         /// <summary>
@@ -490,7 +511,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // メッシュに設定するワールド座標。
             // チャンクの中心をメッシュの位置とする。
-            var position = chunk.PositionWorld + chunkMeshOffset;
+            var position = chunk.PositionWorld + ChunkMeshOffset;
 
             // メッシュに設定するワールド行列。
             Matrix world;
