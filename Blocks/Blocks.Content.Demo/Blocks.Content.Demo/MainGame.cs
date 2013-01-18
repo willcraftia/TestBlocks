@@ -79,19 +79,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         public MainGame()
         {
-            Willcraftia.Xna.Framework.Collections.Octree<float> octree =
-                new Framework.Collections.Octree<float>(256, 16);
-
-            octree.Origin = new Vector3(128f);
-
-            float item;
-            octree.SetItem(new Vector3(128.5f), 200.5f);
-            item = octree.GetItem(new Vector3(128.5f));
-            item = octree.GetItem(new Vector3(129f));
-            item = octree.GetItem(new Vector3(128 + 16));
-            octree.SetItem(new Vector3(128.5f), 0);
-            item = octree.GetItem(new Vector3(128.5f));
-
             //----------------------------------------------------------------
             // GraphicsDeviceManager
 
