@@ -42,18 +42,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         ChunkData data;
 
-        /// <summary>
-        /// 
-        /// </summary>
         bool dataChanged;
-
-        /// <summary>
-        /// チャンクがアクティブであるか否かを示す値。
-        /// </summary>
-        /// <value>
-        /// true (アクティブな場合)、false (それ以外の場合)。
-        /// </value>
-        volatile bool active;
 
         /// <summary>
         /// 不透明メッシュ。
@@ -146,17 +135,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// メッシュ更新のための頂点ビルダを取得または設定します。
         /// </summary>
         public ChunkVerticesBuilder VerticesBuilder { get; internal set; }
-
-        /// <summary>
-        /// チャンクがアクティブであるか否かを示す値を取得します。
-        /// </summary>
-        /// <value>
-        /// true (アクティブな場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Active
-        {
-            get { return active; }
-        }
 
         /// <summary>
         /// 非空ブロックの総数を取得します。
@@ -283,27 +261,15 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// Active プロパティを true に設定します。
+        /// メッシュ更新をチャンク マネージャへ要求します。
         /// </summary>
         protected override void OnActivated()
         {
-            active = true;
-
             // メッシュ更新要求を追加。
             // データが空の場合は更新するメッシュが無い。
             if (data != null) RequestUpdateMesh();
 
             base.OnActivated();
-        }
-
-        /// <summary>
-        /// Active プロパティを false に設定します。
-        /// </summary>
-        protected override void OnPassivated()
-        {
-            active = false;
-
-            base.OnPassivated();
         }
 
         /// <summary>
@@ -317,10 +283,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </returns>
         public bool EnterLock()
         {
-            //if (!Monitor.TryEnter(this)) return false;
-
-            //if (!active) return false;
-
             return Monitor.TryEnter(this);
         }
 
@@ -342,7 +304,6 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override bool ActivateOverride()
         {
             Debug.Assert(region != null);
-            Debug.Assert(!active);
 
             var d = manager.BorrowChunkData();
 
@@ -376,7 +337,6 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override bool PassivateOverride()
         {
             Debug.Assert(region != null);
-            Debug.Assert(active);
 
             if (!EnterLock()) return false;
 
@@ -401,9 +361,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public override void OnNeighborActivated(Partition neighbor, CubicSide side)
         {
-            // 非アクティブな場合、通知を無視。
-            if (!active) return;
-
             // メッシュ更新要求を追加。
             // データが空の場合は更新するメッシュが無い。
             if (data != null) RequestUpdateMesh();
@@ -416,9 +373,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public override void OnNeighborPassivated(Partition neighbor, CubicSide side)
         {
-            // 非アクティブな場合、通知を無視。
-            if (!active) return;
-
             // メッシュ更新要求を追加。
             // データが空の場合は更新するメッシュが無い。
             if (data != null) RequestUpdateMesh();
