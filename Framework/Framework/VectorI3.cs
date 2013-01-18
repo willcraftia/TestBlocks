@@ -101,23 +101,43 @@ namespace Willcraftia.Xna.Framework
 
         #region Operators
 
-        public static VectorI3 operator +(VectorI3 v1, VectorI3 v2)
+        public static VectorI3 operator +(VectorI3 value1, VectorI3 value2)
         {
             return new VectorI3
             {
-                X = v1.X + v2.X,
-                Y = v1.Y + v2.Y,
-                Z = v1.Z + v2.Z
+                X = value1.X + value2.X,
+                Y = value1.Y + value2.Y,
+                Z = value1.Z + value2.Z
             };
         }
 
-        public static VectorI3 operator -(VectorI3 v1, VectorI3 v2)
+        public static VectorI3 operator -(VectorI3 value)
         {
             return new VectorI3
             {
-                X = v1.X - v2.X,
-                Y = v1.Y - v2.Y,
-                Z = v1.Z - v2.Z
+                X = -value.X,
+                Y = -value.Y,
+                Z = -value.Z
+            };
+        }
+
+        public static VectorI3 operator -(VectorI3 value1, VectorI3 value2)
+        {
+            return new VectorI3
+            {
+                X = value1.X - value2.X,
+                Y = value1.Y - value2.Y,
+                Z = value1.Z - value2.Z
+            };
+        }
+
+        public static VectorI3 operator *(int scaleFactor, VectorI3 value)
+        {
+            return new VectorI3
+            {
+                X = value.X * scaleFactor,
+                Y = value.Y * scaleFactor,
+                Z = value.Z * scaleFactor
             };
         }
 
@@ -145,14 +165,14 @@ namespace Willcraftia.Xna.Framework
 
         #region Equatable
 
-        public static bool operator ==(VectorI3 p1, VectorI3 p2)
+        public static bool operator ==(VectorI3 value1, VectorI3 value2)
         {
-            return p1.Equals(p2);
+            return value1.Equals(value2);
         }
 
-        public static bool operator !=(VectorI3 p1, VectorI3 p2)
+        public static bool operator !=(VectorI3 value1, VectorI3 value2)
         {
-            return !p1.Equals(p2);
+            return !value1.Equals(value2);
         }
 
         // I/F
