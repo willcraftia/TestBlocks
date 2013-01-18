@@ -111,6 +111,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public void GetChunkBundle(Stream chunkBundleStream)
         {
             // TODO
+            // バッファ用チャンクを引数で渡せば良いのでは？
             throw new NotImplementedException();
 
             //var storageContainer = StorageManager.RequiredCurrentStorageContainer;
