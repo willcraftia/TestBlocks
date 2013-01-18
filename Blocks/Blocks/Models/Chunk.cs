@@ -288,6 +288,22 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void ReleaseOverride()
         {
+            if (OpaqueMesh != null)
+            {
+                manager.DisposeChunkMesh(OpaqueMesh);
+                OpaqueMesh = null;
+            }
+            if (TranslucentMesh != null)
+            {
+                manager.DisposeChunkMesh(TranslucentMesh);
+                TranslucentMesh = null;
+            }
+            if (VerticesBuilder != null)
+            {
+                manager.ReleaseVerticesBuilder(VerticesBuilder);
+                VerticesBuilder = null;
+            }
+
             if (data != null)
             {
                 manager.ReturnChunkData(data);
@@ -449,31 +465,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (!EnterPassivate()) return false;
 
-            if (OpaqueMesh != null)
-            {
-                manager.DisposeChunkMesh(OpaqueMesh);
-                OpaqueMesh = null;
-            }
-            if (TranslucentMesh != null)
-            {
-                manager.DisposeChunkMesh(TranslucentMesh);
-                TranslucentMesh = null;
-            }
-            if (VerticesBuilder != null)
-            {
-                manager.ReleaseVerticesBuilder(VerticesBuilder);
-                VerticesBuilder = null;
-            }
-
             if (data != null)
             {
-                // データに変更があるならば永続化。
-                if (data.Dirty) Region.ChunkStore.AddChunk(Position, data);
-                manager.ReturnChunkData(data);
+                // 変更があるならば永続化。
+                if (dataChanged || data.Dirty) Region.ChunkStore.AddChunk(Position, data);
             }
             else
             {
-                // 空ではない状態から空になっている場合は空データで永続化。
+                // 変更があるならば空データで永続化。
                 if (dataChanged) Region.ChunkStore.AddChunk(Position, manager.EmptyChunkData);
             }
 
