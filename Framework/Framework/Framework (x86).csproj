@@ -92,6 +92,7 @@
     <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Collections\CubicCollection.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
+    <Compile Include="Collections\Octree.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentInfoManager.cs" />
     <Compile Include="Component\ComponentPropertyStringfier.cs" />

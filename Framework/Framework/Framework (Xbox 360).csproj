@@ -103,6 +103,7 @@
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
+    <Compile Include="Collections\Octree.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentBundleDefinition.cs" />

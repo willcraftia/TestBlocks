@@ -121,6 +121,26 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
+        public static VectorI3 operator *(VectorI3 value, int scaleFactor)
+        {
+            return new VectorI3
+            {
+                X = value.X * scaleFactor,
+                Y = value.Y * scaleFactor,
+                Z = value.Z * scaleFactor
+            };
+        }
+
+        public static VectorI3 operator /(VectorI3 value, int divider)
+        {
+            return new VectorI3
+            {
+                X = value.X / divider,
+                Y = value.Y / divider,
+                Z = value.Z / divider
+            };
+        }
+
         #endregion
 
         #region Equatable
