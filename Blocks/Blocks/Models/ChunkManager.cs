@@ -90,11 +90,6 @@ namespace Willcraftia.Xna.Blocks.Models
         TaskQueue verticesBuilderTaskQueue;
 
         /// <summary>
-        /// 破棄待ちチャンク メッシュのキュー。
-        /// </summary>
-        Queue<ChunkMesh> disposeMeshQueue = new Queue<ChunkMesh>();
-
-        /// <summary>
         /// チャンク メッシュの数を取得します。
         /// </summary>
         public int ChunkMeshCount { get; private set; }
@@ -210,14 +205,11 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// チャンク メッシュの破棄、新たなメッシュ更新の開始、メッシュ更新完了の監視を行います。
+        /// 新たなメッシュ更新の開始、メッシュ更新完了の監視を行います。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
         protected override void UpdatePartitionsOverride(GameTime gameTime)
         {
-            // 破棄要求を受けたチャンク メッシュを処理。
-            CheckDisposingChunkMeshes(gameTime);
-
             // メッシュ更新が必要なチャンクを探索して更新要求を追加。
             // ただし、クローズが開始したら行わない。
             if (!Closing) CheckDirtyChunkMeshes(gameTime);
@@ -477,32 +469,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="chunkMesh">チャンク メッシュ。</param>
         internal void DisposeChunkMesh(ChunkMesh chunkMesh)
         {
-            // 破棄を待機する。
-            lock (disposeMeshQueue)
-                disposeMeshQueue.Enqueue(chunkMesh);
-        }
+            TotalVertexCount -= chunkMesh.VertexCount;
+            TotalIndexCount -= chunkMesh.IndexCount;
 
-        /// <summary>
-        /// 破棄要求の出されたチャンク メッシュを破棄します。
-        /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void CheckDisposingChunkMeshes(GameTime gameTime)
-        {
-            lock (disposeMeshQueue)
-            {
-                var count = disposeMeshQueue.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    var chunkMesh = disposeMeshQueue.Dequeue();
+            chunkMesh.Dispose();
 
-                    TotalVertexCount -= chunkMesh.VertexCount;
-                    TotalIndexCount -= chunkMesh.IndexCount;
-
-                    chunkMesh.Dispose();
-
-                    ChunkMeshCount--;
-                }
-            }
+            ChunkMeshCount--;
         }
 
         /// <summary>

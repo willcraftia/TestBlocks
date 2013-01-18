@@ -309,6 +309,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 manager.ReturnChunkData(data);
                 data = null;
             }
+            dataChanged = false;
 
             region = null;
 
