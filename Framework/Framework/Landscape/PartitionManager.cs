@@ -697,18 +697,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                     }
                 }
 
-                // ビジー状態でなければ非アクティブ化を開始。
-                if (!partition.Busy)
-                {
-                    // 非アクティブ化キューへ追加。
-                    passivatingPartitions.Enqueue(partition);
+                // 非アクティブ化キューへ追加。
+                passivatingPartitions.Enqueue(partition);
 
-                    // 非アクティブ化の開始を通知。
-                    partition.OnPassivating();
+                // 非アクティブ化の開始を通知。
+                partition.OnPassivating();
 
-                    // 非同期処理を要求。
-                    passivationTaskQueue.Enqueue(partition.PassivateAction);
-                }
+                // 非同期処理を要求。
+                passivationTaskQueue.Enqueue(partition.PassivateAction);
             }
         }
 

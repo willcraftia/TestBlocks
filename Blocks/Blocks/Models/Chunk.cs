@@ -48,33 +48,12 @@ namespace Willcraftia.Xna.Blocks.Models
         bool dataChanged;
 
         /// <summary>
-        /// Active プロパティの同期のためのロック オブジェクト。
-        /// </summary>
-        object activeLock = new object();
-
-        /// <summary>
         /// チャンクがアクティブであるか否かを示す値。
         /// </summary>
         /// <value>
         /// true (アクティブな場合)、false (それ以外の場合)。
         /// </value>
         volatile bool active;
-
-        /// <summary>
-        /// 更新ロック中であるか否かを示す値。
-        /// </summary>
-        /// <value>
-        /// true (更新ロック中の場合)、false (それ以外の場合)。
-        /// </value>
-        volatile bool updating;
-
-        /// <summary>
-        /// 非アクティブ化ロック中であるか否かを示す値。
-        /// </summary>
-        /// <value>
-        /// true (非アクティブ化ロック中の場合)、false (それ以外の場合)。
-        /// </value>
-        volatile bool passivating;
 
         /// <summary>
         /// 不透明メッシュ。
@@ -177,19 +156,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public bool Active
         {
             get { return active; }
-        }
-
-        /// <summary>
-        /// 更新ロック中であるか否かを示す値を取得します。
-        /// 更新ロック中の場合、Busy プロパティも true となり、
-        /// 更新ロックが解放されるまで非アクティブ化されない状態となります。
-        /// </summary>
-        /// <value>
-        /// true (更新ロック中の場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Updating
-        {
-            get { return updating; }
         }
 
         /// <summary>
@@ -321,7 +287,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void OnActivated()
         {
-            lock (activeLock) active = true;
+            active = true;
 
             // メッシュ更新要求を追加。
             // データが空の場合は更新するメッシュが無い。
@@ -335,86 +301,35 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void OnPassivated()
         {
-            lock (activeLock) active = false;
+            active = false;
 
             base.OnPassivated();
         }
 
         /// <summary>
-        /// 更新ロックの取得を試行します。
-        /// 他のスレッドがロック中の場合、非アクティブな場合、非アクティブ化中の場合は、
-        /// 更新ロックの取得に失敗します。
-        /// 更新ロックの取得に成功した場合には、
-        /// 必ず ExitUpdate メソッドでロックを解放しなければなりません。
+        /// チャンクに対するロックの取得を試行します。
+        /// 他のスレッドがロック中の場合は、ロックの取得に失敗します。
+        /// ロックの取得に成功した場合は、
+        /// 必ず ExitLock メソッドでロックを解放しなければなりません。
         /// </summary>
         /// <returns>
-        /// true (更新ロックを取得できた場合)、false (それ以外の場合)。
+        /// true (ロックを取得できた場合)、false (それ以外の場合)。
         /// </returns>
-        public bool EnterUpdate()
+        public bool EnterLock()
         {
-            if (!Monitor.TryEnter(activeLock)) return false;
+            //if (!Monitor.TryEnter(this)) return false;
 
-            try
-            {
-                if (!active) return false;
-                if (passivating) return false;
+            //if (!active) return false;
 
-                updating = true;
-
-                // 更新中は非アクティブ化を拒否。
-                Busy = true;
-
-                return true;
-            }
-            finally
-            {
-                Monitor.Exit(activeLock);
-            }
+            return Monitor.TryEnter(this);
         }
 
         /// <summary>
-        /// EnterUpdate メソッドで取得した更新ロックを開放します。
+        /// EnterLock メソッドで取得した更新ロックを開放します。
         /// </summary>
-        public void ExitUpdate()
+        public void ExitLock()
         {
-            updating = false;
-            Busy = false;
-        }
-
-        /// <summary>
-        /// 非アクティブ化ロックの取得を試行します。
-        /// 他のスレッドがロック中の場合、非アクティブな場合、更新ロック中の場合は、
-        /// 非アクティブ化ロックの取得に失敗します。
-        /// 非アクティブ化ロックの取得に成功した場合には、
-        /// 必ず ExitPassivate メソッドでロックを解放しなければなりません。
-        /// </summary>
-        /// <returns>
-        /// true (非アクティブ化ロックを取得できた場合)、false (それ以外の場合)。
-        /// </returns>
-        bool EnterPassivate()
-        {
-            if (!Monitor.TryEnter(activeLock)) return false;
-
-            try
-            {
-                if (!active) return false;
-                if (updating) return false;
-
-                passivating = true;
-                return true;
-            }
-            finally
-            {
-                Monitor.Exit(activeLock);
-            }
-        }
-
-        /// <summary>
-        /// EnterPassivate メソッドで取得した非アクティブ化ロックを開放します。
-        /// </summary>
-        void ExitPassivate()
-        {
-            passivating = false;
+            Monitor.Exit(this);
         }
 
         /// <summary>
@@ -463,7 +378,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(region != null);
             Debug.Assert(active);
 
-            if (!EnterPassivate()) return false;
+            if (!EnterLock()) return false;
 
             if (data != null)
             {
@@ -476,7 +391,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (dataChanged) Region.ChunkStore.AddChunk(Position, manager.EmptyChunkData);
             }
 
-            ExitPassivate();
+            ExitLock();
 
             return base.PassivateOverride();
         }

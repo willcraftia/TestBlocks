@@ -31,11 +31,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         public BoundingBox BoundingBox;
 
         /// <summary>
-        /// 非アクティブ化を制御するためのフラグ。
-        /// </summary>
-        volatile bool busy;
-
-        /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
         /// </summary>
@@ -60,20 +55,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化が取り消されているか否かを示す値。
         /// </summary>
         volatile bool passivationCanceled;
-
-        /// <summary>
-        /// パーティションが何らかの処理により占有状態にあるか否かを示す値を取得または設定します。
-        /// このプロパティが true を返す場合、
-        /// パーティションが非アクティブ化対象となっても非アクティブ化されません。
-        /// </summary>
-        /// <value>
-        /// true (パーティションが何らかの処理により占有状態にある場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Busy
-        {
-            get { return busy; }
-            protected set { busy = value; }
-        }
 
         /// <summary>
         /// 非同期なアクティブ化処理が終了しているかどうかを示す値を取得または設定します。

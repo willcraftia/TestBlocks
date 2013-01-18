@@ -81,7 +81,6 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(!completed);
             Debug.Assert(Chunk != null);
             Debug.Assert(Chunk.Active);
-            Debug.Assert(Chunk.Updating);
 
             Array.Clear(spaceMap, 0, spaceMap.Length);
 

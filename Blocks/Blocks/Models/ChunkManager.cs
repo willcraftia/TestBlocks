@@ -268,44 +268,46 @@ namespace Willcraftia.Xna.Blocks.Models
                 var chunkPosition = waitBuildVerticesQueue.Peek();
 
                 // アクティブ チャンクを取得。
-                // 存在しない場合はメッシュ更新要求を取り消す。
                 Chunk chunk;
                 if (!TryGetChunk(ref chunkPosition, out chunk))
                 {
+                    // 存在しない場合はメッシュ更新要求を取り消す。
                     waitBuildVerticesQueue.Dequeue();
                     continue;
                 }
 
-                if (chunk.EnterUpdate())
+                // チャンクがメッシュ更新中ならば待機キューへ戻す。
+                if (buildVerticesQueue.Contains(chunk))
                 {
-                    if (!buildVerticesQueue.Contains(chunk))
-                    {
-                        var verticesBuilder = verticesBuilderPool.Borrow();
-                        if (verticesBuilder != null)
-                        {
-                            // 頂点ビルダを初期化。
-                            InitializeInterVerticesBuilder(verticesBuilder, chunk);
-
-                            // 頂点ビルダを登録。
-                            verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
-
-                            buildVerticesQueue.Enqueue(chunk);
-                            waitBuildVerticesQueue.Dequeue();
-                        }
-                        else
-                        {
-                            // プール枯渇の場合は次フレームでの再更新判定に期待。
-                            chunk.ExitUpdate();
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    // 更新ロックを取れないという事は、他のスレッドで更新ロックが取られたということ。
-                    // これは、その更新の結果でメッシュを更新すれば良いので、現在の更新要求は取り消す。
                     waitBuildVerticesQueue.Dequeue();
+                    waitBuildVerticesQueue.Enqueue(chunkPosition);
+                    continue;
                 }
+
+                var verticesBuilder = verticesBuilderPool.Borrow();
+                if (verticesBuilder == null)
+                {
+                    // プール枯渇の場合は次フレームでの再更新判定に期待。
+                    break;
+                }
+
+                // チャンクのロックを試行。
+                if (!chunk.EnterLock())
+                {
+                    // ロックを取得できない場合は待機キューへ戻す。
+                    waitBuildVerticesQueue.Dequeue();
+                    waitBuildVerticesQueue.Enqueue(chunkPosition);
+                    continue;
+                }
+
+                // 頂点ビルダを初期化。
+                InitializeInterVerticesBuilder(verticesBuilder, chunk);
+
+                // 頂点ビルダを登録。
+                verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
+
+                buildVerticesQueue.Enqueue(chunk);
+                waitBuildVerticesQueue.Dequeue();
             }
         }
 
@@ -384,7 +386,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 ReleaseVerticesBuilder(chunk.VerticesBuilder);
 
                 // 更新ロックを解放。
-                chunk.ExitUpdate();
+                chunk.ExitLock();
             }
         }
 
