@@ -456,7 +456,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         /// <summary>
         /// チャンクをチャンク ストアへ永続化します。
-        /// また、関連付けられているメッシュを開放します。
         /// </summary>
         /// <returns></returns>
         protected override bool PassivateOverride()
