@@ -292,6 +292,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // チャンクのロックを試行。
+                // 頂点ビルダの更新が完了するまでロックを維持。
                 if (!chunk.EnterLock())
                 {
                     // ロックを取得できない場合は待機キューへ戻す。
@@ -385,7 +386,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 頂点ビルダを解放。
                 ReleaseVerticesBuilder(chunk.VerticesBuilder);
 
-                // 更新ロックを解放。
+                // 更新開始で取得したロックを解放。
                 chunk.ExitLock();
             }
         }
