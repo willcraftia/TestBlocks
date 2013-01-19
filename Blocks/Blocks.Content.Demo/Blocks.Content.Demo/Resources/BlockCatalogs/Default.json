@@ -1,0 +1,35 @@
+{
+  "Name": "Default",
+  "Entries": [
+    {
+      "Index": 1,
+      "Uri": "../Blocks/Dirt.json"
+    },
+    {
+      "Index": 2,
+      "Uri": "../Blocks/Grass.json"
+    },
+    {
+      "Index": 3,
+      "Uri": "../Blocks/Mantle.json"
+    },
+    {
+      "Index": 4,
+      "Uri": "../Blocks/Sand.json"
+    },
+    {
+      "Index": 5,
+      "Uri": "../Blocks/Snow.json"
+    },
+    {
+      "Index": 6,
+      "Uri": "../Blocks/Stone.json"
+    }
+  ],
+  "Dirt": 1,
+  "Grass": 2,
+  "Mantle": 3,
+  "Sand": 4,
+  "Snow": 5,
+  "Stone": 6
+}

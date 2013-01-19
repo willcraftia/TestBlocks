@@ -1,0 +1,17 @@
+{
+  "Name": "Dirt",
+  "Mesh": "../Meshes/Cube.json",
+  "TopTile": "../Tiles/Dirt.json",
+  "BottomTile": "../Tiles/Dirt.json",
+  "FrontTile": "../Tiles/Dirt.json",
+  "BackTile": "../Tiles/Dirt.json",
+  "LeftTile": "../Tiles/Dirt.json",
+  "RightTile": "../Tiles/Dirt.json",
+  "Fluid": false,
+  "ShadowCasting": true,
+  "Shape": 0,
+  "Mass": 1.0,
+  "StaticFriction": 0.5,
+  "DynamicFriction": 0.5,
+  "Restitution": 0.5
+}

@@ -1,0 +1,9 @@
+{
+  "Name": "Default",
+  "Entries": [
+    {
+      "Index": 0,
+      "Uri": "../Biomes/Default.json"
+    }
+  ]
+}

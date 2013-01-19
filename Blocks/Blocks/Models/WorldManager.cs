@@ -293,7 +293,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public Region Load(string worldUri)
         {
             // TODO
-            return RegionManager.LoadRegion("title:Resources/DefaultRegion.json");
+            return RegionManager.LoadRegion("title:Resources/Regions/Default.json");
         }
 
         public void Unload()

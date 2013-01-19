@@ -1,0 +1,805 @@
+{
+  "Components": [
+    {
+      "Name": "DefaultFadeCurve",
+      "Type": "SCurve3",
+      "Properties": null
+    },
+    {
+      "Name": "ConstZero",
+      "Type": "Const",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Const Zero"
+        },
+        {
+          "Name": "Value",
+          "Value": "0"
+        }
+      ]
+    },
+    {
+      "Name": "ConstOne",
+      "Type": "Const",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Const One"
+        },
+        {
+          "Name": "Value",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "LowlandPerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Lowland Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "100"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "LowlandFractal",
+      "Type": "Billow",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Lowland Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "LowlandPerlin"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "1"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "Persistence",
+          "Value": "0.5"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "2"
+        }
+      ]
+    },
+    {
+      "Name": "LowlandScaleBias",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Lowland ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "LowlandFractal"
+        },
+        {
+          "Name": "Bias",
+          "Value": "-0.45"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.125"
+        }
+      ]
+    },
+    {
+      "Name": "LowlandShape",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Lowland Shape"
+        },
+        {
+          "Name": "Source",
+          "Value": "LowlandScaleBias"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "1"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "0"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "HighlandPerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "200"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "HighlandFractal",
+      "Type": "SumFractal",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "HighlandPerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "0.9"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "2"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "4"
+        }
+      ]
+    },
+    {
+      "Name": "HighlandShape",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland Shape"
+        },
+        {
+          "Name": "Source",
+          "Value": "HighlandFractal"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "1"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "0"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "MountainPerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "300"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "MountainFractal",
+      "Type": "RidgedMultifractal",
+      "Properties": [
+        {
+          "Name": "Offset",
+          "Value": "1"
+        },
+        {
+          "Name": "Gain",
+          "Value": "2"
+        },
+        {
+          "Name": "Name",
+          "Value": "Mountain Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "MountainPerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "1"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "1"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "2"
+        }
+      ]
+    },
+    {
+      "Name": "MountainScaleBias",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "MountainFractal"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0.25"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.5"
+        }
+      ]
+    },
+    {
+      "Name": "MountainShape",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Mountain Shape"
+        },
+        {
+          "Name": "Source",
+          "Value": "MountainScaleBias"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "1"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "0"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainTypePerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "400"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainTypeFractal",
+      "Type": "SumFractal",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainTypePerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "0.9"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "0.5"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "0.2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "6"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainTypeScalePoint",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type ScalePoint"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainTypeFractal"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "1"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "0"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainType",
+      "Type": "Cache",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Type Cache"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainTypeScalePoint"
+        }
+      ]
+    },
+    {
+      "Name": "HighlandMountainSelect",
+      "Type": "Select",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Highland or Mountain Select"
+        },
+        {
+          "Name": "Controller",
+          "Value": "TerrainType"
+        },
+        {
+          "Name": "LowerSource",
+          "Value": "HighlandShape"
+        },
+        {
+          "Name": "UpperSource",
+          "Value": "MountainShape"
+        },
+        {
+          "Name": "EdgeFalloff",
+          "Value": "0.2"
+        },
+        {
+          "Name": "LowerBound",
+          "Value": "0"
+        },
+        {
+          "Name": "UpperBound",
+          "Value": "1000"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainSelect",
+      "Type": "Select",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Select"
+        },
+        {
+          "Name": "Controller",
+          "Value": "TerrainType"
+        },
+        {
+          "Name": "LowerSource",
+          "Value": "LowlandShape"
+        },
+        {
+          "Name": "UpperSource",
+          "Value": "HighlandMountainSelect"
+        },
+        {
+          "Name": "EdgeFalloff",
+          "Value": "0.8"
+        },
+        {
+          "Name": "LowerBound",
+          "Value": "0"
+        },
+        {
+          "Name": "UpperBound",
+          "Value": "1000"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainSelectCache",
+      "Type": "Cache",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Select Cache"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainSelect"
+        }
+      ]
+    },
+    {
+      "Name": "TerrainDensity",
+      "Type": "TerrainDensityTest",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Density"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainSelectCache"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "500"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "CaveShape",
+      "Type": "RidgedMultifractal",
+      "Properties": [
+        {
+          "Name": "Offset",
+          "Value": "1"
+        },
+        {
+          "Name": "Gain",
+          "Value": "2"
+        },
+        {
+          "Name": "Name",
+          "Value": "Cave Shape"
+        },
+        {
+          "Name": "Source",
+          "Value": "CavePerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "1"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "4"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "CaveAttenuateBias",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Attenuate ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "TerrainSelectCache"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0.45"
+        },
+        {
+          "Name": "Scale",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "CaveShapeAttenuate",
+      "Type": "Multiply",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Shape Attenuate"
+        },
+        {
+          "Name": "Source0",
+          "Value": "CaveShape"
+        },
+        {
+          "Name": "Source1",
+          "Value": "CaveAttenuateBias"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturbPerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "600"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturnFractal",
+      "Type": "SumFractal",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "CavePerturbPerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "0.9"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "3"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "6"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturbScaleBias",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb ScaleBias"
+        },
+        {
+          "Name": "Source",
+          "Value": "CavePerturnFractal"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.5"
+        }
+      ]
+    },
+    {
+      "Name": "CavePerturb",
+      "Type": "Displace",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Perturb"
+        },
+        {
+          "Name": "Source",
+          "Value": "CaveShapeAttenuate"
+        },
+        {
+          "Name": "DisplaceX",
+          "Value": "CavePerturbScaleBias"
+        },
+        {
+          "Name": "DisplaceY",
+          "Value": "ConstZero"
+        },
+        {
+          "Name": "DisplaceZ",
+          "Value": "ConstZero"
+        }
+      ]
+    },
+    {
+      "Name": "CaveDensity",
+      "Type": "Select",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Cave Density"
+        },
+        {
+          "Name": "Controller",
+          "Value": "CavePerturb"
+        },
+        {
+          "Name": "LowerSource",
+          "Value": "ConstOne"
+        },
+        {
+          "Name": "UpperSource",
+          "Value": "ConstZero"
+        },
+        {
+          "Name": "EdgeFalloff",
+          "Value": "0"
+        },
+        {
+          "Name": "LowerBound",
+          "Value": "0.2"
+        },
+        {
+          "Name": "UpperBound",
+          "Value": "1000"
+        }
+      ]
+    },
+    {
+      "Name": "FinalDensity",
+      "Type": "Multiply",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Final Density"
+        },
+        {
+          "Name": "Source0",
+          "Value": "TerrainDensity"
+        },
+        {
+          "Name": "Source1",
+          "Value": "CaveDensity"
+        }
+      ]
+    },
+    {
+      "Name": "FinalScale",
+      "Type": "ScalePoint",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Final Scale"
+        },
+        {
+          "Name": "Source",
+          "Value": "FinalDensity"
+        },
+        {
+          "Name": "ScaleX",
+          "Value": "0.0625"
+        },
+        {
+          "Name": "ScaleY",
+          "Value": "0.0625"
+        },
+        {
+          "Name": "ScaleZ",
+          "Value": "0.0625"
+        }
+      ]
+    },
+    {
+      "Name": "Target",
+      "Type": "Displace",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Terrain Offset"
+        },
+        {
+          "Name": "Source",
+          "Value": "FinalScale"
+        },
+        {
+          "Name": "DisplaceX",
+          "Value": "ConstZero"
+        },
+        {
+          "Name": "DisplaceY",
+          "Value": "Target_DisplaceY"
+        },
+        {
+          "Name": "DisplaceZ",
+          "Value": "ConstZero"
+        }
+      ]
+    },
+    {
+      "Name": "Target_DisplaceY",
+      "Type": "Const",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": null
+        },
+        {
+          "Name": "Value",
+          "Value": "-232"
+        }
+      ]
+    }
+  ]
+}

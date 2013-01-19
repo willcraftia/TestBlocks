@@ -1,0 +1,17 @@
+{
+  "Name": "Mantle",
+  "Mesh": "../Meshes/Cube.json",
+  "TopTile": "../Tiles/Mantle.json",
+  "BottomTile": "../Tiles/Mantle.json",
+  "FrontTile": "../Tiles/Mantle.json",
+  "BackTile": "../Tiles/Mantle.json",
+  "LeftTile": "../Tiles/Mantle.json",
+  "RightTile": "../Tiles/Mantle.json",
+  "Fluid": false,
+  "ShadowCasting": true,
+  "Shape": 0,
+  "Mass": 1.0,
+  "StaticFriction": 0.5,
+  "DynamicFriction": 0.5,
+  "Restitution": 0.5
+}

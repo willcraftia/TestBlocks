@@ -1,0 +1,305 @@
+{
+  "Components": [
+    {
+      "Name": "DefaultFadeCurve",
+      "Type": "SCurve3",
+      "Properties": null
+    },
+    {
+      "Name": "HumidityPerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Humidity Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "100"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "HumidityFractal",
+      "Type": "SumFractal",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Humidity Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "HumidityPerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "0.9"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "1"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "6"
+        }
+      ]
+    },
+    {
+      "Name": "Humidity",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Humidity"
+        },
+        {
+          "Name": "Source",
+          "Value": "HumidityFractal"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0.5"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.5"
+        }
+      ]
+    },
+    {
+      "Name": "TemperaturePerlin",
+      "Type": "Perlin",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Temperature Perlin"
+        },
+        {
+          "Name": "Seed",
+          "Value": "200"
+        },
+        {
+          "Name": "FadeCurve",
+          "Value": "DefaultFadeCurve"
+        }
+      ]
+    },
+    {
+      "Name": "TemperatureFractal",
+      "Type": "SumFractal",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Temperature Fractal"
+        },
+        {
+          "Name": "Source",
+          "Value": "TemperaturePerlin"
+        },
+        {
+          "Name": "Hurst",
+          "Value": "0.9"
+        },
+        {
+          "Name": "Frequency",
+          "Value": "1"
+        },
+        {
+          "Name": "Lacunarity",
+          "Value": "2"
+        },
+        {
+          "Name": "OctaveCount",
+          "Value": "6"
+        }
+      ]
+    },
+    {
+      "Name": "Temperature",
+      "Type": "ScaleBias",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Temperature"
+        },
+        {
+          "Name": "Source",
+          "Value": "TemperatureFractal"
+        },
+        {
+          "Name": "Bias",
+          "Value": "0.5"
+        },
+        {
+          "Name": "Scale",
+          "Value": "0.5"
+        }
+      ]
+    },
+    {
+      "Name": "Target",
+      "Type": "DefaultBiome",
+      "Properties": [
+        {
+          "Name": "TerrainNoise",
+          "Value": "title:Resources/Terrains/Default.json"
+        },
+        {
+          "Name": "Name",
+          "Value": "Default Biome"
+        },
+        {
+          "Name": "TemperatureNoise",
+          "Value": "Temperature"
+        },
+        {
+          "Name": "HumidityNoise",
+          "Value": "Humidity"
+        },
+        {
+          "Name": "BaseElement",
+          "Value": "Forest"
+        },
+        {
+          "Name": "DesertRange",
+          "Value": "Target_DesertRange"
+        },
+        {
+          "Name": "PlainsRange",
+          "Value": "Target_PlainsRange"
+        },
+        {
+          "Name": "SnowRange",
+          "Value": "Target_SnowRange"
+        },
+        {
+          "Name": "MountainsRange",
+          "Value": "Target_MountainsRange"
+        },
+        {
+          "Name": "ForestRange",
+          "Value": "Target_ForestRange"
+        }
+      ]
+    },
+    {
+      "Name": "Target_DesertRange",
+      "Type": "Range",
+      "Properties": [
+        {
+          "Name": "MinTemperature",
+          "Value": "0.5"
+        },
+        {
+          "Name": "MaxTemperature",
+          "Value": "1"
+        },
+        {
+          "Name": "MinHumidity",
+          "Value": "0"
+        },
+        {
+          "Name": "MaxHumidity",
+          "Value": "0.3"
+        }
+      ]
+    },
+    {
+      "Name": "Target_PlainsRange",
+      "Type": "Range",
+      "Properties": [
+        {
+          "Name": "MinTemperature",
+          "Value": "0.5"
+        },
+        {
+          "Name": "MaxTemperature",
+          "Value": "1"
+        },
+        {
+          "Name": "MinHumidity",
+          "Value": "0.3"
+        },
+        {
+          "Name": "MaxHumidity",
+          "Value": "0.6"
+        }
+      ]
+    },
+    {
+      "Name": "Target_SnowRange",
+      "Type": "Range",
+      "Properties": [
+        {
+          "Name": "MinTemperature",
+          "Value": "0"
+        },
+        {
+          "Name": "MaxTemperature",
+          "Value": "0.3"
+        },
+        {
+          "Name": "MinHumidity",
+          "Value": "0.6"
+        },
+        {
+          "Name": "MaxHumidity",
+          "Value": "1"
+        }
+      ]
+    },
+    {
+      "Name": "Target_MountainsRange",
+      "Type": "Range",
+      "Properties": [
+        {
+          "Name": "MinTemperature",
+          "Value": "0"
+        },
+        {
+          "Name": "MaxTemperature",
+          "Value": "0.5"
+        },
+        {
+          "Name": "MinHumidity",
+          "Value": "0"
+        },
+        {
+          "Name": "MaxHumidity",
+          "Value": "0.6"
+        }
+      ]
+    },
+    {
+      "Name": "Target_ForestRange",
+      "Type": "Range",
+      "Properties": [
+        {
+          "Name": "MinTemperature",
+          "Value": "0.3"
+        },
+        {
+          "Name": "MaxTemperature",
+          "Value": "1"
+        },
+        {
+          "Name": "MinHumidity",
+          "Value": "0.6"
+        },
+        {
+          "Name": "MaxHumidity",
+          "Value": "1"
+        }
+      ]
+    }
+  ]
+}

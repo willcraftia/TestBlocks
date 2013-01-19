@@ -1,0 +1,37 @@
+{
+  "Name": "Default",
+  "Entries": [
+    {
+      "Index": 1,
+      "Uri": "../Tiles/Dirt.json"
+    },
+    {
+      "Index": 2,
+      "Uri": "../Tiles/GrassBottom.json"
+    },
+    {
+      "Index": 3,
+      "Uri": "../Tiles/GrassSide.json"
+    },
+    {
+      "Index": 4,
+      "Uri": "../Tiles/GrassTop.json"
+    },
+    {
+      "Index": 5,
+      "Uri": "../Tiles/Mantle.json"
+    },
+    {
+      "Index": 6,
+      "Uri": "../Tiles/Sand.json"
+    },
+    {
+      "Index": 7,
+      "Uri": "../Tiles/Snow.json"
+    },
+    {
+      "Index": 8,
+      "Uri": "../Tiles/Stone.json"
+    }
+  ]
+}

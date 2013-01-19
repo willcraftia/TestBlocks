@@ -1,0 +1,14 @@
+{
+  "Components": [
+    {
+      "Name": "Target",
+      "Type": "DefaultTerrainProcedure",
+      "Properties": [
+        {
+          "Name": "Name",
+          "Value": "Noise Terrain"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "Name": "Default",
+  "Bounds": {
+    "Min": {
+      "X": -128,
+      "Y": 0,
+      "Z": -128
+    },
+    "Max": {
+      "X": 128,
+      "Y": 16,
+      "Z": 128
+    }
+  },
+  "TileCatalog": "../TileCatalogs/Default.json",
+  "BlockCatalog": "../BlockCatalogs/Default.json",
+  "BiomeManager": "../BiomeManagers/Single.json",
+  "ChunkBundle": null,
+  "ChunkProcedures": [
+    "../ChunkProcedures/NoiseTerrain.json"
+  ],
+  "ChunkStore": 1
+}

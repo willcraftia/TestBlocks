@@ -1,9 +1,0 @@
-﻿<BiomeCatalog>
-	<Name>Default Biome Catalog</Name>
-	<Entries>
-		<Entry>
-			<Index>0</Index>
-			<Uri>DefaultBiome.json</Uri>
-		</Entry>
-	</Entries>
-</BiomeCatalog>

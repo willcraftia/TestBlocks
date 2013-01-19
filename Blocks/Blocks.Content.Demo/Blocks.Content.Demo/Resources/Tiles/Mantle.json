@@ -1,0 +1,9 @@
+{
+  "Name": "Mantle",
+  "Texture": "Mantle.png",
+  "Translucent": false,
+  "DiffuseColor": 4294967295,
+  "EmissiveColor": 4278190080,
+  "SpecularColor": 4278190080,
+  "SpecularPower": 0
+}

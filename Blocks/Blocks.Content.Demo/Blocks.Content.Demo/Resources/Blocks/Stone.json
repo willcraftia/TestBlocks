@@ -1,0 +1,17 @@
+{
+  "Name": "Stone",
+  "Mesh": "../Meshes/Cube.json",
+  "TopTile": "../Tiles/Stone.json",
+  "BottomTile": "../Tiles/Stone.json",
+  "FrontTile": "../Tiles/Stone.json",
+  "BackTile": "../Tiles/Stone.json",
+  "LeftTile": "../Tiles/Stone.json",
+  "RightTile": "../Tiles/Stone.json",
+  "Fluid": false,
+  "ShadowCasting": true,
+  "Shape": 0,
+  "Mass": 1.0,
+  "StaticFriction": 0.5,
+  "DynamicFriction": 0.5,
+  "Restitution": 0.5
+}

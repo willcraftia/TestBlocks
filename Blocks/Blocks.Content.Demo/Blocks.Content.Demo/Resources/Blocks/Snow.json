@@ -1,0 +1,17 @@
+{
+  "Name": "Snow",
+  "Mesh": "../Meshes/Cube.json",
+  "TopTile": "../Tiles/Snow.json",
+  "BottomTile": "../Tiles/Snow.json",
+  "FrontTile": "../Tiles/Snow.json",
+  "BackTile": "../Tiles/Snow.json",
+  "LeftTile": "../Tiles/Snow.json",
+  "RightTile": "../Tiles/Snow.json",
+  "Fluid": false,
+  "ShadowCasting": true,
+  "Shape": 0,
+  "Mass": 1.0,
+  "StaticFriction": 0.5,
+  "DynamicFriction": 0.5,
+  "Restitution": 0.5
+}

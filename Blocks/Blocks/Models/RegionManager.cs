@@ -73,7 +73,7 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // スカイ スフィア
 
-            skySphere = LoadAsset<SkySphere>("title:Resources/DefaultSkySphere.json");
+            skySphere = LoadAsset<SkySphere>("title:Resources/Models/SkySphere.json");
             skySphere.SceneSettings = SceneSettings;
 
             // シーン マネージャへ登録
@@ -91,7 +91,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // これはバイオームで定義できるべきか？
             {
                 var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
-                var particleSettings = LoadAsset<ParticleSettings>("title:Resources/DefaultSnowParticle.json");
+                var particleSettings = LoadAsset<ParticleSettings>("title:Resources/Particles/Snow.json");
 
                 snowParticleSystem = new ParticleSystem(particleSettings, particleEffect);
 
@@ -107,7 +107,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // これはバイオームで定義できるべきか？
             {
                 var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
-                var particleSettings = LoadAsset<ParticleSettings>("title:Resources/DefaultRainParticle.json");
+                var particleSettings = LoadAsset<ParticleSettings>("title:Resources/Particles/Rain.json");
 
                 rainParticleSystem = new ParticleSystem(particleSettings, particleEffect);
 

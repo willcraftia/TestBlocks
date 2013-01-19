@@ -1,0 +1,17 @@
+{
+  "Name": "Sand",
+  "Mesh": "../Meshes/Cube.json",
+  "TopTile": "../Tiles/Sand.json",
+  "BottomTile": "../Tiles/Sand.json",
+  "FrontTile": "../Tiles/Sand.json",
+  "BackTile": "../Tiles/Sand.json",
+  "LeftTile": "../Tiles/Sand.json",
+  "RightTile": "../Tiles/Sand.json",
+  "Fluid": false,
+  "ShadowCasting": true,
+  "Shape": 0,
+  "Mass": 1.0,
+  "StaticFriction": 0.5,
+  "DynamicFriction": 0.5,
+  "Restitution": 0.5
+}
