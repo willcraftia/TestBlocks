@@ -498,9 +498,20 @@ namespace Willcraftia.Xna.Framework.Landscape
             else
             {
                 // アクティブ化関連の処理は破棄。
-                if (activationTaskQueue.QueueCount != 0) activationTaskQueue.Clear();
-                if (activations.Count != 0) activations.Clear();
-                if (waitActivations.Count != 0) waitActivations.Clear();
+                if (activationTaskQueue.QueueCount != 0)
+                    activationTaskQueue.Clear();
+
+                if (waitActivations.Count != 0)
+                {
+                    DisposePartitions(waitPassivations);
+                    waitActivations.Clear();
+                }
+                
+                if (activations.Count != 0)
+                {
+                    DisposePartitions(activations);
+                    activations.Clear();
+                }
 
                 // 非アクティブ化関連を処理。
                 passivationTaskQueue.Update();
@@ -941,6 +952,12 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             DisposePartitions(ActivePartitions);
             ActivePartitions.Clear();
+
+            DisposePartitions(waitActivations);
+            waitActivations.Clear();
+
+            DisposePartitions(waitPassivations);
+            waitPassivations.Clear();
 
             DisposePartitions(activations);
             activations.Clear();
