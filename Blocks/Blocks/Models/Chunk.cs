@@ -278,8 +278,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// リージョンが提供するチャンク ストアに永続化されていない場合、
         /// リージョンが提供するチャンク プロシージャから自動生成します。
         /// </summary>
-        /// <returns></returns>
-        protected override bool ActivateOverride()
+        protected override void ActivateOverride()
         {
             Debug.Assert(region != null);
 
@@ -305,18 +304,15 @@ namespace Willcraftia.Xna.Blocks.Models
                     procedure.Generate(this);
             }
 
-            return base.ActivateOverride();
+            base.ActivateOverride();
         }
 
         /// <summary>
         /// チャンクをチャンク ストアへ永続化します。
         /// </summary>
-        /// <returns></returns>
-        protected override bool PassivateOverride()
+        protected override void PassivateOverride()
         {
             Debug.Assert(region != null);
-
-            if (!EnterLock()) return false;
 
             if (data != null)
             {
@@ -329,9 +325,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (dataChanged) Region.ChunkStore.AddChunk(Position, manager.EmptyChunkData);
             }
 
-            ExitLock();
-
-            return base.PassivateOverride();
+            base.PassivateOverride();
         }
 
         /// <summary>

@@ -47,23 +47,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         volatile bool activationCompleted;
 
         /// <summary>
-        /// アクティブ化が取り消されているか否かを示す値。
-        /// </summary>
-        volatile bool activationCanceled;
-
-        /// <summary>
         /// 非アクティブ化が完了しているか否かを示す値。
         /// </summary>
         volatile bool passivationCompleted;
 
         /// <summary>
-        /// 非アクティブ化が取り消されているか否かを示す値。
-        /// </summary>
-        volatile bool passivationCanceled;
-
-        /// <summary>
         /// 非同期なアクティブ化処理が終了しているかどうかを示す値を取得または設定します。
-        /// アクティブ化の成功可否は ActivationCanceled プロパティで判定する必要があります。
         /// </summary>
         /// <value>
         /// true (非同期なアクティブ化処理が終了している場合)、false (それ以外の場合)。
@@ -75,21 +64,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// アクティブ化処理中に処理が取り消されているかどうかを示す値を取得または設定します。
-        /// このプロパティは ActivationCompleted が true の場合にのみ有効です。
-        /// </summary>
-        /// <value>
-        /// true (アクティブ化処理中に処理が取り消されている場合)、false (それ以外の場合)。
-        /// </value>
-        internal bool ActivationCanceled
-        {
-            get { return activationCanceled; }
-            set { activationCanceled = value; }
-        }
-
-        /// <summary>
         /// 非同期な非アクティブ化処理が終了しているかどうかを示す値を取得または設定します。
-        /// 非アクティブ化の成功可否は PassivationCanceled プロパティで判定する必要があります。
         /// </summary>
         /// <value>
         /// true (非同期な非アクティブ化処理が終了している場合)、false (それ以外の場合)。
@@ -98,19 +73,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             get { return passivationCompleted; }
             set { passivationCompleted = value; }
-        }
-
-        /// <summary>
-        /// 非アクティブ化処理中に処理が取り消されているかどうかを示す値を取得または設定します。
-        /// このプロパティは PassivationCompleted が true の場合にのみ有効です。
-        /// </summary>
-        /// <value>
-        /// true (非アクティブ化処理中に処理が取り消されている場合)、false (それ以外の場合)。
-        /// </value>
-        internal bool PassivationCanceled
-        {
-            get { return passivationCanceled; }
-            set { passivationCanceled = value; }
         }
 
         /// <summary>
@@ -198,9 +160,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             Center = (BoundingBox.Max + BoundingBox.Min) / 2;
 
             activationCompleted = false;
-            activationCanceled = false;
             passivationCompleted = false;
-            passivationCanceled = false;
 
             return InitializeOverride();
         }
@@ -215,9 +175,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             Position = VectorI3.Zero;
 
             activationCompleted = false;
-            activationCanceled = false;
             passivationCompleted = false;
-            passivationCanceled = false;
 
             ReleaseOverride();
         }
@@ -229,11 +187,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void Activate()
         {
             Debug.Assert(!activationCompleted);
-            Debug.Assert(!activationCanceled);
 
             asyncCallEvent.Reset();
 
-            activationCanceled = !ActivateOverride();
+            ActivateOverride();
             activationCompleted = true;
             
             asyncCallEvent.Set();
@@ -245,12 +202,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void Passivate()
         {
-            Debug.Assert(activationCompleted && !activationCanceled);
+            Debug.Assert(activationCompleted);
             Debug.Assert(!passivationCompleted);
 
             asyncCallEvent.Reset();
 
-            passivationCanceled = !PassivateOverride();
+            PassivateOverride();
             passivationCompleted = true;
 
             asyncCallEvent.Set();
@@ -307,7 +264,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (アクティブ化を完了した場合)、false (アクティブ化を取り消した場合)。
         /// </returns>
-        protected virtual bool ActivateOverride() { return true; }
+        protected virtual void ActivateOverride() { }
 
         /// <summary>
         /// 非アクティブ化を試行する際に呼び出されます。
@@ -318,7 +275,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (非アクティブ化を完了した場合)、false (非アクティブ化を取り消した場合)。
         /// </returns>
-        protected virtual bool PassivateOverride() { return true; }
+        protected virtual void PassivateOverride() { }
 
         /// <summary>
         /// パーティションの解放で呼び出されます。

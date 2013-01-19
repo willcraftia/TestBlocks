@@ -259,58 +259,73 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         Pool<Partition> partitionPool;
 
+        /// <summary>
+        /// アクティブ化待機リスト。
+        /// </summary>
         PartitionCollection waitActivations;
+
+        /// <summary>
+        /// 非アクティブ化待機リスト。
+        /// </summary>
         PartitionCollection waitPassivations;
 
         // 効率のためにキュー構造を採用。
         // 全件対象の処理が大半であり、リストでは削除のたびに配列コピーが発生して無駄。
 
         /// <summary>
-        /// アクティブ化中パーティションのキュー。
+        /// アクティブ化実行キュー。
         /// </summary>
-        PartitionQueue activatingPartitions;
+        PartitionQueue activations;
 
         /// <summary>
-        /// 非アクティブ化中パーティションのキュー。
+        /// 非アクティブ化実行キュー。
         /// </summary>
-        PartitionQueue passivatingPartitions;
+        PartitionQueue passivations;
 
         // TODO
+
+        /// <summary>
+        /// 同時アクティブ化待機許容量。
+        /// </summary>
         int waitActivationCapacity = 100;
+        
+        /// <summary>
+        /// 同時非アクティブ化待機許容量。
+        /// </summary>
         int waitPassivationCapacity = 100;
 
         /// <summary>
-        /// 同時アクティブ化許容量。
+        /// 同時アクティブ化実行許容量。
         /// </summary>
         int activationCapacity;
 
         /// <summary>
-        /// 同時非アクティブ化許容量。
+        /// 同時非アクティブ化実行許容量。
         /// </summary>
         int passivationCapacity;
 
         /// <summary>
-        /// アクティブ化可能パーティション検索の最大試行数。
+        /// アクティブ化判定の最大試行数。
         /// </summary>
         int activationSearchCapacity;
 
         /// <summary>
-        /// 非アクティブ化可能パーティション検索の最大試行数。
+        /// 非アクティブ化判定の最大試行数。
         /// </summary>
         int passivationSearchCapacity;
 
         /// <summary>
-        /// アクティブ化可能パーティション検索の開始インデックス。
+        /// アクティブ化判定の開始インデックス。
         /// </summary>
         int activationSearchOffset = 0;
 
         /// <summary>
-        /// パーティションのアクティブ化タスク キュー。
+        /// アクティブ化タスク キュー。
         /// </summary>
         TaskQueue activationTaskQueue = new TaskQueue();
 
         /// <summary>
-        /// パーティションの非アクティブ化タスク キュー。
+        /// 非アクティブ化タスク キュー。
         /// </summary>
         TaskQueue passivationTaskQueue = new TaskQueue();
 
@@ -376,7 +391,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public int ActivatingPartitionCount
         {
-            get { return activatingPartitions.Count; }
+            get { return activations.Count; }
         }
 
         /// <summary>
@@ -384,7 +399,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public int PassivatingPartitionCount
         {
-            get { return passivatingPartitions.Count; }
+            get { return passivations.Count; }
         }
 
         /// <summary>
@@ -423,8 +438,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             waitActivations = new PartitionCollection(waitActivationCapacity);
             waitPassivations = new PartitionCollection(waitPassivationCapacity);
 
-            activatingPartitions = new PartitionQueue(activationCapacity);
-            passivatingPartitions = new PartitionQueue(passivationCapacity);
+            activations = new PartitionQueue(activationCapacity);
+            passivations = new PartitionQueue(passivationCapacity);
 
             activationTaskQueue.SlotCount = settings.ActivationTaskQueueSlotCount;
             passivationTaskQueue.SlotCount = settings.PassivationTaskQueueSlotCount;
@@ -448,7 +463,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションのアクティブ化と非アクティブ化を行います。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        /// <param name="eyePositionWorld">ワールド空間での視点の位置。</param>
+        /// <param name="eyePositionWorld">ワールド空間における視点の位置。</param>
         public void Update(GameTime gameTime, Vector3 eyePositionWorld)
         {
             if (Closed) return;
@@ -469,8 +484,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 activationTaskQueue.Update();
                 passivationTaskQueue.Update();
 
-                CheckPassivationCompleted(gameTime);
-                CheckActivationCompleted(gameTime);
+                CheckPassivations(gameTime);
+                CheckActivations(gameTime);
 
                 CheckWaitPassivations(gameTime);
                 CheckWaitActivations(gameTime);
@@ -484,12 +499,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 // アクティブ化関連の処理は破棄。
                 if (activationTaskQueue.QueueCount != 0) activationTaskQueue.Clear();
-                if (activatingPartitions.Count != 0) activatingPartitions.Clear();
+                if (activations.Count != 0) activations.Clear();
                 if (waitActivations.Count != 0) waitActivations.Clear();
 
                 // 非アクティブ化関連を処理。
                 passivationTaskQueue.Update();
-                CheckPassivationCompleted(gameTime);
+                CheckPassivations(gameTime);
                 CheckWaitPassivations(gameTime);
                 PassivatePartitions(gameTime);
 
@@ -497,7 +512,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 UpdatePartitions(gameTime);
 
                 // 全ての非アクティブ化が完了していればクローズ完了。
-                if (passivatingPartitions.Count == 0 && ActivePartitions.Count == 0)
+                if (passivations.Count == 0 && ActivePartitions.Count == 0)
                 {
                     Closing = false;
                     Closed = true;
@@ -511,7 +526,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション マネージャをクローズします。
         /// クローズ処理が開始すると、パーティションのアクティブ化は完全に停止し、
-        /// アクティブ化中のパーティションはその処理が破棄され、
         /// アクティブなパーティションは全て非アクティブ化されます。
         /// なお、非アクティブ化は非同期に行われるため、
         /// クローズ処理の完了は Closed プロパティで確認する必要があります。
@@ -588,90 +602,65 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected virtual void UpdatePartitionsOverride(GameTime gameTime) { }
 
         /// <summary>
-        /// 非同期に実行されている非アクティブ化の完了を検査します。
-        /// 非アクティブ化の完了には、成功と取消が存在します。
-        /// 非アクティブ化が成功している場合には、
-        /// 対象のパーティションは非アクティブ化中リストから削除され、プールへ戻されます。
-        /// 非アクティブ化が取り消されている場合には、
-        /// 対象のパーティションは非アクティブ化中リストから削除され、アクティブ リストへ戻されます。
+        /// 非アクティブ化の完了を検査します。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void CheckPassivationCompleted(GameTime gameTime)
+        void CheckPassivations(GameTime gameTime)
         {
-            int partitionCount = passivatingPartitions.Count;
+            int partitionCount = passivations.Count;
             for (int i = 0; i < partitionCount; i++)
             {
-                var partition = passivatingPartitions.Dequeue();
+                var partition = passivations.Dequeue();
 
                 if (!partition.PassivationCompleted)
                 {
                     // 未完ならばキューへ戻す。
-                    passivatingPartitions.Enqueue(partition);
-                    continue;
-                }
-
-                if (partition.PassivationCanceled)
-                {
-                    // 取り消されていたならばアクティブ リストへ戻し、次回の非アクティブ化に委ねる。
-                    partition.PassivationCanceled = false;
-                    partition.PassivationCompleted = false;
-                    ActivePartitions.Enqueue(partition);
+                    passivations.Enqueue(partition);
                     continue;
                 }
                 
-                // アクティブな隣接パーティションへ非アクティブ化を通知。
+                // 非アクティブ化の開始で取得したロックを解放。
+                partition.ExitLock();
+
+                // 隣接パーティションへ通知。
                 NortifyNeighborPassivated(partition);
 
-                // 非アクティブ化完了を通知。
+                // 完了を通知。
                 partition.OnPassivated();
 
-                // 解放処理を呼び出す。
+                // 解放。
                 partition.Release();
 
-                // 非アクティブ化に成功したのでプールへ戻す。
+                // プールへ戻す。
                 partitionPool.Return(partition);
             }
         }
 
         /// <summary>
-        /// 非同期に実行されているアクティブ化の完了を検査します。
-        /// アクティブ化の完了には、成功と取消が存在します。
-        /// アクティブ化が成功している場合には、
-        /// 対象のパーティションはアクティブ化中リストから削除され、アクティブ リストへ追加されます。
-        /// アクティブ化が取り消されている場合には、
-        /// 対象のパーティションはアクティブ化中リストから削除され、プールへ戻されます。
+        /// アクティブ化の完了を検査します。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void CheckActivationCompleted(GameTime gameTime)
+        void CheckActivations(GameTime gameTime)
         {
-            int partitionCount = activatingPartitions.Count;
+            int partitionCount = activations.Count;
             for (int i = 0; i < partitionCount; i++)
             {
-                var partition = activatingPartitions.Dequeue();
+                var partition = activations.Dequeue();
 
                 if (!partition.ActivationCompleted)
                 {
                     // 未完ならばキューへ戻す。
-                    activatingPartitions.Enqueue(partition);
+                    activations.Enqueue(partition);
                     continue;
                 }
 
-                if (partition.ActivationCanceled)
-                {
-                    // 解放処理を呼び出してから返却。
-                    partition.Release();
-                    partitionPool.Return(partition);
-
-                    continue;
-                }
-
-                // アクティブ化に成功したのでアクティブ リストへ追加。
+                // アクティブ リストへ追加。
                 ActivePartitions.Enqueue(partition);
 
-                // アクティブ化完了を通知。
+                // 完了を通知。
                 partition.OnActivated();
 
-                // アクティブな隣接パーティションへ通知。
+                // 隣接パーティションへ通知。
                 NotifyNeighborActivated(partition);
             }
         }
@@ -693,7 +682,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     // その非アクティブ化が取り消されて activePartitions に戻され、
                     // 次の非アクティブ化判定の試行では非アクティブ化対象ではなくなる場合がある。
                     // このため、passivatingPartitions にあるパーティションについても探索する。
-                    if (!passivatingPartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                    if (!passivations.TryGetItem(ref nearbyPosition, out neighbor))
                         continue;
                 }
 
@@ -719,7 +708,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     // その非アクティブ化が取り消されて activePartitions に戻され、
                     // 次の非アクティブ化判定の試行では非アクティブ化対象ではなくなる場合がある。
                     // このため、passivatingPartitions にあるパーティションについても探索する。
-                    if (!passivatingPartitions.TryGetItem(ref nearbyPosition, out neighbor))
+                    if (!passivations.TryGetItem(ref nearbyPosition, out neighbor))
                         continue;
                 }
 
@@ -732,6 +721,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
+        /// <summary>
+        /// 非アクティブ化待機中のパーティションを検査します。
+        /// </summary>
+        /// <param name="gameTime">ゲーム時間。</param>
         void CheckWaitPassivations(GameTime gameTime)
         {
             // 視点から近い順に並び替え。
@@ -743,13 +736,17 @@ namespace Willcraftia.Xna.Framework.Landscape
             // 視点から遠いパーティションを優先してアクティブ化。
             for (int i = waitPassivations.Count - 1; 0 <= i; i--)
             {
-                if (passivationCapacity <= passivatingPartitions.Count) break;
+                if (passivationCapacity <= passivations.Count) break;
 
                 var partition = waitPassivations[i];
                 waitPassivations.RemoveAt(i);
 
+                // ロックの取得を試行。
+                // ロックを取得できない場合は非アクティブ化を断念。
+                if (!partition.EnterLock()) continue;
+
                 // 実行キューへ追加。
-                passivatingPartitions.Enqueue(partition);
+                passivations.Enqueue(partition);
 
                 // 開始を通知。
                 partition.OnPassivating();
@@ -773,9 +770,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             int count = Math.Min(ActivePartitions.Count, passivationSearchCapacity);
             for (int i = 0; i < count; i++)
             {
-                // 同時非アクティブ化許容数を越えるならば処理終了。
-                //if (passivationCapacity <= passivatingPartitions.Count)
-                //    break;
+                // 同時待機許容数を越えるならば終了。
                 if (waitPassivationCapacity <= waitPassivations.Count) break;
 
                 var partition = ActivePartitions.Dequeue();
@@ -790,25 +785,22 @@ namespace Willcraftia.Xna.Framework.Landscape
                     }
                 }
 
+                // 既に待機中ならスキップ。
                 if (waitPassivations.Contains(partition)) continue;
 
+                // アクティブ化待機中ならばそれを破棄。
                 if (waitActivations.Contains(partition))
                     waitActivations.Remove(partition);
 
                 // 待機リストへ追加。
                 waitPassivations.Add(partition);
-
-                //// 非アクティブ化キューへ追加。
-                //passivatingPartitions.Enqueue(partition);
-
-                //// 非アクティブ化の開始を通知。
-                //partition.OnPassivating();
-
-                //// 非同期処理を要求。
-                //passivationTaskQueue.Enqueue(partition.PassivateAction);
             }
         }
 
+        /// <summary>
+        /// アクティブ化待機中のパーティションを検査します。
+        /// </summary>
+        /// <param name="gameTime">ゲーム時間。</param>
         void CheckWaitActivations(GameTime gameTime)
         {
             // 視点から遠い順に並べ替える。
@@ -820,13 +812,14 @@ namespace Willcraftia.Xna.Framework.Landscape
             // 視点から近いパーティションを優先してアクティブ化。
             for (int i = waitActivations.Count - 1; 0 <= i; i--)
             {
-                if (activationCapacity <= activatingPartitions.Count) break;
+                // 同時実行許容量を越えるならば終了。
+                if (activationCapacity <= activations.Count) break;
 
                 var partition = waitActivations[i];
                 waitActivations.RemoveAt(i);
 
                 // アクティブ化キューへ追加。
-                activatingPartitions.Enqueue(partition);
+                activations.Enqueue(partition);
 
                 // アクティブ化の開始を通知。
                 partition.OnActivating();
@@ -851,9 +844,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             bool cycled = false;
             for (int i = 0; i < activationSearchCapacity; i++)
             {
-                // 同時アクティブ化許容数を越えるならば処理終了。
-                //if (activationCapacity <= activatingPartitions.Count)
-                //    break;
+                // 同時待機許容数を越えるならば処理終了。
                 if (waitActivationCapacity <= waitActivations.Count) break;
 
                 // index が末尾に到達したら先頭へ戻し、循環したとしてマーク。
@@ -868,16 +859,13 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 var position = eyePosition + minActivePointOffsets[index++];
 
-                // 既にアクティブであるかどうか。
+                // 既にアクティブならばスキップ。
                 if (ActivePartitions.Contains(ref position)) continue;
 
-                // アクティブ化中あるいは非アクティブ化中かどうか。
-                //if (activatingPartitions.Contains(position) ||
-                //    passivatingPartitions.Contains(position))
-                //    continue;
-
+                // 既に待機中ならばスキップ。
                 if (waitActivations.Contains(position)) continue;
 
+                // 非アクティブ化待機中ならばそれを破棄。
                 if (waitPassivations.Contains(position))
                     waitPassivations.Remove(position);
 
@@ -885,7 +873,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (!CanActivatePartition(ref position)) continue;
 
                 // プールからパーティションを取得。
-                // プール枯渇ならば以降のアクティブ化を全てスキップ。
+                // プール枯渇ならば終了。
                 var partition = partitionPool.Borrow();
                 if (partition == null) break;
 
@@ -894,19 +882,10 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     // 待機リストへ追加。
                     waitActivations.Add(partition);
-
-                    //// アクティブ化キューへ追加。
-                    //activatingPartitions.Enqueue(partition);
-
-                    //// アクティブ化の開始を通知。
-                    //partition.OnActivating();
-
-                    //// 非同期処理を要求。
-                    //activationTaskQueue.Enqueue(partition.ActivateAction);
                 }
                 else
                 {
-                    // 初期化に失敗したならばアクティブ化を取り消す。
+                    // 初期化失敗ならば取消。
                     partitionPool.Return(partition);
                 }
             }
@@ -967,11 +946,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             DisposePartitions(ActivePartitions);
             ActivePartitions.Clear();
 
-            DisposePartitions(activatingPartitions);
-            activatingPartitions.Clear();
+            DisposePartitions(activations);
+            activations.Clear();
 
-            DisposePartitions(passivatingPartitions);
-            passivatingPartitions.Clear();
+            DisposePartitions(passivations);
+            passivations.Clear();
 
             //================================================================
             // Clear all tasks.
