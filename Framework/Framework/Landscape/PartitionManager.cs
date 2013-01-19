@@ -178,10 +178,11 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         sealed class VectorI3LengthComparer : IComparer<VectorI3>
         {
-            public static VectorI3LengthComparer Instace = new VectorI3LengthComparer();
+            internal static readonly VectorI3LengthComparer Instace = new VectorI3LengthComparer();
 
             VectorI3LengthComparer() { }
 
+            // I/F
             public int Compare(VectorI3 x, VectorI3 y)
             {
                 var d1 = x.LengthSquared();
@@ -190,6 +191,52 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (d1 == d2) return 0;
 
                 return d1 < d2 ? -1 : 1;
+            }
+        }
+
+        #endregion
+
+        #region PartitionDistanceAscComparer
+
+        sealed class PartitionDistanceAscComparer : IComparer<Partition>
+        {
+            internal static readonly PartitionDistanceAscComparer Instance = new PartitionDistanceAscComparer();
+
+            internal Vector3 EyePosition;
+
+            PartitionDistanceAscComparer() { }
+
+            // I/F
+            public int Compare(Partition x, Partition y)
+            {
+                var dx = (x.Center - EyePosition).LengthSquared();
+                var dy = (y.Center - EyePosition).LengthSquared();
+
+                if (dx == dy) return 0;
+                return dx < dy ? -1 : 1;
+            }
+        }
+
+        #endregion
+
+        #region PartitionDistanceDescComparer
+
+        sealed class PartitionDistanceDescComparer : IComparer<Partition>
+        {
+            internal static readonly PartitionDistanceDescComparer Instance = new PartitionDistanceDescComparer();
+
+            internal Vector3 EyePosition;
+
+            PartitionDistanceDescComparer() { }
+
+            // I/F
+            public int Compare(Partition x, Partition y)
+            {
+                var dx = (x.Center - EyePosition).LengthSquared();
+                var dy = (y.Center - EyePosition).LengthSquared();
+                
+                if (dx == dy) return 0;
+                return dx < dy ? 1 : -1;
             }
         }
 
@@ -212,6 +259,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         Pool<Partition> partitionPool;
 
+        PartitionCollection waitActivations;
+        PartitionCollection waitPassivations;
+
         // 効率のためにキュー構造を採用。
         // 全件対象の処理が大半であり、リストでは削除のたびに配列コピーが発生して無駄。
 
@@ -224,6 +274,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化中パーティションのキュー。
         /// </summary>
         PartitionQueue passivatingPartitions;
+
+        // TODO
+        int waitActivationCapacity = 100;
+        int waitPassivationCapacity = 100;
 
         /// <summary>
         /// 同時アクティブ化許容量。
@@ -276,9 +330,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         VectorI3[] minActivePointOffsets;
 
         /// <summary>
-        /// パーティション空間での視点の位置。
+        /// パーティション空間における視点の位置。
         /// </summary>
         VectorI3 eyePosition;
+
+        /// <summary>
+        /// ワールド空間における視点の位置。
+        /// </summary>
+        Vector3 eyePositionWorld;
 
         /// <summary>
         /// クローズ処理中であるか否かを示す値を取得します。
@@ -360,6 +419,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             activationCapacity = settings.InitialActivationCapacity;
             passivationCapacity = settings.InitialPassivationCapacity;
 
+            // TODO
+            waitActivations = new PartitionCollection(waitActivationCapacity);
+            waitPassivations = new PartitionCollection(waitPassivationCapacity);
+
             activatingPartitions = new PartitionQueue(activationCapacity);
             passivatingPartitions = new PartitionQueue(passivationCapacity);
 
@@ -385,16 +448,18 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションのアクティブ化と非アクティブ化を行います。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        /// <param name="eyeWorldPosition">ワールド空間での視点の位置。</param>
-        public void Update(GameTime gameTime, Vector3 eyeWorldPosition)
+        /// <param name="eyePositionWorld">ワールド空間での視点の位置。</param>
+        public void Update(GameTime gameTime, Vector3 eyePositionWorld)
         {
             if (Closed) return;
 
             Monitor.Begin(MonitorUpdate);
 
-            eyePosition.X = MathExtension.Floor(eyeWorldPosition.X * inversePartitionSize.X);
-            eyePosition.Y = MathExtension.Floor(eyeWorldPosition.Y * inversePartitionSize.Y);
-            eyePosition.Z = MathExtension.Floor(eyeWorldPosition.Z * inversePartitionSize.Z);
+            this.eyePositionWorld = eyePositionWorld;
+
+            eyePosition.X = MathExtension.Floor(eyePositionWorld.X * inversePartitionSize.X);
+            eyePosition.Y = MathExtension.Floor(eyePositionWorld.Y * inversePartitionSize.Y);
+            eyePosition.Z = MathExtension.Floor(eyePositionWorld.Z * inversePartitionSize.Z);
 
             // アクティブ領域を現在の視点位置を中心に設定。
             maxLandscapeVolume.Center = eyePosition;
@@ -407,6 +472,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 CheckPassivationCompleted(gameTime);
                 CheckActivationCompleted(gameTime);
 
+                CheckWaitPassivations(gameTime);
+                CheckWaitActivations(gameTime);
+
                 PassivatePartitions(gameTime);
                 ActivatePartitions(gameTime);
 
@@ -414,18 +482,15 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
             else
             {
-                // アクティブ化中のパーティションは破棄。
-                if (activationTaskQueue.QueueCount != 0)
-                    activationTaskQueue.Clear();
+                // アクティブ化関連の処理は破棄。
+                if (activationTaskQueue.QueueCount != 0) activationTaskQueue.Clear();
+                if (activatingPartitions.Count != 0) activatingPartitions.Clear();
+                if (waitActivations.Count != 0) waitActivations.Clear();
 
-                if (activatingPartitions.Count != 0)
-                    activatingPartitions.Clear();
-
-                // 非アクティブ化中のパーティションを処理。
+                // 非アクティブ化関連を処理。
                 passivationTaskQueue.Update();
                 CheckPassivationCompleted(gameTime);
-
-                // アクティブなパーティションを全て非アクティブ化。
+                CheckWaitPassivations(gameTime);
                 PassivatePartitions(gameTime);
 
                 // パーティション内部でも必要に応じてクローズのための更新を行う。
@@ -667,6 +732,33 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
+        void CheckWaitPassivations(GameTime gameTime)
+        {
+            // 視点から近い順に並び替え。
+            // ループ内で待機リストを末尾から処理する際、
+            // 要素削除で発生する配列コピーを回避する目的。
+            PartitionDistanceAscComparer.Instance.EyePosition = eyePositionWorld;
+            waitPassivations.Sort(PartitionDistanceAscComparer.Instance);
+
+            // 視点から遠いパーティションを優先してアクティブ化。
+            for (int i = waitPassivations.Count - 1; 0 <= i; i--)
+            {
+                if (passivationCapacity <= passivatingPartitions.Count) break;
+
+                var partition = waitPassivations[i];
+                waitPassivations.RemoveAt(i);
+
+                // 実行キューへ追加。
+                passivatingPartitions.Enqueue(partition);
+
+                // 開始を通知。
+                partition.OnPassivating();
+
+                // 非同期処理を要求。
+                passivationTaskQueue.Enqueue(partition.PassivateAction);
+            }
+        }
+
         /// <summary>
         /// パーティションの非アクティブ化を試行します。
         /// 非アクティブ化すべきと判定されたパーティションは、
@@ -682,8 +774,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             for (int i = 0; i < count; i++)
             {
                 // 同時非アクティブ化許容数を越えるならば処理終了。
-                if (passivationCapacity <= passivatingPartitions.Count)
-                    break;
+                //if (passivationCapacity <= passivatingPartitions.Count)
+                //    break;
+                if (waitPassivationCapacity <= waitPassivations.Count) break;
 
                 var partition = ActivePartitions.Dequeue();
 
@@ -697,14 +790,49 @@ namespace Willcraftia.Xna.Framework.Landscape
                     }
                 }
 
-                // 非アクティブ化キューへ追加。
-                passivatingPartitions.Enqueue(partition);
+                if (waitPassivations.Contains(partition)) continue;
 
-                // 非アクティブ化の開始を通知。
-                partition.OnPassivating();
+                if (waitActivations.Contains(partition))
+                    waitActivations.Remove(partition);
+
+                // 待機リストへ追加。
+                waitPassivations.Add(partition);
+
+                //// 非アクティブ化キューへ追加。
+                //passivatingPartitions.Enqueue(partition);
+
+                //// 非アクティブ化の開始を通知。
+                //partition.OnPassivating();
+
+                //// 非同期処理を要求。
+                //passivationTaskQueue.Enqueue(partition.PassivateAction);
+            }
+        }
+
+        void CheckWaitActivations(GameTime gameTime)
+        {
+            // 視点から遠い順に並べ替える。
+            // ループ内で待機リストを末尾から処理する際、
+            // 要素削除で発生する配列コピーを回避する目的。
+            PartitionDistanceDescComparer.Instance.EyePosition = eyePositionWorld;
+            waitActivations.Sort(PartitionDistanceDescComparer.Instance);
+
+            // 視点から近いパーティションを優先してアクティブ化。
+            for (int i = waitActivations.Count - 1; 0 <= i; i--)
+            {
+                if (activationCapacity <= activatingPartitions.Count) break;
+
+                var partition = waitActivations[i];
+                waitActivations.RemoveAt(i);
+
+                // アクティブ化キューへ追加。
+                activatingPartitions.Enqueue(partition);
+
+                // アクティブ化の開始を通知。
+                partition.OnActivating();
 
                 // 非同期処理を要求。
-                passivationTaskQueue.Enqueue(partition.PassivateAction);
+                activationTaskQueue.Enqueue(partition.ActivateAction);
             }
         }
 
@@ -724,8 +852,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             for (int i = 0; i < activationSearchCapacity; i++)
             {
                 // 同時アクティブ化許容数を越えるならば処理終了。
-                if (activationCapacity <= activatingPartitions.Count)
-                    break;
+                //if (activationCapacity <= activatingPartitions.Count)
+                //    break;
+                if (waitActivationCapacity <= waitActivations.Count) break;
 
                 // index が末尾に到達したら先頭へ戻し、循環したとしてマーク。
                 if (minActivePointOffsets.Length <= index)
@@ -743,9 +872,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (ActivePartitions.Contains(ref position)) continue;
 
                 // アクティブ化中あるいは非アクティブ化中かどうか。
-                if (activatingPartitions.Contains(position) ||
-                    passivatingPartitions.Contains(position))
-                    continue;
+                //if (activatingPartitions.Contains(position) ||
+                //    passivatingPartitions.Contains(position))
+                //    continue;
+
+                if (waitActivations.Contains(position)) continue;
+
+                if (waitPassivations.Contains(position))
+                    waitPassivations.Remove(position);
 
                 // アクティブ化可能であるかどうか。
                 if (!CanActivatePartition(ref position)) continue;
@@ -758,14 +892,17 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // パーティションを初期化。
                 if (partition.Initialize(position, partitionSize))
                 {
-                    // アクティブ化キューへ追加。
-                    activatingPartitions.Enqueue(partition);
+                    // 待機リストへ追加。
+                    waitActivations.Add(partition);
 
-                    // アクティブ化の開始を通知。
-                    partition.OnActivating();
+                    //// アクティブ化キューへ追加。
+                    //activatingPartitions.Enqueue(partition);
 
-                    // 非同期処理を要求。
-                    activationTaskQueue.Enqueue(partition.ActivateAction);
+                    //// アクティブ化の開始を通知。
+                    //partition.OnActivating();
+
+                    //// 非同期処理を要求。
+                    //activationTaskQueue.Enqueue(partition.ActivateAction);
                 }
                 else
                 {

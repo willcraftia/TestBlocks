@@ -225,6 +225,7 @@
     <Compile Include="Landscape\FlatLandscapeVolume.cs" />
     <Compile Include="Landscape\ILandscapeVolume.cs" />
     <Compile Include="Landscape\Partition.cs" />
+    <Compile Include="Landscape\PartitionCollection.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
     <Compile Include="Landscape\PartitionQueue.cs" />
     <Compile Include="MathExtension.cs" />

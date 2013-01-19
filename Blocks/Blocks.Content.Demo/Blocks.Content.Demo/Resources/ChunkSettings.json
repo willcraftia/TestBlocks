@@ -17,7 +17,7 @@
   "InitialActiveChunkCapacity": 5000,
   "InitialActiveClusterCapacity": 50,
   "InitialActivationCapacity": 3,
-  "InitialPassivationCapacity": 1000,
+  "InitialPassivationCapacity": 10,
   "ActivationTaskQueueSlotCount": 3,
   "PassivationTaskQueueSlotCount": 50,
   "ActivationSearchCapacity": 100,

@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         public VectorI3 Position;
 
         /// <summary>
-        /// ワールド空間におけるパーティションの位置。
+        /// ワールド空間におけるパーティションの原点位置。
         /// </summary>
         public Vector3 PositionWorld;
 
@@ -29,6 +29,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// ワールド空間におけるパーティションの境界ボックス。
         /// </summary>
         public BoundingBox BoundingBox;
+
+        /// <summary>
+        /// ワールド空間におけるパーティションの中心位置。
+        /// </summary>
+        public Vector3 Center;
 
         /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
@@ -189,6 +194,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             BoundingBox.Min = PositionWorld;
             BoundingBox.Max = PositionWorld + partitionSize;
+
+            Center = (BoundingBox.Max + BoundingBox.Min) / 2;
 
             activationCompleted = false;
             activationCanceled = false;
