@@ -8,13 +8,13 @@ using System.Collections.Generic;
 
 namespace Willcraftia.Xna.Framework.Collections
 {
-    public sealed class LruSet<T> : ICollection<T>
+    public sealed class LruCollection<T> : ICollection<T>
     {
         #region Enumerator
 
         struct Enumerator : IEnumerator<T>
         {
-            LruSet<T> collection;
+            LruCollection<T> collection;
 
             LinkedListNode<T> node;
 
@@ -32,7 +32,7 @@ namespace Willcraftia.Xna.Framework.Collections
                 get { return current.Value; }
             }
 
-            public Enumerator(LruSet<T> collection)
+            public Enumerator(LruCollection<T> collection)
             {
                 this.collection = collection;
                 node = collection.list.First;
@@ -82,12 +82,12 @@ namespace Willcraftia.Xna.Framework.Collections
 
         public int Capacity { get; private set; }
 
-        public LruSet()
+        public LruCollection()
             : this(defaultCapacity)
         {
         }
 
-        public LruSet(int capacity)
+        public LruCollection(int capacity)
         {
             if (capacity <= 0) throw new ArgumentOutOfRangeException("capacity");
 
