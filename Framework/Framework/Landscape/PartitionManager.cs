@@ -275,12 +275,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// アクティブ化実行キュー。
         /// </summary>
-        PartitionQueue activations;
+        Queue<Partition> activations;
 
         /// <summary>
         /// 非アクティブ化実行キュー。
         /// </summary>
-        PartitionQueue passivations;
+        Queue<Partition> passivations;
 
         // TODO
 
@@ -438,8 +438,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             waitActivations = new PartitionCollection(waitActivationCapacity);
             waitPassivations = new PartitionCollection(waitPassivationCapacity);
 
-            activations = new PartitionQueue(activationCapacity);
-            passivations = new PartitionQueue(passivationCapacity);
+            activations = new Queue<Partition>(activationCapacity);
+            passivations = new Queue<Partition>(passivationCapacity);
 
             activationTaskQueue.SlotCount = settings.ActivationTaskQueueSlotCount;
             passivationTaskQueue.SlotCount = settings.PassivationTaskQueueSlotCount;
@@ -678,11 +678,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 Partition neighbor;
                 if (!ActivePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
                 {
-                    // passivatingPartitions にあるパーティションは、
-                    // その非アクティブ化が取り消されて activePartitions に戻され、
-                    // 次の非アクティブ化判定の試行では非アクティブ化対象ではなくなる場合がある。
-                    // このため、passivatingPartitions にあるパーティションについても探索する。
-                    if (!passivations.TryGetItem(ref nearbyPosition, out neighbor))
+                    // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
+                    // このため、非アクティブ化待機中パーティションについても探索。
+                    if (!waitPassivations.TryGetItem(ref nearbyPosition, out neighbor))
                         continue;
                 }
 
@@ -704,18 +702,16 @@ namespace Willcraftia.Xna.Framework.Landscape
                 Partition neighbor;
                 if (!ActivePartitions.TryGetPartition(ref nearbyPosition, out neighbor))
                 {
-                    // passivatingPartitions にあるパーティションは、
-                    // その非アクティブ化が取り消されて activePartitions に戻され、
-                    // 次の非アクティブ化判定の試行では非アクティブ化対象ではなくなる場合がある。
-                    // このため、passivatingPartitions にあるパーティションについても探索する。
-                    if (!passivations.TryGetItem(ref nearbyPosition, out neighbor))
+                    // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
+                    // このため、非アクティブ化待機中パーティションについても探索。
+                    if (!waitPassivations.TryGetItem(ref nearbyPosition, out neighbor))
                         continue;
                 }
 
-                // partition へアクティブな隣接パーティションを通知。
+                // 自身へアクティブな隣接パーティションを通知。
                 partition.OnNeighborActivated(neighbor, side);
 
-                // アクティブな隣接パーティションへ partition を通知。
+                // アクティブな隣接パーティションへ自身を通知。
                 var reverseSide = side.Reverse();
                 neighbor.OnNeighborActivated(partition, reverseSide);
             }
