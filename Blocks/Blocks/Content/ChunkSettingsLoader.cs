@@ -31,12 +31,12 @@ namespace Willcraftia.Xna.Blocks.Content
 
             settings.PartitionManager.PartitionPoolMaxCapacity = definition.ChunkPoolMaxCapacity;
             settings.PartitionManager.ClusterSize = definition.ClusterSize;
-            settings.PartitionManager.InitialActivePartitionCapacity = definition.InitialActiveChunkCapacity;
-            settings.PartitionManager.InitialActiveClusterCapacity = definition.InitialActiveClusterCapacity;
-            settings.PartitionManager.InitialActivationCapacity = definition.InitialActivationCapacity;
-            settings.PartitionManager.InitialPassivationCapacity = definition.InitialPassivationCapacity;
-            settings.PartitionManager.ActivationTaskQueueSlotCount = definition.ActivationTaskQueueSlotCount;
-            settings.PartitionManager.PassivationTaskQueueSlotCount = definition.PassivationTaskQueueSlotCount;
+            settings.PartitionManager.ActivePartitionCapacity = definition.ActiveChunkCapacity;
+            settings.PartitionManager.ActiveClusterCapacity = definition.ActiveClusterCapacity;
+            settings.PartitionManager.WaitActivationCapacity = definition.WaitActivationCapacity;
+            settings.PartitionManager.WaitPassivationCapacity = definition.WaitPassivationCapacity;
+            settings.PartitionManager.ActivationCapacity = definition.ActivationCapacity;
+            settings.PartitionManager.PassivationCapacity = definition.PassivationCapacity;
             settings.PartitionManager.ActivationSearchCapacity = definition.ActivationSearchCapacity;
             settings.PartitionManager.PassivationSearchCapacity = definition.PassivationSearchCapacity;
 
@@ -60,12 +60,12 @@ namespace Willcraftia.Xna.Blocks.Content
                 MaxActiveRange = settings.MaxActiveRange,
                 ChunkPoolMaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity,
                 ClusterSize = settings.PartitionManager.ClusterSize,
-                InitialActiveChunkCapacity = settings.PartitionManager.InitialActivePartitionCapacity,
-                InitialActiveClusterCapacity = settings.PartitionManager.InitialActiveClusterCapacity,
-                InitialActivationCapacity = settings.PartitionManager.InitialActivationCapacity,
-                InitialPassivationCapacity = settings.PartitionManager.InitialPassivationCapacity,
-                ActivationTaskQueueSlotCount = settings.PartitionManager.ActivationTaskQueueSlotCount,
-                PassivationTaskQueueSlotCount = settings.PartitionManager.PassivationTaskQueueSlotCount,
+                ActiveChunkCapacity = settings.PartitionManager.ActivePartitionCapacity,
+                ActiveClusterCapacity = settings.PartitionManager.ActiveClusterCapacity,
+                WaitActivationCapacity = settings.PartitionManager.WaitActivationCapacity,
+                WaitPassivationCapacity = settings.PartitionManager.WaitPassivationCapacity,
+                ActivationCapacity = settings.PartitionManager.ActivationCapacity,
+                PassivationCapacity = settings.PartitionManager.PassivationCapacity,
                 ActivationSearchCapacity = settings.PartitionManager.ActivationSearchCapacity,
                 PassivationSearchCapacity = settings.PartitionManager.PassivationSearchCapacity
             };

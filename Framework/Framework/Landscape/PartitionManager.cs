@@ -29,21 +29,21 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             VectorI3 clusterSize = new VectorI3(8);
 
-            int initialActivePartitionCapacity = 5000;
+            int activePartitionCapacity = 5000;
 
-            int initialActiveClusterCapacity = 50;
+            int activeClusterCapacity = 50;
 
-            int initialActivationCapacity = 100;
+            int waitActivationCapacity = 9;
 
-            int initialPassivationCapacity = 1000;
+            int waitPassivationCapacity = 30;
+
+            int activationCapacity = 3;
+
+            int passivationCapacity = 10;
 
             int activationSearchCapacity = 100;
 
             int passivationSearchCapacity = 200;
-
-            int activationTaskQueueSlotCount = 50;
-
-            int passivationTaskQueueSlotCount = 50;
 
             public Vector3 PartitionSize
             {
@@ -79,75 +79,71 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            public int InitialActivePartitionCapacity
+            public int ActivePartitionCapacity
             {
-                get { return initialActivePartitionCapacity; }
+                get { return activePartitionCapacity; }
                 set
                 {
                     if (value < 0) throw new ArgumentOutOfRangeException("value");
 
-                    initialActivePartitionCapacity = value;
+                    activePartitionCapacity = value;
                 }
             }
 
-            public int InitialActiveClusterCapacity
+            public int ActiveClusterCapacity
             {
-                get { return initialActiveClusterCapacity; }
+                get { return activeClusterCapacity; }
                 set
                 {
                     if (value < 0) throw new ArgumentOutOfRangeException("value");
 
-                    initialActiveClusterCapacity = value;
+                    activeClusterCapacity = value;
                 }
             }
 
-            public int InitialActivationCapacity
+            public int WaitActivationCapacity
             {
-                get { return initialActivationCapacity; }
+                get { return waitActivationCapacity; }
                 set
                 {
                     if (value < 1) throw new ArgumentOutOfRangeException("value");
 
-                    initialActivationCapacity = value;
+                    waitActivationCapacity = value;
                 }
             }
 
-            public int InitialPassivationCapacity
+            public int WaitPassivationCapacity
             {
-                get { return initialPassivationCapacity; }
+                get { return waitPassivationCapacity; }
                 set
                 {
                     if (value < 1) throw new ArgumentOutOfRangeException("value");
 
-                    initialPassivationCapacity = value;
+                    waitPassivationCapacity = value;
                 }
             }
 
-            public int ActivationTaskQueueSlotCount
+            public int ActivationCapacity
             {
-                get { return activationTaskQueueSlotCount; }
+                get { return activationCapacity; }
                 set
                 {
                     if (value < 1) throw new ArgumentOutOfRangeException("value");
 
-                    activationTaskQueueSlotCount = value;
+                    activationCapacity = value;
                 }
             }
 
-            public int PassivationTaskQueueSlotCount
+            public int PassivationCapacity
             {
-                get { return passivationTaskQueueSlotCount; }
+                get { return passivationCapacity; }
                 set
                 {
                     if (value < 1) throw new ArgumentOutOfRangeException("value");
 
-                    passivationTaskQueueSlotCount = value;
+                    passivationCapacity = value;
                 }
             }
-
-            public ILandscapeVolume MinLandscapeVolume { get; set; }
-
-            public ILandscapeVolume MaxLandscapeVolume { get; set; }
 
             public int ActivationSearchCapacity
             {
@@ -170,6 +166,10 @@ namespace Willcraftia.Xna.Framework.Landscape
                     passivationSearchCapacity = value;
                 }
             }
+
+            public ILandscapeVolume MinLandscapeVolume { get; set; }
+
+            public ILandscapeVolume MaxLandscapeVolume { get; set; }
         }
 
         #endregion
@@ -269,9 +269,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         PartitionCollection waitPassivations;
 
-        // 効率のためにキュー構造を採用。
-        // 全件対象の処理が大半であり、リストでは削除のたびに配列コピーが発生して無駄。
-
         /// <summary>
         /// アクティブ化実行キュー。
         /// </summary>
@@ -282,17 +279,15 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         Queue<Partition> passivations;
 
-        // TODO
-
         /// <summary>
         /// 同時アクティブ化待機許容量。
         /// </summary>
-        int waitActivationCapacity = 100;
+        int waitActivationCapacity;
         
         /// <summary>
         /// 同時非アクティブ化待機許容量。
         /// </summary>
-        int waitPassivationCapacity = 100;
+        int waitPassivationCapacity;
 
         /// <summary>
         /// 同時アクティブ化実行許容量。
@@ -428,21 +423,22 @@ namespace Willcraftia.Xna.Framework.Landscape
             ActivePartitions = new ClusteredPartitionQueue(
                 settings.ClusterSize,
                 settings.PartitionSize,
-                settings.InitialActiveClusterCapacity,
-                settings.InitialActivePartitionCapacity);
+                settings.ActiveClusterCapacity,
+                settings.ActivePartitionCapacity);
 
-            activationCapacity = settings.InitialActivationCapacity;
-            passivationCapacity = settings.InitialPassivationCapacity;
+            waitActivationCapacity = settings.WaitActivationCapacity;
+            waitPassivationCapacity = settings.WaitPassivationCapacity;
+            activationCapacity = settings.ActivationCapacity;
+            passivationCapacity = settings.PassivationCapacity;
 
-            // TODO
             waitActivations = new PartitionCollection(waitActivationCapacity);
             waitPassivations = new PartitionCollection(waitPassivationCapacity);
 
             activations = new Queue<Partition>(activationCapacity);
             passivations = new Queue<Partition>(passivationCapacity);
 
-            activationTaskQueue.SlotCount = settings.ActivationTaskQueueSlotCount;
-            passivationTaskQueue.SlotCount = settings.PassivationTaskQueueSlotCount;
+            activationTaskQueue.SlotCount = activationCapacity;
+            passivationTaskQueue.SlotCount = passivationCapacity;
 
             // null の場合はデフォルト実装を与える。
             minLandscapeVolume = settings.MinLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);

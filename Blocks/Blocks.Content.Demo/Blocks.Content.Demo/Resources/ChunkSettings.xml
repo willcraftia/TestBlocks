@@ -14,12 +14,12 @@
 		<Y>8</Y>
 		<Z>8</Z>
 	</ClusterSize>
-	<InitialActiveChunkCapacity>5000</InitialActiveChunkCapacity>
-	<InitialActiveClusterCapacity>50</InitialActiveClusterCapacity>
-	<InitialActivationCapacity>3</InitialActivationCapacity>
-	<InitialPassivationCapacity>1000</InitialPassivationCapacity>
-	<ActivationTaskQueueSlotCount>3</ActivationTaskQueueSlotCount>
-	<PassivationTaskQueueSlotCount>50</PassivationTaskQueueSlotCount>
+	<ActiveChunkCapacity>5000</ActiveChunkCapacity>
+	<ActiveClusterCapacity>50</ActiveClusterCapacity>
+	<WaitActivationCapacity>9</WaitActivationCapacity>
+	<WaitPassivationCapacity>30</WaitPassivationCapacity>
+	<ActivationCapacity>3</ActivationCapacity>
+	<PassivationCapacity>10</PassivationCapacity>
 	<ActivationSearchCapacity>100</ActivationSearchCapacity>
 	<PassivationSearchCapacity>200</PassivationSearchCapacity>
 </ChunkSettingsDefinition>

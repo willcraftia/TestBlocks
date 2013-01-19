@@ -14,12 +14,12 @@
     "Y": 8,
     "Z": 8
   },
-  "InitialActiveChunkCapacity": 5000,
-  "InitialActiveClusterCapacity": 50,
-  "InitialActivationCapacity": 3,
-  "InitialPassivationCapacity": 10,
-  "ActivationTaskQueueSlotCount": 3,
-  "PassivationTaskQueueSlotCount": 50,
+  "ActiveChunkCapacity": 5000,
+  "ActiveClusterCapacity": 50,
+  "WaitActivationCapacity": 9,
+  "WaitPassivationCapacity": 30,
+  "ActivationCapacity": 3,
+  "PassivationCapacity": 10,
   "ActivationSearchCapacity": 100,
   "PassivationSearchCapacity": 200
 }
