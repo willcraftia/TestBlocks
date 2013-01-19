@@ -130,6 +130,28 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
+        /// パーティションに対するロックの取得を試行します。
+        /// 他のスレッドがロック中の場合は、ロックの取得に失敗します。
+        /// ロックの取得に成功した場合は、
+        /// 必ず ExitLock メソッドでロックを解放しなければなりません。
+        /// </summary>
+        /// <returns>
+        /// true (ロックを取得できた場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool EnterLock()
+        {
+            return Monitor.TryEnter(this);
+        }
+
+        /// <summary>
+        /// EnterLock メソッドで取得した更新ロックを開放します。
+        /// </summary>
+        public void ExitLock()
+        {
+            Monitor.Exit(this);
+        }
+
+        /// <summary>
         /// アクティブ パーティション領域に含まれるか否かを検査します。
         /// </summary>
         /// <param name="volume">アクティブ パーティション領域。</param>

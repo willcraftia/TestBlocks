@@ -273,28 +273,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// チャンクに対するロックの取得を試行します。
-        /// 他のスレッドがロック中の場合は、ロックの取得に失敗します。
-        /// ロックの取得に成功した場合は、
-        /// 必ず ExitLock メソッドでロックを解放しなければなりません。
-        /// </summary>
-        /// <returns>
-        /// true (ロックを取得できた場合)、false (それ以外の場合)。
-        /// </returns>
-        public bool EnterLock()
-        {
-            return Monitor.TryEnter(this);
-        }
-
-        /// <summary>
-        /// EnterLock メソッドで取得した更新ロックを開放します。
-        /// </summary>
-        public void ExitLock()
-        {
-            Monitor.Exit(this);
-        }
-
-        /// <summary>
         /// リージョンが提供するチャンク ストアに永続化されている場合、
         /// チャンク ストアからチャンクをロードします。
         /// リージョンが提供するチャンク ストアに永続化されていない場合、
