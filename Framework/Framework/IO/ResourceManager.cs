@@ -61,6 +61,8 @@ namespace Willcraftia.Xna.Framework.IO
 
         #endregion
 
+        static readonly char[] delimiter = { '/', ':' };
+
         Dictionary<string, IResource> cache = new Dictionary<string, IResource>();
 
         Dictionary<RelativeUriKey, IResource> relativeUriCache = new Dictionary<RelativeUriKey, IResource>();
@@ -96,7 +98,9 @@ namespace Willcraftia.Xna.Framework.IO
             if (relativeUriCache.TryGetValue(relativeUriKey, out resource))
                 return resource;
 
-            resource = Load(baseResource.BaseUri + relativeUri);
+            var uri = CombineUri(baseResource.BaseUri, "./" + relativeUri);
+            resource = Load(uri);
+            
             relativeUriCache[relativeUriKey] = resource;
             return resource;
         }
@@ -116,6 +120,26 @@ namespace Willcraftia.Xna.Framework.IO
         {
             cache.Clear();
             relativeUriCache.Clear();
+        }
+
+        string CombineUri(string baseUri, string relativeUri)
+        {
+            var baseLastIndex = baseUri.Length - 1;
+
+            var relativeUriIndex = 0;
+            if (relativeUri.StartsWith("./")) relativeUriIndex += 2;
+
+            int relativeCursor = -1;
+            while (0 <= (relativeCursor = relativeUri.IndexOf("../", relativeUriIndex)))
+            {
+                relativeUriIndex = relativeCursor + 3;
+
+                baseLastIndex = baseUri.LastIndexOfAny(delimiter, baseLastIndex - 1);
+                if (baseLastIndex < 0)
+                    throw new ArgumentException(string.Format("Can not combine \"{0}\" and \"{1}\"", baseUri, relativeUri));
+            }
+
+            return baseUri.Substring(0, baseLastIndex + 1) + relativeUri.Substring(relativeUriIndex);
         }
     }
 }
