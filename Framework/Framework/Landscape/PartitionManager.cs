@@ -824,7 +824,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     continue;
                 }
 
-                clusterManager.RemovePartition(partition.Position);
+                clusterManager.RemovePartition(partition);
                 partitions.Remove(partition.ListNode);
                 lruPartitions.RemoveFirst();
 
@@ -855,7 +855,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // アクティブではない状態にする。
-                clusterManager.RemovePartition(partition.Position);
+                clusterManager.RemovePartition(partition);
                 lruPartitions.Remove(partition.LruNode);
 
                 // 待機リストへ追加。

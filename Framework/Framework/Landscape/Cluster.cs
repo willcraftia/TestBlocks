@@ -136,7 +136,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// クラスタへパーティションを追加します。
+        /// パーティションを追加します。
         /// </summary>
         /// <param name="partition">パーティション。</param>
         internal void Add(Partition partition)
@@ -145,12 +145,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// クラスタからパーティションを削除します。
+        /// パーティションを削除します。
         /// </summary>
-        /// <param name="position">パーティションの位置。</param>
-        internal void Remove(VectorI3 position)
+        /// <param name="partition">パーティション。</param>
+        internal void Remove(Partition partition)
         {
-            dictionary.Remove(position);
+            dictionary.Remove(partition.Position);
         }
     }
 }

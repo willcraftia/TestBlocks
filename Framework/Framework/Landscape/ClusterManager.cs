@@ -136,15 +136,15 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 指定の位置にあるパーティションを削除します。
+        /// パーティションを削除します。
         /// </summary>
-        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        internal void RemovePartition(VectorI3 position)
+        /// <param name="partition">パーティション。</param>
+        internal void RemovePartition(Partition partition)
         {
-            var cluster = GetCluster(position);
+            var cluster = GetCluster(partition.Position);
             if (cluster == null) return;
 
-            cluster.Remove(position);
+            cluster.Remove(partition);
 
             if (cluster.Count == 0)
             {
