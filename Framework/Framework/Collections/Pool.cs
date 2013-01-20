@@ -1,14 +1,13 @@
 ﻿#region Using
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Collections
 {
-    public sealed class Pool<T> where T : class
+    public sealed class Pool<T> : IEnumerable<T> where T : class
     {
         // 0 means the infinite capacity.
         public const int DefaultMaxCapacity = 0;
@@ -93,6 +92,16 @@ namespace Willcraftia.Xna.Framework.Collections
             if (disposable != null) disposable.Dispose();
 
             TotalObjectCount--;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return objects.GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return objects.GetEnumerator();
         }
     }
 }
