@@ -110,47 +110,25 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         internal bool ContainsPartition(ref VectorI3 position)
         {
-            VectorI3 clusterPosition;
-            CalculateClusterPosition(ref position, out clusterPosition);
-
-            Cluster cluster;
-            if (!clusters.TryGetValue(clusterPosition, out cluster))
-                return false;
+            var cluster = GetCluster(ref position);
+            if (cluster == null) return false;
 
             return cluster.ContainsPartition(ref position);
         }
 
         /// <summary>
-        /// パーティションを取得します。
+        /// 指定の位置にあるパーティションを取得します。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <returns>パーティション。</returns>
+        /// <returns>
+        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
+        /// </returns>
         internal Partition GetPartition(ref VectorI3 position)
         {
             var cluster = GetCluster(ref position);
+            if (cluster == null) return null;
+
             return cluster.GetPartition(ref position);
-        }
-
-        /// <summary>
-        /// パーティションの取得を試行します。
-        /// </summary>
-        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <param name="result">
-        /// パーティション、あるいは、パーティションが存在しない場合は null。
-        /// </param>
-        /// <returns>
-        /// true (パーティションが存在する場合)、false (それ以外の場合)。
-        /// </returns>
-        internal bool TryGetPartition(ref VectorI3 position, out Partition result)
-        {
-            Cluster cluster;
-            if (!TryGetCluster(ref position, out cluster))
-            {
-                result = null;
-                return false;
-            }
-
-            return cluster.TryGetPartition(ref position, out result);
         }
 
         /// <summary>
@@ -214,34 +192,20 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// パーティションの位置からクラスタを取得します。
+        /// 指定の位置にあるパーティションを含むクラスタを取得します。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <returns>クラスタ。</returns>
+        /// <returns>
+        /// クラスタ、あるいは、該当するクラスタが存在しない場合は null。
+        /// </returns>
         Cluster GetCluster(ref VectorI3 position)
         {
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref position, out clusterPosition);
 
-            return clusters[clusterPosition];
-        }
-
-        /// <summary>
-        /// パーティションの位置からクラスタの取得を試行します。
-        /// </summary>
-        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <param name="result">
-        /// クラスタ、あるいは、クラスタが存在しない場合は null。
-        /// </param>
-        /// <returns>
-        /// true (クラスタが存在する場合)、false (それ以外の場合)。
-        /// </returns>
-        bool TryGetCluster(ref VectorI3 position, out Cluster result)
-        {
-            VectorI3 clusterPosition;
-            CalculateClusterPosition(ref position, out clusterPosition);
-
-            return clusters.TryGetValue(clusterPosition, out result);
+            Cluster result;
+            clusters.TryGetValue(clusterPosition, out result);
+            return result;
         }
 
         /// <summary>

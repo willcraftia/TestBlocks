@@ -122,28 +122,17 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// パーティションを取得します。
+        /// 指定の位置にあるパーティションを取得します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
-        /// <returns>パーティション。</returns>
-        public Partition GetPartition(ref VectorI3 position)
-        {
-            return partitions[position];
-        }
-
-        /// <summary>
-        /// パーティションの取得を試行します。
-        /// </summary>
-        /// <param name="position">パーティションの位置。</param>
-        /// <param name="result">
-        /// パーティション、あるいは、パーティションが存在しない場合には null。
-        /// </param>
         /// <returns>
-        /// true (パーティションが存在する場合)、false (それ以外の場合)。
+        /// パーティション、あるいは、指定の位置にパーティションが存在しないならば null。
         /// </returns>
-        internal bool TryGetPartition(ref VectorI3 position, out Partition result)
+        internal Partition GetPartition(ref VectorI3 position)
         {
-            return partitions.TryGetValue(position, out result);
+            Partition result;
+            partitions.TryGetValue(position, out result);
+            return result;
         }
 
         /// <summary>

@@ -268,8 +268,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 var chunkPosition = waitBuildVerticesQueue.Peek();
 
                 // アクティブ チャンクを取得。
-                Chunk chunk;
-                if (!TryGetChunk(ref chunkPosition, out chunk))
+                var chunk = GetChunk(ref chunkPosition);
+                if (chunk == null)
                 {
                     // 存在しない場合はメッシュ更新要求を取り消す。
                     waitBuildVerticesQueue.Dequeue();
@@ -351,10 +351,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         closePosition.Y += y;
                         closePosition.Z += z;
 
-                        Chunk closeChunk;
-                        TryGetChunk(ref closePosition, out closeChunk);
-
-                        verticesBuilder.CloseChunks[x, y, z] = closeChunk;
+                        verticesBuilder.CloseChunks[x, y, z] = GetChunk(ref closePosition);
                     }
                 }
             }
@@ -392,28 +389,15 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 指定の位置にあるチャンクの取得を試行します。
+        /// 指定の位置にあるチャンクを取得します。
         /// </summary>
         /// <param name="position">パーティション空間におけるチャンクの位置。</param>
-        /// <param name="result">
-        /// 指定の位置にあるチャンク、あるいは、そのようなチャンクが無い場合は null。
-        /// </param>
         /// <returns>
-        /// true (指定の位置にチャンクが存在した場合)、false (それ以外の場合)。
+        /// チャンク、あるいは、指定の位置にチャンクが存在しない場合は null。
         /// </returns>
-        bool TryGetChunk(ref VectorI3 position, out Chunk result)
+        Chunk GetChunk(ref VectorI3 position)
         {
-            Partition partition;
-            if (ActivePartitions.TryGetPartition(ref position, out partition))
-            {
-                result = partition as Chunk;
-                return true;
-            }
-            else
-            {
-                result = null;
-                return false;
-            }
+            return ActivePartitions.GetPartition(ref position) as Chunk;
         }
 
         ChunkData CreateData()
