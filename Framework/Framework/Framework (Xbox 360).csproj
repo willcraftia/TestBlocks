@@ -218,6 +218,7 @@
     <Compile Include="IO\WebResource.cs" />
     <Compile Include="IO\WebResourceLoader.cs" />
     <Compile Include="Landscape\Cluster.cs" />
+    <Compile Include="Landscape\ClusterCollection.cs" />
     <Compile Include="Landscape\ClusteredPartitionList.cs" />
     <Compile Include="Landscape\ClusteredPartitionQueue.cs" />
     <Compile Include="Landscape\ClusterManager.cs" />

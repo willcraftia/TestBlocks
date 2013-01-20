@@ -39,11 +39,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             get { return clusterManager.Count; }
         }
 
-        internal ICollection<Cluster> Clusters
-        {
-            get { return clusterManager.Clusters; }
-        }
-
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
@@ -66,7 +61,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public Partition GetPartition(ref VectorI3 position)
         {
-            return clusterManager.GetPartition(ref position);
+            return clusterManager.GetPartition(position);
         }
 
         /// <summary>
@@ -86,7 +81,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal Partition Dequeue()
         {
             var partition = partitionQueue.Dequeue();
-            clusterManager.RemovePartition(ref partition.Position);
+            clusterManager.RemovePartition(partition.Position);
             return partition;
         }
 
@@ -99,7 +94,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         internal bool Contains(ref VectorI3 position)
         {
-            return clusterManager.ContainsPartition(ref position);
+            return clusterManager.ContainsPartition(position);
         }
 
         /// <summary>

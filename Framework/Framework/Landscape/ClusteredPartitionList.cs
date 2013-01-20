@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public Partition this[VectorI3 position]
         {
-            get { return clusterManager.GetPartition(ref position); }
+            get { return clusterManager.GetPartition(position); }
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         // I/F
         public bool Contains(Partition item)
         {
-            return clusterManager.ContainsPartition(ref item.Position);
+            return clusterManager.ContainsPartition(item.Position);
         }
 
         // I/F
@@ -107,7 +107,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             var result = (item.ListNode.List == partitions);
 
             partitions.Remove(item.ListNode);
-            clusterManager.RemovePartition(ref item.Position);
+            clusterManager.RemovePartition(item.Position);
 
             return result;
         }
@@ -133,7 +133,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public bool Contains(VectorI3 position)
         {
-            return clusterManager.ContainsPartition(ref position);
+            return clusterManager.ContainsPartition(position);
         }
 
         public void AddFirst(LinkedListNode<Partition> node)
@@ -152,14 +152,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             var node = partitions.First;
             partitions.RemoveFirst();
-            clusterManager.RemovePartition(ref node.Value.Position);
+            clusterManager.RemovePartition(node.Value.Position);
         }
 
         public void RemoveLast()
         {
             var node = partitions.Last;
             partitions.RemoveLast();
-            clusterManager.RemovePartition(ref node.Value.Position);
+            clusterManager.RemovePartition(node.Value.Position);
         }
 
         /// <summary>
@@ -169,14 +169,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="collector">収集先パーティションのコレクション。</param>
         public void Collect<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
         {
-            foreach (var cluster in clusterManager.Clusters)
-            {
-                bool intersected;
-                frustum.Intersects(ref cluster.BoundingBox, out intersected);
-
-                // クラスタが境界錐台と交差するなら、クラスタに含まれるパーティションを収集。
-                if (intersected) cluster.CollectPartitions(frustum, collector);
-            }
+            clusterManager.Collect(frustum, collector);
         }
     }
 }

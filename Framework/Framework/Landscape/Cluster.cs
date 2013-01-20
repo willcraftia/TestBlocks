@@ -42,14 +42,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションの位置をキーとするパーティションのディクショナリ。
         /// </summary>
-        Dictionary<VectorI3, Partition> partitions;
+        Dictionary<VectorI3, Partition> dictionary;
 
         /// <summary>
         /// パーティション数を取得します。
         /// </summary>
         internal int Count
         {
-            get { return partitions.Count; }
+            get { return dictionary.Count; }
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             this.manager = manager;
 
             var size = manager.Size;
-            partitions = new Dictionary<VectorI3, Partition>(size.X * size.Y * size.Z);
+            dictionary = new Dictionary<VectorI3, Partition>(size.X * size.Y * size.Z);
         }
 
         /// <summary>
@@ -100,7 +100,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="collector">収集先パーティションのコレクション。</param>
         internal void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
         {
-            foreach (var partition in partitions.Values)
+            foreach (var partition in dictionary.Values)
             {
                 bool intersected;
                 frustum.Intersects(ref partition.BoundingBox, out intersected);
@@ -116,9 +116,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        internal bool ContainsPartition(ref VectorI3 position)
+        internal bool Contains(VectorI3 position)
         {
-            return partitions.ContainsKey(position);
+            return dictionary.ContainsKey(position);
         }
 
         /// <summary>
@@ -128,10 +128,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、指定の位置にパーティションが存在しないならば null。
         /// </returns>
-        internal Partition GetPartition(ref VectorI3 position)
+        internal Partition GetPartition(VectorI3 position)
         {
             Partition result;
-            partitions.TryGetValue(position, out result);
+            dictionary.TryGetValue(position, out result);
             return result;
         }
 
@@ -139,18 +139,18 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// クラスタへパーティションを追加します。
         /// </summary>
         /// <param name="partition">パーティション。</param>
-        internal void AddPartition(Partition partition)
+        internal void Add(Partition partition)
         {
-            partitions[partition.Position] = partition;
+            dictionary[partition.Position] = partition;
         }
 
         /// <summary>
         /// クラスタからパーティションを削除します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
-        internal void RemovePartition(ref VectorI3 position)
+        internal void Remove(VectorI3 position)
         {
-            partitions.Remove(position);
+            dictionary.Remove(position);
         }
     }
 }

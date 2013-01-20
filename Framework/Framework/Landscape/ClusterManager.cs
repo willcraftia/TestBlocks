@@ -17,12 +17,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション空間におけるクラスタのサイズ。
         /// </summary>
-        VectorI3 size;
+        internal readonly VectorI3 Size;
 
         /// <summary>
         /// ワールド空間におけるクラスタのサイズ。
         /// </summary>
-        Vector3 sizeWorld;
+        internal readonly Vector3 SizeWorld;
 
         /// <summary>
         /// クラスタのプール。
@@ -30,25 +30,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         Pool<Cluster> clusterPool;
 
         /// <summary>
-        /// クラスタの位置をキーとするクラスタのディクショナリ。
+        /// クラスタのコレクション。
         /// </summary>
-        Dictionary<VectorI3, Cluster> clusters;
-
-        /// <summary>
-        /// パーティション空間におけるクラスタのサイズを取得します。
-        /// </summary>
-        internal VectorI3 Size
-        {
-            get { return size; }
-        }
-
-        /// <summary>
-        /// ワールド空間におけるクラスタのサイズを取得します。
-        /// </summary>
-        internal Vector3 SizeWorld
-        {
-            get { return sizeWorld; }
-        }
+        ClusterCollection clusters;
 
         /// <summary>
         /// クラスタ数を取得します。
@@ -56,11 +40,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal int Count
         {
             get { return clusters.Count; }
-        }
-
-        internal ICollection<Cluster> Clusters
-        {
-            get { return clusters.Values; }
         }
 
         /// <summary>
@@ -76,9 +55,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 throw new ArgumentOutOfRangeException("size");
             if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
 
-            this.size = size;
+            Size = size;
 
-            sizeWorld = new Vector3
+            SizeWorld = new Vector3
             {
                 X = size.X * partitionSize.X,
                 Y = size.Y * partitionSize.Y,
@@ -86,7 +65,24 @@ namespace Willcraftia.Xna.Framework.Landscape
             };
 
             clusterPool = new Pool<Cluster>(CreateCluster);
-            clusters = new Dictionary<VectorI3, Cluster>(capacity);
+            clusters = new ClusterCollection(capacity);
+        }
+
+        /// <summary>
+        /// 境界錐台と交差するパーティションを収集します。
+        /// </summary>
+        /// <param name="frustum">境界錐台。</param>
+        /// <param name="collector">収集先パーティションのコレクション。</param>
+        internal void Collect<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
+        {
+            foreach (var cluster in clusters)
+            {
+                bool intersected;
+                frustum.Intersects(ref cluster.BoundingBox, out intersected);
+
+                // クラスタが境界錐台と交差するなら、クラスタに含まれるパーティションを収集。
+                if (intersected) cluster.CollectPartitions(frustum, collector);
+            }
         }
 
         /// <summary>
@@ -96,12 +92,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        internal bool ContainsPartition(ref VectorI3 position)
+        internal bool ContainsPartition(VectorI3 position)
         {
-            var cluster = GetCluster(ref position);
+            var cluster = GetCluster(position);
             if (cluster == null) return false;
 
-            return cluster.ContainsPartition(ref position);
+            return cluster.Contains(position);
         }
 
         /// <summary>
@@ -111,12 +107,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
         /// </returns>
-        internal Partition GetPartition(ref VectorI3 position)
+        internal Partition GetPartition(VectorI3 position)
         {
-            var cluster = GetCluster(ref position);
+            var cluster = GetCluster(position);
             if (cluster == null) return null;
 
-            return cluster.GetPartition(ref position);
+            return cluster.GetPartition(position);
         }
 
         /// <summary>
@@ -129,26 +125,26 @@ namespace Willcraftia.Xna.Framework.Landscape
             CalculateClusterPosition(ref partition.Position, out clusterPosition);
 
             Cluster cluster;
-            if (!clusters.TryGetValue(clusterPosition, out cluster))
+            if (!clusters.TryGet(clusterPosition, out cluster))
             {
                 cluster = clusterPool.Borrow();
                 cluster.Initialize(clusterPosition);
-                clusters[clusterPosition] = cluster;
+                clusters.Add(cluster);
             }
 
-            cluster.AddPartition(partition);
+            cluster.Add(partition);
         }
 
         /// <summary>
         /// 指定の位置にあるパーティションを削除します。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        internal void RemovePartition(ref VectorI3 position)
+        internal void RemovePartition(VectorI3 position)
         {
-            var cluster = GetCluster(ref position);
+            var cluster = GetCluster(position);
             if (cluster == null) return;
 
-            cluster.RemovePartition(ref position);
+            cluster.Remove(position);
 
             if (cluster.Count == 0)
             {
@@ -173,13 +169,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// クラスタ、あるいは、該当するクラスタが存在しない場合は null。
         /// </returns>
-        Cluster GetCluster(ref VectorI3 position)
+        Cluster GetCluster(VectorI3 position)
         {
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref position, out clusterPosition);
 
             Cluster result;
-            clusters.TryGetValue(clusterPosition, out result);
+            clusters.TryGet(clusterPosition, out result);
             return result;
         }
 
@@ -192,9 +188,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             result = new VectorI3
             {
-                X = MathExtension.Floor(position.X / (float) size.X),
-                Y = MathExtension.Floor(position.Y / (float) size.Y),
-                Z = MathExtension.Floor(position.Z / (float) size.Z)
+                X = MathExtension.Floor(position.X / (float) Size.X),
+                Y = MathExtension.Floor(position.Y / (float) Size.Y),
+                Z = MathExtension.Floor(position.Z / (float) Size.Z)
             };
         }
 
