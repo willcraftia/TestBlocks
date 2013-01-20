@@ -499,7 +499,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (waitActivations.Count != 0)
                 {
-                    DisposePartitions(waitPassivations);
+                    DisposePartitions(waitActivations);
                     waitActivations.Clear();
                 }
                 
