@@ -86,24 +86,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal Partition Dequeue()
         {
             var partition = partitionQueue.Dequeue();
-            clusterManager.RemovePartition(partition);
+            clusterManager.RemovePartition(ref partition.Position);
             return partition;
         }
 
         /// <summary>
-        /// パーティションが存在するか否かを検査します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        /// <returns>
-        /// true (パーティションが存在する場合)、false (それ以外の場合)。
-        /// </returns>
-        internal bool Contains(Partition partition)
-        {
-            return clusterManager.ContainsPartition(partition);
-        }
-
-        /// <summary>
-        /// パーティションが存在するか否かを検査します。
+        /// 指定の位置にパーティションが存在するか否かを検査します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
         /// <returns>

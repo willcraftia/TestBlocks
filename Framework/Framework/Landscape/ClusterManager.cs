@@ -90,19 +90,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// パーティションが存在するか否かを検査します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        /// <returns>
-        /// true (パーティションが存在する場合)、false (それ以外の場合)。
-        /// </returns>
-        internal bool ContainsPartition(Partition partition)
-        {
-            return ContainsPartition(ref partition.Position);
-        }
-
-        /// <summary>
-        /// パーティションが存在するか否かを検査します。
+        /// 指定の位置にパーティションが存在するか否かを検査します。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         /// <returns>
@@ -138,7 +126,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void AddPartition(Partition partition)
         {
             VectorI3 clusterPosition;
-            CalculateClusterPosition(partition, out clusterPosition);
+            CalculateClusterPosition(ref partition.Position, out clusterPosition);
 
             Cluster cluster;
             if (!clusters.TryGetValue(clusterPosition, out cluster))
@@ -152,34 +140,21 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// パーティションを削除します。
+        /// 指定の位置にあるパーティションを削除します。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
         internal void RemovePartition(ref VectorI3 position)
         {
-            VectorI3 clusterPosition;
-            CalculateClusterPosition(ref position, out clusterPosition);
-
-            Cluster cluster;
-            if (!clusters.TryGetValue(clusterPosition, out cluster))
-                return;
+            var cluster = GetCluster(ref position);
+            if (cluster == null) return;
 
             cluster.RemovePartition(ref position);
 
             if (cluster.Count == 0)
             {
-                clusters.Remove(clusterPosition);
+                clusters.Remove(cluster.Position);
                 clusterPool.Return(cluster);
             }
-        }
-
-        /// <summary>
-        /// パーティションを削除します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        internal void RemovePartition(Partition partition)
-        {
-            RemovePartition(ref partition.Position);
         }
 
         /// <summary>
@@ -221,16 +196,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 Y = MathExtension.Floor(position.Y / (float) size.Y),
                 Z = MathExtension.Floor(position.Z / (float) size.Z)
             };
-        }
-
-        /// <summary>
-        /// パーティションが属するクラスタの位置を算出します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        /// <param name="result">クラスタ空間におけるクラスタの位置。</param>
-        void CalculateClusterPosition(Partition partition, out VectorI3 result)
-        {
-            CalculateClusterPosition(ref partition.Position, out result);
         }
 
         /// <summary>
