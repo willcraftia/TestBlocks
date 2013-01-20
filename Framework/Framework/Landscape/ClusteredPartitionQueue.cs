@@ -26,7 +26,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション数を取得します。
         /// </summary>
-        public int Count
+        internal int Count
         {
             get { return partitionQueue.Count; }
         }
@@ -34,12 +34,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// クラスタ数を取得します。
         /// </summary>
-        public int ClusterCount
+        internal int ClusterCount
         {
             get { return clusterManager.Count; }
         }
 
-        public ICollection<Cluster> Clusters
+        internal ICollection<Cluster> Clusters
         {
             get { return clusterManager.Clusters; }
         }
@@ -51,55 +51,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="partitionSize">ワールド空間におけるパーティションのサイズ。</param>
         /// <param name="clusterCapacity">クラスタの初期容量。</param>
         /// <param name="partitionCapacity">パーティションの初期容量。</param>
-        public ClusteredPartitionQueue(VectorI3 clusterSize, Vector3 partitionSize, int clusterCapacity, int partitionCapacity)
+        internal ClusteredPartitionQueue(VectorI3 clusterSize, Vector3 partitionSize, int clusterCapacity, int partitionCapacity)
         {
             clusterManager = new ClusterManager(clusterSize, partitionSize, clusterCapacity);
             partitionQueue = new Queue<Partition>(partitionCapacity);
-        }
-
-        /// <summary>
-        /// パーティションをキューへ追加します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        public void Enqueue(Partition partition)
-        {
-            clusterManager.AddPartition(partition);
-            partitionQueue.Enqueue(partition);
-        }
-
-        /// <summary>
-        /// キューからパーティションを取り出します。
-        /// </summary>
-        /// <returns>パーティション。</returns>
-        public Partition Dequeue()
-        {
-            var partition = partitionQueue.Dequeue();
-            clusterManager.RemovePartition(partition);
-            return partition;
-        }
-
-        /// <summary>
-        /// パーティションが存在するか否かを検査します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        /// <returns>
-        /// true (パーティションが存在する場合)、false (それ以外の場合)。
-        /// </returns>
-        public bool Contains(Partition partition)
-        {
-            return clusterManager.ContainsPartition(partition);
-        }
-
-        /// <summary>
-        /// パーティションが存在するか否かを検査します。
-        /// </summary>
-        /// <param name="position">パーティションの位置。</param>
-        /// <returns>
-        /// true (パーティションが存在する場合)、false (それ以外の場合)。
-        /// </returns>
-        public bool Contains(ref VectorI3 position)
-        {
-            return clusterManager.ContainsPartition(ref position);
         }
 
         /// <summary>
@@ -118,9 +73,54 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
+        /// パーティションをキューへ追加します。
+        /// </summary>
+        /// <param name="partition">パーティション。</param>
+        internal void Enqueue(Partition partition)
+        {
+            clusterManager.AddPartition(partition);
+            partitionQueue.Enqueue(partition);
+        }
+
+        /// <summary>
+        /// キューからパーティションを取り出します。
+        /// </summary>
+        /// <returns>パーティション。</returns>
+        internal Partition Dequeue()
+        {
+            var partition = partitionQueue.Dequeue();
+            clusterManager.RemovePartition(partition);
+            return partition;
+        }
+
+        /// <summary>
+        /// パーティションが存在するか否かを検査します。
+        /// </summary>
+        /// <param name="partition">パーティション。</param>
+        /// <returns>
+        /// true (パーティションが存在する場合)、false (それ以外の場合)。
+        /// </returns>
+        internal bool Contains(Partition partition)
+        {
+            return clusterManager.ContainsPartition(partition);
+        }
+
+        /// <summary>
+        /// パーティションが存在するか否かを検査します。
+        /// </summary>
+        /// <param name="position">パーティションの位置。</param>
+        /// <returns>
+        /// true (パーティションが存在する場合)、false (それ以外の場合)。
+        /// </returns>
+        internal bool Contains(ref VectorI3 position)
+        {
+            return clusterManager.ContainsPartition(ref position);
+        }
+
+        /// <summary>
         /// キューにある全てのパーティションを除去します。
         /// </summary>
-        public void Clear()
+        internal void Clear()
         {
             clusterManager.Clear();
             partitionQueue.Clear();

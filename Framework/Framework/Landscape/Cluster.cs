@@ -17,7 +17,7 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// この問題を解決するために、パーティションをクラスタで纏めて管理し、
     /// 検索の際には、クラスタを検索した後、クラスタからパーティションを検索するという方法を採ります。
     /// </summary>
-    public sealed class Cluster
+    internal sealed class Cluster
     {
         /// <summary>
         /// クラスタ空間におけるクラスタの位置。
@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション数を取得します。
         /// </summary>
-        public int Count
+        internal int Count
         {
             get { return partitions.Count; }
         }
@@ -98,7 +98,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="frustum">境界錐台。</param>
         /// <param name="collector">収集先パーティションのコレクション。</param>
-        public void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
+        internal void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
         {
             foreach (var partition in partitions.Values)
             {
@@ -116,7 +116,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool ContainsPartition(ref VectorI3 position)
+        internal bool ContainsPartition(ref VectorI3 position)
         {
             return partitions.ContainsKey(position);
         }
@@ -141,7 +141,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool TryGetPartition(ref VectorI3 position, out Partition result)
+        internal bool TryGetPartition(ref VectorI3 position, out Partition result)
         {
             return partitions.TryGetValue(position, out result);
         }

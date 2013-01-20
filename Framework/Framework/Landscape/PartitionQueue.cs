@@ -11,13 +11,13 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// パーティションのキューです。
     /// キュー内のパーティションは、パーティションの位置をキーとしても管理されます。
     /// </summary>
-    public sealed class PartitionQueue : KeyedQueue<VectorI3, Partition>
+    internal sealed class PartitionQueue : KeyedQueue<VectorI3, Partition>
     {
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="capacity">初期容量。</param>
-        public PartitionQueue(int capacity)
+        internal PartitionQueue(int capacity)
             : base(capacity)
         {
         }
@@ -32,7 +32,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool TryGetItem(ref VectorI3 key, out Partition item)
+        internal bool TryGetItem(ref VectorI3 key, out Partition item)
         {
             return Dictionary.TryGetValue(key, out item);
         }
