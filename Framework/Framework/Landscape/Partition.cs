@@ -36,56 +36,38 @@ namespace Willcraftia.Xna.Framework.Landscape
         public Vector3 Center;
 
         /// <summary>
-        /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
-        /// Dispose() の実行を待機するためのシグナルを管理します。
-        /// </summary>
-        ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
-
-        /// <summary>
         /// アクティブ化が完了しているか否かを示す値。
-        /// </summary>
-        volatile bool activationCompleted;
-
-        /// <summary>
-        /// 非アクティブ化が完了しているか否かを示す値。
-        /// </summary>
-        volatile bool passivationCompleted;
-
-        /// <summary>
-        /// 非同期なアクティブ化処理が終了しているかどうかを示す値を取得または設定します。
-        /// </summary>
-        /// <value>
-        /// true (非同期なアクティブ化処理が終了している場合)、false (それ以外の場合)。
-        /// </value>
-        internal bool ActivationCompleted
-        {
-            get { return activationCompleted; }
-            set { activationCompleted = value; }
-        }
-
-        /// <summary>
-        /// 非同期な非アクティブ化処理が終了しているかどうかを示す値を取得または設定します。
         /// </summary>
         /// <value>
         /// true (非同期な非アクティブ化処理が終了している場合)、false (それ以外の場合)。
         /// </value>
-        internal bool PassivationCompleted
-        {
-            get { return passivationCompleted; }
-            set { passivationCompleted = value; }
-        }
+        internal volatile bool ActivationCompleted;
+
+        /// <summary>
+        /// 非アクティブ化が完了しているか否かを示す値。
+        /// </summary>
+        /// <value>
+        /// true (非同期なアクティブ化処理が終了している場合)、false (それ以外の場合)。
+        /// </value>
+        internal volatile bool PassivationCompleted;
 
         /// <summary>
         /// Activate() メソッドのデリゲートです。
         /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
         /// </summary>
-        internal Action ActivateAction { get; private set; }
+        internal Action ActivateAction;
 
         /// <summary>
         /// Passivate() メソッドのデリゲートです。
         /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
         /// </summary>
-        internal Action PassivateAction { get; private set; }
+        internal Action PassivateAction;
+
+        /// <summary>
+        /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
+        /// Dispose() の実行を待機するためのシグナルを管理します。
+        /// </summary>
+        ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
 
         /// <summary>
         /// インスタンスを生成します。
@@ -159,8 +141,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             Center = (BoundingBox.Max + BoundingBox.Min) / 2;
 
-            activationCompleted = false;
-            passivationCompleted = false;
+            ActivationCompleted = false;
+            PassivationCompleted = false;
 
             return InitializeOverride();
         }
@@ -174,8 +156,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Position = VectorI3.Zero;
 
-            activationCompleted = false;
-            passivationCompleted = false;
+            ActivationCompleted = false;
+            PassivationCompleted = false;
 
             ReleaseOverride();
         }
@@ -186,12 +168,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void Activate()
         {
-            Debug.Assert(!activationCompleted);
+            Debug.Assert(!ActivationCompleted);
 
             asyncCallEvent.Reset();
 
             ActivateOverride();
-            activationCompleted = true;
+            ActivationCompleted = true;
             
             asyncCallEvent.Set();
         }
@@ -202,13 +184,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void Passivate()
         {
-            Debug.Assert(activationCompleted);
-            Debug.Assert(!passivationCompleted);
+            Debug.Assert(ActivationCompleted);
+            Debug.Assert(!PassivationCompleted);
 
             asyncCallEvent.Reset();
 
             PassivateOverride();
-            passivationCompleted = true;
+            PassivationCompleted = true;
 
             asyncCallEvent.Set();
         }
@@ -218,22 +200,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="neighbor">アクティブになった隣接パーティション。</param>
         /// <param name="side">隣接パーティションの方向。</param>
-        public virtual void OnNeighborActivated(Partition neighbor, CubicSide side) { }
+        protected internal virtual void OnNeighborActivated(Partition neighbor, CubicSide side) { }
 
         /// <summary>
         /// 隣接パーティションが非アクティブになった時に呼び出されます。
         /// </summary>
         /// <param name="neighbor">非アクティブになった隣接パーティション。</param>
         /// <param name="side">隣接パーティションの方向。</param>
-        public virtual void OnNeighborPassivated(Partition neighbor, CubicSide side) { }
-
-        /// <summary>
-        /// パーティションの初期化で呼び出されます。
-        /// </summary>
-        /// <returns>
-        /// true (初期化に成功した場合)、false (それ以外の場合)。
-        /// </returns>
-        protected virtual bool InitializeOverride() { return true; }
+        protected internal virtual void OnNeighborPassivated(Partition neighbor, CubicSide side) { }
 
         /// <summary>
         /// アクティブ化の開始直前で呼び出されます。
@@ -254,6 +228,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化の完了直後で呼び出されます。
         /// </summary>
         protected internal virtual void OnPassivated() { }
+
+        /// <summary>
+        /// パーティションの初期化で呼び出されます。
+        /// </summary>
+        /// <returns>
+        /// true (初期化に成功した場合)、false (それ以外の場合)。
+        /// </returns>
+        protected virtual bool InitializeOverride() { return true; }
 
         /// <summary>
         /// アクティブ化を試行する際に呼び出されます。

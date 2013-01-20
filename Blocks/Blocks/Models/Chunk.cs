@@ -214,6 +214,28 @@ namespace Willcraftia.Xna.Blocks.Models
             manager.RequestUpdateMesh(Position);
         }
 
+        public int CalculateBlockPositionX(int x)
+        {
+            return Position.X * manager.ChunkSize.X + x;
+        }
+
+        public int CalculateBlockPositionY(int y)
+        {
+            return Position.Y * manager.ChunkSize.Y + y;
+        }
+
+        public int CalculateBlockPositionZ(int z)
+        {
+            return Position.Z * manager.ChunkSize.Z + z;
+        }
+
+        public bool Contains(ref VectorI3 blockPosition)
+        {
+            return 0 <= blockPosition.X && blockPosition.X < manager.ChunkSize.X &&
+                0 <= blockPosition.Y && blockPosition.Y < manager.ChunkSize.Y &&
+                0 <= blockPosition.Z && blockPosition.Z < manager.ChunkSize.Z;
+        }
+
         /// <summary>
         /// チャンクが属するリージョンを探索して関連付けます。
         /// </summary>
@@ -331,7 +353,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// メッシュ更新をチャンク マネージャへ要求します。
         /// </summary>
-        public override void OnNeighborActivated(Partition neighbor, CubicSide side)
+        protected override void OnNeighborActivated(Partition neighbor, CubicSide side)
         {
             // メッシュ更新要求を追加。
             // データが空の場合は更新するメッシュが無い。
@@ -343,35 +365,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// メッシュ更新をチャンク マネージャへ要求します。
         /// </summary>
-        public override void OnNeighborPassivated(Partition neighbor, CubicSide side)
+        protected override void OnNeighborPassivated(Partition neighbor, CubicSide side)
         {
             // メッシュ更新要求を追加。
             // データが空の場合は更新するメッシュが無い。
             if (data != null) RequestUpdateMesh();
 
             base.OnNeighborPassivated(neighbor, side);
-        }
-
-        public int CalculateBlockPositionX(int x)
-        {
-            return Position.X * manager.ChunkSize.X + x;
-        }
-
-        public int CalculateBlockPositionY(int y)
-        {
-            return Position.Y * manager.ChunkSize.Y + y;
-        }
-
-        public int CalculateBlockPositionZ(int z)
-        {
-            return Position.Z * manager.ChunkSize.Z + z;
-        }
-
-        public bool Contains(ref VectorI3 blockPosition)
-        {
-            return 0 <= blockPosition.X && blockPosition.X < manager.ChunkSize.X &&
-                0 <= blockPosition.Y && blockPosition.Y < manager.ChunkSize.Y &&
-                0 <= blockPosition.Z && blockPosition.Z < manager.ChunkSize.Z;
         }
     }
 }
