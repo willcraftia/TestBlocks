@@ -788,9 +788,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                     }
                 }
 
-                // 既に待機中ならスキップ。
-                if (waitPassivations.Contains(partition)) continue;
-
                 // アクティブ化待機中ならばそれを破棄。
                 if (waitActivations.Contains(partition))
                     waitActivations.Remove(partition);
