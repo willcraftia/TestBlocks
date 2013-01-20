@@ -275,6 +275,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         LinkedList<Partition> partitions;
 
+        /// <summary>
+        /// LRU アルゴリズムのための連結リスト。
+        /// 描画などでパーティションを利用したら、末尾へノードを設定し直します。
+        /// これにより、最も利用されていないパーティションのノードの位置は先頭へ向かうため、
+        /// パーティション許容量を越えた場合には、先頭ノードが表すパーティションから順に
+        /// 非アクティブ化します。
+        /// </summary>
         LinkedList<Partition> lruPartitions;
 
         /// <summary>
@@ -569,6 +576,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             clusterManager.Collect(frustum, collector);
         }
 
+        /// <summary>
+        /// 指定のパーティションを利用したものとマークします。
+        /// このメソッドを呼び出す事で、パーティションに対応するノードは、
+        /// LRU 連結リストの末尾へ移動します。
+        /// </summary>
+        /// <param name="partition">パーティション。</param>
         public void TouchPartition(Partition partition)
         {
             if (partition == null) throw new ArgumentNullException("partition");
