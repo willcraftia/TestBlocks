@@ -291,6 +291,12 @@ namespace Willcraftia.Xna.Blocks.Models
                     break;
                 }
 
+                // メッシュ更新が終わるまで非アクティブ化を抑制。
+                // パーティション マネージャは非アクティブ化前にロック取得を試みるが、
+                // チャンク マネージャはそのサブクラスでロックを取得しているため、
+                // ロックだけでは非アクティブ化を抑制できない事に注意。
+                chunk.SuppressPassivation = true;
+
                 // チャンクのロックを試行。
                 // 頂点ビルダの更新が完了するまでロックを維持。
                 if (!chunk.EnterLock())
@@ -385,6 +391,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 // 更新開始で取得したロックを解放。
                 chunk.ExitLock();
+
+                // 非アクティブ化の抑制を解除。
+                chunk.SuppressPassivation = false;
             }
         }
 
@@ -460,6 +469,8 @@ namespace Willcraftia.Xna.Blocks.Models
             TotalIndexCount -= chunkMesh.IndexCount;
 
             chunkMesh.Dispose();
+
+            GC.Collect();
 
             ChunkMeshCount--;
         }

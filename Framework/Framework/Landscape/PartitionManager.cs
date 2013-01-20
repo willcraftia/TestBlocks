@@ -275,6 +275,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         LinkedList<Partition> partitions;
 
+        LinkedList<Partition> lruPartitions;
+
         /// <summary>
         /// アクティブ化待機リスト。
         /// </summary>
@@ -294,6 +296,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化実行キュー。
         /// </summary>
         Queue<Partition> passivations;
+
+        int activePartitionCapacity;
 
         /// <summary>
         /// 同時アクティブ化待機許容量。
@@ -433,7 +437,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize, settings.ActiveClusterCapacity);
             partitions = new LinkedList<Partition>();
+            lruPartitions = new LinkedList<Partition>();
 
+            activePartitionCapacity = settings.ActivePartitionCapacity;
             waitActivationCapacity = settings.WaitActivationCapacity;
             waitPassivationCapacity = settings.WaitPassivationCapacity;
             activationCapacity = settings.ActivationCapacity;
@@ -563,6 +569,14 @@ namespace Willcraftia.Xna.Framework.Landscape
             clusterManager.Collect(frustum, collector);
         }
 
+        public void TouchPartition(Partition partition)
+        {
+            if (partition == null) throw new ArgumentNullException("partition");
+
+            lruPartitions.Remove(partition.LruNode);
+            lruPartitions.AddLast(partition.LruNode);
+        }
+
         /// <summary>
         /// 事前にパーティション プールにインスタンスを生成する場合に、
         /// サブクラスのコンストラクタで呼び出します。
@@ -670,6 +684,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティブ リストへ追加。
                 clusterManager.AddPartition(partition);
                 partitions.AddLast(partition.ListNode);
+                lruPartitions.AddLast(partition.LruNode);
 
                 // 完了を通知。
                 partition.OnActivated();
@@ -743,7 +758,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             PartitionDistanceAscComparer.Instance.EyePosition = eyePositionWorld;
             waitPassivations.Sort(PartitionDistanceAscComparer.Instance);
 
-            // 視点から遠いパーティションを優先してアクティブ化。
+            // 視点から遠いパーティションを優先。
             for (int i = waitPassivations.Count - 1; 0 <= i; i--)
             {
                 if (passivationCapacity <= passivations.Count) break;
@@ -751,8 +766,11 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var partition = waitPassivations[i];
                 waitPassivations.RemoveAt(i);
 
+                // 非アクティブ化が抑制されている場合は断念。
+                if (partition.SuppressPassivation) continue;
+
                 // ロックの取得を試行。
-                // ロックを取得できない場合は非アクティブ化を断念。
+                // ロックを取得できない場合は断念。
                 if (!partition.EnterLock()) continue;
 
                 // 実行キューへ追加。
@@ -777,6 +795,30 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         void PassivatePartitions(GameTime gameTime)
         {
+            while (activePartitionCapacity < lruPartitions.Count)
+            {
+                // 同時待機許容数を越えるならば終了。
+                if (waitPassivationCapacity <= waitPassivations.Count) break;
+
+                var node = lruPartitions.First;
+                var partition = node.Value;
+
+                if (minLandscapeVolume.Contains(partition.Position))
+                {
+                    // 最小アクティブ領域内ならば非アクティブ化しない。
+                    // ここで強制的に利用した状態としてマーク。
+                    TouchPartition(partition);
+                    continue;
+                }
+
+                clusterManager.RemovePartition(partition.Position);
+                partitions.Remove(partition.ListNode);
+                lruPartitions.RemoveFirst();
+
+                // 待機リストへ追加。
+                waitPassivations.Add(partition);
+            }
+
             int count = Math.Min(partitions.Count, passivationSearchCapacity);
 
             for (int i = 0; i < count; i++)
@@ -801,6 +843,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // アクティブではない状態にする。
                 clusterManager.RemovePartition(partition.Position);
+                lruPartitions.Remove(partition.LruNode);
 
                 // 待機リストへ追加。
                 waitPassivations.Add(partition);
@@ -819,7 +862,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             PartitionDistanceDescComparer.Instance.EyePosition = eyePositionWorld;
             waitActivations.Sort(PartitionDistanceDescComparer.Instance);
 
-            // 視点から近いパーティションを優先してアクティブ化。
+            // 視点から近いパーティションを優先。
             for (int i = waitActivations.Count - 1; 0 <= i; i--)
             {
                 // 同時実行許容量を越えるならば終了。

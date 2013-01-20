@@ -56,21 +56,33 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// Activate() メソッドのデリゲートです。
         /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
         /// </summary>
-        internal Action ActivateAction;
+        internal readonly Action ActivateAction;
 
         /// <summary>
         /// Passivate() メソッドのデリゲートです。
         /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
         /// </summary>
-        internal Action PassivateAction;
+        internal readonly Action PassivateAction;
 
-        internal LinkedListNode<Partition> ListNode;
+        internal readonly LinkedListNode<Partition> ListNode;
+
+        internal readonly LinkedListNode<Partition> LruNode;
 
         /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
         /// </summary>
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
+
+        /// <summary>
+        /// 非アクティブ化を抑制するか否かを示す値を取得または設定します。
+        /// このプロパティを true にしている間は、
+        /// 非アクティブ化対象となってもパーティション マネージャは非アクティブ化しません。
+        /// </summary>
+        /// <value>
+        /// true (非アクティブ化を抑制する場合)、false (それ以外の場合)。
+        /// </value>
+        public bool SuppressPassivation { get; set; }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -80,6 +92,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             ActivateAction = new Action(Activate);
             PassivateAction = new Action(Passivate);
             ListNode = new LinkedListNode<Partition>(this);
+            LruNode = new LinkedListNode<Partition>(this);
         }
 
         /// <summary>

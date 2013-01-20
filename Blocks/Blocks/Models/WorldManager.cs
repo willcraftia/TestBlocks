@@ -364,6 +364,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             foreach (var chunk in visibleChunks)
             {
+                ChunkManager.TouchPartition(chunk);
+
                 if (chunk.OpaqueMesh != null)
                 {
                     SceneManager.OpaqueObjects.Add(chunk.OpaqueMesh);
