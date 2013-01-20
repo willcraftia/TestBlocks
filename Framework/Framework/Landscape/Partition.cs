@@ -105,20 +105,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// アクティブ パーティション領域に含まれるか否かを検査します。
-        /// </summary>
-        /// <param name="volume">アクティブ パーティション領域。</param>
-        /// <returns>
-        /// true (アクティブ パーティション領域に含まれる場合)、false (それ以外の場合)。
-        /// </returns>
-        internal bool IsInLandscapeVolume(ILandscapeVolume volume)
-        {
-            bool result;
-            volume.Contains(ref Position, out result);
-            return result;
-        }
-
-        /// <summary>
         /// パーティションを初期化します。
         /// このメソッドは、パーティション プールから取り出され、
         /// アクティブ化が要求されるまえに呼び出されます。

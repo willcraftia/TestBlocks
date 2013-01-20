@@ -260,9 +260,20 @@ namespace Willcraftia.Xna.Framework.Landscape
         Pool<Partition> partitionPool;
 
         /// <summary>
-        /// アクティブ リスト。
+        /// クラスタ マネージャ。
+        /// アクティブなパーティションを参照する場合は、
+        /// 基本的にはクラスタ マネージャから参照します。
         /// </summary>
-        ClusteredPartitionList partitions;
+        ClusterManager clusterManager;
+
+        /// <summary>
+        /// アクティブ パーティションの連結リスト。
+        /// 連結リストのノードはパーティションが管理しています。
+        /// アクティブ化と非アクティブ化の判定のために用いる連結リストであり、
+        /// 要素として登録されているパーティションの順序は、
+        /// アクティブ化と非アクティブ化の判定が実行されるごとに変化します。
+        /// </summary>
+        LinkedList<Partition> partitions;
 
         /// <summary>
         /// アクティブ化待機リスト。
@@ -375,7 +386,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public int ActiveClusterCount
         {
-            get { return partitions.ClusterCount; }
+            get { return clusterManager.Count; }
         }
 
         /// <summary>
@@ -420,11 +431,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             partitionPool = new Pool<Partition>(CreatePartition);
             partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
 
-            partitions = new ClusteredPartitionList(
-                settings.ClusterSize,
-                settings.PartitionSize,
-                settings.ActiveClusterCapacity,
-                settings.ActivePartitionCapacity);
+            clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize, settings.ActiveClusterCapacity);
+            partitions = new LinkedList<Partition>();
 
             waitActivationCapacity = settings.WaitActivationCapacity;
             waitPassivationCapacity = settings.WaitPassivationCapacity;
@@ -552,7 +560,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="collector">収集先パーティションのコレクション。</param>
         public void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
         {
-            partitions.Collect(frustum, collector);
+            clusterManager.Collect(frustum, collector);
         }
 
         /// <summary>
@@ -603,7 +611,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         protected Partition GetActivePartition(VectorI3 position)
         {
-            return partitions[position];
+            return clusterManager.GetPartition(position);
         }
 
         /// <summary>
@@ -660,6 +668,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // アクティブ リストへ追加。
+                clusterManager.AddPartition(partition);
                 partitions.AddLast(partition.ListNode);
 
                 // 完了を通知。
@@ -680,7 +689,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = partitions[nearbyPosition];
+                var neighbor = clusterManager.GetPartition(nearbyPosition);
                 if (neighbor == null)
                 {
                     // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
@@ -704,7 +713,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = partitions[nearbyPosition];
+                var neighbor = clusterManager.GetPartition(nearbyPosition);
                 if (neighbor == null)
                 {
                     // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
@@ -782,13 +791,16 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (partition.IsInLandscapeVolume(maxLandscapeVolume))
+                    if (maxLandscapeVolume.Contains(partition.Position))
                     {
-                        // アクティブ状態維持領域内ならばアクティブ リストへ戻す。
+                        // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.AddLast(node);
                         continue;
                     }
                 }
+
+                // アクティブではない状態にする。
+                clusterManager.RemovePartition(partition.Position);
 
                 // 待機リストへ追加。
                 waitPassivations.Add(partition);
@@ -858,7 +870,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var position = eyePosition + minActivePointOffsets[index++];
 
                 // 既にアクティブならばスキップ。
-                if (partitions.Contains(position)) continue;
+                if (clusterManager.ContainsPartition(position)) continue;
 
                 // 既に待機中ならばスキップ。
                 if (waitActivations.Contains(position)) continue;
@@ -963,24 +975,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             passivationTaskQueue.Clear();
 
             disposed = true;
-        }
-
-        void DisposePartitions(Pool<Partition> partitions)
-        {
-            while (0 < partitions.Count)
-            {
-                var partition = partitions.Borrow();
-                partition.Dispose();
-            }
-        }
-
-        void DisposePartitions(ClusteredPartitionQueue partitions)
-        {
-            while (0 < partitions.Count)
-            {
-                var partition = partitions.Dequeue();
-                partition.Dispose();
-            }
         }
 
         void DisposePartitions(IEnumerable<Partition> partitions)

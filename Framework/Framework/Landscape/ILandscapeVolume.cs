@@ -27,9 +27,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションの位置が領域に含まれるか否かを検査します。
         /// </summary>
         /// <param name="point">パーティションの位置。</param>
-        /// <param name="result">
+        /// <returns>
         /// true (パーティションの位置が領域に含まれる場合)、false (それ以外の場合)。
-        /// </param>
-        void Contains(ref VectorI3 point, out bool result);
+        /// </returns>
+        bool Contains(VectorI3 point);
     }
 }

@@ -90,7 +90,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public void Contains(ref VectorI3 point, out bool result)
+        public bool Contains(VectorI3 point)
         {
             var flatPoint = point;
             flatPoint.Y = 0;
@@ -98,7 +98,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             int distanceSquared;
             VectorI3.DistanceSquared(ref center, ref point, out distanceSquared);
 
-            result = distanceSquared <= radiusSquared;
+            return distanceSquared <= radiusSquared;
         }
     }
 }
