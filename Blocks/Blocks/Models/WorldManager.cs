@@ -277,9 +277,9 @@ namespace Willcraftia.Xna.Blocks.Models
             //camera.View.Position = new Vector3(0, 16 * 2, 0);
             defaultCamera.Projection.AspectRatio = GraphicsDevice.Viewport.AspectRatio;
 
-            // 最小アクティブ範囲を超えない位置へ FarPlaneDistance を設定。
+            // 最大アクティブ範囲を超えない位置へ FarPlaneDistance を設定。
             // パーティション (チャンク) のサイズを掛けておく。
-            defaultCamera.Projection.FarPlaneDistance = (chunkSettings.MinActiveRange - 1) * 16;
+            defaultCamera.Projection.FarPlaneDistance = (chunkSettings.MaxActiveRange - 1) * 16;
 
             // 念のためここで一度更新。
             defaultCamera.Update();
