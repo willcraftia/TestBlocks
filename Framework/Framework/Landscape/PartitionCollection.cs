@@ -23,21 +23,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// パーティションの取得を試行します。
-        /// </summary>
-        /// <param name="key">パーティションの位置。</param>
-        /// <param name="item">
-        /// パーティション、あるいは、パーティションが存在しない場合は null。
-        /// </param>
-        /// <returns>
-        /// true (パーティションが存在する場合)、false (それ以外の場合)。
-        /// </returns>
-        internal bool TryGetItem(ref VectorI3 key, out Partition item)
-        {
-            return Dictionary.TryGetValue(key, out item);
-        }
-
-        /// <summary>
         /// パーティションの位置をキーとして返します。
         /// </summary>
         /// <param name="item">パーティション。</param>

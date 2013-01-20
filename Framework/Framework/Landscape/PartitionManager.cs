@@ -722,7 +722,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
                     // このため、非アクティブ化待機中パーティションについても探索。
-                    if (!waitPassivations.TryGetItem(ref nearbyPosition, out neighbor))
+                    if (!waitPassivations.TryGet(nearbyPosition, out neighbor))
                         continue;
                 }
 
@@ -746,7 +746,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
                     // このため、非アクティブ化待機中パーティションについても探索。
-                    if (!waitPassivations.TryGetItem(ref nearbyPosition, out neighbor))
+                    if (!waitPassivations.TryGet(nearbyPosition, out neighbor))
                         continue;
                 }
 
