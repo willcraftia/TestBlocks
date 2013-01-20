@@ -115,7 +115,12 @@ namespace Willcraftia.Xna.Blocks.Models
             //p.Z = reader.ReadInt32();
 
             for (int i = 0; i < blockIndices.Length; i++)
-                blockIndices[i] = reader.ReadByte();
+            {
+                var value = reader.ReadByte();
+                blockIndices[i] = value;
+
+                if (value != Block.EmptyIndex) SolidCount++;
+            }
         }
 
         public void Write(BinaryWriter writer)
