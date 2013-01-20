@@ -197,11 +197,11 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 指定の位置を含むリージョンがある場合、アクティブ化可能であると判定します。
         /// </summary>
-        protected override bool CanActivatePartition(ref VectorI3 position)
+        protected override bool CanActivatePartition(VectorI3 position)
         {
             if (!regionManager.RegionExists(ref position)) return false;
 
-            return base.CanActivatePartition(ref position);
+            return base.CanActivatePartition(position);
         }
 
         /// <summary>
@@ -268,7 +268,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var chunkPosition = waitBuildVerticesQueue.Peek();
 
                 // アクティブ チャンクを取得。
-                var chunk = GetChunk(ref chunkPosition);
+                var chunk = GetChunk(chunkPosition);
                 if (chunk == null)
                 {
                     // 存在しない場合はメッシュ更新要求を取り消す。
@@ -351,7 +351,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         closePosition.Y += y;
                         closePosition.Z += z;
 
-                        verticesBuilder.CloseChunks[x, y, z] = GetChunk(ref closePosition);
+                        verticesBuilder.CloseChunks[x, y, z] = GetChunk(closePosition);
                     }
                 }
             }
@@ -395,9 +395,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <returns>
         /// チャンク、あるいは、指定の位置にチャンクが存在しない場合は null。
         /// </returns>
-        Chunk GetChunk(ref VectorI3 position)
+        Chunk GetChunk(VectorI3 position)
         {
-            return ActivePartitions[position] as Chunk;
+            return GetActivePartition(position) as Chunk;
         }
 
         ChunkData CreateData()
