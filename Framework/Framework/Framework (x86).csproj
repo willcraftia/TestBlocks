@@ -163,6 +163,7 @@
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\VertexPositionNormal.cs" />
     <Compile Include="Graphics\VertexPositionNormalColorTexture.cs" />
+    <Compile Include="Landscape\ClusteredPartitionList.cs" />
     <Compile Include="Landscape\ClusteredPartitionQueue.cs" />
     <Compile Include="Landscape\Cluster.cs" />
     <Compile Include="Landscape\ClusterManager.cs" />

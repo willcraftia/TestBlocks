@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework;
@@ -63,6 +64,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal Action PassivateAction;
 
+        internal LinkedListNode<Partition> ListNode;
+
         /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
@@ -76,6 +79,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             ActivateAction = new Action(Activate);
             PassivateAction = new Action(Passivate);
+            ListNode = new LinkedListNode<Partition>(this);
         }
 
         /// <summary>

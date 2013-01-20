@@ -398,9 +398,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// アクティブなパーティションのキュー。
+        /// アクティブなパーティションのリスト。
         /// </summary>
-        protected ClusteredPartitionQueue ActivePartitions { get; private set; }
+        protected ClusteredPartitionList ActivePartitions { get; private set; }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -420,7 +420,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             partitionPool = new Pool<Partition>(CreatePartition);
             partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
 
-            ActivePartitions = new ClusteredPartitionQueue(
+            ActivePartitions = new ClusteredPartitionList(
                 settings.ClusterSize,
                 settings.PartitionSize,
                 settings.ActiveClusterCapacity,
@@ -552,14 +552,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="collector">収集先パーティションのコレクション。</param>
         public void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
         {
-            foreach (var cluster in ActivePartitions.Clusters)
-            {
-                bool intersected;
-                frustum.Intersects(ref cluster.BoundingBox, out intersected);
-
-                // クラスタが境界錐台と交差するなら、クラスタに含まれるパーティションを収集。
-                if (intersected) cluster.CollectPartitions(frustum, collector);
-            }
+            ActivePartitions.Collect(frustum, collector);
         }
 
         /// <summary>
@@ -662,7 +655,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // アクティブ リストへ追加。
-                ActivePartitions.Enqueue(partition);
+                ActivePartitions.AddLast(partition.ListNode);
 
                 // 完了を通知。
                 partition.OnActivated();
@@ -682,7 +675,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = ActivePartitions.GetPartition(ref nearbyPosition);
+                var neighbor = ActivePartitions[nearbyPosition];
                 if (neighbor == null)
                 {
                     // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
@@ -706,7 +699,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = ActivePartitions.GetPartition(ref nearbyPosition);
+                var neighbor = ActivePartitions[nearbyPosition];
                 if (neighbor == null)
                 {
                     // 非アクティブ化待機中パーティションは、待機取消が発生する可能性がある。
@@ -771,19 +764,23 @@ namespace Willcraftia.Xna.Framework.Landscape
         void PassivatePartitions(GameTime gameTime)
         {
             int count = Math.Min(ActivePartitions.Count, passivationSearchCapacity);
+
             for (int i = 0; i < count; i++)
             {
                 // 同時待機許容数を越えるならば終了。
                 if (waitPassivationCapacity <= waitPassivations.Count) break;
 
-                var partition = ActivePartitions.Dequeue();
+                var node = ActivePartitions.First;
+                ActivePartitions.RemoveFirst();
+
+                var partition = node.Value;
 
                 if (!Closing)
                 {
                     if (partition.IsInLandscapeVolume(maxLandscapeVolume))
                     {
                         // アクティブ状態維持領域内ならばアクティブ リストへ戻す。
-                        ActivePartitions.Enqueue(partition);
+                        ActivePartitions.AddLast(node);
                         continue;
                     }
                 }
@@ -856,7 +853,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var position = eyePosition + minActivePointOffsets[index++];
 
                 // 既にアクティブならばスキップ。
-                if (ActivePartitions.Contains(ref position)) continue;
+                if (ActivePartitions.Contains(position)) continue;
 
                 // 既に待機中ならばスキップ。
                 if (waitActivations.Contains(position)) continue;

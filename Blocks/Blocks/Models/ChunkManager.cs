@@ -397,7 +397,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </returns>
         Chunk GetChunk(ref VectorI3 position)
         {
-            return ActivePartitions.GetPartition(ref position) as Chunk;
+            return ActivePartitions[position] as Chunk;
         }
 
         ChunkData CreateData()
