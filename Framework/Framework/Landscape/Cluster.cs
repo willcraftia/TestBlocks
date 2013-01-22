@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Willcraftia.Xna.Framework.Collections;
 
 #endregion
 
@@ -19,20 +20,62 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     internal sealed class Cluster
     {
+        #region Collector
+
+        struct Collector
+        {
+            public Vector3 PartitionSize;
+
+            public Vector3 ClusterPositionWorld;
+
+            public BoundingFrustum Frustum;
+
+            public ICollection<Partition> List;
+
+            public bool IntersectFrustum(Octree<Partition>.Node node)
+            {
+                var relativePosition = new Vector3
+                {
+                    X = node.Origin.X * PartitionSize.X,
+                    Y = node.Origin.Y * PartitionSize.Y,
+                    Z = node.Origin.Z * PartitionSize.Z
+                };
+
+                var sizeWorld = PartitionSize * node.Size;
+                var positionWorld = ClusterPositionWorld + relativePosition;
+
+                var nodeBox = new BoundingBox
+                {
+                    Min = positionWorld,
+                    Max = positionWorld + sizeWorld
+                };
+
+                bool intersected;
+                Frustum.Intersects(ref nodeBox, out intersected);
+
+                return intersected;
+            }
+
+            public void Add(Octree<Partition>.Leaf leaf)
+            {
+                if (leaf.Item != null)
+                {
+                    List.Add(leaf.Item);
+                }
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// クラスタ空間におけるクラスタの位置。
         /// </summary>
         internal VectorI3 Position;
 
         /// <summary>
-        /// ワールド空間におけるクラスタの位置。
-        /// </summary>
-        internal Vector3 PositionWorld;
-
-        /// <summary>
         /// ワールド空間におけるクラスタの境界ボックス。
         /// </summary>
-        internal BoundingBox BoundingBox;
+        internal BoundingBox Box;
 
         /// <summary>
         /// クラスタ マネージャ。
@@ -40,17 +83,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         ClusterManager manager;
 
         /// <summary>
-        /// パーティションの位置をキーとするパーティションのディクショナリ。
+        /// パーティションを管理する八分木。
         /// </summary>
-        Dictionary<VectorI3, Partition> dictionary;
+        Octree<Partition> octree;
 
         /// <summary>
         /// パーティション数を取得します。
         /// </summary>
-        internal int Count
-        {
-            get { return dictionary.Count; }
-        }
+        internal int Count { get; private set; }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -62,8 +102,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             this.manager = manager;
 
-            var size = manager.Size;
-            dictionary = new Dictionary<VectorI3, Partition>(size.X * size.Y * size.Z);
+            octree = new Octree<Partition>(manager.Dimension);
         }
 
         /// <summary>
@@ -74,13 +113,16 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Position = position;
 
-            var sizeWorld = manager.SizeWorld;
-            PositionWorld.X = Position.X * sizeWorld.X;
-            PositionWorld.Y = Position.Y * sizeWorld.Y;
-            PositionWorld.Z = Position.Z * sizeWorld.Z;
+            var sizeWorld = manager.PartitionSize * manager.Dimension;
+            var positionWorld = new Vector3
+            {
+                X = Position.X * sizeWorld.X,
+                Y = Position.Y * sizeWorld.Y,
+                Z = Position.Z * sizeWorld.Z
+            };
 
-            BoundingBox.Min = PositionWorld;
-            BoundingBox.Max = PositionWorld + sizeWorld;
+            Box.Min = positionWorld;
+            Box.Max = positionWorld + sizeWorld;
         }
 
         /// <summary>
@@ -89,24 +131,25 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void Release()
         {
             Position = VectorI3.Zero;
-            PositionWorld = Vector3.Zero;
-            BoundingBox = BoundingBoxHelper.Empty;
+            Box = BoundingBoxHelper.Empty;
         }
 
         /// <summary>
         /// 境界錐台と交差するパーティションを収集します。
         /// </summary>
         /// <param name="frustum">境界錐台。</param>
-        /// <param name="collector">収集先パーティションのコレクション。</param>
-        internal void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
+        /// <param name="result">収集先パーティションのコレクション。</param>
+        internal void CollectPartitions(BoundingFrustum frustum, ICollection<Partition> result)
         {
-            foreach (var partition in dictionary.Values)
+            var collector = new Collector
             {
-                bool intersected;
-                frustum.Intersects(ref partition.BoundingBox, out intersected);
+                ClusterPositionWorld = Box.Min,
+                PartitionSize = manager.PartitionSize,
+                Frustum = frustum,
+                List = result,
+            };
 
-                if (intersected) collector.Add(partition as T);
-            }
+            octree.Execute(collector.Add, collector.IntersectFrustum);
         }
 
         /// <summary>
@@ -118,7 +161,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         internal bool Contains(VectorI3 position)
         {
-            return dictionary.ContainsKey(position);
+            var relativePosition = position - Position * manager.Dimension;
+            return octree.GetItem(relativePosition) != null;
         }
 
         /// <summary>
@@ -130,9 +174,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         internal Partition GetPartition(VectorI3 position)
         {
-            Partition result;
-            dictionary.TryGetValue(position, out result);
-            return result;
+            var relativePosition = position - Position * manager.Dimension;
+            return octree.GetItem(relativePosition);
         }
 
         /// <summary>
@@ -141,7 +184,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="partition">パーティション。</param>
         internal void Add(Partition partition)
         {
-            dictionary[partition.Position] = partition;
+            var relativePosition = partition.Position - Position * manager.Dimension;
+            octree.SetItem(relativePosition, partition);
+
+            Count++;
         }
 
         /// <summary>
@@ -150,7 +196,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="partition">パーティション。</param>
         internal void Remove(Partition partition)
         {
-            dictionary.Remove(partition.Position);
+            var relativePosition = partition.Position - Position * manager.Dimension;
+            octree.RemoveItem(relativePosition);
+
+            Count--;
         }
     }
 }

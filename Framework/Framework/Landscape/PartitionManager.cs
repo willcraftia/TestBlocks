@@ -242,6 +242,35 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         #endregion
 
+        #region PartitionQueue
+
+        /// <summary>
+        /// 位置による参照を可能とするパーティションのキューです。
+        /// </summary>
+        sealed class PartitionQueue : KeyedQueue<VectorI3, Partition>
+        {
+            /// <summary>
+            /// インスタンスを生成します。
+            /// </summary>
+            /// <param name="capacity">初期容量。</param>
+            internal PartitionQueue(int capacity)
+                : base(capacity)
+            {
+            }
+
+            /// <summary>
+            /// パーティションの位置をキーとして返します。
+            /// </summary>
+            /// <param name="item">パーティション。</param>
+            /// <returns>パーティションの位置。</returns>
+            protected override VectorI3 GetKeyForItem(Partition item)
+            {
+                return item.Position;
+            }
+        }
+
+        #endregion
+
         public const string MonitorUpdate = "PartitionManager.Update";
 
         /// <summary>
@@ -297,12 +326,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// アクティブ化実行キュー。
         /// </summary>
-        Queue<Partition> activations;
+        PartitionQueue activations;
 
         /// <summary>
         /// 非アクティブ化実行キュー。
         /// </summary>
-        Queue<Partition> passivations;
+        PartitionQueue passivations;
 
         int activePartitionCapacity;
 
@@ -376,6 +405,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         Vector3 eyePositionWorld;
 
+        Matrix view;
+
+        Matrix projection;
+
+        PartitionOctree octree;
+
         /// <summary>
         /// クローズ処理中であるか否かを示す値を取得します。
         /// </summary>
@@ -442,7 +477,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             partitionPool = new Pool<Partition>(CreatePartition);
             partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
 
-            clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize, settings.ActiveClusterCapacity);
+            // TODO
+            clusterManager = new ClusterManager(16, settings.PartitionSize, settings.ActiveClusterCapacity);
             partitions = new LinkedList<Partition>();
             lruPartitions = new LinkedList<Partition>();
 
@@ -455,8 +491,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             waitActivations = new PartitionCollection(waitActivationCapacity);
             waitPassivations = new PartitionCollection(waitPassivationCapacity);
 
-            activations = new Queue<Partition>(activationCapacity);
-            passivations = new Queue<Partition>(passivationCapacity);
+            activations = new PartitionQueue(activationCapacity);
+            passivations = new PartitionQueue(passivationCapacity);
 
             activationTaskQueue.SlotCount = activationCapacity;
             passivationTaskQueue.SlotCount = passivationCapacity;
@@ -474,6 +510,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             activationSearchCapacity = settings.ActivationSearchCapacity;
             passivationSearchCapacity = settings.PassivationSearchCapacity;
+
+            octree = new PartitionOctree(512, 16);
         }
 
         /// <summary>
@@ -481,20 +519,26 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
         /// <param name="eyePositionWorld">ワールド空間における視点の位置。</param>
-        public void Update(GameTime gameTime, Vector3 eyePositionWorld)
+        public void Update(GameTime gameTime, Matrix view, Matrix projection)
         {
             if (Closed) return;
 
             Monitor.Begin(MonitorUpdate);
 
-            this.eyePositionWorld = eyePositionWorld;
+            this.view = view;
+            this.projection = projection;
 
-            eyePosition.X = MathExtension.Floor(eyePositionWorld.X * inversePartitionSize.X);
-            eyePosition.Y = MathExtension.Floor(eyePositionWorld.Y * inversePartitionSize.Y);
-            eyePosition.Z = MathExtension.Floor(eyePositionWorld.Z * inversePartitionSize.Z);
+            this.eyePositionWorld = View.GetPosition(view);
+
+            eyePosition.X = (int) Math.Floor(eyePositionWorld.X * inversePartitionSize.X);
+            eyePosition.Y = (int) Math.Floor(eyePositionWorld.Y * inversePartitionSize.Y);
+            eyePosition.Z = (int) Math.Floor(eyePositionWorld.Z * inversePartitionSize.Z);
 
             // アクティブ領域を現在の視点位置を中心に設定。
             maxLandscapeVolume.Center = eyePosition;
+
+            // 八分木の境界錐台を更新。
+            octree.Update(view, projection);
 
             if (!Closing)
             {
@@ -570,10 +614,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 境界錐台と交差するパーティションを収集します。
         /// </summary>
         /// <param name="frustum">境界錐台。</param>
-        /// <param name="collector">収集先パーティションのコレクション。</param>
-        public void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
+        /// <param name="result">収集先パーティションのコレクション。</param>
+        public void CollectPartitions(BoundingFrustum frustum, ICollection<Partition> result)
         {
-            clusterManager.Collect(frustum, collector);
+            clusterManager.Collect(frustum, result);
         }
 
         /// <summary>
@@ -808,29 +852,32 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         void PassivatePartitions(GameTime gameTime)
         {
-            while (activePartitionCapacity < lruPartitions.Count)
-            {
-                // 同時待機許容数を越えるならば終了。
-                if (waitPassivationCapacity <= waitPassivations.Count) break;
+            //while (activePartitionCapacity < lruPartitions.Count)
+            //{
+            //    // 同時待機許容数を越えるならば終了。
+            //    if (waitPassivationCapacity <= waitPassivations.Count) break;
 
-                var node = lruPartitions.First;
-                var partition = node.Value;
+            //    var node = lruPartitions.First;
+            //    var partition = node.Value;
 
-                if (minLandscapeVolume.Contains(partition.Position))
-                {
-                    // 最小アクティブ領域内ならば非アクティブ化しない。
-                    // ここで強制的に利用した状態としてマーク。
-                    TouchPartition(partition);
-                    continue;
-                }
+            //    if (minLandscapeVolume.Contains(partition.Position))
+            //    {
+            //        // 最小アクティブ領域内ならば非アクティブ化しない。
+            //        // ここで強制的に利用した状態としてマーク。
+            //        TouchPartition(partition);
+            //        continue;
+            //    }
 
-                clusterManager.RemovePartition(partition);
-                partitions.Remove(partition.ListNode);
-                lruPartitions.RemoveFirst();
+            //    clusterManager.RemovePartition(partition);
+            //    partitions.Remove(partition.ListNode);
+            //    lruPartitions.RemoveFirst();
 
-                // 待機リストへ追加。
-                waitPassivations.Add(partition);
-            }
+            //    // アクティブ化待機リストにあるならばそれを削除。
+            //    waitActivations.Remove(partition);
+
+            //    // 待機リストへ追加。
+            //    waitPassivations.Add(partition);
+            //}
 
             int count = Math.Min(partitions.Count, passivationSearchCapacity);
 
@@ -846,12 +893,19 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (maxLandscapeVolume.Contains(partition.Position))
+                    if (octree.Contains(partition.PositionWorld - eyePositionWorld))
                     {
-                        // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.AddLast(node);
                         continue;
                     }
+
+                    //if (maxLandscapeVolume.Contains(partition.Position))
+                    ////if (minLandscapeVolume.Contains(partition.Position))
+                    //{
+                    //    // アクティブ状態維持領域内ならばリストへ戻す。
+                    //    partitions.AddLast(node);
+                    //    continue;
+                    //}
                 }
 
                 // アクティブではない状態にする。
@@ -895,6 +949,49 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
         }
 
+        void TryActivate(PartitionOctree.Leaf leaf)
+        {
+            // ここで制御すると、視点近隣以外のノードで待機リストが占有されてしまう。
+            //if (waitActivationCapacity <= waitActivations.Count) return;
+
+            var position = eyePosition + leaf.PartitionOffset;
+
+            // 既にアクティブならばスキップ。
+            if (clusterManager.ContainsPartition(position)) return;
+
+            // 既に実行中ならばスキップ。
+            if (activations.Contains(position)) return;
+
+            // 既に待機中ならばスキップ。
+            if (waitActivations.Contains(position)) return;
+
+            // 非アクティブ化待機中ならばそれを破棄。
+            if (waitPassivations.Contains(position))
+                waitPassivations.Remove(position);
+
+            // アクティブ化可能であるかどうか。
+            if (!CanActivatePartition(position)) return;
+
+            // プールからパーティションを取得。
+            // プール枯渇ならば終了。
+            var partition = partitionPool.Borrow();
+            
+            // TODO
+            if (partition == null) return;
+
+            // パーティションを初期化。
+            if (partition.Initialize(position, partitionSize))
+            {
+                // 待機リストへ追加。
+                waitActivations.Add(partition);
+            }
+            else
+            {
+                // 初期化失敗ならば取消。
+                partitionPool.Return(partition);
+            }
+        }
+
         /// <summary>
         /// パーティションのアクティブ化を試行します。
         /// アクティブ化すべきと判定されたパーティションは、
@@ -906,57 +1003,61 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         void ActivatePartitions(GameTime gameTime)
         {
-            int index = activationSearchOffset;
-            bool cycled = false;
-            for (int i = 0; i < activationSearchCapacity; i++)
-            {
-                // 同時待機許容数を越えるならば処理終了。
-                if (waitActivationCapacity <= waitActivations.Count) break;
+            octree.Execute(TryActivate);
 
-                // index が末尾に到達したら先頭へ戻し、循環したとしてマーク。
-                if (minActivePointOffsets.Length <= index)
-                {
-                    index = 0;
-                    cycled = true;
-                }
+            //int index = activationSearchOffset;
+            //bool cycled = false;
+            //for (int i = 0; i < activationSearchCapacity; i++)
+            //{
+            //    // 同時待機許容数を越えるならば処理終了。
+            //    if (waitActivationCapacity <= waitActivations.Count) break;
 
-                // 循環かつ最初のオフセットに到達しているならば処理終了。
-                if (cycled && activationSearchOffset <= index) break;
+            //    // index が末尾に到達したら先頭へ戻し、循環したとしてマーク。
+            //    if (minActivePointOffsets.Length <= index)
+            //    {
+            //        index = 0;
+            //        cycled = true;
+            //    }
 
-                var position = eyePosition + minActivePointOffsets[index++];
+            //    // 循環かつ最初のオフセットに到達しているならば処理終了。
+            //    if (cycled && activationSearchOffset <= index) break;
 
-                // 既にアクティブならばスキップ。
-                if (clusterManager.ContainsPartition(position)) continue;
+            //    var position = eyePosition + minActivePointOffsets[index++];
 
-                // 既に待機中ならばスキップ。
-                if (waitActivations.Contains(position)) continue;
+            //    // 既にアクティブならばスキップ。
+            //    if (clusterManager.ContainsPartition(position)) continue;
 
-                // 非アクティブ化待機中ならばそれを破棄。
-                if (waitPassivations.Contains(position))
-                    waitPassivations.Remove(position);
+            //    // TODO: 実行中もスキップ。
 
-                // アクティブ化可能であるかどうか。
-                if (!CanActivatePartition(position)) continue;
+            //    // 既に待機中ならばスキップ。
+            //    if (waitActivations.Contains(position)) continue;
 
-                // プールからパーティションを取得。
-                // プール枯渇ならば終了。
-                var partition = partitionPool.Borrow();
-                if (partition == null) break;
+            //    // 非アクティブ化待機中ならばそれを破棄。
+            //    if (waitPassivations.Contains(position))
+            //        waitPassivations.Remove(position);
 
-                // パーティションを初期化。
-                if (partition.Initialize(position, partitionSize))
-                {
-                    // 待機リストへ追加。
-                    waitActivations.Add(partition);
-                }
-                else
-                {
-                    // 初期化失敗ならば取消。
-                    partitionPool.Return(partition);
-                }
-            }
+            //    // アクティブ化可能であるかどうか。
+            //    if (!CanActivatePartition(position)) continue;
 
-            activationSearchOffset = index;
+            //    // プールからパーティションを取得。
+            //    // プール枯渇ならば終了。
+            //    var partition = partitionPool.Borrow();
+            //    if (partition == null) break;
+
+            //    // パーティションを初期化。
+            //    if (partition.Initialize(position, partitionSize))
+            //    {
+            //        // 待機リストへ追加。
+            //        waitActivations.Add(partition);
+            //    }
+            //    else
+            //    {
+            //        // 初期化失敗ならば取消。
+            //        partitionPool.Return(partition);
+            //    }
+            //}
+
+            //activationSearchOffset = index;
         }
 
         /// <summary>

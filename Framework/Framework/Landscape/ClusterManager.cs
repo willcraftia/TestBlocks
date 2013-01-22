@@ -16,13 +16,14 @@ namespace Willcraftia.Xna.Framework.Landscape
     {
         /// <summary>
         /// パーティション空間におけるクラスタのサイズ。
+        /// 八分木の寸法であり 2^n でなければならない。
         /// </summary>
-        internal readonly VectorI3 Size;
+        internal readonly int Dimension;
 
         /// <summary>
-        /// ワールド空間におけるクラスタのサイズ。
+        /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
-        internal readonly Vector3 SizeWorld;
+        internal readonly Vector3 PartitionSize;
 
         /// <summary>
         /// クラスタのプール。
@@ -45,25 +46,22 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="size">パーティション空間におけるクラスタのサイズ。</param>
+        /// <param name="dimension">
+        /// パーティション空間におけるクラスタのサイズ。
+        /// 八分木の寸法であり 2^n でなければならない。
+        /// </param>
         /// <param name="partitionSize">ワールド空間におけるパーティションのサイズ。</param>
         /// <param name="capacity">クラスタの初期容量。</param>
-        internal ClusterManager(VectorI3 size, Vector3 partitionSize, int capacity)
+        internal ClusterManager(int dimension, Vector3 partitionSize, int capacity)
         {
-            if (size.X < 1 || size.Y < 1 || size.X < 1) throw new ArgumentOutOfRangeException("size");
+            if (((dimension - 1) & dimension) != 0) throw new ArgumentException("dimension must be a power of 2.");
             if (partitionSize.X < 0 || partitionSize.Y < 0 || partitionSize.X < 0)
                 throw new ArgumentOutOfRangeException("size");
             if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
 
-            Size = size;
-
-            SizeWorld = new Vector3
-            {
-                X = size.X * partitionSize.X,
-                Y = size.Y * partitionSize.Y,
-                Z = size.Z * partitionSize.Z,
-            };
-
+            Dimension = dimension;
+            PartitionSize = partitionSize;
+        
             clusterPool = new Pool<Cluster>(CreateCluster);
             clusters = new ClusterCollection(capacity);
         }
@@ -72,16 +70,16 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 境界錐台と交差するパーティションを収集します。
         /// </summary>
         /// <param name="frustum">境界錐台。</param>
-        /// <param name="collector">収集先パーティションのコレクション。</param>
-        internal void Collect<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
+        /// <param name="result">収集先パーティションのコレクション。</param>
+        internal void Collect(BoundingFrustum frustum, ICollection<Partition> result)
         {
             foreach (var cluster in clusters)
             {
                 bool intersected;
-                frustum.Intersects(ref cluster.BoundingBox, out intersected);
+                frustum.Intersects(ref cluster.Box, out intersected);
 
                 // クラスタが境界錐台と交差するなら、クラスタに含まれるパーティションを収集。
-                if (intersected) cluster.CollectPartitions(frustum, collector);
+                if (intersected) cluster.CollectPartitions(frustum, result);
             }
         }
 
@@ -188,9 +186,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             result = new VectorI3
             {
-                X = MathExtension.Floor(position.X / (float) Size.X),
-                Y = MathExtension.Floor(position.Y / (float) Size.Y),
-                Z = MathExtension.Floor(position.Z / (float) Size.Z)
+                X = (int) Math.Floor(position.X / (float) Dimension),
+                Y = (int) Math.Floor(position.Y / (float) Dimension),
+                Z = (int) Math.Floor(position.Z / (float) Dimension)
             };
         }
 
