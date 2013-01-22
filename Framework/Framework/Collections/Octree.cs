@@ -92,7 +92,7 @@ namespace Willcraftia.Xna.Framework.Collections
             /// </summary>
             /// <param name="point">八分木空間における子ノードの位置。</param>
             /// <returns>子ノード。</returns>
-            internal Node GetChild(ref VectorI3 point)
+            internal Node GetChild(VectorI3 point)
             {
                 var relative = point - Origin;
                 var halfSize = Size / 2;
@@ -128,14 +128,6 @@ namespace Willcraftia.Xna.Framework.Collections
 
         #endregion
 
-        // 原点もほぼ整数で扱うと思うが、
-        // 要素取得で使用する座標が float であるため、計算のしやすさから float。
-        
-        /// <summary>
-        /// ワールド空間における八分木の原点位置。
-        /// </summary>
-        Vector3 origin;
-
         // 整数で寸法を決めたいので int。float にすると計算が面倒。
 
         /// <summary>
@@ -156,15 +148,6 @@ namespace Willcraftia.Xna.Framework.Collections
         Node root;
 
         /// <summary>
-        /// ワールド空間における八分木の原点位置を取得または設定します。
-        /// </summary>
-        public Vector3 Origin
-        {
-            get { return origin; }
-            set { origin = value; }
-        }
-
-        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="dimension">ワールド空間における八分木の寸法。</param>
@@ -180,212 +163,38 @@ namespace Willcraftia.Xna.Framework.Collections
             root = new Branch(VectorI3.Zero, dimension / itemSize);
         }
 
-        /// <summary>
-        /// ワールド空間における指定の位置が八分木に含まれるか否かを判定します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <returns>
-        /// true (八分木に含まれる場合)、false (それ以外の場合)。
-        /// </returns>
-        public bool Contains(Vector3 position)
+        public T GetItem(VectorI3 point)
         {
-            bool result;
-            Contains(ref position, out result);
-            return result;
+            return GetLeaf(ref point).Item;
         }
 
-        /// <summary>
-        /// ワールド空間における指定の位置が八分木に含まれるか否かを判定します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <param name="result">
-        /// true (八分木に含まれる場合)、false (それ以外の場合)。
-        /// </param>
-        public void Contains(ref Vector3 position, out bool result)
+        public void SetItem(VectorI3 point, T item)
         {
-            // ワールド空間における八分木の原点からの相対位置。
-            var relative = position - origin;
-
-            // 範囲外か否か。
-            if (relative.X < 0 || dimension <= relative.X ||
-                relative.Y < 0 || dimension <= relative.Y ||
-                relative.Z < 0 || dimension <= relative.Z)
-            {
-                result = false;
-            }
-            else
-            {
-                result = true;
-            }
+            GetLeaf(ref point).Item = item;
         }
 
-        /// <summary>
-        /// ワールド空間における指定の位置にある要素を取得します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <returns>要素。</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// position が八分木の範囲外である場合。
-        /// </exception>
-        public T GetItem(Vector3 position)
+        public void RemoveItem(VectorI3 point)
         {
-            T result;
-            GetItem(ref position, out result);
-            return result;
+            GetLeaf(ref point).Item = default(T);
         }
 
-        /// <summary>
-        /// ワールド空間における指定の位置にある要素を取得します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <param name="result">要素。</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// position が八分木の範囲外である場合。
-        /// </exception>
-        public void GetItem(ref Vector3 position, out T result)
+        Leaf GetLeaf(ref VectorI3 point)
         {
-            // ワールド空間における八分木の原点からの相対位置。
-            var relative = position - origin;
-
-            // 範囲外か否か。
-            if (relative.X < 0 || dimension <= relative.X ||
-                relative.Y < 0 || dimension <= relative.Y ||
-                relative.Z < 0 || dimension <= relative.Z)
-                throw new ArgumentOutOfRangeException("position");
-
-            // 八分木空間での位置。
-            var point = new VectorI3
-            {
-                X = (int) (relative.X / itemSize),
-                Y = (int) (relative.Y / itemSize),
-                Z = (int) (relative.Z / itemSize)
-            };
+            if (point.X < 0 || dimension <= point.X) throw new ArgumentOutOfRangeException("point");
+            if (point.Y < 0 || dimension <= point.Y) throw new ArgumentOutOfRangeException("point");
+            if (point.Z < 0 || dimension <= point.Z) throw new ArgumentOutOfRangeException("point");
 
             var node = root;
-
             while (true)
             {
                 var branch = node as Branch;
                 if (branch != null)
                 {
-                    node = branch.GetChild(ref point);
+                    node = branch.GetChild(point);
                 }
                 else
                 {
-                    result = (node as Leaf).Item;
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// ワールド空間における指定の位置に要素を設定します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <param name="item">要素。</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// position が八分木の範囲外である場合。
-        /// </exception>
-        public void SetItem(Vector3 position, T item)
-        {
-            SetItem(ref position, ref item);
-        }
-
-        /// <summary>
-        /// ワールド空間における指定の位置に要素を設定します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <param name="item">要素。</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// position が八分木の範囲外である場合。
-        /// </exception>
-        public void SetItem(ref Vector3 position, ref T item)
-        {
-            // ワールド空間における八分木の原点からの相対位置。
-            var relative = position - origin;
-
-            // 範囲外か否か。
-            if (relative.X < 0 || dimension <= relative.X ||
-                relative.Y < 0 || dimension <= relative.Y ||
-                relative.Z < 0 || dimension <= relative.Z)
-                throw new ArgumentOutOfRangeException("position");
-
-            // 八分木空間での位置。
-            var point = new VectorI3
-            {
-                X = (int) (relative.X / itemSize),
-                Y = (int) (relative.Y / itemSize),
-                Z = (int) (relative.Z / itemSize)
-            };
-
-            var node = root;
-
-            while (true)
-            {
-                var branch = node as Branch;
-                if (branch != null)
-                {
-                    node = branch.GetChild(ref point);
-                }
-                else
-                {
-                    (node as Leaf).Item = item;
-                    return;
-                }
-            }
-        }
-
-        /// <summary>
-        /// ワールド空間における指定の位置にある要素を削除します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// position が八分木の範囲外である場合。
-        /// </exception>
-        public void Remove(Vector3 position)
-        {
-            Remove(ref position);
-        }
-
-        /// <summary>
-        /// ワールド空間における指定の位置にある要素を削除します。
-        /// </summary>
-        /// <param name="position">ワールド空間における位置。</param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// position が八分木の範囲外である場合。
-        /// </exception>
-        public void Remove(ref Vector3 position)
-        {
-            // ワールド空間における八分木の原点からの相対位置。
-            var relative = position - origin;
-
-            // 範囲外か否か。
-            if (relative.X < 0 || dimension <= relative.X ||
-                relative.Y < 0 || dimension <= relative.Y ||
-                relative.Z < 0 || dimension <= relative.Z)
-                throw new ArgumentOutOfRangeException("position");
-
-            // 八分木空間での位置。
-            var point = new VectorI3
-            {
-                X = (int) (relative.X / itemSize),
-                Y = (int) (relative.Y / itemSize),
-                Z = (int) (relative.Z / itemSize)
-            };
-
-            var node = root;
-
-            while (true)
-            {
-                var branch = node as Branch;
-                if (branch != null)
-                {
-                    node = branch.GetChild(ref point);
-                }
-                else
-                {
-                    (node as Leaf).Item = default(T);
-                    return;
+                    return (node as Leaf);
                 }
             }
         }
