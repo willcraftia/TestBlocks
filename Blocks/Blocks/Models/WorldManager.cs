@@ -31,7 +31,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         BasicCamera defaultCamera = new BasicCamera("Default");
 
-        List<Chunk> visibleChunks = new List<Chunk>();
+        List<Partition> visibleChunks = new List<Partition>();
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -345,7 +345,8 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク マネージャ
 
-            ChunkManager.Update(gameTime, SceneManager.ActiveCamera.View.Position);
+            //ChunkManager.Update(gameTime, SceneManager.ActiveCamera.View.Position);
+            ChunkManager.Update(gameTime, SceneManager.ActiveCamera.View.Matrix, SceneManager.ActiveCamera.Projection.Matrix);
 
             //----------------------------------------------------------------
             // リージョン マネージャ
@@ -362,7 +363,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             ChunkManager.CollectPartitions(SceneManager.ActiveCamera.Frustum, visibleChunks);
 
-            foreach (var chunk in visibleChunks)
+            foreach (Chunk chunk in visibleChunks)
             {
                 ChunkManager.TouchPartition(chunk);
 
@@ -428,7 +429,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
-            foreach (var chunk in visibleChunks)
+            foreach (Chunk chunk in visibleChunks)
                 DebugDrawChunkBoundingBox(chunk);
 
             GraphicsDevice.SetRenderTarget(null);
