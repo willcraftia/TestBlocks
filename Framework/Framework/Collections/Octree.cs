@@ -7,6 +7,15 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Framework.Collections
 {
+    /// <summary>
+    /// 八分木で要素を管理するクラスです。
+    /// この八分木では、八分木を利用する空間のスケールによらず、
+    /// 八分木によるノードの分割およびノードの管理のみを実装しています。
+    /// つまり、要素の取得と設定では、八分木内部で定まるノード位置 (三次元のインデックス) を用います。
+    /// このため、ある空間をこの八分木実装で分割管理したい場合、
+    /// その空間における位置を八分木における位置へ変換してから利用する必要があります。
+    /// </summary>
+    /// <typeparam name="T">リーフ ノードに設定する要素の型。</typeparam>
     public sealed class Octree<T>
     {
         #region Node
@@ -128,15 +137,10 @@ namespace Willcraftia.Xna.Framework.Collections
 
         #endregion
 
-        // 整数で寸法を決めたいので int。float にすると計算が面倒。
-
         /// <summary>
-        /// ワールド空間における八分木の寸法。
-        /// 2^n でなければならない。
+        /// 八分木の寸法。2^n でなければならない。
         /// </summary>
         int dimension;
-
-        // 整数で要素サイズを決めたいので int。float にすると計算が面倒。
 
         /// <summary>
         /// ルート ノード。
@@ -144,9 +148,29 @@ namespace Willcraftia.Xna.Framework.Collections
         Branch root;
 
         /// <summary>
+        /// 指定の位置について要素を取得または設定します。
+        /// </summary>
+        /// <param name="point">八分木空間における位置。</param>
+        /// <returns>
+        /// 要素。
+        /// 取得時は、要素が設定されていない場合は型 T のデフォルト。
+        /// </returns>
+        public T this[VectorI3 point]
+        {
+            get
+            {
+                return GetLeaf(ref point).Item;
+            }
+            set
+            {
+                GetLeaf(ref point).Item = value;
+            }
+        }
+
+        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="dimension">ワールド空間における八分木の寸法。</param>
+        /// <param name="dimension">八分木の寸法。2^n でなければならない。</param>
         public Octree(int dimension)
         {
             if (dimension < 1) throw new ArgumentOutOfRangeException("dimension");
@@ -157,12 +181,25 @@ namespace Willcraftia.Xna.Framework.Collections
             root = new Branch(VectorI3.Zero, dimension);
         }
 
+        /// <summary>
+        /// 指定の Predicate 従ってノードを探索し、リーフ ノードに到達できた場合、
+        /// 指定の Action を実行します。
+        /// </summary>
+        /// <param name="action">到達できたリーフ ノードで実行するメソッド。</param>
+        /// <param name="predicate">探索するノードを定める述語。</param>
         public void Execute(Action<Leaf> action, Predicate<Node> predicate)
         {
             if (predicate(root))
                 Execute(root, action, predicate);
         }
 
+        /// <summary>
+        /// 指定の Predicate 従ってノードを探索し、リーフ ノードに到達できた場合、
+        /// 指定の Action を実行します。
+        /// </summary>
+        /// <param name="branch">探索の基点とするブランチ ノード。</param>
+        /// <param name="action">到達できたリーフ ノードで実行するメソッド。</param>
+        /// <param name="predicate">探索するノードを定める述語。</param>
         void Execute(Branch branch, Action<Leaf> action, Predicate<Node> predicate)
         {
             foreach (var child in branch.Children)
@@ -182,21 +219,21 @@ namespace Willcraftia.Xna.Framework.Collections
             }
         }
 
-        public T GetItem(VectorI3 point)
-        {
-            return GetLeaf(ref point).Item;
-        }
-
-        public void SetItem(VectorI3 point, T item)
-        {
-            GetLeaf(ref point).Item = item;
-        }
-
+        /// <summary>
+        /// 指定の位置にある要素を削除します。
+        /// このメソッドは、指定の位置へ型 T のデフォルトを設定します。
+        /// </summary>
+        /// <param name="point">八分木空間における位置。</param>
         public void RemoveItem(VectorI3 point)
         {
             GetLeaf(ref point).Item = default(T);
         }
 
+        /// <summary>
+        /// 指定の位置にあるリーフ ノードを取得します。
+        /// </summary>
+        /// <param name="point">八分木空間における位置。</param>
+        /// <returns>リーフ ノード。</returns>
         Leaf GetLeaf(ref VectorI3 point)
         {
             if (point.X < 0 || dimension <= point.X) throw new ArgumentOutOfRangeException("point");

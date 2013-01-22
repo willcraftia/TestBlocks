@@ -162,7 +162,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal bool Contains(VectorI3 position)
         {
             var relativePosition = position - Position * manager.Dimension;
-            return octree.GetItem(relativePosition) != null;
+            return octree[relativePosition] != null;
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal Partition GetPartition(VectorI3 position)
         {
             var relativePosition = position - Position * manager.Dimension;
-            return octree.GetItem(relativePosition);
+            return octree[relativePosition];
         }
 
         /// <summary>
@@ -185,7 +185,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void Add(Partition partition)
         {
             var relativePosition = partition.Position - Position * manager.Dimension;
-            octree.SetItem(relativePosition, partition);
+            octree[relativePosition] = partition;
 
             Count++;
         }
