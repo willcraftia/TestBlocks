@@ -14,17 +14,17 @@ namespace Willcraftia.Xna.Framework.Collections
         /// <summary>
         /// ノードを表すクラスです。
         /// </summary>
-        abstract class Node
+        public abstract class Node
         {
             /// <summary>
             /// 八分木空間における原点位置。
             /// </summary>
-            protected readonly VectorI3 Origin;
+            public readonly VectorI3 Origin;
 
             /// <summary>
             /// 八分木空間におけるサイズ。
             /// </summary>
-            protected readonly int Size;
+            public readonly int Size;
 
             /// <summary>
             /// インスタンスを生成します。
@@ -49,10 +49,10 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             /// <summary>
             /// 子ノード。
-            /// 原点に最も近いノードが [0,0,0]、
-            /// 原点から最も遠いノードが [1,1,1]。
+            /// 原点に最も近いノードが (0,0,0)、
+            /// 原点から最も遠いノードが (1,1,1)。
             /// </summary>
-            readonly Node[,,] children;
+            internal readonly Node[, ,] Children;
 
             /// <summary>
             /// インスタンスを生成します。
@@ -62,7 +62,7 @@ namespace Willcraftia.Xna.Framework.Collections
             internal Branch(VectorI3 origin, int size)
                 : base(origin, size)
             {
-                children = new Node[2, 2, 2];
+                Children = new Node[2, 2, 2];
 
                 var childSize = size / 2;
 
@@ -76,11 +76,11 @@ namespace Willcraftia.Xna.Framework.Collections
 
                             if (childSize == 1)
                             {
-                                children[x, y, z] = new Leaf(childOrigin, childSize);
+                                Children[x, y, z] = new Leaf(childOrigin, childSize);
                             }
                             else
                             {
-                                children[x, y, z] = new Branch(childOrigin, childSize);
+                                Children[x, y, z] = new Branch(childOrigin, childSize);
                             }
                         }
                     }
@@ -100,7 +100,7 @@ namespace Willcraftia.Xna.Framework.Collections
                 var y = relative.Y / halfSize;
                 var z = relative.Z / halfSize;
 
-                return children[x, y, z];
+                return Children[x, y, z];
             }
         }
 
@@ -108,12 +108,12 @@ namespace Willcraftia.Xna.Framework.Collections
 
         #region Leaf
 
-        sealed class Leaf : Node
+        public sealed class Leaf : Node
         {
             /// <summary>
             /// 要素。
             /// </summary>
-            internal T Item;
+            public T Item;
 
             /// <summary>
             /// インスタンスを生成します。
@@ -132,35 +132,54 @@ namespace Willcraftia.Xna.Framework.Collections
 
         /// <summary>
         /// ワールド空間における八分木の寸法。
+        /// 2^n でなければならない。
         /// </summary>
         int dimension;
 
         // 整数で要素サイズを決めたいので int。float にすると計算が面倒。
 
         /// <summary>
-        /// ワールド空間における要素のサイズ (リーフ サイズ)。
-        /// </summary>
-        int itemSize;
-
-        /// <summary>
         /// ルート ノード。
         /// </summary>
-        Node root;
+        Branch root;
 
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="dimension">ワールド空間における八分木の寸法。</param>
-        /// <param name="itemSize">ワールド空間における要素のサイズ (リーフ サイズ)。</param>
-        public Octree(int dimension, int itemSize)
+        public Octree(int dimension)
         {
             if (dimension < 1) throw new ArgumentOutOfRangeException("dimension");
-            if (itemSize < 1) throw new ArgumentOutOfRangeException("itemSize");
+            if (((dimension - 1) & dimension) != 0) throw new ArgumentException("dimension must be a power of 2.");
 
             this.dimension = dimension;
-            this.itemSize = itemSize;
 
-            root = new Branch(VectorI3.Zero, dimension / itemSize);
+            root = new Branch(VectorI3.Zero, dimension);
+        }
+
+        public void Execute(Action<Leaf> action, Predicate<Node> predicate)
+        {
+            if (predicate(root))
+                Execute(root, action, predicate);
+        }
+
+        void Execute(Branch branch, Action<Leaf> action, Predicate<Node> predicate)
+        {
+            foreach (var child in branch.Children)
+            {
+                if (predicate(child))
+                {
+                    var leaf = child as Leaf;
+                    if (leaf != null)
+                    {
+                        action(leaf);
+                    }
+                    else
+                    {
+                        Execute(child as Branch, action, predicate);
+                    }
+                }
+            }
         }
 
         public T GetItem(VectorI3 point)
@@ -184,7 +203,7 @@ namespace Willcraftia.Xna.Framework.Collections
             if (point.Y < 0 || dimension <= point.Y) throw new ArgumentOutOfRangeException("point");
             if (point.Z < 0 || dimension <= point.Z) throw new ArgumentOutOfRangeException("point");
 
-            var node = root;
+            Node node = root;
             while (true)
             {
                 var branch = node as Branch;
