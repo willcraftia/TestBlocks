@@ -85,6 +85,11 @@ namespace Willcraftia.Xna.Framework.Collections
             dictionary.Clear();
         }
 
+        public bool TryGet(TKey key, out TItem item)
+        {
+            return dictionary.TryGetValue(key, out item);
+        }
+
         protected abstract TKey GetKeyForItem(TItem item);
 
         protected TKey GetKey(TItem item)
