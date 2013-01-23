@@ -105,6 +105,7 @@
     <Compile Include="Collections\LruDictionary.cs" />
     <Compile Include="Collections\Octree.cs" />
     <Compile Include="Collections\Pool.cs" />
+    <Compile Include="Collections\PriorityQueue.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentBundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />
