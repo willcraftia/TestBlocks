@@ -96,6 +96,7 @@
     <Compile Include="BoundingBoxHelper.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="CollectionHelper.cs" />
+    <Compile Include="Collections\ConcurrentKeyedQueue.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Collections\ConcurrentPriorityQueue.cs" />
     <Compile Include="Collections\CubicCollection.cs" />
