@@ -156,5 +156,34 @@ namespace Willcraftia.Xna.Framework.Collections
 
             return result;
         }
+
+        /// <summary>
+        /// 先頭の要素を削除せずに取得します。
+        /// </summary>
+        /// <returns>要素。</returns>
+        public T Peek()
+        {
+            return heap[0];
+        }
+
+        /// <summary>
+        /// 全ての要素を削除します。
+        /// </summary>
+        public void Clear()
+        {
+            heap.Clear();
+        }
+
+        /// <summary>
+        /// 指定の要素が存在するか否かを検査します。
+        /// </summary>
+        /// <param name="item">要素。</param>
+        /// <returns>
+        /// true (要素が存在する場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool Contains(T item)
+        {
+            return heap.Contains(item);
+        }
     }
 }

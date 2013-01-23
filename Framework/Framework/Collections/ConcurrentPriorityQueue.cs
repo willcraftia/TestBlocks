@@ -97,5 +97,34 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             lock (queue) return queue.Dequeue();
         }
+
+        /// <summary>
+        /// 先頭の要素を削除せずに取得します。
+        /// </summary>
+        /// <returns>要素。</returns>
+        public T Peek()
+        {
+            lock (queue) return queue.Peek();
+        }
+
+        /// <summary>
+        /// 全ての要素を削除します。
+        /// </summary>
+        public void Clear()
+        {
+            lock (queue) queue.Clear();
+        }
+
+        /// <summary>
+        /// 指定の要素が存在するか否かを検査します。
+        /// </summary>
+        /// <param name="item">要素。</param>
+        /// <returns>
+        /// true (要素が存在する場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool Contains(T item)
+        {
+            lock (queue) return queue.Contains(item);
+        }
     }
 }
