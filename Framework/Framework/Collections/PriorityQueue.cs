@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Framework.Collections
     // 参考: http://ufcpp.net/study/algorithm/col_heap.html
 
     /// <summary>
-    /// 優先度付きの先入れ先出しコレクションです。
+    /// 優先度付き待ち行列です。
     /// </summary>
     /// <typeparam name="T">キュー内の要素の型。</typeparam>
     public sealed class PriorityQueue<T> : IEnumerable<T>
