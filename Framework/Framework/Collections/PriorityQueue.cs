@@ -7,10 +7,15 @@ using System.Collections.Generic;
 
 namespace Willcraftia.Xna.Framework.Collections
 {
-    // 参考: http://ufcpp.net/study/algorithm/col_heap.html
-
     /// <summary>
     /// 優先度付き待ち行列です。
+    /// この待ち行列の先頭は、指定された順序付けにおける最小の要素です。
+    /// 
+    /// このクラスの実装は、下記サイトを参考にしています。
+    /// 
+    /// http://ufcpp.net/study/algorithm/col_heap.html
+    /// 
+    /// なお、上記サイトでは、指定された順序付けにおける最大の要素を待ち行列の先頭にしています。
     /// </summary>
     /// <typeparam name="T">キュー内の要素の型。</typeparam>
     public sealed class PriorityQueue<T> : IEnumerable<T>
@@ -117,7 +122,7 @@ namespace Willcraftia.Xna.Framework.Collections
             while (n != 0)
             {
                 var i = (n - 1) / 2;
-                if (0 < comparer.Compare(heap[n], heap[i]))
+                if (comparer.Compare(heap[n], heap[i]) < 0)
                 {
                     T temp = heap[n];
                     heap[n] = heap[i];
@@ -141,10 +146,10 @@ namespace Willcraftia.Xna.Framework.Collections
 
             for (int i = 0, j; (j = 2 * i + 1) < n; )
             {
-                if ((j != n - 1) && comparer.Compare(heap[j], heap[j + 1]) < 0)
+                if ((j != n - 1) && 0 < comparer.Compare(heap[j], heap[j + 1]))
                     j++;
 
-                if (comparer.Compare(heap[i], heap[j]) < 0)
+                if (0 < comparer.Compare(heap[i], heap[j]))
                 {
                     T temp = heap[j];
                     heap[j] = heap[i];
