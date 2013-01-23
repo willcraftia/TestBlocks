@@ -8,19 +8,26 @@ using System.Collections.Generic;
 namespace Willcraftia.Xna.Framework.Collections
 {
     /// <summary>
-    /// キーが値に埋め込まれているリストの抽象基本クラスです。
+    /// キーが要素に埋め込まれているリストの抽象基本クラスです。
     /// System.Collections.ObjectModel.KeyedCollection とは異なり、
-    /// 値のキーが null であることを許容しません。
+    /// キーが null であることを許容しません。
     /// また、初期容量をコンストラクタで指定でき、
     /// インスタンス後も Capacity プロパティによりリストの容量を任意に変更できます。
-    /// ただし、キー管理のための Dictionary の容量は、Dictionary に従います。
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TItem"></typeparam>
     public abstract class KeyedList<TKey, TItem> : ListBase<TItem>
     {
+        /// <summary>
+        /// キーと要素のディクショナリ。
+        /// </summary>
         Dictionary<TKey, TItem> dictionary;
 
+        /// <summary>
+        /// 指定のキーに対応する要素を取得します。
+        /// </summary>
+        /// <param name="key">キー。</param>
+        /// <returns>要素。</returns>
         public TItem this[TKey key]
         {
             get
@@ -30,22 +37,40 @@ namespace Willcraftia.Xna.Framework.Collections
             }
         }
 
+        /// <summary>
+        /// キーと要素のディクショナリを取得します。
+        /// </summary>
         protected IDictionary<TKey, TItem> Dictionary
         {
             get { return dictionary; }
         }
 
+        /// <summary>
+        /// インスタンスを生成します。
+        /// 初期容量には 4 を用います。
+        /// </summary>
         protected KeyedList()
         {
             dictionary = new Dictionary<TKey, TItem>(Capacity);
         }
 
+        /// <summary>
+        /// インスタンスを生成します。
+        /// </summary>
+        /// <param name="capacity">初期容量。</param>
         protected KeyedList(int capacity)
             : base(capacity)
         {
             dictionary = new Dictionary<TKey, TItem>(Capacity);
         }
 
+        /// <summary>
+        /// 指定のキーに対応する要素が存在するか否かを検査します。
+        /// </summary>
+        /// <param name="key">キー。</param>
+        /// <returns>
+        /// true (要素が存在する場合)、false (それ以外の場合)。
+        /// </returns>
         public bool Contains(TKey key)
         {
             if (key == null) throw new ArgumentNullException("key");
@@ -53,6 +78,13 @@ namespace Willcraftia.Xna.Framework.Collections
             return dictionary.ContainsKey(key);
         }
 
+        /// <summary>
+        /// 指定のキーに対応する要素を削除します。
+        /// </summary>
+        /// <param name="key">キー。</param>
+        /// <returns>
+        /// true (要素が存在しない場合)、false (それ以外の場合)。
+        /// </returns>
         public bool Remove(TKey key)
         {
             if (key == null) throw new ArgumentNullException("key");
@@ -67,13 +99,30 @@ namespace Willcraftia.Xna.Framework.Collections
             return false;
         }
 
+        /// <summary>
+        /// 指定のキーに対応する要素の取得を試行します。
+        /// </summary>
+        /// <param name="key">キー。</param>
+        /// <param name="item">要素。</param>
+        /// <returns>
+        /// true (要素が存在しない場合)、false (それ以外の場合)。
+        /// </returns>
         public bool TryGet(TKey key, out TItem item)
         {
             return dictionary.TryGetValue(key, out item);
         }
 
+        /// <summary>
+        /// 指定した要素からキーを抽出します。
+        /// サブクラスでは、このメソッドを要素の型に応じて実装します。
+        /// </summary>
+        /// <param name="item">要素。</param>
+        /// <returns>キー。</returns>
         protected abstract TKey GetKeyForItem(TItem item);
 
+        /// <summary>
+        /// 全ての要素を削除する際に呼び出されます。
+        /// </summary>
         protected override void ClearOverride()
         {
             dictionary.Clear();
@@ -81,6 +130,11 @@ namespace Willcraftia.Xna.Framework.Collections
             base.ClearOverride();
         }
 
+        /// <summary>
+        /// 指定の位置へ要素を挿入する際に呼び出されます。
+        /// </summary>
+        /// <param name="index">インデックス。</param>
+        /// <param name="item">要素。</param>
         protected override void InsertOverride(int index, TItem item)
         {
             var key = GetKey(item);
@@ -89,6 +143,11 @@ namespace Willcraftia.Xna.Framework.Collections
             base.InsertOverride(index, item);
         }
 
+        /// <summary>
+        /// 指定の位置へ要素を設定する際に呼び出されます。
+        /// </summary>
+        /// <param name="index">インデックス。</param>
+        /// <param name="item">要素。</param>
         protected override void SetOverride(int index, TItem item)
         {
             var newKey = GetKey(item);
@@ -101,6 +160,10 @@ namespace Willcraftia.Xna.Framework.Collections
             base.SetOverride(index, item);
         }
 
+        /// <summary>
+        /// 指定の位置から要素を削除する際に呼び出されます。
+        /// </summary>
+        /// <param name="index">インデックス。</param>
         protected override void RemoveAtOverride(int index)
         {
             var key = GetKey(base[index]);
@@ -109,6 +172,11 @@ namespace Willcraftia.Xna.Framework.Collections
             base.RemoveAtOverride(index);
         }
 
+        /// <summary>
+        /// 指定した要素からキーを抽出します。
+        /// </summary>
+        /// <param name="item">要素。</param>
+        /// <returns>キー。</returns>
         protected TKey GetKey(TItem item)
         {
             var key = GetKeyForItem(item);
