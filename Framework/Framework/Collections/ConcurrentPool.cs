@@ -10,100 +10,85 @@ namespace Willcraftia.Xna.Framework.Collections
 {
     public sealed class ConcurrentPool<T> where T : class
     {
-        // 0 means the infinite capacity.
-        public const int DefaultMaxCapacity = 0;
-
-        Func<T> createFunction;
-
-        Queue<T> objects = new Queue<T>();
+        Pool<T> pool;
 
         public int Count
         {
             get
             {
-                lock (objects)
+                lock (this)
                 {
-                    return objects.Count;
+                    return pool.Count;
                 }
             }
         }
-        public int InitialCapacity { get; private set; }
 
-        public int MaxCapacity { get; set; }
+        public int InitialCapacity
+        {
+            get { return pool.InitialCapacity; }
+        }
 
-        public int TotalObjectCount { get; private set; }
+        public int MaxCapacity
+        {
+            get
+            {
+                lock (this)
+                {
+                    return pool.MaxCapacity;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    pool.MaxCapacity = value;
+                }
+            }
+        }
+
+        public int TotalObjectCount
+        {
+            get
+            {
+                lock (this)
+                {
+                    return pool.TotalObjectCount;
+                }
+            }
+        }
 
         public ConcurrentPool(Func<T> createFunction)
         {
-            this.createFunction = createFunction;
-            MaxCapacity = DefaultMaxCapacity;
+            pool = new Pool<T>(createFunction);
         }
 
         public void Prepare(int initialCapacity)
         {
-            if (initialCapacity < 0 || (MaxCapacity != 0 && MaxCapacity < initialCapacity))
-                throw new ArgumentOutOfRangeException("initialCapacity");
-
-            InitialCapacity = initialCapacity;
-
-            for (int i = 0; i < initialCapacity; i++)
-                objects.Enqueue(CreateObject());
+            pool.Prepare(initialCapacity);
         }
 
         public T Borrow()
         {
-            lock (objects)
+            lock (this)
             {
-                while (0 < MaxCapacity && MaxCapacity < TotalObjectCount && 0 < objects.Count)
-                    DisposeObject(objects.Dequeue());
-
-                if (0 < objects.Count)
-                    return objects.Dequeue();
-
-                return CreateObject();
+                return pool.Borrow();
             }
         }
 
         public void Return(T obj)
         {
-            lock (objects)
+            lock (this)
             {
-                if (MaxCapacity == 0 || TotalObjectCount <= MaxCapacity)
-                {
-                    objects.Enqueue(obj);
-                }
-                else
-                {
-                    DisposeObject(obj);
-                }
+                pool.Return(obj);
             }
         }
 
         public void Clear()
         {
-            lock (objects)
+            lock (this)
             {
-                foreach (var obj in objects) DisposeObject(obj);
-
-                objects.Clear();
+                pool.Clear();
             }
-        }
-
-        T CreateObject()
-        {
-            if (0 < MaxCapacity && MaxCapacity < TotalObjectCount)
-                return null;
-
-            TotalObjectCount++;
-            return createFunction();
-        }
-
-        void DisposeObject(T obj)
-        {
-            var disposable = obj as IDisposable;
-            if (disposable != null) disposable.Dispose();
-
-            TotalObjectCount--;
         }
     }
 }

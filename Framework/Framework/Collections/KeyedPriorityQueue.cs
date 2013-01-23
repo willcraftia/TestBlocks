@@ -8,12 +8,17 @@ using System.Collections.Generic;
 namespace Willcraftia.Xna.Framework.Collections
 {
     /// <summary>
-    /// キーが要素に埋め込まれている優先度付き待ち行列の抽象基本クラスです。
+    /// キーが要素に埋め込まれている優先度付き待ち行列です。
     /// </summary>
     /// <typeparam name="TKey">キーの型。</typeparam>
     /// <typeparam name="TItem">要素の型。</typeparam>
-    public abstract class KeyedPriorityQueue<TKey, TItem> : IEnumerable<TItem>
+    public sealed class KeyedPriorityQueue<TKey, TItem> : IEnumerable<TItem>
     {
+        /// <summary>
+        /// 要素のキーを取得するデリゲート。
+        /// </summary>
+        Func<TItem, TKey> getKeyFunc;
+
         /// <summary>
         /// 優先度付き待ち行列。
         /// </summary>
@@ -48,25 +53,20 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// キーと要素のディクショナリを取得します。
-        /// </summary>
-        protected IDictionary<TKey, TItem> Dictionary
-        {
-            get { return dictionary; }
-        }
-
-        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
+        /// <param name="getKeyFunc">要素のキーを取得するデリゲート。</param>
         /// <param name="capacity">初期容量。</param>
         /// <param name="comparer">
         /// 要素の比較オブジェクト。
         /// null を指定した場合は Comparer&lt;T&gt;.Default を用います
         /// </param>
-        protected KeyedPriorityQueue(int capacity, IComparer<TItem> comparer)
+        public KeyedPriorityQueue(Func<TItem, TKey> getKeyFunc, int capacity, IComparer<TItem> comparer)
         {
+            if (getKeyFunc == null) throw new ArgumentNullException("getKeyFunc");
             if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
 
+            this.getKeyFunc = getKeyFunc;
             queue = new PriorityQueue<TItem>(capacity, comparer);
             dictionary = new Dictionary<TKey, TItem>(capacity);
         }
@@ -91,7 +91,7 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             if (item == null) throw new ArgumentNullException("item");
 
-            var key = GetKey(item);
+            var key = getKeyFunc(item);
             dictionary[key] = item;
             queue.Enqueue(item);
         }
@@ -103,7 +103,7 @@ namespace Willcraftia.Xna.Framework.Collections
         public TItem Dequeue()
         {
             var item = queue.Dequeue();
-            var key = GetKey(item);
+            var key = getKeyFunc(item);
             dictionary.Remove(key);
             return item;
         }
@@ -153,27 +153,6 @@ namespace Willcraftia.Xna.Framework.Collections
         public bool TryGet(TKey key, out TItem item)
         {
             return dictionary.TryGetValue(key, out item);
-        }
-
-        /// <summary>
-        /// 指定した要素からキーを抽出します。
-        /// サブクラスでは、このメソッドを要素の型に応じて実装します。
-        /// </summary>
-        /// <param name="item">要素。</param>
-        /// <returns>キー。</returns>
-        protected abstract TKey GetKeyForItem(TItem item);
-
-        /// <summary>
-        /// 指定した要素からキーを抽出します。
-        /// </summary>
-        /// <param name="item">要素。</param>
-        /// <returns>キー。</returns>
-        protected TKey GetKey(TItem item)
-        {
-            var key = GetKeyForItem(item);
-            if (key == null) throw new InvalidOperationException("Key is null.");
-
-            return key;
         }
     }
 }

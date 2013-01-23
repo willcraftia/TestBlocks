@@ -12,8 +12,13 @@ namespace Willcraftia.Xna.Framework.Collections
     /// </summary>
     /// <typeparam name="TKey">キーの型。</typeparam>
     /// <typeparam name="TItem">要素の型。</typeparam>
-    public abstract class KeyedQueue<TKey, TItem> : IEnumerable<TItem>
+    public sealed class KeyedQueue<TKey, TItem> : IEnumerable<TItem>
     {
+        /// <summary>
+        /// 要素のキーを取得するデリゲート。
+        /// </summary>
+        Func<TItem, TKey> getKeyFunc;
+
         /// <summary>
         /// 待ち行列。
         /// </summary>
@@ -48,21 +53,15 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// キーと要素のディクショナリを取得します。
-        /// </summary>
-        protected IDictionary<TKey, TItem> Dictionary
-        {
-            get { return dictionary; }
-        }
-
-        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="capacity">初期容量。</param>
-        protected KeyedQueue(int capacity)
+        public KeyedQueue(Func<TItem, TKey> getKeyFunc, int capacity)
         {
+            if (getKeyFunc == null) throw new ArgumentNullException("getKeyFunc");
             if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
 
+            this.getKeyFunc = getKeyFunc;
             queue = new Queue<TItem>(capacity);
             dictionary = new Dictionary<TKey, TItem>(capacity);
         }
@@ -87,7 +86,7 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             if (item == null) throw new ArgumentNullException("item");
 
-            var key = GetKey(item);
+            var key = getKeyFunc(item);
             dictionary[key] = item;
             queue.Enqueue(item);
         }
@@ -99,7 +98,7 @@ namespace Willcraftia.Xna.Framework.Collections
         public TItem Dequeue()
         {
             var item = queue.Dequeue();
-            var key = GetKey(item);
+            var key = getKeyFunc(item);
             dictionary.Remove(key);
             return item;
         }
@@ -149,27 +148,6 @@ namespace Willcraftia.Xna.Framework.Collections
         public bool TryGet(TKey key, out TItem item)
         {
             return dictionary.TryGetValue(key, out item);
-        }
-
-        /// <summary>
-        /// 指定した要素からキーを抽出します。
-        /// サブクラスでは、このメソッドを要素の型に応じて実装します。
-        /// </summary>
-        /// <param name="item">要素。</param>
-        /// <returns>キー。</returns>
-        protected abstract TKey GetKeyForItem(TItem item);
-
-        /// <summary>
-        /// 指定した要素からキーを抽出します。
-        /// </summary>
-        /// <param name="item">要素。</param>
-        /// <returns>キー。</returns>
-        protected TKey GetKey(TItem item)
-        {
-            var key = GetKeyForItem(item);
-            if (key == null) throw new InvalidOperationException("Key is null.");
-
-            return key;
         }
     }
 }
