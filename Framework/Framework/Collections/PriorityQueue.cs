@@ -128,7 +128,7 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// 先頭にある要素を削除して返します。
+        /// 先頭の要素を削除してから取得します。
         /// </summary>
         /// <returns>要素。</returns>
         public T Dequeue()
