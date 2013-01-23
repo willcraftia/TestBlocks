@@ -1,7 +1,6 @@
 ﻿#region Using
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 #endregion
@@ -73,10 +72,11 @@ namespace Willcraftia.Xna.Framework.Collections
         {
             return queue.GetEnumerator();
         }
+
         // I/F
-        IEnumerator IEnumerable.GetEnumerator()
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return queue.GetEnumerator();
+            return GetEnumerator();
         }
 
         /// <summary>
