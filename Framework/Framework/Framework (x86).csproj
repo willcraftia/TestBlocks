@@ -89,6 +89,7 @@
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
     <Compile Include="BoundingBoxHelper.cs" />
+    <Compile Include="Collections\ConcurrentKeyedPriorityQueue.cs" />
     <Compile Include="Collections\ConcurrentKeyedQueue.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Collections\ConcurrentPriorityQueue.cs" />
