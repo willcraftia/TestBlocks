@@ -8,17 +8,15 @@ using System.Collections.Generic;
 namespace Willcraftia.Xna.Framework.Collections
 {
     /// <summary>
-    /// キーが要素に埋め込まれている待ち行列のスレッド セーフな抽象基本クラスです。
-    /// このクラスでは、同期を必要とするプロパティおよびメソッドにおいて、
-    /// lock (this) でロックしています。
-    /// サブクラスの実装において同期が必要な場合には、同様に lock(this) でロックします。
-    /// 
+    /// キーが要素に埋め込まれているスレッド セーフな待ち行列です。
     /// IEnumerable&lt;T&gt; の実装は面倒なため実装しません。
     /// </summary>
     /// <typeparam name="TKey">キーの型。</typeparam>
     /// <typeparam name="TItem">要素の型。</typeparam>
-    public abstract class ConcurrentKeyedQueue<TKey, TItem>
+    public sealed class ConcurrentKeyedQueue<TKey, TItem>
     {
+        Func<TItem, TKey> getKeyFunc;
+
         /// <summary>
         /// 待ち行列。
         /// </summary>
@@ -63,21 +61,16 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// キーと要素のディクショナリを取得します。
-        /// </summary>
-        protected IDictionary<TKey, TItem> Dictionary
-        {
-            get { return dictionary; }
-        }
-
-        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
+        /// <param name="getKeyFunc">要素のキーを取得するデリゲート。</param>
         /// <param name="capacity">初期容量。</param>
-        protected ConcurrentKeyedQueue(int capacity)
+        public ConcurrentKeyedQueue(Func<TItem, TKey> getKeyFunc, int capacity)
         {
+            if (getKeyFunc == null) throw new ArgumentNullException("getKeyFunc");
             if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
 
+            this.getKeyFunc = getKeyFunc;
             queue = new Queue<TItem>(capacity);
             dictionary = new Dictionary<TKey, TItem>(capacity);
         }
@@ -92,7 +85,7 @@ namespace Willcraftia.Xna.Framework.Collections
 
             lock (this)
             {
-                var key = GetKey(item);
+                var key = getKeyFunc(item);
                 dictionary[key] = item;
                 queue.Enqueue(item);
             }
@@ -107,7 +100,7 @@ namespace Willcraftia.Xna.Framework.Collections
             lock (this)
             {
                 var item = queue.Dequeue();
-                var key = GetKey(item);
+                var key = getKeyFunc(item);
                 dictionary.Remove(key);
                 return item;
             }
@@ -171,27 +164,5 @@ namespace Willcraftia.Xna.Framework.Collections
                 return dictionary.TryGetValue(key, out item);
             }
         }
-
-        /// <summary>
-        /// 指定した要素からキーを抽出します。
-        /// サブクラスでは、このメソッドを要素の型に応じて実装します。
-        /// </summary>
-        /// <param name="item">要素。</param>
-        /// <returns>キー。</returns>
-        protected abstract TKey GetKeyForItem(TItem item);
-
-        /// <summary>
-        /// 指定した要素からキーを抽出します。
-        /// </summary>
-        /// <param name="item">要素。</param>
-        /// <returns>キー。</returns>
-        protected TKey GetKey(TItem item)
-        {
-            var key = GetKeyForItem(item);
-            if (key == null) throw new InvalidOperationException("Key is null.");
-
-            return key;
-        }
     }
-
 }
