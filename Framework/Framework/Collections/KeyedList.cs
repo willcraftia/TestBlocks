@@ -121,7 +121,7 @@ namespace Willcraftia.Xna.Framework.Collections
         protected abstract TKey GetKeyForItem(TItem item);
 
         /// <summary>
-        /// 全ての要素を削除する際に呼び出されます。
+        /// ディクショナリから全ての要素を削除します。
         /// </summary>
         protected override void ClearOverride()
         {
@@ -131,10 +131,8 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// 指定の位置へ要素を挿入する際に呼び出されます。
+        /// ディクショナリへ要素を追加します。
         /// </summary>
-        /// <param name="index">インデックス。</param>
-        /// <param name="item">要素。</param>
         protected override void InsertOverride(int index, TItem item)
         {
             var key = GetKey(item);
@@ -144,10 +142,8 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// 指定の位置へ要素を設定する際に呼び出されます。
+        /// 要素のキーに従ってディクショナリの要素を置換します。
         /// </summary>
-        /// <param name="index">インデックス。</param>
-        /// <param name="item">要素。</param>
         protected override void SetOverride(int index, TItem item)
         {
             var newKey = GetKey(item);
@@ -161,9 +157,8 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// 指定の位置から要素を削除する際に呼び出されます。
+        /// ディクショナリから要素を削除します。
         /// </summary>
-        /// <param name="index">インデックス。</param>
         protected override void RemoveAtOverride(int index)
         {
             var key = GetKey(base[index]);
