@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Willcraftia.Xna.Framework.Collections
 {
     /// <summary>
-    /// キーで要素を管理する待ち行列の抽象基本クラスです。
+    /// キーが要素に埋め込まれている待ち行列の抽象基本クラスです。
     /// </summary>
     /// <typeparam name="TKey">キーの型。</typeparam>
     /// <typeparam name="TItem">要素の型。</typeparam>
