@@ -30,7 +30,13 @@ namespace Willcraftia.Xna.Framework.Collections
         /// </summary>
         public int Count
         {
-            get { lock (queue) return queue.Count; }
+            get
+            {
+                lock (queue)
+                {
+                    return queue.Count;
+                }
+            }
         }
 
         /// <summary>
@@ -86,25 +92,62 @@ namespace Willcraftia.Xna.Framework.Collections
         /// <param name="item">要素。</param>
         public void Enqueue(T item)
         {
-            lock (queue) queue.Enqueue(item);
+            lock (queue)
+            {
+                queue.Enqueue(item);
+            }
         }
 
         /// <summary>
-        /// 先頭の要素を削除してから取得します。
+        /// 先頭の要素を削除してから取得することを試行します。
         /// </summary>
-        /// <returns>要素。</returns>
-        public T Dequeue()
+        /// <param name="result">
+        /// 先頭の要素、あるいは、非同期に待ち行列が空になっていた場合は型 T のデフォルト。
+        /// </param>
+        /// <returns>
+        /// true (先頭の要素を取得できた場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool TryDequeue(out T result)
         {
-            lock (queue) return queue.Dequeue();
+            lock (this)
+            {
+                if (queue.Count == 0)
+                {
+                    result = default(T);
+                    return false;
+                }
+                else
+                {
+                    result = queue.Dequeue();
+                    return true;
+                }
+            }
         }
 
         /// <summary>
-        /// 先頭の要素を削除せずに取得します。
+        /// 先頭の要素を削除せずに取得することを試行します。
         /// </summary>
-        /// <returns>要素。</returns>
-        public T Peek()
+        /// <param name="result">
+        /// 先頭の要素、あるいは、非同期に待ち行列が空になっていた場合は型 T のデフォルト。
+        /// </param>
+        /// <returns>
+        /// true (先頭の要素を取得できた場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool TryPeek(out T result)
         {
-            lock (queue) return queue.Peek();
+            lock (this)
+            {
+                if (queue.Count == 0)
+                {
+                    result = default(T);
+                    return false;
+                }
+                else
+                {
+                    result = queue.Peek();
+                    return true;
+                }
+            }
         }
 
         /// <summary>
@@ -112,7 +155,10 @@ namespace Willcraftia.Xna.Framework.Collections
         /// </summary>
         public void Clear()
         {
-            lock (queue) queue.Clear();
+            lock (queue)
+            {
+                queue.Clear();
+            }
         }
 
         /// <summary>
@@ -124,7 +170,10 @@ namespace Willcraftia.Xna.Framework.Collections
         /// </returns>
         public bool Contains(T item)
         {
-            lock (queue) return queue.Contains(item);
+            lock (queue)
+            {
+                return queue.Contains(item);
+            }
         }
     }
 }

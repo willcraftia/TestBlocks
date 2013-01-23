@@ -95,29 +95,56 @@ namespace Willcraftia.Xna.Framework.Collections
         }
 
         /// <summary>
-        /// 先頭の要素を削除してから取得します。
+        /// 先頭の要素を削除してから取得することを試行します。
         /// </summary>
-        /// <returns></returns>
-        public TItem Dequeue()
+        /// <param name="result">
+        /// 先頭の要素、あるいは、非同期に待ち行列が空になっていた場合は型 T のデフォルト。
+        /// </param>
+        /// <returns>
+        /// true (先頭の要素を取得できた場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool TryDequeue(out TItem result)
         {
             lock (this)
             {
-                var item = queue.Dequeue();
-                var key = getKeyFunc(item);
-                dictionary.Remove(key);
-                return item;
+                if (queue.Count == 0)
+                {
+                    result = default(TItem);
+                    return false;
+                }
+                else
+                {
+                    result = queue.Dequeue();
+                    var key = getKeyFunc(result);
+                    dictionary.Remove(key);
+                    return true;
+                }
             }
         }
 
         /// <summary>
-        /// 先頭の要素を削除せずに取得します。
+        /// 先頭の要素を削除せずに取得することを試行します。
         /// </summary>
-        /// <returns></returns>
-        public TItem Peek()
+        /// <param name="result">
+        /// 先頭の要素、あるいは、非同期に待ち行列が空になっていた場合は型 T のデフォルト。
+        /// </param>
+        /// <returns>
+        /// true (先頭の要素を取得できた場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool TryPeek(out TItem result)
         {
             lock (this)
             {
-                return queue.Peek();
+                if (queue.Count == 0)
+                {
+                    result = default(TItem);
+                    return false;
+                }
+                else
+                {
+                    result = queue.Peek();
+                    return true;
+                }
             }
         }
 
