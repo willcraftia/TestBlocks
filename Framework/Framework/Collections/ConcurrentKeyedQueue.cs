@@ -15,6 +15,9 @@ namespace Willcraftia.Xna.Framework.Collections
     /// <typeparam name="TItem">要素の型。</typeparam>
     public sealed class ConcurrentKeyedQueue<TKey, TItem>
     {
+        /// <summary>
+        /// 要素のキーを取得するデリゲート。
+        /// </summary>
         Func<TItem, TKey> getKeyFunc;
 
         /// <summary>
