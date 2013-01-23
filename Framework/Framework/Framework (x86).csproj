@@ -90,6 +90,7 @@
     <Compile Include="ArrayHelper.cs" />
     <Compile Include="BoundingBoxHelper.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
+    <Compile Include="Collections\ConcurrentPriorityQueue.cs" />
     <Compile Include="Collections\CubicCollection.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Collections\Octree.cs" />
