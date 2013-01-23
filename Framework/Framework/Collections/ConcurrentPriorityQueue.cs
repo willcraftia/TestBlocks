@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Collections
     /// スレッド セーフな優先度付き待ち行列です。
     /// IEnumerable&lt;T&gt; の実装は面倒なため実装しません。
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">要素の型。</typeparam>
     public sealed class ConcurrentPriorityQueue<T>
     {
         /// <summary>
