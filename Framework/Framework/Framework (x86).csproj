@@ -92,6 +92,7 @@
     <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Collections\ConcurrentPriorityQueue.cs" />
     <Compile Include="Collections\CubicCollection.cs" />
+    <Compile Include="Collections\KeyedPriorityQueue.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Collections\Octree.cs" />
     <Compile Include="Collections\PriorityQueue.cs" />

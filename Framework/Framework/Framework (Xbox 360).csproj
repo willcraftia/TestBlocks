@@ -100,6 +100,7 @@
     <Compile Include="Collections\ConcurrentPriorityQueue.cs" />
     <Compile Include="Collections\CubicCollection.cs" />
     <Compile Include="Collections\KeyedList.cs" />
+    <Compile Include="Collections\KeyedPriorityQueue.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
