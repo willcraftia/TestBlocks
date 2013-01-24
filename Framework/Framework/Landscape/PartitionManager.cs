@@ -33,10 +33,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             int activeClusterCapacity = 50;
 
-            int waitActivationCapacity = 9;
-
-            int waitPassivationCapacity = 30;
-
             int activationCapacity = 3;
 
             int passivationCapacity = 10;
