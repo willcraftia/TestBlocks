@@ -232,7 +232,6 @@
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionCollection.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
-    <Compile Include="Landscape\PartitionOctree.cs" />
     <Compile Include="MathExtension.cs" />
     <Compile Include="Noise\Add.cs" />
     <Compile Include="Noise\Billow.cs" />

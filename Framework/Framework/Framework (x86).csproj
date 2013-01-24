@@ -176,7 +176,6 @@
     <Compile Include="Landscape\IActiveVolume.cs" />
     <Compile Include="Landscape\DefaultActiveVolume.cs" />
     <Compile Include="Landscape\PartitionCollection.cs" />
-    <Compile Include="Landscape\PartitionOctree.cs" />
     <Compile Include="Noise\Cache.cs" />
     <Compile Include="Noise\Const.cs" />
     <Compile Include="Noise\Multiply.cs" />
