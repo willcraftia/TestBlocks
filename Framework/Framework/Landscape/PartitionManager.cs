@@ -141,9 +141,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            public ILandscapeVolume MinLandscapeVolume { get; set; }
+            public IActiveVolume MinActiveVolume { get; set; }
 
-            public ILandscapeVolume MaxLandscapeVolume { get; set; }
+            public IActiveVolume MaxActiveVolume { get; set; }
         }
 
         #endregion
@@ -223,7 +223,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             VectorI3 eyePosition;
 
-            ILandscapeVolume volume;
+            IActiveVolume volume;
 
             PriorityQueue<Partition> candidates;
 
@@ -251,7 +251,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 candidates = new PriorityQueue<Partition>(maxDistance * maxDistance * maxDistance, comparer);
             }
 
-            internal void Initialize(Matrix view, Matrix projection, VectorI3 eyePosition, ILandscapeVolume volume)
+            internal void Initialize(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume)
             {
                 this.view = view;
                 this.projection = projection;
@@ -423,12 +423,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// 最小アクティブ領域。
         /// </summary>
-        ILandscapeVolume minLandscapeVolume;
+        IActiveVolume minActiveVolume;
 
         /// <summary>
         /// 最大アクティブ領域。
         /// </summary>
-        ILandscapeVolume maxLandscapeVolume;
+        IActiveVolume maxActiveVolume;
 
         /// <summary>
         /// パーティション空間における視点の位置。
@@ -531,8 +531,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             passivationTaskQueue.SlotCount = passivationCapacity;
 
             // null の場合はデフォルト実装を与える。
-            minLandscapeVolume = settings.MinLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
-            maxLandscapeVolume = settings.MaxLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
+            minActiveVolume = settings.MinActiveVolume ?? new DefaultActiveVolume(4);
+            maxActiveVolume = settings.MaxActiveVolume ?? new DefaultActiveVolume(8);
 
             activationSearchCapacity = settings.ActivationSearchCapacity;
             passivationSearchCapacity = settings.PassivationSearchCapacity;
@@ -557,9 +557,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             eyePosition.X = (int) Math.Floor(eyePositionWorld.X * inversePartitionSize.X);
             eyePosition.Y = (int) Math.Floor(eyePositionWorld.Y * inversePartitionSize.Y);
             eyePosition.Z = (int) Math.Floor(eyePositionWorld.Z * inversePartitionSize.Z);
-
-            // アクティブ領域を現在の視点位置を中心に設定。
-            maxLandscapeVolume.Center = eyePosition;
 
             if (!Closing)
             {
@@ -808,8 +805,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (maxLandscapeVolume.Contains(partition.Position))
-                    //if (minLandscapeVolume.Contains(partition.Position))
+                    if (maxActiveVolume.Contains(eyePosition, partition.Position))
+                    //if (minLandscapeVolume.Contains(eyePosition, partition.Position))
                     {
                         // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.Enqueue(partition);
@@ -853,7 +850,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             // 常に 1 つの非同期試行とするために制限。
             if (!activationReviewerExecuting)
             {
-                activationReviewer.Initialize(view, projection, eyePosition, maxLandscapeVolume);
+                activationReviewer.Initialize(view, projection, eyePosition, maxActiveVolume);
                 activationReviewTaskQueue.Enqueue(activationReviewer.ReviewAction);
                 activationReviewTaskQueue.Update();
 

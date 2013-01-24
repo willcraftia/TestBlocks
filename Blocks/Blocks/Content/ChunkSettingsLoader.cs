@@ -25,8 +25,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 ChunkSize = definition.ChunkSize,
                 MeshUpdateSearchCapacity = definition.MeshUpdateSearchCapacity,
                 VerticesBuilderCount = definition.VerticesBuilderCount,
-                MinActiveRange = definition.MinActiveRange,
-                MaxActiveRange = definition.MaxActiveRange,
+                MinActiveVolume = definition.MinActiveRange,
+                MaxActiveVolume = definition.MaxActiveRange,
             };
 
             settings.PartitionManager.PartitionPoolMaxCapacity = definition.ChunkPoolMaxCapacity;
@@ -39,8 +39,8 @@ namespace Willcraftia.Xna.Blocks.Content
             settings.PartitionManager.PassivationSearchCapacity = definition.PassivationSearchCapacity;
 
             settings.PartitionManager.PartitionSize = definition.ChunkSize.ToVector3();
-            settings.PartitionManager.MinLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, settings.MinActiveRange);
-            settings.PartitionManager.MaxLandscapeVolume = new DefaultLandscapeVolume(VectorI3.Zero, settings.MaxActiveRange);
+            settings.PartitionManager.MinActiveVolume = new DefaultActiveVolume(settings.MinActiveVolume);
+            settings.PartitionManager.MaxActiveVolume = new DefaultActiveVolume(settings.MaxActiveVolume);
 
             return settings;
         }
@@ -54,8 +54,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 ChunkSize = settings.ChunkSize,
                 MeshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity,
                 VerticesBuilderCount = settings.VerticesBuilderCount,
-                MinActiveRange = settings.MinActiveRange,
-                MaxActiveRange = settings.MaxActiveRange,
+                MinActiveRange = settings.MinActiveVolume,
+                MaxActiveRange = settings.MaxActiveVolume,
                 ChunkPoolMaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity,
                 ClusterSize = settings.PartitionManager.ClusterSize,
                 ActiveChunkCapacity = settings.PartitionManager.ActivePartitionCapacity,

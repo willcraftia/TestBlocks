@@ -66,7 +66,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public int MinActiveRange
+        public int MinActiveVolume
         {
             get { return minActiveRange; }
             set
@@ -77,7 +77,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public int MaxActiveRange
+        public int MaxActiveVolume
         {
             get { return maxActiveRange; }
             set

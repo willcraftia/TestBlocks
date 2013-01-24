@@ -279,7 +279,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 最大アクティブ範囲を超えない位置へ FarPlaneDistance を設定。
             // パーティション (チャンク) のサイズを掛けておく。
-            defaultCamera.Projection.FarPlaneDistance = (chunkSettings.MaxActiveRange - 1) * 16;
+            defaultCamera.Projection.FarPlaneDistance = (chunkSettings.MaxActiveVolume - 1) * 16;
 
             // 念のためここで一度更新。
             defaultCamera.Update();
