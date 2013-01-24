@@ -122,12 +122,8 @@ namespace Willcraftia.Xna.Framework.Collections
             while (n != 0)
             {
                 var i = (n - 1) / 2;
-                if (comparer.Compare(heap[n], heap[i]) < 0)
-                {
-                    T temp = heap[n];
-                    heap[n] = heap[i];
-                    heap[i] = temp;
-                }
+                if (Compare(n, i) < 0) Swap(n, i);
+
                 n = i;
             }
         }
@@ -146,15 +142,9 @@ namespace Willcraftia.Xna.Framework.Collections
 
             for (int i = 0, j; (j = 2 * i + 1) < n; )
             {
-                if ((j != n - 1) && 0 < comparer.Compare(heap[j], heap[j + 1]))
-                    j++;
+                if ((j != n - 1) && 0 < Compare(j, j + 1)) j++;
 
-                if (0 < comparer.Compare(heap[i], heap[j]))
-                {
-                    T temp = heap[j];
-                    heap[j] = heap[i];
-                    heap[i] = temp;
-                }
+                if (0 < Compare(i, j)) Swap(j, i);
 
                 i = j;
             }
@@ -189,6 +179,33 @@ namespace Willcraftia.Xna.Framework.Collections
         public bool Contains(T item)
         {
             return heap.Contains(item);
+        }
+
+        /// <summary>
+        /// 指定の添字にある要素同士を比較します。
+        /// </summary>
+        /// <param name="index1">添字 1。</param>
+        /// <param name="index2">添字 2。</param>
+        /// <returns>
+        /// -1 (添字 1 の要素が添字 2 の要素よりも小さい場合)、
+        /// 0 (添字 1 の要素と添字 2 の要素が等しい場合)、
+        /// 1 (添字 1 の要素が添字 2 の要素よりも大きい場合)。
+        /// </returns>
+        int Compare(int index1, int index2)
+        {
+            return comparer.Compare(heap[index1], heap[index2]);
+        }
+
+        /// <summary>
+        /// 指定の添字にある要素同士を交換します。
+        /// </summary>
+        /// <param name="index1">添字 1。</param>
+        /// <param name="index2">添字 2。</param>
+        void Swap(int index1, int index2)
+        {
+            T temp = heap[index2];
+            heap[index2] = heap[index1];
+            heap[index1] = temp;
         }
     }
 }
