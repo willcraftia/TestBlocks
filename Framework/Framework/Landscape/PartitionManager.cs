@@ -451,15 +451,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         LinkedList<Partition> partitions;
 
-        /// <summary>
-        /// LRU アルゴリズムのための連結リスト。
-        /// 描画などでパーティションを利用したら、末尾へノードを設定し直します。
-        /// これにより、最も利用されていないパーティションのノードの位置は先頭へ向かうため、
-        /// パーティション許容量を越えた場合には、先頭ノードが表すパーティションから順に
-        /// 非アクティブ化します。
-        /// </summary>
-        LinkedList<Partition> lruPartitions;
-
         bool activationReviewerExecuting;
 
         ActivationReviewer activationReviewer;
@@ -630,7 +621,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             // TODO
             clusterManager = new ClusterManager(16, settings.PartitionSize, settings.ActiveClusterCapacity);
             partitions = new LinkedList<Partition>();
-            lruPartitions = new LinkedList<Partition>();
 
             activePartitionCapacity = settings.ActivePartitionCapacity;
             waitActivationCapacity = settings.WaitActivationCapacity;
@@ -770,20 +760,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 指定のパーティションを利用したものとマークします。
-        /// このメソッドを呼び出す事で、パーティションに対応するノードは、
-        /// LRU 連結リストの末尾へ移動します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        public void TouchPartition(Partition partition)
-        {
-            if (partition == null) throw new ArgumentNullException("partition");
-
-            lruPartitions.Remove(partition.LruNode);
-            lruPartitions.AddLast(partition.LruNode);
-        }
-
-        /// <summary>
         /// 事前にパーティション プールにインスタンスを生成する場合に、
         /// サブクラスのコンストラクタで呼び出します。
         /// </summary>
@@ -892,7 +868,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティブ リストへ追加。
                 clusterManager.AddPartition(partition);
                 partitions.AddLast(partition.ListNode);
-                lruPartitions.AddLast(partition.LruNode);
 
                 // 完了を通知。
                 partition.OnActivated();
@@ -1002,33 +977,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         void PassivatePartitions(GameTime gameTime)
         {
-            //while (activePartitionCapacity < lruPartitions.Count)
-            //{
-            //    // 同時待機許容数を越えるならば終了。
-            //    if (waitPassivationCapacity <= waitPassivations.Count) break;
-
-            //    var node = lruPartitions.First;
-            //    var partition = node.Value;
-
-            //    if (minLandscapeVolume.Contains(partition.Position))
-            //    {
-            //        // 最小アクティブ領域内ならば非アクティブ化しない。
-            //        // ここで強制的に利用した状態としてマーク。
-            //        TouchPartition(partition);
-            //        continue;
-            //    }
-
-            //    clusterManager.RemovePartition(partition);
-            //    partitions.Remove(partition.ListNode);
-            //    lruPartitions.RemoveFirst();
-
-            //    // アクティブ化待機リストにあるならばそれを削除。
-            //    waitActivations.Remove(partition);
-
-            //    // 待機リストへ追加。
-            //    waitPassivations.Add(partition);
-            //}
-
             int count = Math.Min(partitions.Count, passivationSearchCapacity);
 
             for (int i = 0; i < count; i++)
@@ -1043,27 +991,17 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    // TODO
-                    // ちょっとこの判定を止めたい。
-                    // 非同期処理の邪魔。
-                    if (octree.Contains(partition.PositionWorld - eyePositionWorld))
+                    if (maxLandscapeVolume.Contains(partition.Position))
+                    //if (minLandscapeVolume.Contains(partition.Position))
                     {
+                        // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.AddLast(node);
                         continue;
                     }
-
-                    //if (maxLandscapeVolume.Contains(partition.Position))
-                    ////if (minLandscapeVolume.Contains(partition.Position))
-                    //{
-                    //    // アクティブ状態維持領域内ならばリストへ戻す。
-                    //    partitions.AddLast(node);
-                    //    continue;
-                    //}
                 }
 
                 // アクティブではない状態にする。
                 clusterManager.RemovePartition(partition);
-                lruPartitions.Remove(partition.LruNode);
 
                 // 待機リストへ追加。
                 waitPassivations.Add(partition);
