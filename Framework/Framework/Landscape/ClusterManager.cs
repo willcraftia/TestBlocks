@@ -14,6 +14,23 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     internal sealed class ClusterManager
     {
+        #region ClusterCollection
+
+        sealed class ClusterCollection : KeyedList<VectorI3, Cluster>
+        {
+            internal ClusterCollection(int capacity)
+                : base(capacity)
+            {
+            }
+
+            protected override VectorI3 GetKeyForItem(Cluster item)
+            {
+                return item.Position;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// パーティション空間におけるクラスタのサイズ。
         /// </summary>
