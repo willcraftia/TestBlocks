@@ -1,5 +1,5 @@
 {
-  "ShadowMapEnabled": true,
+  "ShadowMapEnabled": false,
   "ShadowMap": {
     "Technique": 0,
     "Size": 2048,
@@ -41,7 +41,7 @@
       "Amount": 4.0
     }
   },
-  "DofEnabled": true,
+  "DofEnabled": false,
   "Dof": {
     "MapScale": 0.5,
     "Blur": {

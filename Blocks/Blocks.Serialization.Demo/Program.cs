@@ -1389,8 +1389,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ClusterSize = new VectorI3(8),
                     ActiveChunkCapacity = 5000,
                     ActiveClusterCapacity = 50,
-                    WaitActivationCapacity = 9,
-                    WaitPassivationCapacity = 30,
                     ActivationCapacity = 3,
                     PassivationCapacity = 10,
                     ActivationSearchCapacity = 100,

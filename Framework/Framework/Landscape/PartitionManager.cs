@@ -101,28 +101,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            public int WaitActivationCapacity
-            {
-                get { return waitActivationCapacity; }
-                set
-                {
-                    if (value < 1) throw new ArgumentOutOfRangeException("value");
-
-                    waitActivationCapacity = value;
-                }
-            }
-
-            public int WaitPassivationCapacity
-            {
-                get { return waitPassivationCapacity; }
-                set
-                {
-                    if (value < 1) throw new ArgumentOutOfRangeException("value");
-
-                    waitPassivationCapacity = value;
-                }
-            }
-
             public int ActivationCapacity
             {
                 get { return activationCapacity; }
@@ -416,16 +394,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         int activePartitionCapacity;
 
         /// <summary>
-        /// 同時アクティブ化待機許容量。
-        /// </summary>
-        int waitActivationCapacity;
-        
-        /// <summary>
-        /// 同時非アクティブ化待機許容量。
-        /// </summary>
-        int waitPassivationCapacity;
-
-        /// <summary>
         /// 同時アクティブ化実行許容量。
         /// </summary>
         int activationCapacity;
@@ -473,22 +441,18 @@ namespace Willcraftia.Xna.Framework.Landscape
         ILandscapeVolume maxLandscapeVolume;
 
         /// <summary>
-        /// 最小アクティブ領域に含まれる座標の配列。
-        /// </summary>
-        VectorI3[] minActivePointOffsets;
-
-        /// <summary>
         /// パーティション空間における視点の位置。
         /// </summary>
         VectorI3 eyePosition;
 
         /// <summary>
-        /// ワールド空間における視点の位置。
+        /// ビュー行列。
         /// </summary>
-        Vector3 eyePositionWorld;
-
         Matrix view;
 
+        /// <summary>
+        /// 射影行列。
+        /// </summary>
         Matrix projection;
 
         /// <summary>
@@ -562,8 +526,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             partitions = new LinkedList<Partition>();
 
             activePartitionCapacity = settings.ActivePartitionCapacity;
-            waitActivationCapacity = settings.WaitActivationCapacity;
-            waitPassivationCapacity = settings.WaitPassivationCapacity;
             activationCapacity = settings.ActivationCapacity;
             passivationCapacity = settings.PassivationCapacity;
 
@@ -580,13 +542,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             // null の場合はデフォルト実装を与える。
             minLandscapeVolume = settings.MinLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
-            minActivePointOffsets = minLandscapeVolume.GetPoints();
-
-            // 中心から近い位置からアクティブ化したいため中心に近い位置でソート。
-            // なんらかのアクティブ化中ならば意味は無いが、初回、あるいは、
-            // 待機している全てのアクティブ化を終えた後からの新たなアクティブ化では意味がある。
-            Array.Sort(minActivePointOffsets, VectorI3LengthComparer.Instace);
-
             maxLandscapeVolume = settings.MaxLandscapeVolume ?? new DefaultLandscapeVolume(VectorI3.Zero, 1000);
 
             activationSearchCapacity = settings.ActivationSearchCapacity;
@@ -607,7 +562,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             this.view = view;
             this.projection = projection;
 
-            this.eyePositionWorld = View.GetPosition(view);
+            var eyePositionWorld = View.GetPosition(view);
 
             eyePosition.X = (int) Math.Floor(eyePositionWorld.X * inversePartitionSize.X);
             eyePosition.Y = (int) Math.Floor(eyePositionWorld.Y * inversePartitionSize.Y);

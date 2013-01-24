@@ -33,8 +33,6 @@ namespace Willcraftia.Xna.Blocks.Content
             settings.PartitionManager.ClusterSize = definition.ClusterSize;
             settings.PartitionManager.ActivePartitionCapacity = definition.ActiveChunkCapacity;
             settings.PartitionManager.ActiveClusterCapacity = definition.ActiveClusterCapacity;
-            settings.PartitionManager.WaitActivationCapacity = definition.WaitActivationCapacity;
-            settings.PartitionManager.WaitPassivationCapacity = definition.WaitPassivationCapacity;
             settings.PartitionManager.ActivationCapacity = definition.ActivationCapacity;
             settings.PartitionManager.PassivationCapacity = definition.PassivationCapacity;
             settings.PartitionManager.ActivationSearchCapacity = definition.ActivationSearchCapacity;
@@ -62,8 +60,6 @@ namespace Willcraftia.Xna.Blocks.Content
                 ClusterSize = settings.PartitionManager.ClusterSize,
                 ActiveChunkCapacity = settings.PartitionManager.ActivePartitionCapacity,
                 ActiveClusterCapacity = settings.PartitionManager.ActiveClusterCapacity,
-                WaitActivationCapacity = settings.PartitionManager.WaitActivationCapacity,
-                WaitPassivationCapacity = settings.PartitionManager.WaitPassivationCapacity,
                 ActivationCapacity = settings.PartitionManager.ActivationCapacity,
                 PassivationCapacity = settings.PartitionManager.PassivationCapacity,
                 ActivationSearchCapacity = settings.PartitionManager.ActivationSearchCapacity,

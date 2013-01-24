@@ -27,10 +27,6 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public int ActiveClusterCapacity;
 
-        public int WaitActivationCapacity;
-
-        public int WaitPassivationCapacity;
-
         public int ActivationCapacity;
 
         public int PassivationCapacity;
