@@ -223,14 +223,12 @@
     <Compile Include="IO\WebResource.cs" />
     <Compile Include="IO\WebResourceLoader.cs" />
     <Compile Include="Landscape\Cluster.cs" />
-    <Compile Include="Landscape\ClusterCollection.cs" />
     <Compile Include="Landscape\ClusterManager.cs" />
     <Compile Include="Landscape\DefaultActiveVolume.cs" />
     <Compile Include="Landscape\DomeActiveVolume.cs" />
     <Compile Include="Landscape\FlatActiveVolume.cs" />
     <Compile Include="Landscape\IActiveVolume.cs" />
     <Compile Include="Landscape\Partition.cs" />
-    <Compile Include="Landscape\PartitionCollection.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
     <Compile Include="MathExtension.cs" />
     <Compile Include="Noise\Add.cs" />
