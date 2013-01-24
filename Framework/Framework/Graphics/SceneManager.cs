@@ -109,6 +109,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int InitialPostProcessorCapacity = 10;
 
+        public const string MonitorDraw = "SceneManager.Draw";
+
         public const string MonitorDrawShadowMap = "SceneManager.DrawShadowMap";
         
         public const string MonitorDrawScene = "SceneManager.DrawScene";
@@ -341,6 +343,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (gameTime == null) throw new ArgumentNullException("gameTime");
             if (activeCamera == null) throw new InvalidOperationException("ActiveCamera is null.");
 
+            Monitor.Begin(MonitorDraw);
+
             activeCamera.Frustum.GetCorners(frustumCorners);
             frustumSphere = BoundingSphere.CreateFromPoints(frustumCorners);
 
@@ -415,6 +419,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             OpaqueObjects.Clear();
             TranslucentObjects.Clear();
             ShadowCasters.Clear();
+
+            Monitor.End(MonitorDraw);
         }
 
         public void UpdateEffect(Effect effect)
