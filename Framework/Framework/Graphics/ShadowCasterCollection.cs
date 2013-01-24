@@ -14,6 +14,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         public ShadowCasterCollection(ISceneObjectContext context, int capacity)
             : base(capacity)
         {
+            this.context = context;
         }
 
         protected override void InsertOverride(int index, ShadowCaster item)
