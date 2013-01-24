@@ -104,5 +104,41 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             return distanceSquared <= radiusSquared;
         }
+
+        // I/F
+        public void ForEach(Action<VectorI3> action)
+        {
+            for (int z = -radius; z < radius; z++)
+            {
+                for (int y = -radius; y < radius; y++)
+                {
+                    for (int x = -radius; x < radius; x++)
+                    {
+                        var point = new VectorI3(x, y, z);
+                        var lengthSquared = point.LengthSquared();
+                        if (lengthSquared <= radiusSquared)
+                            action(point);
+                    }
+                }
+            }
+        }
+
+        // I/F
+        public void ForEach(Func<VectorI3, bool> function)
+        {
+            for (int z = -radius; z < radius; z++)
+            {
+                for (int y = -radius; y < radius; y++)
+                {
+                    for (int x = -radius; x < radius; x++)
+                    {
+                        var point = new VectorI3(x, y, z);
+                        var lengthSquared = point.LengthSquared();
+                        if (lengthSquared <= radiusSquared)
+                            if (!function(point)) return;
+                    }
+                }
+            }
+        }
     }
 }

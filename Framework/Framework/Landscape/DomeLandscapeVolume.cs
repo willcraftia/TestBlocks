@@ -119,5 +119,17 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             return distanceSquared <= radiusSquared;
         }
+
+        // I/F
+        public void ForEach(Action<VectorI3> action)
+        {
+            throw new NotImplementedException();
+        }
+
+        // I/F
+        public void ForEach(Func<VectorI3, bool> function)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

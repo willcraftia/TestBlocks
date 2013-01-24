@@ -31,5 +31,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// true (パーティションの位置が領域に含まれる場合)、false (それ以外の場合)。
         /// </returns>
         bool Contains(VectorI3 point);
+
+        void ForEach(Action<VectorI3> action);
+
+        void ForEach(Func<VectorI3, bool> function);
     }
 }

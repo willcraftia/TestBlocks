@@ -297,11 +297,13 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             VectorI3 eyePosition;
 
-            int distance;
+            ILandscapeVolume volume;
 
             PriorityQueue<Partition> candidates;
 
             CandidateComparer comparer = new CandidateComparer();
+
+            Func<VectorI3, bool> reviewPartitionFunc;
 
             volatile bool completed;
 
@@ -315,6 +317,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             internal ActivationReviewer(PartitionManager manager)
             {
                 this.manager = manager;
+                reviewPartitionFunc = new Func<VectorI3, bool>(ReviewPartition);
                 ReviewAction = new Action(Review);
 
                 // TODO
@@ -322,12 +325,12 @@ namespace Willcraftia.Xna.Framework.Landscape
                 candidates = new PriorityQueue<Partition>(maxDistance * maxDistance * maxDistance, comparer);
             }
 
-            internal void Initialize(Matrix view, Matrix projection, VectorI3 eyePosition, int distance)
+            internal void Initialize(Matrix view, Matrix projection, VectorI3 eyePosition, ILandscapeVolume volume)
             {
                 this.view = view;
                 this.projection = projection;
                 this.eyePosition = eyePosition;
-                this.distance = distance;
+                this.volume = volume;
 
                 comparer.Initialize(view, projection);
 
@@ -336,49 +339,38 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             internal void Review()
             {
-                // TODO
-                // まだ試験中のロジック。ボックス範囲では無駄が多すぎる。
-                for (int z = -distance; z < distance; z++)
-                {
-                    for (int y = -distance; y < distance; y++)
-                    {
-                        for (int x = -distance; x < distance; x++)
-                        {
-                            var position = eyePosition + new VectorI3(x, y, z);
-                            ReviewPartition(ref position);
-                        }
-                    }
-                }
+                volume.ForEach(reviewPartitionFunc);
 
                 ActivateCandidates();
 
                 completed = true;
             }
 
-            void ReviewPartition(ref VectorI3 position)
+            bool ReviewPartition(VectorI3 offset)
             {
+                var position = eyePosition + offset;
+
                 // TODO
                 // クラスタを後でスレッド セーフにする。
 
                 // 既にアクティブならばスキップ。
-                if (manager.clusterManager.ContainsPartition(position)) return;
+                if (manager.clusterManager.ContainsPartition(position)) return true;
 
                 // 既に実行中ならばスキップ。
-                if (manager.activations.Contains(position)) return;
+                if (manager.activations.Contains(position)) return true;
 
                 // 非アクティブ化待機中ならばそれを破棄。
                 if (manager.waitPassivations.Contains(position))
                     manager.waitPassivations.Remove(position);
 
                 // アクティブ化可能であるかどうか。
-                if (!manager.CanActivatePartition(position)) return;
+                if (!manager.CanActivatePartition(position)) return true;
 
                 // プールからパーティションを取得。
-                // プール枯渇ならば終了。
                 var partition = manager.partitionPool.Borrow();
 
-                // TODO
-                if (partition == null) return;
+                // プール枯渇ならば終了。
+                if (partition == null) return false;
 
                 // パーティションを初期化。
                 if (partition.Initialize(position, manager.partitionSize))
@@ -391,6 +383,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                     // 初期化失敗ならば取消。
                     manager.partitionPool.Return(partition);
                 }
+
+                return true;
             }
 
             void ActivateCandidates()
@@ -1088,7 +1082,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             // 常に 1 つの非同期試行とするために制限。
             if (!activationReviewerExecuting)
             {
-                activationReviewer.Initialize(view, projection, eyePosition, 16);
+                activationReviewer.Initialize(view, projection, eyePosition, maxLandscapeVolume);
                 activationReviewTaskQueue.Enqueue(activationReviewer.ReviewAction);
                 activationReviewTaskQueue.Update();
 
