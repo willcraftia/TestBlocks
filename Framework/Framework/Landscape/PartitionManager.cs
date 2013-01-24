@@ -365,13 +365,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         ClusterManager clusterManager;
 
         /// <summary>
-        /// アクティブ パーティションの連結リスト。
-        /// 連結リストのノードはパーティションが管理しています。
-        /// アクティブ化と非アクティブ化の判定のために用いる連結リストであり、
-        /// 要素として登録されているパーティションの順序は、
-        /// アクティブ化と非アクティブ化の判定が実行されるごとに変化します。
+        /// アクティブ パーティションのキュー。
+        /// 非アクティブ化調査では、このキューの先頭から順にパーティションを取り出し、
+        /// 非アクティブ化可能であるか否かを判定します。
+        /// 非アクティブ化不能であった場合、このキューの末尾へパーティションを戻します。
         /// </summary>
-        LinkedList<Partition> partitions;
+        Queue<Partition> partitions;
 
         bool activationReviewerExecuting;
 
@@ -408,11 +407,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化判定の最大試行数。
         /// </summary>
         int passivationSearchCapacity;
-
-        /// <summary>
-        /// アクティブ化判定の開始インデックス。
-        /// </summary>
-        //int activationSearchOffset = 0;
 
         TaskQueue activationReviewTaskQueue = new TaskQueue();
 
@@ -519,7 +513,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             // TODO
             clusterManager = new ClusterManager(16, settings.PartitionSize, settings.ActiveClusterCapacity);
-            partitions = new LinkedList<Partition>();
+            partitions = new Queue<Partition>();
 
             activePartitionCapacity = settings.ActivePartitionCapacity;
             activationCapacity = settings.ActivationCapacity;
@@ -742,7 +736,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // アクティブ リストへ追加。
                 clusterManager.AddPartition(partition);
-                partitions.AddLast(partition.ListNode);
+                partitions.Enqueue(partition);
 
                 // 完了を通知。
                 partition.OnActivated();
@@ -810,10 +804,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 同時実行数を越えるならば終了。
                 if (passivationCapacity <= passivations.Count) break;
 
-                var node = partitions.First;
-                partitions.RemoveFirst();
-
-                var partition = node.Value;
+                var partition = partitions.Dequeue();
 
                 if (!Closing)
                 {
@@ -821,7 +812,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     //if (minLandscapeVolume.Contains(partition.Position))
                     {
                         // アクティブ状態維持領域内ならばリストへ戻す。
-                        partitions.AddLast(node);
+                        partitions.Enqueue(partition);
                         continue;
                     }
                 }
@@ -935,12 +926,10 @@ namespace Willcraftia.Xna.Framework.Landscape
             disposed = true;
         }
 
-        void DisposePartitions(ICollection<Partition> partitions)
+        void DisposePartitions(Queue<Partition> partitions)
         {
-            foreach (var partition in partitions)
-                partition.Dispose();
-
-            partitions.Clear();
+            while (0 < partitions.Count)
+                partitions.Dequeue().Dispose();
         }
 
         void DisposePartitions(ConcurrentKeyedPriorityQueue<VectorI3, Partition> partitions)

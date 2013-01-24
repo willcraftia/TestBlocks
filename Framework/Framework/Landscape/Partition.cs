@@ -64,8 +64,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal readonly Action PassivateAction;
 
-        internal readonly LinkedListNode<Partition> ListNode;
-
         /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
@@ -89,7 +87,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             ActivateAction = new Action(Activate);
             PassivateAction = new Action(Passivate);
-            ListNode = new LinkedListNode<Partition>(this);
         }
 
         /// <summary>
