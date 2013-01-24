@@ -512,7 +512,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
 
             // TODO
-            clusterManager = new ClusterManager(16, settings.PartitionSize, settings.ActiveClusterCapacity);
+            clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize, settings.ActiveClusterCapacity);
             partitions = new Queue<Partition>();
 
             activePartitionCapacity = settings.ActivePartitionCapacity;
@@ -832,9 +832,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // 非同期処理を要求。
                 passivationTaskQueue.Enqueue(partition.PassivateAction);
-
-                // 待機リストへ追加。
-                //waitPassivations.Add(partition);
             }
         }
 
