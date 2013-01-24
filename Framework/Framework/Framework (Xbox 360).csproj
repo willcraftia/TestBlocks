@@ -107,9 +107,9 @@
     <Compile Include="Collections\ListBase.cs" />
     <Compile Include="Collections\LruCollection.cs" />
     <Compile Include="Collections\LruDictionary.cs" />
-    <Compile Include="Collections\Octree.cs" />
     <Compile Include="Collections\Pool.cs" />
     <Compile Include="Collections\PriorityQueue.cs" />
+    <Compile Include="Collections\SimpleOctree.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentBundleDefinition.cs" />
     <Compile Include="Component\ComponentDefinition.cs" />
@@ -186,6 +186,7 @@
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\Monochrome.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
+    <Compile Include="Graphics\Octree.cs" />
     <Compile Include="Graphics\ParticleSettings.cs" />
     <Compile Include="Graphics\ParticleSystem.cs" />
     <Compile Include="Graphics\ParticleSystemCollection.cs" />

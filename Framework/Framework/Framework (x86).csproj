@@ -96,7 +96,7 @@
     <Compile Include="Collections\CubicCollection.cs" />
     <Compile Include="Collections\KeyedPriorityQueue.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
-    <Compile Include="Collections\Octree.cs" />
+    <Compile Include="Collections\SimpleOctree.cs" />
     <Compile Include="Collections\PriorityQueue.cs" />
     <Compile Include="Component\ComponentBundleBuilder.cs" />
     <Compile Include="Component\ComponentInfoManager.cs" />
@@ -131,6 +131,7 @@
     <Compile Include="Graphics\IEffectShadowMap.cs" />
     <Compile Include="Graphics\Scanline.cs" />
     <Compile Include="Graphics\SceneObjectCollection.cs" />
+    <Compile Include="Graphics\Octree.cs" />
     <Compile Include="Graphics\ShadowCasterCollection.cs" />
     <Compile Include="Graphics\SsaoMapBlur.cs" />
     <Compile Include="Graphics\Bloom.cs" />
