@@ -84,12 +84,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // メッシュの BoundingBox。
             var transform = mesh.World;
-            Vector3.Transform(ref boundingBox.Min, ref transform, out mesh.BoundingBox.Min);
-            Vector3.Transform(ref boundingBox.Max, ref transform, out mesh.BoundingBox.Max);
+            Vector3.Transform(ref boundingBox.Min, ref transform, out mesh.BoxWorld.Min);
+            Vector3.Transform(ref boundingBox.Max, ref transform, out mesh.BoxWorld.Max);
 
             // メッシュの BoundingSphere。
-            mesh.BoundingBox.GetCorners(corners);
-            mesh.BoundingSphere = BoundingSphere.CreateFromPoints(corners);
+            mesh.BoxWorld.GetCorners(corners);
+            mesh.SphereWorld = BoundingSphere.CreateFromPoints(corners);
 
             mesh.SetVertices(vertices, VertexCount);
             mesh.SetIndices(indices, IndexCount);

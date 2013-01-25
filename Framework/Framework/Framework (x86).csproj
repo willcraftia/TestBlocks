@@ -88,6 +88,7 @@
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
+    <Compile Include="BoundingBoxExtension.cs" />
     <Compile Include="BoundingBoxHelper.cs" />
     <Compile Include="Collections\ConcurrentKeyedPriorityQueue.cs" />
     <Compile Include="Collections\ConcurrentKeyedQueue.cs" />
@@ -129,10 +130,11 @@
     <Compile Include="Graphics\EffectHelper.cs" />
     <Compile Include="Graphics\IEffectEye.cs" />
     <Compile Include="Graphics\IEffectShadowMap.cs" />
+    <Compile Include="Graphics\OctreeRegion.cs" />
+    <Compile Include="Graphics\OctreeNode.cs" />
     <Compile Include="Graphics\Scanline.cs" />
-    <Compile Include="Graphics\SceneObjectCollection.cs" />
+    <Compile Include="Graphics\SceneNode.cs" />
     <Compile Include="Graphics\Octree.cs" />
-    <Compile Include="Graphics\ShadowCasterCollection.cs" />
     <Compile Include="Graphics\SsaoMapBlur.cs" />
     <Compile Include="Graphics\Bloom.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
@@ -155,7 +157,6 @@
     <Compile Include="Graphics\PostProcessor.cs" />
     <Compile Include="Graphics\PostProcessorCollection.cs" />
     <Compile Include="Graphics\SceneObject.cs" />
-    <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
     <Compile Include="Graphics\CubeMesh.cs" />

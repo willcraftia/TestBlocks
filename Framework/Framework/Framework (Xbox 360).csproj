@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="AppendNumberOptions.cs" />
     <Compile Include="ArrayHelper.cs" />
+    <Compile Include="BoundingBoxExtension.cs" />
     <Compile Include="BoundingBoxHelper.cs" />
     <Compile Include="BoundingBoxI.cs" />
     <Compile Include="CollectionHelper.cs" />
@@ -181,12 +182,13 @@
     <Compile Include="Graphics\IEffectEye.cs" />
     <Compile Include="Graphics\IEffectShadowMap.cs" />
     <Compile Include="Graphics\IPostProcessorContext.cs" />
-    <Compile Include="Graphics\ISceneObjectContext.cs" />
     <Compile Include="Graphics\LensFlare.cs" />
     <Compile Include="Graphics\LightCamera.cs" />
     <Compile Include="Graphics\Monochrome.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\Octree.cs" />
+    <Compile Include="Graphics\OctreeNode.cs" />
+    <Compile Include="Graphics\OctreeRegion.cs" />
     <Compile Include="Graphics\ParticleSettings.cs" />
     <Compile Include="Graphics\ParticleSystem.cs" />
     <Compile Include="Graphics\ParticleSystemCollection.cs" />
@@ -195,10 +197,9 @@
     <Compile Include="Graphics\PrimitiveMesh.cs" />
     <Compile Include="Graphics\Scanline.cs" />
     <Compile Include="Graphics\SceneManager.cs" />
+    <Compile Include="Graphics\SceneNode.cs" />
     <Compile Include="Graphics\SceneObject.cs" />
-    <Compile Include="Graphics\SceneObjectCollection.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
-    <Compile Include="Graphics\ShadowCasterCollection.cs" />
     <Compile Include="Graphics\ShadowMap.cs" />
     <Compile Include="Graphics\SphereMesh.cs" />
     <Compile Include="Graphics\Ssao.cs" />

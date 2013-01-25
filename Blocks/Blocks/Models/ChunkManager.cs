@@ -517,7 +517,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     TotalIndexCount -= chunk.OpaqueMesh.IndexCount;
                 }
 
-                chunk.OpaqueMesh.Position = position;
+                chunk.OpaqueMesh.PositionWorld = position;
                 chunk.OpaqueMesh.World = world;
                 builder.Opaque.Populate(chunk.OpaqueMesh);
 
@@ -550,7 +550,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     TotalIndexCount -= chunk.TranslucentMesh.IndexCount;
                 }
 
-                chunk.TranslucentMesh.Position = position;
+                chunk.TranslucentMesh.PositionWorld = position;
                 chunk.TranslucentMesh.World = world;
                 builder.Translucent.Populate(chunk.TranslucentMesh);
 

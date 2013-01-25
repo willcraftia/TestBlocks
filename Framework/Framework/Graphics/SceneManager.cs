@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Diagnostics;
 
 #endregion
 
 namespace Willcraftia.Xna.Framework.Graphics
 {
-    public sealed class SceneManager : ISceneObjectContext
+    public sealed class SceneManager
     {
         #region Settings
 
@@ -37,8 +38,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 float d1;
                 float d2;
-                Vector3.DistanceSquared(ref EyePosition, ref o1.Position, out d1);
-                Vector3.DistanceSquared(ref EyePosition, ref o2.Position, out d2);
+                Vector3.DistanceSquared(ref EyePosition, ref o1.PositionWorld, out d1);
+                Vector3.DistanceSquared(ref EyePosition, ref o2.PositionWorld, out d2);
 
                 if (d1 == d2) return 0;
                 return (d1 < d2) ? -1 : 1;
@@ -97,6 +98,30 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region SceneObjectCollection
+
+        public sealed class SceneObjectCollection : ListBase<SceneObject>
+        {
+            public SceneObjectCollection(int capacity)
+                : base(capacity)
+            {
+            }
+        }
+
+        #endregion
+
+        #region ShadowCasterCollection
+
+        public sealed class ShadowCasterCollection : ListBase<ShadowCaster>
+        {
+            public ShadowCasterCollection(int capacity)
+                : base(capacity)
+            {
+            }
+        }
+
+        #endregion
+
         public const int InitialCameraCapacity = 10;
 
         public const int InitialDirectionalLightCapacity = 10;
@@ -133,7 +158,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         public event EventHandler ShadowMapUpdated = delegate { };
 
-        SceneObject skySphere;
+        SceneNode skySphereNode;
 
         string activeCameraName;
 
@@ -251,17 +276,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public Vector3 BackgroundColor { get; set; }
 
-        public SceneObject SkySphere
+        public SceneNode SkySphere
         {
-            get { return skySphere; }
-            set
-            {
-                if (skySphere != null) skySphere.Context = null;
-
-                skySphere = value;
-
-                if (skySphere != null) skySphere.Context = this;
-            }
+            get { return skySphereNode; }
+            set { skySphereNode = value; }
         }
 
         public SceneObjectCollection OpaqueObjects { get; private set; }
@@ -303,9 +321,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             DirectionalLights = new DirectionalLightCollection(InitialDirectionalLightCapacity);
             ParticleSystems = new ParticleSystemCollection(InitialParticleSystemCapacity);
             PostProcessors = new PostProcessorCollection(InitialPostProcessorCapacity);
-            OpaqueObjects = new SceneObjectCollection(this, InitialSceneObjectCapacity);
-            TranslucentObjects = new SceneObjectCollection(this, InitialSceneObjectCapacity);
-            ShadowCasters = new ShadowCasterCollection(this, InitialShadowCasterCapacity);
+            OpaqueObjects = new SceneObjectCollection(InitialSceneObjectCapacity);
+            TranslucentObjects = new SceneObjectCollection(InitialSceneObjectCapacity);
+            ShadowCasters = new ShadowCasterCollection(InitialShadowCasterCapacity);
 
             //----------------------------------------------------------------
             // シーン描画のためのレンダ ターゲット
@@ -495,13 +513,13 @@ namespace Willcraftia.Xna.Framework.Graphics
         bool IsVisibleObject(SceneObject sceneObject)
         {
             // 球同士で判定。
-            if (!sceneObject.BoundingSphere.Intersects(frustumSphere)) return false;
+            if (!sceneObject.SphereWorld.Intersects(frustumSphere)) return false;
 
             // 球と視錐台で判定。
-            if (!sceneObject.BoundingSphere.Intersects(frustumSphere)) return false;
+            if (!sceneObject.SphereWorld.Intersects(frustumSphere)) return false;
 
             // 視錐台と AABB で判定。
-            return sceneObject.BoundingBox.Intersects(activeCamera.Frustum);
+            return sceneObject.BoxWorld.Intersects(activeCamera.Frustum);
         }
 
         void DrawShadowMap()
@@ -596,8 +614,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // スカイ スフィア
 
-            if (SkySphere != null && SkySphere.Visible)
-                SkySphere.Draw();
+            foreach (var obj in skySphereNode.Objects)
+            {
+                if (obj.Visible) obj.Draw();
+            }
+
+            //if (skySphere != null && skySphere.Visible)
+            //    skySphere.Draw();
 
             Monitor.End(MonitorDrawSceneObjects);
 
@@ -678,7 +701,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         void DebugDrawBoundingBox(SceneObject sceneObject)
         {
             var color = (sceneObject.Occluded) ? Color.Gray : Color.White;
-            debugBoundingBoxDrawer.Draw(ref sceneObject.BoundingBox, debugBoundingBoxEffect, ref color);
+            debugBoundingBoxDrawer.Draw(ref sceneObject.BoxWorld, debugBoundingBoxEffect, ref color);
         }
     }
 }

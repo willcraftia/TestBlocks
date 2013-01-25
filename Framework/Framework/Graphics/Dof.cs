@@ -314,13 +314,13 @@ namespace Willcraftia.Xna.Framework.Graphics
         bool IsVisibleObject(SceneObject sceneObject)
         {
             // 球同士で判定。
-            if (!sceneObject.BoundingSphere.Intersects(frustumSphere)) return false;
+            if (!sceneObject.SphereWorld.Intersects(frustumSphere)) return false;
 
             // 球と視錐台で判定。
-            if (!sceneObject.BoundingSphere.Intersects(frustumSphere)) return false;
+            if (!sceneObject.SphereWorld.Intersects(frustumSphere)) return false;
 
             // 視錐台と AABB で判定。
-            return sceneObject.BoundingBox.Intersects(internalCamera.Frustum);
+            return sceneObject.BoxWorld.Intersects(internalCamera.Frustum);
         }
 
         #region IDisposable

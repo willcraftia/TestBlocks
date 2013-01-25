@@ -87,7 +87,9 @@ namespace Willcraftia.Xna.Blocks.Models
             }
             Effect.SunVisible = SunVisible;
 
-            var camera = Context.ActiveCamera;
+            //var camera = Context.ActiveCamera;
+
+            var camera = Parent.Manager.ActiveCamera;
 
             //
             // メモ

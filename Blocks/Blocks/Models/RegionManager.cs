@@ -75,9 +75,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
             skySphere = LoadAsset<SkySphere>("title:Resources/Models/SkySphere.json");
             skySphere.SceneSettings = SceneSettings;
+            // TODO
+            skySphere.Name = "SkySphere";
 
             // シーン マネージャへ登録
-            sceneManager.SkySphere = skySphere;
+            // TODO
+            var skySphereNode = new SceneNode(sceneManager, "SkySphere");
+            skySphereNode.Objects.Add(skySphere);
+
+            sceneManager.SkySphere = skySphereNode;
 
             //----------------------------------------------------------------
             // チャンク エフェクト

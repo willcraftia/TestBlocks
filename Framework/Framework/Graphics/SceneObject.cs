@@ -13,19 +13,47 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// <summary>
         /// 位置。
         /// </summary>
-        public Vector3 Position;
+        public Vector3 PositionWorld;
 
         /// <summary>
         /// オブジェクトのメッシュ全体を含む BoundingBox。
         /// </summary>
-        public BoundingBox BoundingBox;
+        public BoundingBox BoxWorld;
 
         /// <summary>
         /// オブジェクトのメッシュ全体を含む BoundingSphere。
         /// </summary>
-        public BoundingSphere BoundingSphere;
+        public BoundingSphere SphereWorld;
 
-        public ISceneObjectContext Context { get; set; }
+        string name;
+
+        public string Name
+        {
+            get { return name; }
+            set
+            {
+                // TODO
+                // コンストラクタで確定させたい。
+
+                if (value == null) throw new ArgumentNullException("value");
+
+                if (Parent != null)
+                {
+                    if (Parent.Objects.Contains(value))
+                        throw new ArgumentException("Name duplicate.", "value");
+
+                    // 今の名前での登録を解除。
+                    if (name != null) Parent.Objects.Remove(this);
+                }
+
+                name = value;
+
+                // 新たな名前で再登録。
+                if (Parent != null) Parent.Objects.Add(this);
+            }
+        }
+
+        public SceneNode Parent { get; internal set; }
 
         /// <summary>
         /// 可視か否かを示す値を取得または設定します。

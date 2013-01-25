@@ -522,19 +522,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public void TryAddShadowCaster(ShadowCaster shadowCaster)
         {
-            if (!shadowCaster.BoundingSphere.Intersects(frustumBoundingBox)) return;
-            if (!shadowCaster.BoundingBox.Intersects(frustumBoundingBox)) return;
+            if (!shadowCaster.SphereWorld.Intersects(frustumBoundingBox)) return;
+            if (!shadowCaster.BoxWorld.Intersects(frustumBoundingBox)) return;
 
             for (int i = 0; i < splitCameras.Length; i++)
             {
                 var lightCamera = splitCameras[i];
 
                 bool shouldAdd = false;
-                if (shadowCaster.BoundingSphere.Intersects(lightCamera.Frustum))
+                if (shadowCaster.SphereWorld.Intersects(lightCamera.Frustum))
                 {
                     shouldAdd = true;
                 }
-                else if (shadowCaster.BoundingBox.Intersects(lightCamera.Frustum))
+                else if (shadowCaster.BoxWorld.Intersects(lightCamera.Frustum))
                 {
                     shouldAdd = true;
                 }
