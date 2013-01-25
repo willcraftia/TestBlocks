@@ -130,8 +130,7 @@
     <Compile Include="Graphics\EffectHelper.cs" />
     <Compile Include="Graphics\IEffectEye.cs" />
     <Compile Include="Graphics\IEffectShadowMap.cs" />
-    <Compile Include="Graphics\OctreeRegion.cs" />
-    <Compile Include="Graphics\OctreeNode.cs" />
+    <Compile Include="Graphics\OctreeManager.cs" />
     <Compile Include="Graphics\Scanline.cs" />
     <Compile Include="Graphics\SceneNode.cs" />
     <Compile Include="Graphics\Octree.cs" />

@@ -28,19 +28,6 @@ namespace Willcraftia.Xna.Framework.Graphics
                 this.parent = parent;
             }
 
-            public bool Contains(string name)
-            {
-                return dictionary.ContainsKey(name);
-            }
-
-            public bool Remove(string name)
-            {
-                SceneNode node;
-                if (!dictionary.TryGetValue(name, out node)) return false;
-
-                return Remove(node);
-            }
-
             #region ICollection
 
             public void Add(SceneNode item)
@@ -56,7 +43,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             public void Clear()
             {
                 foreach (var item in dictionary.Values)
+                {
+                    // 八分木から削除。
+                    RemoveOctreeSceneNode(item);
+
                     item.Parent = null;
+                }
 
                 dictionary.Clear();
             }
@@ -90,6 +82,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 if (item == null) throw new ArgumentNullException("item");
 
+                // 八分木から削除。
+                RemoveOctreeSceneNode(item);
+
                 item.Parent = null;
                 return dictionary.Remove(item.Name);
             }
@@ -105,6 +100,29 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             #endregion
+
+            public bool Contains(string name)
+            {
+                return dictionary.ContainsKey(name);
+            }
+
+            public bool Remove(string name)
+            {
+                SceneNode node;
+                if (!dictionary.TryGetValue(name, out node)) return false;
+
+                return Remove(node);
+            }
+
+            void RemoveOctreeSceneNode(SceneNode item)
+            {
+                // 自分の削除。
+                item.Manager.RemoveOctreeSceneNode(item);
+
+                // 子も全て八分木から削除。
+                foreach (var child in item.Children)
+                    RemoveOctreeSceneNode(child);
+            }
         }
 
         #endregion
@@ -147,7 +165,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 if (item == null) throw new ArgumentNullException("item");
                 if (item.Parent != null) throw new ArgumentException(string.Format(
                     "SceneObject '{0}' already was a child of '{1}'.", item.Name, item.Parent.Name));
-                if (dictionary.ContainsKey(item.Name)) throw new ArgumentException("Name duplicate.");
+                if (dictionary.ContainsKey(item.Name)) throw new ArgumentException("Name duplicate: " + item.Name);
 
                 item.Parent = parent;
 
@@ -223,6 +241,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public SceneManager Manager { get; private set; }
 
+        public Octree Octree { get; internal set; }
+
         public SceneNode(SceneManager manager, string name)
         {
             if (manager == null) throw new ArgumentNullException("manager");
@@ -235,8 +255,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             Objects = new ObjectCollection(this);
         }
 
-        public void Update()
+        public void Update(bool updateChildren)
         {
+            if (updateChildren)
+            {
+                foreach (var child in Children)
+                    child.Update(true);
+            }
+
             UpdateBoxWorld();
         }
 
@@ -247,6 +273,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             foreach (var obj in Objects)
                 BoundingBox.CreateMerged(ref BoxWorld, ref obj.BoxWorld, out BoxWorld);
+
+            Manager.UpdateOctreeSceneNode(this);
         }
     }
 }

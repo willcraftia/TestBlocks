@@ -13,7 +13,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         #region NodeCollection
 
-        public sealed class NodeCollection : ListBase<OctreeNode>
+        public sealed class NodeCollection : ListBase<SceneNode>
         {
             Octree octree;
 
@@ -22,14 +22,16 @@ namespace Willcraftia.Xna.Framework.Graphics
                 this.octree = octree;
             }
 
-            protected override void InsertOverride(int index, OctreeNode item)
+            protected override void InsertOverride(int index, SceneNode item)
             {
                 item.Octree = octree;
+
+                octree.Ref();
 
                 base.InsertOverride(index, item);
             }
 
-            protected override void SetOverride(int index, OctreeNode item)
+            protected override void SetOverride(int index, SceneNode item)
             {
                 var removed = this[index];
                 removed.Octree = null;
@@ -44,13 +46,19 @@ namespace Willcraftia.Xna.Framework.Graphics
                 var removed = this[index];
                 removed.Octree = null;
 
+                octree.Unref();
+
                 base.RemoveAtOverride(index);
             }
 
             protected override void ClearOverride()
             {
                 foreach (var item in this)
+                {
                     item.Octree = null;
+
+                    octree.Unref();
+                }
 
                 base.ClearOverride();
             }
@@ -60,21 +68,36 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public BoundingBox Box;
 
-        Octree parent;
-
         Octree[, ,] children = new Octree[2, 2, 2];
+
+        public Octree Parent { get; private set; }
 
         public Octree this[int x, int y, int z]
         {
             get { return children[x, y, z]; }
-            set { children[x, y, z] = value; }
+            set
+            {
+                if (children[x, y, z] != null)
+                    children[x, y, z].Parent = null;
+
+                children[x, y, z] = value;
+
+                if (children[x, y, z] != null)
+                    children[x, y, z].Parent = this;
+            }
+        }
+
+        public Octree Root
+        {
+            get { return (Parent == null) ? this : Parent.Root; }
         }
 
         public NodeCollection Nodes { get; private set; }
 
-        public Octree(Octree parent)
+        public int NodeCount { get; private set; }
+
+        public Octree()
         {
-            this.parent = parent;
             Nodes = new NodeCollection(this);
         }
 
@@ -102,55 +125,18 @@ namespace Willcraftia.Xna.Framework.Graphics
             z = (targetCenter.Z <= center.Z) ? 0 : 1;
         }
 
-        public void AllocateChild(int x, int y, int z)
+        void Ref()
         {
-            if (children[x, y, z] != null) return;
+            NodeCount++;
 
-            // 子がまだ存在しないなら生成。
-            var child = new Octree(this);
-            children[x, y, z] = child;
+            if (Parent != null) Parent.Ref();
+        }
 
-            var max = Box.Max;
-            var min = Box.Min;
+        void Unref()
+        {
+            NodeCount--;
 
-            var childMax = new Vector3();
-            var childMin = new Vector3();
-
-            if (x == 0)
-            {
-                childMin.X = min.X;
-                childMax.X = (min.X + max.X) / 2;
-            }
-            else
-            {
-                childMin.X = (min.X + max.X) / 2;
-                childMax.X = max.X;
-            }
-
-            if (y == 0)
-            {
-                childMin.Y = min.Y;
-                childMax.Y = (min.Y + max.Y) / 2;
-            }
-            else
-            {
-                childMin.Y = (min.Y + max.Y) / 2;
-                childMax.Y = max.Y;
-            }
-
-            if (z == 0)
-            {
-                childMin.Z = min.Z;
-                childMax.Z = (min.Z + max.Z) / 2;
-            }
-            else
-            {
-                childMin.Z = (min.Z + max.Z) / 2;
-                childMax.Z = max.Z;
-            }
-
-            child.Box.Min = childMin;
-            child.Box.Max = childMax;
+            if (Parent != null) Parent.Unref();
         }
     }
 }

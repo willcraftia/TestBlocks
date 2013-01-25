@@ -187,8 +187,7 @@
     <Compile Include="Graphics\Monochrome.cs" />
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\Octree.cs" />
-    <Compile Include="Graphics\OctreeNode.cs" />
-    <Compile Include="Graphics\OctreeRegion.cs" />
+    <Compile Include="Graphics\OctreeManager.cs" />
     <Compile Include="Graphics\ParticleSettings.cs" />
     <Compile Include="Graphics\ParticleSystem.cs" />
     <Compile Include="Graphics\ParticleSystemCollection.cs" />

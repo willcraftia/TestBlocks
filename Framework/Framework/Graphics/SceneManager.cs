@@ -158,6 +158,8 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         public event EventHandler ShadowMapUpdated = delegate { };
 
+        OctreeManager octreeManager;
+
         SceneNode skySphereNode;
 
         string activeCameraName;
@@ -348,12 +350,30 @@ namespace Willcraftia.Xna.Framework.Graphics
             postProcessRenderTarget = new RenderTarget2D(GraphicsDevice, width, height,
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
 
+            // TODO
+            octreeManager = new OctreeManager(new Vector3(256), 4);
+
 #if DEBUG || TRACE
             debugBoundingBoxEffect = new BasicEffect(GraphicsDevice);
             debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
             debugBoundingBoxEffect.VertexColorEnabled = true;
             debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
 #endif
+        }
+
+        public SceneNode CreateSceneNode(string name)
+        {
+            return new SceneNode(this, name);
+        }
+
+        public void UpdateOctreeSceneNode(SceneNode node)
+        {
+            octreeManager.Update(node);
+        }
+
+        public void RemoveOctreeSceneNode(SceneNode node)
+        {
+            octreeManager.Remove(node);
         }
 
         public void Draw(GameTime gameTime)
