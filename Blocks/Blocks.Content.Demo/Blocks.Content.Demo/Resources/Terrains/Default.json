@@ -73,7 +73,7 @@
         },
         {
           "Name": "Persistence",
-          "Value": "0.5"
+          "Value": "0.1"
         },
         {
           "Name": "OctaveCount",
@@ -95,11 +95,11 @@
         },
         {
           "Name": "Bias",
-          "Value": "-0.45"
+          "Value": "-0.75"
         },
         {
           "Name": "Scale",
-          "Value": "0.125"
+          "Value": "0.225"
         }
       ]
     },
@@ -343,11 +343,11 @@
         },
         {
           "Name": "Frequency",
-          "Value": "0.5"
+          "Value": "0.7"
         },
         {
           "Name": "Lacunarity",
-          "Value": "0.2"
+          "Value": "0.7"
         },
         {
           "Name": "OctaveCount",
@@ -451,7 +451,7 @@
         },
         {
           "Name": "EdgeFalloff",
-          "Value": "0.8"
+          "Value": "0.5"
         },
         {
           "Name": "LowerBound",
@@ -511,16 +511,8 @@
     },
     {
       "Name": "CaveShape",
-      "Type": "RidgedMultifractal",
+      "Type": "SumFractal",
       "Properties": [
-        {
-          "Name": "Offset",
-          "Value": "1"
-        },
-        {
-          "Name": "Gain",
-          "Value": "2"
-        },
         {
           "Name": "Name",
           "Value": "Cave Shape"
@@ -531,7 +523,7 @@
         },
         {
           "Name": "Hurst",
-          "Value": "1"
+          "Value": "0.9"
         },
         {
           "Name": "Frequency",
@@ -539,7 +531,7 @@
         },
         {
           "Name": "Lacunarity",
-          "Value": "2"
+          "Value": "4"
         },
         {
           "Name": "OctaveCount",
@@ -548,138 +540,28 @@
       ]
     },
     {
-      "Name": "CaveAttenuateBias",
-      "Type": "ScaleBias",
+      "Name": "CaveScalePoint",
+      "Type": "ScalePoint",
       "Properties": [
         {
           "Name": "Name",
-          "Value": "Cave Attenuate ScaleBias"
+          "Value": "Cave ScalePoint"
         },
         {
           "Name": "Source",
-          "Value": "TerrainSelectCache"
-        },
-        {
-          "Name": "Bias",
-          "Value": "0.45"
-        },
-        {
-          "Name": "Scale",
-          "Value": "1"
-        }
-      ]
-    },
-    {
-      "Name": "CaveShapeAttenuate",
-      "Type": "Multiply",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Cave Shape Attenuate"
-        },
-        {
-          "Name": "Source0",
           "Value": "CaveShape"
         },
         {
-          "Name": "Source1",
-          "Value": "CaveAttenuateBias"
-        }
-      ]
-    },
-    {
-      "Name": "CavePerturbPerlin",
-      "Type": "Perlin",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Cave Perturb Perlin"
+          "Name": "ScaleX",
+          "Value": "0.25"
         },
         {
-          "Name": "Seed",
-          "Value": "600"
+          "Name": "ScaleY",
+          "Value": "0.25"
         },
         {
-          "Name": "FadeCurve",
-          "Value": "DefaultFadeCurve"
-        }
-      ]
-    },
-    {
-      "Name": "CavePerturnFractal",
-      "Type": "SumFractal",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Cave Perturb Fractal"
-        },
-        {
-          "Name": "Source",
-          "Value": "CavePerturbPerlin"
-        },
-        {
-          "Name": "Hurst",
-          "Value": "0.9"
-        },
-        {
-          "Name": "Frequency",
-          "Value": "3"
-        },
-        {
-          "Name": "Lacunarity",
-          "Value": "2"
-        },
-        {
-          "Name": "OctaveCount",
-          "Value": "6"
-        }
-      ]
-    },
-    {
-      "Name": "CavePerturbScaleBias",
-      "Type": "ScaleBias",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Cave Perturb ScaleBias"
-        },
-        {
-          "Name": "Source",
-          "Value": "CavePerturnFractal"
-        },
-        {
-          "Name": "Bias",
-          "Value": "0"
-        },
-        {
-          "Name": "Scale",
-          "Value": "0.5"
-        }
-      ]
-    },
-    {
-      "Name": "CavePerturb",
-      "Type": "Displace",
-      "Properties": [
-        {
-          "Name": "Name",
-          "Value": "Cave Perturb"
-        },
-        {
-          "Name": "Source",
-          "Value": "CaveShapeAttenuate"
-        },
-        {
-          "Name": "DisplaceX",
-          "Value": "CavePerturbScaleBias"
-        },
-        {
-          "Name": "DisplaceY",
-          "Value": "ConstZero"
-        },
-        {
-          "Name": "DisplaceZ",
-          "Value": "ConstZero"
+          "Name": "ScaleZ",
+          "Value": "0.25"
         }
       ]
     },
@@ -693,7 +575,7 @@
         },
         {
           "Name": "Controller",
-          "Value": "CavePerturb"
+          "Value": "CaveScalePoint"
         },
         {
           "Name": "LowerSource",
@@ -709,7 +591,7 @@
         },
         {
           "Name": "LowerBound",
-          "Value": "0.2"
+          "Value": "0.1"
         },
         {
           "Name": "UpperBound",
