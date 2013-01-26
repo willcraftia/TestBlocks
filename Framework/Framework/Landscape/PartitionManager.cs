@@ -29,15 +29,11 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             VectorI3 clusterSize = new VectorI3(8);
 
-            int activePartitionCapacity = 5000;
-
             int activeClusterCapacity = 50;
 
             int activationCapacity = 3;
 
             int passivationCapacity = 10;
-
-            int activationSearchCapacity = 100;
 
             int passivationSearchCapacity = 200;
 
@@ -75,17 +71,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            public int ActivePartitionCapacity
-            {
-                get { return activePartitionCapacity; }
-                set
-                {
-                    if (value < 0) throw new ArgumentOutOfRangeException("value");
-
-                    activePartitionCapacity = value;
-                }
-            }
-
             public int ActiveClusterCapacity
             {
                 get { return activeClusterCapacity; }
@@ -116,17 +101,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                     if (value < 1) throw new ArgumentOutOfRangeException("value");
 
                     passivationCapacity = value;
-                }
-            }
-
-            public int ActivationSearchCapacity
-            {
-                get { return activationSearchCapacity; }
-                set
-                {
-                    if (value < 1) throw new ArgumentOutOfRangeException("value");
-
-                    activationSearchCapacity = value;
                 }
             }
 
@@ -386,8 +360,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         ConcurrentKeyedQueue<VectorI3, Partition> passivations;
 
-        int activePartitionCapacity;
-
         /// <summary>
         /// 同時アクティブ化実行許容量。
         /// </summary>
@@ -397,11 +369,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 同時非アクティブ化実行許容量。
         /// </summary>
         int passivationCapacity;
-
-        /// <summary>
-        /// アクティブ化判定の最大試行数。
-        /// </summary>
-        int activationSearchCapacity;
 
         /// <summary>
         /// 非アクティブ化判定の最大試行数。
@@ -515,7 +482,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize, settings.ActiveClusterCapacity);
             partitions = new Queue<Partition>();
 
-            activePartitionCapacity = settings.ActivePartitionCapacity;
             activationCapacity = settings.ActivationCapacity;
             passivationCapacity = settings.PassivationCapacity;
 
@@ -534,7 +500,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             minActiveVolume = settings.MinActiveVolume ?? new DefaultActiveVolume(4);
             maxActiveVolume = settings.MaxActiveVolume ?? new DefaultActiveVolume(8);
 
-            activationSearchCapacity = settings.ActivationSearchCapacity;
             passivationSearchCapacity = settings.PassivationSearchCapacity;
         }
 

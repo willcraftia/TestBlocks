@@ -494,6 +494,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 {
                     Name = "Lowland Fractal",
                     OctaveCount = 2,
+                    Persistence = 0.1f,
                     Source = lowlandPerlin
                 };
                 builder.Add("LowlandFractal", lowlandFractal);
@@ -501,8 +502,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var lowlandScaleBias = new ScaleBias
                 {
                     Name = "Lowland ScaleBias",
-                    Scale = 0.125f,
-                    Bias = -0.45f,
+                    Scale = 0.225f,
+                    Bias = -0.75f,
                     Source = lowlandFractal
                 };
                 builder.Add("LowlandScaleBias", lowlandScaleBias);
@@ -598,8 +599,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var terrainTypeFractal = new SumFractal
                 {
                     Name = "Terrain Type Fractal",
-                    Frequency = 0.5f,
-                    Lacunarity = 0.2f,
+                    Frequency = 0.7f,
+                    Lacunarity = 0.7f,
                     Source = terrainTypePerlin
                 };
                 builder.Add("TerrainTypeFractal", terrainTypeFractal);
@@ -650,7 +651,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     UpperSource = highlandMountainSelect,
                     UpperBound = 1000,
                     Controller = terrainType,
-                    EdgeFalloff = 0.8f
+                    EdgeFalloff = 0.5f
                 };
                 builder.Add("TerrainSelect", terrainSelect);
 
@@ -673,6 +674,93 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 };
                 builder.Add("TerrainDensity", terrainDensity);
 
+                ////------------------------------------------------------------
+                ////
+                //// 洞窟形状
+                ////
+
+                //var cavePerlin = new Perlin
+                //{
+                //    Name = "Cave Perlin",
+                //    Seed = 500
+                //};
+                //builder.Add("CavePerlin", cavePerlin);
+
+                //var caveShape = new RidgedMultifractal
+                //{
+                //    Name = "Cave Shape",
+                //    OctaveCount = 1,
+                //    Frequency = 4,
+                //    Source = cavePerlin
+                //};
+                //builder.Add("CaveShape", caveShape);
+
+                //var caveAttenuateBias = new ScaleBias
+                //{
+                //    Name = "Cave Attenuate ScaleBias",
+                //    Bias = 0.45f,
+                //    Source = terrainSelectCache
+                //};
+                //builder.Add("CaveAttenuateBias", caveAttenuateBias);
+
+                //var caveShapeAttenuate = new Multiply
+                //{
+                //    Name = "Cave Shape Attenuate",
+                //    Source0 = caveShape,
+                //    Source1 = caveAttenuateBias
+                //};
+                //builder.Add("CaveShapeAttenuate", caveShapeAttenuate);
+
+                //var cavePerturbPerlin = new Perlin
+                //{
+                //    Name = "Cave Perturb Perlin",
+                //    Seed = 600
+                //};
+                //builder.Add("CavePerturbPerlin", cavePerturbPerlin);
+
+                //var cavePerturnFractal = new SumFractal
+                //{
+                //    Name = "Cave Perturb Fractal",
+                //    OctaveCount = 6,
+                //    Frequency = 3,
+                //    Source = cavePerturbPerlin
+                //};
+                //builder.Add("CavePerturnFractal", cavePerturnFractal);
+
+                //var cavePerturbScaleBias = new ScaleBias
+                //{
+                //    Name = "Cave Perturb ScaleBias",
+                //    Scale = 0.5f,
+                //    Source = cavePerturnFractal
+                //};
+                //builder.Add("CavePerturbScaleBias", cavePerturbScaleBias);
+
+                //var cavePerturb = new Displace
+                //{
+                //    Name = "Cave Perturb",
+                //    DisplaceX = cavePerturbScaleBias,
+                //    DisplaceY = constZero,
+                //    DisplaceZ = constZero,
+                //    Source = caveShapeAttenuate
+                //};
+                //builder.Add("CavePerturb", cavePerturb);
+
+                ////------------------------------------------------------------
+                ////
+                //// 洞窟密度
+                ////
+
+                //var caveDensity = new Select
+                //{
+                //    Name = "Cave Density",
+                //    LowerBound = 0.2f,
+                //    LowerSource = constOne,
+                //    UpperBound = 1000,
+                //    UpperSource = constZero,
+                //    Controller = cavePerturb
+                //};
+                //builder.Add("CaveDensity", caveDensity);
+
                 //------------------------------------------------------------
                 //
                 // 洞窟形状
@@ -685,64 +773,26 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 };
                 builder.Add("CavePerlin", cavePerlin);
 
-                var caveShape = new RidgedMultifractal
+                var caveShape = new SumFractal
                 {
                     Name = "Cave Shape",
                     OctaveCount = 1,
                     Frequency = 4,
+                    Lacunarity = 4,
                     Source = cavePerlin
                 };
                 builder.Add("CaveShape", caveShape);
 
-                var caveAttenuateBias = new ScaleBias
+                // サンプリング範囲を狭めて洞窟の広さを調整。
+                var caveScalePoint = new ScalePoint
                 {
-                    Name = "Cave Attenuate ScaleBias",
-                    Bias = 0.45f,
-                    Source = terrainSelectCache
+                    Name = "Cave ScalePoint",
+                    ScaleX = 0.25f,
+                    ScaleY = 0.25f,
+                    ScaleZ = 0.25f,
+                    Source = caveShape
                 };
-                builder.Add("CaveAttenuateBias", caveAttenuateBias);
-
-                var caveShapeAttenuate = new Multiply
-                {
-                    Name = "Cave Shape Attenuate",
-                    Source0 = caveShape,
-                    Source1 = caveAttenuateBias
-                };
-                builder.Add("CaveShapeAttenuate", caveShapeAttenuate);
-
-                var cavePerturbPerlin = new Perlin
-                {
-                    Name = "Cave Perturb Perlin",
-                    Seed = 600
-                };
-                builder.Add("CavePerturbPerlin", cavePerturbPerlin);
-
-                var cavePerturnFractal = new SumFractal
-                {
-                    Name = "Cave Perturb Fractal",
-                    OctaveCount = 6,
-                    Frequency = 3,
-                    Source = cavePerturbPerlin
-                };
-                builder.Add("CavePerturnFractal", cavePerturnFractal);
-
-                var cavePerturbScaleBias = new ScaleBias
-                {
-                    Name = "Cave Perturb ScaleBias",
-                    Scale = 0.5f,
-                    Source = cavePerturnFractal
-                };
-                builder.Add("CavePerturbScaleBias", cavePerturbScaleBias);
-
-                var cavePerturb = new Displace
-                {
-                    Name = "Cave Perturb",
-                    DisplaceX = cavePerturbScaleBias,
-                    DisplaceY = constZero,
-                    DisplaceZ = constZero,
-                    Source = caveShapeAttenuate
-                };
-                builder.Add("CavePerturb", cavePerturb);
+                builder.Add("CaveScalePoint", caveScalePoint);
 
                 //------------------------------------------------------------
                 //
@@ -752,11 +802,11 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var caveDensity = new Select
                 {
                     Name = "Cave Density",
-                    LowerBound = 0.2f,
+                    LowerBound = 0.1f,
                     LowerSource = constOne,
                     UpperBound = 1000,
                     UpperSource = constZero,
-                    Controller = cavePerturb
+                    Controller = caveScalePoint
                 };
                 builder.Add("CaveDensity", caveDensity);
 
@@ -1065,6 +1115,140 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 builder.BuildDefinition(out bundle);
 
                 SerializeAndDeserialize<ComponentBundleDefinition>("Terrains/Simple", bundle);
+            }
+            Console.WriteLine();
+
+            #endregion
+
+            #region 洞窟ノイズ コンポーネント (テスト用)
+
+            Console.WriteLine("洞窟ノイズ コンポーネント (テスト用)");
+            {
+                var componentInfoManager = new ComponentInfoManager(NoiseLoader.ComponentTypeRegistory);
+                var builder = new ComponentBundleBuilder(componentInfoManager);
+
+                //------------------------------------------------------------
+                //
+                // フェード曲線
+                //
+
+                // デフォルトでは Perlin.FadeCurve は静的フィールドで共有状態なので、
+                // ここで一つだけビルダへ登録しておく。
+                builder.Add("DefaultFadeCurve", Perlin.DefaultFadeCurve);
+
+                //------------------------------------------------------------
+                //
+                // 定数
+                //
+
+                var constZero = new Const
+                {
+                    Name = "Const Zero",
+                    Value = 0
+                };
+                builder.Add("ConstZero", constZero);
+
+                var constOne = new Const
+                {
+                    Name = "Const One",
+                    Value = 1
+                };
+                builder.Add("ConstOne", constOne);
+
+                //------------------------------------------------------------
+                //
+                // 洞窟形状
+                //
+
+                var cavePerlin = new Perlin
+                {
+                    Name = "Cave Perlin",
+                    Seed = 500
+                };
+                builder.Add("CavePerlin", cavePerlin);
+
+                var caveShape = new SumFractal
+                {
+                    Name = "Cave Shape",
+                    OctaveCount = 1,
+                    Frequency = 4,
+                    Lacunarity = 4,
+                    Source = cavePerlin
+                };
+                builder.Add("CaveShape", caveShape);
+
+                // 洞窟が横に広がり、縦に浅い感じ。
+                var caveScalePoint = new ScalePoint
+                {
+                    Name = "Cave ScalePoint",
+                    ScaleX = 0.7f,
+                    ScaleY = 2,
+                    ScaleZ = 0.7f,
+                    Source = caveShape
+                };
+                builder.Add("CaveScalePoint", caveScalePoint);
+
+                //------------------------------------------------------------
+                //
+                // 洞窟密度
+                //
+
+                var caveDensity = new Select
+                {
+                    Name = "Cave Density",
+                    LowerBound = 0.1f,
+                    LowerSource = constOne,
+                    UpperBound = 1000,
+                    UpperSource = constZero,
+                    Controller = caveScalePoint
+                };
+                builder.Add("CaveDensity", caveDensity);
+
+                //------------------------------------------------------------
+                //
+                // ブロック用座標変換
+                //
+
+                // プロシージャはブロック空間座標で XYZ を指定するため、
+                // これらをノイズ空間のスケールへ変更。
+                //
+                // 16 という数値は、チャンク サイズに一致しているものの、
+                // チャンク サイズに一致させるべきものではなく、
+                // 期待する結果へノイズをスケーリングできれば何でも良い。
+                // ただし、ブロック空間座標は int、ノイズ空間は float であるため、
+                // 連続性のあるノイズを抽出するには 1 未満の float のスケールとする必要がある。
+                //
+                // XZ スケールは 64 辺りが妥当。
+                // Y スケールは 64 以上が妥当。
+                //      64 未満は高低差が少なすぎる傾向。
+                var finalScale = new ScalePoint
+                {
+                    Name = "Final Scale",
+                    ScaleX = 1 / 64f,
+                    ScaleY = 1 / 128f,
+                    ScaleZ = 1 / 64f,
+                    Source = caveDensity
+                };
+                builder.Add("FinalScale", finalScale);
+
+                // 地形の起伏が現れる Y の位置へブロック空間座標を移動。
+                var target = new Displace
+                {
+                    Name = "Terrain Offset",
+                    DisplaceX = constZero,
+                    DisplaceY = new Const
+                    {
+                        Value = -256
+                    },
+                    DisplaceZ = constZero,
+                    Source = finalScale
+                };
+                builder.Add("Target", target);
+
+                ComponentBundleDefinition bundle;
+                builder.BuildDefinition(out bundle);
+
+                SerializeAndDeserialize<ComponentBundleDefinition>("Terrains/CaveTest", bundle);
             }
             Console.WriteLine();
 
@@ -1387,11 +1571,9 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     MaxActiveRange = 12,
                     ChunkPoolMaxCapacity = 0,
                     ClusterSize = new VectorI3(8),
-                    ActiveChunkCapacity = 5000,
                     ActiveClusterCapacity = 50,
                     ActivationCapacity = 3,
                     PassivationCapacity = 10,
-                    ActivationSearchCapacity = 100,
                     PassivationSearchCapacity = 200,
                 };
                 SerializeAndDeserialize<ChunkSettingsDefinition>("ChunkSettings", definition);

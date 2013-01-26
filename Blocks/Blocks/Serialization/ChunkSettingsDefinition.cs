@@ -23,15 +23,11 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public VectorI3 ClusterSize;
 
-        public int ActiveChunkCapacity;
-
         public int ActiveClusterCapacity;
 
         public int ActivationCapacity;
 
         public int PassivationCapacity;
-
-        public int ActivationSearchCapacity;
 
         public int PassivationSearchCapacity;
     }
