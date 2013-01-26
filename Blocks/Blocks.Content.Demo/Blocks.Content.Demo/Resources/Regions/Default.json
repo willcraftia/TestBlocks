@@ -19,5 +19,5 @@
   "ChunkProcedures": [
     "../ChunkProcedures/NoiseTerrain.json"
   ],
-  "ChunkStore": 1
+  "ChunkStore": 0
 }

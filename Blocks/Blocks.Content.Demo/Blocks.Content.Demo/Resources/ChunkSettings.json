@@ -7,7 +7,7 @@
   "MeshUpdateSearchCapacity": 100,
   "VerticesBuilderCount": 5,
   "MinActiveRange": 7,
-  "MaxActiveRange": 8,
+  "MaxActiveRange": 16,
   "ChunkPoolMaxCapacity": 0,
   "ClusterSize": {
     "X": 8,
