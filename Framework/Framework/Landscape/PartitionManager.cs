@@ -131,9 +131,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         #endregion
 
-        #region ActivationReviewer
+        #region Activator
 
-        sealed class ActivationReviewer
+        sealed class Activator
         {
             #region CandidateComparer
 
@@ -192,28 +192,27 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             Func<VectorI3, bool> reviewPartitionFunc;
 
-            volatile bool completed;
+            volatile bool active;
 
-            internal Action ReviewAction { get; private set; }
-
-            internal bool Completed
+            internal bool Active
             {
-                get { return completed; }
+                get { return active; }
             }
 
-            internal ActivationReviewer(PartitionManager manager)
+            internal Activator(PartitionManager manager)
             {
                 this.manager = manager;
                 reviewPartitionFunc = new Func<VectorI3, bool>(ReviewPartition);
-                ReviewAction = new Action(Review);
 
                 // TODO
                 const int maxDistance = 16;
                 candidates = new PriorityQueue<Partition>(maxDistance * maxDistance * maxDistance, comparer);
             }
 
-            internal void Initialize(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume)
+            internal void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume)
             {
+                if (active) return;
+
                 this.view = view;
                 this.projection = projection;
                 this.eyePosition = eyePosition;
@@ -221,16 +220,20 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 comparer.Initialize(view, projection);
 
-                completed = false;
+                active = true;
+
+                System.Threading.ThreadPool.QueueUserWorkItem(WaitCallback, null);
             }
 
-            internal void Review()
+            void WaitCallback(object state)
             {
+                // アクティブ化候補を探索。
                 volume.ForEach(reviewPartitionFunc);
 
+                // アクティブ化候補をアクティブ化。
                 ActivateCandidates();
 
-                completed = true;
+                active = false;
             }
 
             bool ReviewPartition(VectorI3 offset)
@@ -333,9 +336,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         Queue<Partition> partitions;
 
-        bool activationReviewerExecuting;
-
-        ActivationReviewer activationReviewer;
+        /// <summary>
+        /// アクティベータ。
+        /// </summary>
+        Activator activator;
 
         /// <summary>
         /// アクティブ化実行キュー。
@@ -361,8 +365,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化判定の最大試行数。
         /// </summary>
         int passivationSearchCapacity;
-
-        TaskQueue activationReviewTaskQueue = new TaskQueue();
 
         /// <summary>
         /// アクティブ化タスク キュー。
@@ -471,8 +473,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             activationCapacity = settings.ActivationCapacity;
             passivationCapacity = settings.PassivationCapacity;
 
-            activationReviewer = new ActivationReviewer(this);
-            activationReviewTaskQueue.SlotCount = 1;
+            activator = new Activator(this);
 
             activations = new ConcurrentKeyedQueue<VectorI3, Partition>(
                 (i) => { return i.Position; }, activationCapacity);
@@ -785,18 +786,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         void ActivatePartitions(GameTime gameTime)
         {
-            // 常に 1 つの非同期試行とするために制限。
-            if (!activationReviewerExecuting)
+            if (!activator.Active)
             {
-                activationReviewer.Initialize(view, projection, eyePosition, maxActiveVolume);
-                activationReviewTaskQueue.Enqueue(activationReviewer.ReviewAction);
-                activationReviewTaskQueue.Update();
-
-                activationReviewerExecuting = true;
-            }
-            else if (activationReviewer.Completed)
-            {
-                activationReviewerExecuting = false;
+                // 非同期処理中ではないならば、アクティベータの実行を開始。
+                activator.Start(view, projection, eyePosition, maxActiveVolume);
             }
         }
 

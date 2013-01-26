@@ -14,7 +14,7 @@
     "Y": 8,
     "Z": 8
   },
-  "ActivationCapacity": 100,
+  "ActivationCapacity": 10,
   "PassivationCapacity": 10,
   "PassivationSearchCapacity": 200
 }
