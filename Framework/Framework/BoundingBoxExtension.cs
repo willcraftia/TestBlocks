@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Framework
             // 参考: result = (box.Max + box.Min) / 2
             
             Vector3 maxMin;
-            Vector3.Add(ref box.Max, ref box.Max, out maxMin);
+            Vector3.Add(ref box.Max, ref box.Min, out maxMin);
             Vector3.Divide(ref maxMin, 2, out result);
         }
 
