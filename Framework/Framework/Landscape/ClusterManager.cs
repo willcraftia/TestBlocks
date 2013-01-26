@@ -14,23 +14,6 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     internal sealed class ClusterManager
     {
-        #region ClusterCollection
-
-        sealed class ClusterCollection : KeyedList<VectorI3, Cluster>
-        {
-            internal ClusterCollection(int capacity)
-                : base(capacity)
-            {
-            }
-
-            protected override VectorI3 GetKeyForItem(Cluster item)
-            {
-                return item.Position;
-            }
-        }
-
-        #endregion
-
         /// <summary>
         /// パーティション空間におけるクラスタのサイズ。
         /// </summary>
@@ -49,14 +32,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// クラスタのコレクション。
         /// </summary>
-        ClusterCollection clusters;
+        Dictionary<VectorI3, Cluster> clustersByPosition;
 
         /// <summary>
         /// クラスタ数を取得します。
         /// </summary>
         internal int Count
         {
-            get { return clusters.Count; }
+            get { return clustersByPosition.Count; }
         }
 
         /// <summary>
@@ -64,13 +47,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="size">パーティション空間におけるクラスタのサイズ。</param>
         /// <param name="partitionSize">ワールド空間におけるパーティションのサイズ。</param>
-        /// <param name="capacity">クラスタの初期容量。</param>
-        internal ClusterManager(VectorI3 size, Vector3 partitionSize, int capacity)
+        internal ClusterManager(VectorI3 size, Vector3 partitionSize)
         {
             if (size.X < 1 || size.Y < 1 || size.X < 1) throw new ArgumentOutOfRangeException("size");
             if (partitionSize.X < 0 || partitionSize.Y < 0 || partitionSize.X < 0)
                 throw new ArgumentOutOfRangeException("size");
-            if (capacity < 0) throw new ArgumentOutOfRangeException("capacity");
 
             Size = size;
 
@@ -82,7 +63,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             };
 
             clusterPool = new Pool<Cluster>(CreateCluster);
-            clusters = new ClusterCollection(capacity);
+            clustersByPosition = new Dictionary<VectorI3, Cluster>();
         }
 
         /// <summary>
@@ -125,11 +106,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             CalculateClusterPosition(ref partition.Position, out clusterPosition);
 
             Cluster cluster;
-            if (!clusters.TryGet(clusterPosition, out cluster))
+            if (!clustersByPosition.TryGetValue(clusterPosition, out cluster))
             {
                 cluster = clusterPool.Borrow();
                 cluster.Initialize(clusterPosition);
-                clusters.Add(cluster);
+                clustersByPosition[clusterPosition] = cluster;
             }
 
             cluster.Add(partition);
@@ -148,7 +129,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             if (cluster.Count == 0)
             {
-                clusters.Remove(cluster.Position);
+                clustersByPosition.Remove(cluster.Position);
                 clusterPool.Return(cluster);
             }
         }
@@ -158,7 +139,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void Clear()
         {
-            clusters.Clear();
+            clustersByPosition.Clear();
             clusterPool.Clear();
         }
 
@@ -175,7 +156,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             CalculateClusterPosition(ref position, out clusterPosition);
 
             Cluster result;
-            clusters.TryGet(clusterPosition, out result);
+            clustersByPosition.TryGetValue(clusterPosition, out result);
             return result;
         }
 

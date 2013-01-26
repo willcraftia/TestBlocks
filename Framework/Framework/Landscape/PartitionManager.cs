@@ -29,8 +29,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             VectorI3 clusterSize = new VectorI3(8);
 
-            int activeClusterCapacity = 50;
-
             int activationCapacity = 3;
 
             int passivationCapacity = 10;
@@ -68,17 +66,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                     if (value.X < 1 || value.Y < 1 || value.Z < 1) throw new ArgumentOutOfRangeException("value");
 
                     clusterSize = value;
-                }
-            }
-
-            public int ActiveClusterCapacity
-            {
-                get { return activeClusterCapacity; }
-                set
-                {
-                    if (value < 0) throw new ArgumentOutOfRangeException("value");
-
-                    activeClusterCapacity = value;
                 }
             }
 
@@ -478,8 +465,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             partitionPool = new ConcurrentPool<Partition>(CreatePartition);
             partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
 
-            // TODO
-            clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize, settings.ActiveClusterCapacity);
+            clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize);
             partitions = new Queue<Partition>();
 
             activationCapacity = settings.ActivationCapacity;

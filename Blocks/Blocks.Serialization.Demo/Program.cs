@@ -1571,7 +1571,6 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     MaxActiveRange = 12,
                     ChunkPoolMaxCapacity = 0,
                     ClusterSize = new VectorI3(8),
-                    ActiveClusterCapacity = 50,
                     ActivationCapacity = 3,
                     PassivationCapacity = 10,
                     PassivationSearchCapacity = 200,

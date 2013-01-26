@@ -31,7 +31,6 @@ namespace Willcraftia.Xna.Blocks.Content
 
             settings.PartitionManager.PartitionPoolMaxCapacity = definition.ChunkPoolMaxCapacity;
             settings.PartitionManager.ClusterSize = definition.ClusterSize;
-            settings.PartitionManager.ActiveClusterCapacity = definition.ActiveClusterCapacity;
             settings.PartitionManager.ActivationCapacity = definition.ActivationCapacity;
             settings.PartitionManager.PassivationCapacity = definition.PassivationCapacity;
             settings.PartitionManager.PassivationSearchCapacity = definition.PassivationSearchCapacity;
@@ -56,7 +55,6 @@ namespace Willcraftia.Xna.Blocks.Content
                 MaxActiveRange = settings.MaxActiveVolume,
                 ChunkPoolMaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity,
                 ClusterSize = settings.PartitionManager.ClusterSize,
-                ActiveClusterCapacity = settings.PartitionManager.ActiveClusterCapacity,
                 ActivationCapacity = settings.PartitionManager.ActivationCapacity,
                 PassivationCapacity = settings.PartitionManager.PassivationCapacity,
                 PassivationSearchCapacity = settings.PartitionManager.PassivationSearchCapacity

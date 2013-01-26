@@ -14,7 +14,6 @@
     "Y": 8,
     "Z": 8
   },
-  "ActiveClusterCapacity": 50,
   "ActivationCapacity": 100,
   "PassivationCapacity": 10,
   "PassivationSearchCapacity": 200
