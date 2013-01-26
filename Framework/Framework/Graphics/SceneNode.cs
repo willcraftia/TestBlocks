@@ -268,11 +268,18 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void UpdateBoxWorld()
         {
-            BoxWorld.Min = Vector3.Zero;
-            BoxWorld.Max = Vector3.Zero;
+            BoxWorld = BoundingBoxHelper.Empty;
 
             foreach (var obj in Objects)
-                BoundingBox.CreateMerged(ref BoxWorld, ref obj.BoxWorld, out BoxWorld);
+            {
+                BoxWorld.Min.X = MathHelper.Min(BoxWorld.Min.X, obj.BoxWorld.Min.X);
+                BoxWorld.Min.Y = MathHelper.Min(BoxWorld.Min.Y, obj.BoxWorld.Min.Y);
+                BoxWorld.Min.Z = MathHelper.Min(BoxWorld.Min.Z, obj.BoxWorld.Min.Z);
+
+                BoxWorld.Max.X = MathHelper.Max(BoxWorld.Max.X, obj.BoxWorld.Max.X);
+                BoxWorld.Max.Y = MathHelper.Max(BoxWorld.Max.Y, obj.BoxWorld.Max.Y);
+                BoxWorld.Max.Z = MathHelper.Max(BoxWorld.Max.Z, obj.BoxWorld.Max.Z);
+            }
 
             Manager.UpdateOctreeSceneNode(this);
         }

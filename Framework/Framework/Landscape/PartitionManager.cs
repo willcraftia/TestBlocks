@@ -616,16 +616,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 境界錐台と交差するパーティションを収集します。
-        /// </summary>
-        /// <param name="frustum">境界錐台。</param>
-        /// <param name="result">収集先パーティションのコレクション。</param>
-        public void CollectPartitions(BoundingFrustum frustum, ICollection<Partition> result)
-        {
-            clusterManager.Collect(frustum, result);
-        }
-
-        /// <summary>
         /// 事前にパーティション プールにインスタンスを生成する場合に、
         /// サブクラスのコンストラクタで呼び出します。
         /// </summary>

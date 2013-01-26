@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Landscape;
 using Willcraftia.Xna.Blocks.Models;
 
@@ -113,13 +114,24 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public SceneNode Node { get; private set; }
+
         /// <summary>
         /// 不透明メッシュを取得または設定します。
         /// </summary>
         public ChunkMesh OpaqueMesh
         {
             get { return opaqueMesh; }
-            internal set { opaqueMesh = value; }
+            internal set
+            {
+                if (opaqueMesh != null)
+                    DetachMesh(opaqueMesh);
+
+                opaqueMesh = value;
+
+                if (opaqueMesh != null)
+                    AttachMesh(opaqueMesh);
+            }
         }
 
         /// <summary>
@@ -128,7 +140,16 @@ namespace Willcraftia.Xna.Blocks.Models
         public ChunkMesh TranslucentMesh
         {
             get { return translucentMesh; }
-            internal set { translucentMesh = value; }
+            internal set
+            {
+                if (translucentMesh != null)
+                    DetachMesh(translucentMesh);
+
+                translucentMesh = value;
+
+                if (translucentMesh != null)
+                    AttachMesh(translucentMesh);
+            }
         }
 
         /// <summary>
@@ -157,6 +178,8 @@ namespace Willcraftia.Xna.Blocks.Models
             if (manager == null) throw new ArgumentNullException("manager");
 
             this.manager = manager;
+
+            Node = new SceneNode(manager.SceneManager, "Chunk" + manager.CreateChunkNodeId());
         }
 
         /// <summary>
@@ -254,15 +277,15 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void ReleaseOverride()
         {
-            if (OpaqueMesh != null)
+            if (opaqueMesh != null)
             {
-                manager.DisposeChunkMesh(OpaqueMesh);
-                OpaqueMesh = null;
+                DetachMesh(opaqueMesh);
+                opaqueMesh = null;
             }
-            if (TranslucentMesh != null)
+            if (translucentMesh != null)
             {
-                manager.DisposeChunkMesh(TranslucentMesh);
-                TranslucentMesh = null;
+                DetachMesh(translucentMesh);
+                translucentMesh = null;
             }
             if (VerticesBuilder != null)
             {
@@ -291,7 +314,18 @@ namespace Willcraftia.Xna.Blocks.Models
             // データが空の場合は更新するメッシュが無い。
             if (data != null) RequestUpdateMesh();
 
+            // アクティブ化完了でノードを追加。
+            manager.ChunkRootNode.Children.Add(Node);
+
             base.OnActivated();
+        }
+
+        protected override void OnPassivating()
+        {
+            // 非アクティブ化開始でノードを削除。
+            manager.ChunkRootNode.Children.Remove(Node);
+
+            base.OnPassivating();
         }
 
         /// <summary>
@@ -372,6 +406,21 @@ namespace Willcraftia.Xna.Blocks.Models
             if (data != null) RequestUpdateMesh();
 
             base.OnNeighborPassivated(neighbor, side);
+        }
+
+        void AttachMesh(ChunkMesh mesh)
+        {
+            // ノードへ追加。
+            Node.Objects.Add(mesh);
+        }
+
+        void DetachMesh(ChunkMesh mesh)
+        {
+            // ノードから削除。
+            Node.Objects.Remove(mesh);
+
+            // マネージャへ削除要求。
+            manager.DisposeChunkMesh(mesh);
         }
     }
 }

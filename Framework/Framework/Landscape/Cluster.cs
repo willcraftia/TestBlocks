@@ -95,22 +95,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 境界錐台と交差するパーティションを収集します。
-        /// </summary>
-        /// <param name="frustum">境界錐台。</param>
-        /// <param name="collector">収集先パーティションのコレクション。</param>
-        internal void CollectPartitions<T>(BoundingFrustum frustum, ICollection<T> collector) where T : Partition
-        {
-            foreach (var partition in dictionary.Values)
-            {
-                bool intersected;
-                frustum.Intersects(ref partition.BoundingBox, out intersected);
-
-                if (intersected) collector.Add(partition as T);
-            }
-        }
-
-        /// <summary>
         /// パーティションが存在するか否かを検査します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>

@@ -12,7 +12,8 @@ namespace Willcraftia.Xna.Framework.Graphics
     {
         public bool CastShadow { get; set; }
 
-        protected ShadowCaster()
+        protected ShadowCaster(string name)
+            : base(name)
         {
             CastShadow = true;
         }

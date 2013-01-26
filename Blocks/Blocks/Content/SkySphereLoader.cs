@@ -35,7 +35,9 @@ namespace Willcraftia.Xna.Blocks.Content
         {
             var definition = (SkySphereDefinition) serializer.Deserialize(resource);
 
-            return new SkySphere(graphicsDevice)
+            // TODO
+            // オブジェクト名も設定で管理か？
+            return new SkySphere("skySphere", graphicsDevice)
             {
                 SunVisible = definition.SunVisible,
                 SunThreshold = definition.SunThreshold,

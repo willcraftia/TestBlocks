@@ -58,6 +58,8 @@ namespace Willcraftia.Xna.Framework.Graphics
                 };
 
                 root.Box = box;
+
+                rootsByPositionGrid[rootPositionGrid] = root;
             }
 
             Add(node, root);
@@ -120,31 +122,35 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
         }
 
-        void RemoveOctreeFromParent(Octree octree)
+        public void Execute(BoundingFrustum frustum, Action<Octree> action)
         {
-            if (octree.Parent == null) return;
+            foreach (var root in rootsByPositionGrid.Values)
+            {
+                Execute(frustum, action, root);
+            }
+        }
 
-            // 親から自分を削除。
+        void Execute(BoundingFrustum frustum, Action<Octree> action, Octree octree)
+        {
+            bool intersected;
+            frustum.Intersects(ref octree.Box, out intersected);
+            if (!intersected) return;
+
+            action(octree);
+
             for (int z = 0; z < 2; z++)
             {
                 for (int y = 0; y < 2; y++)
                 {
                     for (int x = 0; x < 2; x++)
                     {
-                        if (octree.Parent[x, y, z] != octree) continue;
-
-                        // 自分をプールへ戻す。
-                        octreePool.Return(octree);
-                        octree.Parent[x, y, z] = null;
-                        break;
+                        var child = octree[x, y, z];
+                        if (child != null)
+                        {
+                            Execute(frustum, action, child);
+                        }
                     }
                 }
-            }
-
-            if (octree.Parent.NodeCount == 0)
-            {
-                // 再帰的にノードを持たなくなった先祖がいれば全て削除。
-                RemoveOctreeFromParent(octree.Parent);
             }
         }
 
@@ -239,6 +245,37 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             child.Box.Min = childMin;
             child.Box.Max = childMax;
+        }
+
+        void RemoveOctreeFromParent(Octree octree)
+        {
+            if (octree.Parent == null) return;
+
+            // 親から自分を削除。
+            for (int z = 0; z < 2; z++)
+            {
+                for (int y = 0; y < 2; y++)
+                {
+                    for (int x = 0; x < 2; x++)
+                    {
+                        if (octree.Parent[x, y, z] != octree) continue;
+
+                        var parent = octree.Parent;
+
+                        // 自分をプールへ戻す。
+                        octreePool.Return(octree);
+                        octree.Parent[x, y, z] = null;
+
+                        if (parent.NodeCount == 0)
+                        {
+                            // 再帰的にノードを持たなくなった先祖がいれば全て削除。
+                            RemoveOctreeFromParent(parent);
+                        }
+
+                        return;
+                    }
+                }
+            }
         }
 
         Octree CreateOctree()

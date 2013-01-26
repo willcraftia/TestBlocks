@@ -40,7 +40,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public int PrimitiveCount { get; private set; }
 
-        public ChunkMesh(ChunkEffect chunkEffect)
+        public ChunkMesh(string name, ChunkEffect chunkEffect)
+            : base(name)
         {
             if (chunkEffect == null) throw new ArgumentNullException("chunkEffect");
 

@@ -25,33 +25,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </summary>
         public BoundingSphere SphereWorld;
 
-        string name;
-
-        public string Name
-        {
-            get { return name; }
-            set
-            {
-                // TODO
-                // コンストラクタで確定させたい。
-
-                if (value == null) throw new ArgumentNullException("value");
-
-                if (Parent != null)
-                {
-                    if (Parent.Objects.Contains(value))
-                        throw new ArgumentException("Name duplicate.", "value");
-
-                    // 今の名前での登録を解除。
-                    if (name != null) Parent.Objects.Remove(this);
-                }
-
-                name = value;
-
-                // 新たな名前で再登録。
-                if (Parent != null) Parent.Objects.Add(this);
-            }
-        }
+        public string Name { get; private set; }
 
         public SceneNode Parent { get; internal set; }
 
@@ -79,8 +53,9 @@ namespace Willcraftia.Xna.Framework.Graphics
         /// </value>
         public bool Occluded { get; protected set; }
 
-        protected SceneObject()
+        protected SceneObject(string name)
         {
+            Name = name;
             Visible = true;
         }
 

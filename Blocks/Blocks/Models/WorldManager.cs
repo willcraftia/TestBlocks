@@ -266,7 +266,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var chunkSettings = LoadAsset<ChunkSettings>("title:Resources/ChunkSettings.json");
 
-            ChunkManager = new ChunkManager(chunkSettings, GraphicsDevice, RegionManager);
+            ChunkManager = new ChunkManager(chunkSettings, GraphicsDevice, RegionManager, SceneManager);
 
             //----------------------------------------------------------------
             // デフォルト カメラ
@@ -345,7 +345,6 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク マネージャ
 
-            //ChunkManager.Update(gameTime, SceneManager.ActiveCamera.View.Position);
             ChunkManager.Update(gameTime, SceneManager.ActiveCamera.View.Matrix, SceneManager.ActiveCamera.Projection.Matrix);
 
             //----------------------------------------------------------------
@@ -358,25 +357,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Draw(GameTime gameTime)
         {
-            //----------------------------------------------------------------
-            // 視錐台に含まれるチャンクを収集してシーン マネージャへ追加
-
-            ChunkManager.CollectPartitions(SceneManager.ActiveCamera.Frustum, visibleChunks);
-
-            foreach (Chunk chunk in visibleChunks)
-            {
-                if (chunk.OpaqueMesh != null)
-                {
-                    SceneManager.OpaqueObjects.Add(chunk.OpaqueMesh);
-
-                    if (chunk.OpaqueMesh.CastShadow)
-                        SceneManager.ShadowCasters.Add(chunk.OpaqueMesh);
-                }
-                
-                if (chunk.TranslucentMesh != null)
-                    SceneManager.TranslucentObjects.Add(chunk.TranslucentMesh);
-            }
-
             //----------------------------------------------------------------
             // リージョン マネージャ
 

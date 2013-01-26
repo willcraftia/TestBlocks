@@ -61,7 +61,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SceneSettings SceneSettings { get; set; }
 
-        public SkySphere(GraphicsDevice graphicsDevice)
+        public SkySphere(string name, GraphicsDevice graphicsDevice)
+            : base(name)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
 

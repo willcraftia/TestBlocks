@@ -56,6 +56,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         RegionManager regionManager;
 
+        int chunkNodeIdSequence;
+
         /// <summary>
         /// 1 / chunkSize。
         /// </summary>
@@ -88,6 +90,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 頂点ビルダの処理を非同期に実行するためのタスク キュー。
         /// </summary>
         TaskQueue verticesBuilderTaskQueue;
+
+        /// <summary>
+        /// シーン マネージャ。
+        /// </summary>
+        public SceneManager SceneManager { get; private set; }
+
+        public SceneNode ChunkRootNode { get; private set; }
 
         /// <summary>
         /// チャンク メッシュの数を取得します。
@@ -146,7 +155,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="settings">チャンク設定。</param>
         /// <param name="graphicsDevice">グラフィックス デバイス。</param>
         /// <param name="regionManager">リージョン マネージャ。</param>
-        public ChunkManager(ChunkSettings settings, GraphicsDevice graphicsDevice, RegionManager regionManager)
+        /// <param name="sceneManager">シーン マネージャ。</param>
+        public ChunkManager(ChunkSettings settings, GraphicsDevice graphicsDevice, RegionManager regionManager, SceneManager sceneManager)
             : base(settings.PartitionManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -155,6 +165,7 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkSize = settings.ChunkSize;
             this.graphicsDevice = graphicsDevice;
             this.regionManager = regionManager;
+            SceneManager = sceneManager;
 
             meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
             verticesBuilderCount = settings.VerticesBuilderCount;
@@ -184,6 +195,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             waitBuildVerticesQueue = new Queue<VectorI3>();
             buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
+
+            ChunkRootNode = sceneManager.CreateSceneNode("ChunkRoot");
+            sceneManager.RootNode.Children.Add(ChunkRootNode);
         }
 
         /// <summary>
@@ -249,6 +263,11 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (!waitBuildVerticesQueue.Contains(chunkPosition))
                 waitBuildVerticesQueue.Enqueue(chunkPosition);
+        }
+
+        internal int CreateChunkNodeId()
+        {
+            return chunkNodeIdSequence++;
         }
 
         /// <summary>
@@ -449,7 +468,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <returns>チャンク メッシュ。</returns>
         ChunkMesh CreateChunkMesh(ChunkEffect chunkEffect, bool translucent)
         {
-            var chunkMesh = new ChunkMesh(chunkEffect);
+            var name = (translucent) ? "TranslucentMesh" : "OpaqueMesh";
+
+            var chunkMesh = new ChunkMesh(name, chunkEffect);
             chunkMesh.Translucent = translucent;
 
             ChunkMeshCount++;
@@ -501,7 +522,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (chunk.OpaqueMesh != null)
                 {
-                    DisposeChunkMesh(chunk.OpaqueMesh);
+                    //DisposeChunkMesh(chunk.OpaqueMesh);
                     chunk.OpaqueMesh = null;
                 }
             }
@@ -534,7 +555,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (chunk.TranslucentMesh != null)
                 {
-                    DisposeChunkMesh(chunk.TranslucentMesh);
+                    //DisposeChunkMesh(chunk.TranslucentMesh);
                     chunk.TranslucentMesh = null;
                 }
             }
@@ -559,6 +580,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 MaxVertexCount = Math.Max(MaxVertexCount, chunk.TranslucentMesh.VertexCount);
                 MaxIndexCount = Math.Max(MaxIndexCount, chunk.TranslucentMesh.IndexCount);
             }
+
+            // チャンクのノードを更新。
+            chunk.Node.Update(false);
         }
     }
 }

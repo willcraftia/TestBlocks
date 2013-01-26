@@ -75,8 +75,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             skySphere = LoadAsset<SkySphere>("title:Resources/Models/SkySphere.json");
             skySphere.SceneSettings = SceneSettings;
-            // TODO
-            skySphere.Name = "SkySphere";
 
             // シーン マネージャへ登録
             // TODO
