@@ -14,15 +14,155 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// </summary>
     internal sealed class ClusterManager
     {
+        #region Cluster
+
+        /// <summary>
+        /// ある領域に含まれるパーティションを一つの集合として管理するクラスです。
+        /// パーティションのアクティブ化および非アクティブ化では、
+        /// 対象とするパーティションの位置からパーティションを検索しますが、
+        /// 検索対象はパーティション数に比例するため、
+        /// パーティション数が増加する程に検索負荷が増加する問題があります。
+        /// この問題を解決するために、パーティションをクラスタで纏めて管理し、
+        /// 検索の際には、クラスタを検索した後、クラスタからパーティションを検索するという方法を採ります。
+        /// </summary>
+        sealed class Cluster
+        {
+            /// <summary>
+            /// クラスタ空間におけるクラスタの位置。
+            /// </summary>
+            internal VectorI3 Position;
+
+            /// <summary>
+            /// ワールド空間におけるクラスタの位置。
+            /// </summary>
+            internal Vector3 PositionWorld;
+
+            /// <summary>
+            /// ワールド空間におけるクラスタの境界ボックス。
+            /// </summary>
+            internal BoundingBox BoundingBox;
+
+            /// <summary>
+            /// クラスタ マネージャ。
+            /// </summary>
+            ClusterManager manager;
+
+            /// <summary>
+            /// パーティションの位置をキーとするパーティションのディクショナリ。
+            /// </summary>
+            Dictionary<VectorI3, Partition> partitionsByPosition;
+
+            /// <summary>
+            /// パーティション数を取得します。
+            /// </summary>
+            internal int Count
+            {
+                get { return partitionsByPosition.Count; }
+            }
+
+            /// <summary>
+            /// 指定の位置についてパーティションを取得または設定します。
+            /// </summary>
+            /// <param name="position">パーティションの位置。</param>
+            /// <returns>
+            /// パーティション、あるいは、指定の位置にパーティションが存在しないならば null。
+            /// </returns>
+            internal Partition this[VectorI3 position]
+            {
+                get
+                {
+                    Partition result;
+                    partitionsByPosition.TryGetValue(position, out result);
+                    return result;
+                }
+                set
+                {
+                    partitionsByPosition[position] = value;
+                }
+            }
+
+            /// <summary>
+            /// インスタンスを生成します。
+            /// </summary>
+            /// <param name="manager">クラスタ マネージャ。</param>
+            internal Cluster(ClusterManager manager)
+            {
+                if (manager == null) throw new ArgumentNullException("manager");
+
+                this.manager = manager;
+
+                var size = manager.size;
+                partitionsByPosition = new Dictionary<VectorI3, Partition>(size.X * size.Y * size.Z);
+            }
+
+            /// <summary>
+            /// 指定の位置にあるクラスタとして初期化します。
+            /// </summary>
+            /// <param name="position">クラスタ空間におけるクラスタの位置。</param>
+            internal void Initialize(VectorI3 position)
+            {
+                Position = position;
+
+                var sizeWorld = manager.sizeWorld;
+                PositionWorld.X = Position.X * sizeWorld.X;
+                PositionWorld.Y = Position.Y * sizeWorld.Y;
+                PositionWorld.Z = Position.Z * sizeWorld.Z;
+
+                BoundingBox.Min = PositionWorld;
+                BoundingBox.Max = PositionWorld + sizeWorld;
+            }
+
+            /// <summary>
+            /// クラスタを開放します。
+            /// </summary>
+            internal void Release()
+            {
+                Position = VectorI3.Zero;
+                PositionWorld = Vector3.Zero;
+                BoundingBox = BoundingBoxHelper.Empty;
+            }
+
+            /// <summary>
+            /// パーティションが存在するか否かを検査します。
+            /// </summary>
+            /// <param name="position">パーティションの位置。</param>
+            /// <returns>
+            /// true (パーティションが存在する場合)、false (それ以外の場合)。
+            /// </returns>
+            internal bool Contains(VectorI3 position)
+            {
+                return partitionsByPosition.ContainsKey(position);
+            }
+
+            /// <summary>
+            /// 指定の位置にあるパーティションを削除します。
+            /// </summary>
+            /// <param name="position">パーティションの位置。</param>
+            internal bool Remove(VectorI3 position)
+            {
+                return partitionsByPosition.Remove(position);
+            }
+
+            /// <summary>
+            /// 全てのパーティションを削除します。
+            /// </summary>
+            internal void Clear()
+            {
+                partitionsByPosition.Clear();
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// パーティション空間におけるクラスタのサイズ。
         /// </summary>
-        internal readonly VectorI3 Size;
+        readonly VectorI3 size;
 
         /// <summary>
         /// ワールド空間におけるクラスタのサイズ。
         /// </summary>
-        internal readonly Vector3 SizeWorld;
+        readonly Vector3 sizeWorld;
 
         /// <summary>
         /// クラスタのプール。
@@ -43,6 +183,39 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
+        /// 指定の位置についてパーティションを取得または設定します。
+        /// </summary>
+        /// <param name="position">パーティションの位置。</param>
+        /// <returns>
+        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
+        /// </returns>
+        internal Partition this[VectorI3 position]
+        {
+            get
+            {
+                var cluster = GetCluster(position);
+                if (cluster == null) return null;
+
+                return cluster[position];
+            }
+            set
+            {
+                VectorI3 clusterPosition;
+                CalculateClusterPosition(ref position, out clusterPosition);
+
+                Cluster cluster;
+                if (!clustersByPosition.TryGetValue(clusterPosition, out cluster))
+                {
+                    cluster = clusterPool.Borrow();
+                    cluster.Initialize(clusterPosition);
+                    clustersByPosition[clusterPosition] = cluster;
+                }
+
+                cluster[position] = value;
+            }
+        }
+
+        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="size">パーティション空間におけるクラスタのサイズ。</param>
@@ -53,9 +226,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (partitionSize.X < 0 || partitionSize.Y < 0 || partitionSize.X < 0)
                 throw new ArgumentOutOfRangeException("size");
 
-            Size = size;
+            this.size = size;
 
-            SizeWorld = new Vector3
+            sizeWorld = new Vector3
             {
                 X = size.X * partitionSize.X,
                 Y = size.Y * partitionSize.Y,
@@ -73,7 +246,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        internal bool ContainsPartition(VectorI3 position)
+        internal bool Contains(VectorI3 position)
         {
             var cluster = GetCluster(position);
             if (cluster == null) return false;
@@ -82,56 +255,25 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 指定の位置にあるパーティションを取得します。
+        /// 指定の位置にあるパーティションを削除します。
+        /// パーティションの削除により、それを管理していたクラスタにパーティションがゼロになる場合、
+        /// クラスタを削除してプールへ戻します。
         /// </summary>
-        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <returns>
-        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
-        /// </returns>
-        internal Partition GetPartition(VectorI3 position)
+        /// <param name="position">パーティションの位置。</param>
+        internal bool Remove(VectorI3 position)
         {
             var cluster = GetCluster(position);
-            if (cluster == null) return null;
+            if (cluster == null) return false;
 
-            return cluster.GetPartition(position);
-        }
-
-        /// <summary>
-        /// パーティションを追加します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        internal void AddPartition(Partition partition)
-        {
-            VectorI3 clusterPosition;
-            CalculateClusterPosition(ref partition.Position, out clusterPosition);
-
-            Cluster cluster;
-            if (!clustersByPosition.TryGetValue(clusterPosition, out cluster))
-            {
-                cluster = clusterPool.Borrow();
-                cluster.Initialize(clusterPosition);
-                clustersByPosition[clusterPosition] = cluster;
-            }
-
-            cluster.Add(partition);
-        }
-
-        /// <summary>
-        /// パーティションを削除します。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        internal void RemovePartition(Partition partition)
-        {
-            var cluster = GetCluster(partition.Position);
-            if (cluster == null) return;
-
-            cluster.Remove(partition);
+            var result = cluster.Remove(position);
 
             if (cluster.Count == 0)
             {
                 clustersByPosition.Remove(cluster.Position);
                 clusterPool.Return(cluster);
             }
+
+            return result;
         }
 
         /// <summary>
@@ -139,6 +281,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void Clear()
         {
+            foreach (var cluster in clustersByPosition.Values)
+                cluster.Clear();
+
             clustersByPosition.Clear();
             clusterPool.Clear();
         }
@@ -169,9 +314,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             result = new VectorI3
             {
-                X = MathExtension.Floor(position.X / (float) Size.X),
-                Y = MathExtension.Floor(position.Y / (float) Size.Y),
-                Z = MathExtension.Floor(position.Z / (float) Size.Z)
+                X = MathExtension.Floor(position.X / (float) size.X),
+                Y = MathExtension.Floor(position.Y / (float) size.Y),
+                Z = MathExtension.Floor(position.Z / (float) size.Z)
             };
         }
 

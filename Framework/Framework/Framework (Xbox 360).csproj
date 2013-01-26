@@ -223,7 +223,6 @@
     <Compile Include="IO\TitleResourceLoader.cs" />
     <Compile Include="IO\WebResource.cs" />
     <Compile Include="IO\WebResourceLoader.cs" />
-    <Compile Include="Landscape\Cluster.cs" />
     <Compile Include="Landscape\ClusterManager.cs" />
     <Compile Include="Landscape\DefaultActiveVolume.cs" />
     <Compile Include="Landscape\DomeActiveVolume.cs" />

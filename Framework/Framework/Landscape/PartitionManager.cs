@@ -241,7 +241,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // クラスタを後でスレッド セーフにする。
 
                 // 既にアクティブならばスキップ。
-                if (manager.clusterManager.ContainsPartition(position)) return true;
+                if (manager.clusterManager.Contains(position)) return true;
 
                 // 既に実行中ならばスキップ。
                 if (manager.activations.Contains(position)) return true;
@@ -614,7 +614,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         protected Partition GetActivePartition(VectorI3 position)
         {
-            return clusterManager.GetPartition(position);
+            return clusterManager[position];
         }
 
         /// <summary>
@@ -673,7 +673,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // アクティブ リストへ追加。
-                clusterManager.AddPartition(partition);
+                clusterManager[partition.Position]= partition;
                 partitions.Enqueue(partition);
 
                 // 完了を通知。
@@ -694,7 +694,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = clusterManager.GetPartition(nearbyPosition);
+                var neighbor = clusterManager[nearbyPosition];
                 if (neighbor == null) continue;
 
                 var reverseSide = side.Reverse();
@@ -712,7 +712,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = clusterManager.GetPartition(nearbyPosition);
+                var neighbor = clusterManager[nearbyPosition];
                 if (neighbor == null) continue;
 
                 // 自身へアクティブな隣接パーティションを通知。
@@ -763,7 +763,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (!partition.EnterLock()) continue;
 
                 // アクティブではない状態にする。
-                clusterManager.RemovePartition(partition);
+                clusterManager.Remove(partition.Position);
 
                 // 実行キューへ追加。
                 passivations.Enqueue(partition);
