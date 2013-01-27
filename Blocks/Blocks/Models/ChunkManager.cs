@@ -491,8 +491,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunkMesh.Dispose();
 
-            GC.Collect();
-
             ChunkMeshCount--;
         }
 
