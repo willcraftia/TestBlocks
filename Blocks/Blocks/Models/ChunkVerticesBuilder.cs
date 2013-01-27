@@ -104,7 +104,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         closePosition.Y += y;
                         closePosition.Z += z;
 
-                        closeChunks[x, y, z] = manager.GetActivePartition(closePosition) as Chunk;
+                        closeChunks[x, y, z] = manager[closePosition] as Chunk;
                     }
                 }
             }

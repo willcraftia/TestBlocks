@@ -452,6 +452,18 @@ namespace Willcraftia.Xna.Framework.Landscape
         Matrix projection;
 
         /// <summary>
+        /// 指定の位置にあるアクティブなパーティションを取得します。
+        /// </summary>
+        /// <param name="position">パーティションの位置。</param>
+        /// <returns>
+        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
+        /// </returns>
+        public Partition this[VectorI3 position]
+        {
+            get { return clusterManager[position]; }
+        }
+
+        /// <summary>
         /// クローズ処理中であるか否かを示す値を取得します。
         /// </summary>
         /// <value>
@@ -611,11 +623,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             Closing = true;
             OnClosing();
-        }
-
-        public Partition GetActivePartition(VectorI3 position)
-        {
-            return clusterManager[position];
         }
 
         /// <summary>

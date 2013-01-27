@@ -287,7 +287,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var chunkPosition = waitBuildVerticesQueue.Peek();
 
                 // アクティブ チャンクを取得。
-                var chunk = GetChunk(chunkPosition);
+                var chunk = this[chunkPosition] as Chunk;
                 if (chunk == null)
                 {
                     // 存在しない場合はメッシュ更新要求を取り消す。
@@ -383,18 +383,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 非アクティブ化の抑制を解除。
                 chunk.SuppressPassivation = false;
             }
-        }
-
-        /// <summary>
-        /// 指定の位置にあるチャンクを取得します。
-        /// </summary>
-        /// <param name="position">パーティション空間におけるチャンクの位置。</param>
-        /// <returns>
-        /// チャンク、あるいは、指定の位置にチャンクが存在しない場合は null。
-        /// </returns>
-        Chunk GetChunk(VectorI3 position)
-        {
-            return GetActivePartition(position) as Chunk;
         }
 
         ChunkData CreateData()
