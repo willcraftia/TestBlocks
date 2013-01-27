@@ -613,6 +613,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             OnClosing();
         }
 
+        public Partition GetActivePartition(VectorI3 position)
+        {
+            return clusterManager[position];
+        }
+
         /// <summary>
         /// 事前にパーティション プールにインスタンスを生成する場合に、
         /// サブクラスのコンストラクタで呼び出します。
@@ -658,11 +663,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
         protected virtual void UpdatePartitionsOverride(GameTime gameTime) { }
-
-        protected Partition GetActivePartition(VectorI3 position)
-        {
-            return clusterManager[position];
-        }
 
         /// <summary>
         /// 非アクティブ化の完了を検査します。

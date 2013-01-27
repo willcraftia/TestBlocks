@@ -45,11 +45,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager manager;
 
+        CloseChunks closeChunks;
+
         SpaceTypes[, ,] spaceMap;
 
         public Chunk Chunk { get; internal set; }
-
-        public CloseChunks CloseChunks { get; private set; }
 
         public ChunkVertices Translucent { get; private set; }
 
@@ -69,7 +69,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.manager = manager;
 
-            CloseChunks = new CloseChunks(manager.ChunkSize);
+            closeChunks = new CloseChunks(manager.ChunkSize);
             Opaque = new ChunkVertices(manager.ChunkSize);
             Translucent = new ChunkVertices(manager.ChunkSize);
             ExecuteAction = new Action(Execute);
@@ -80,6 +80,34 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(!completed);
             Debug.Assert(Chunk != null);
+
+            // 隣接チャンク集合を構築。
+            var centerPosition = Chunk.Position;
+            for (int z = -1; z <= 1; z++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        // 8 つの隅は不要。
+                        if (x != 0 && y != 0 && z != 0) continue;
+
+                        // 中心には自身を設定。
+                        if (x == 0 && y == 0 && z == 0)
+                        {
+                            closeChunks[0, 0, 0] = Chunk;
+                            continue;
+                        }
+
+                        var closePosition = centerPosition;
+                        closePosition.X += x;
+                        closePosition.Y += y;
+                        closePosition.Z += z;
+
+                        closeChunks[x, y, z] = manager.GetActivePartition(closePosition) as Chunk;
+                    }
+                }
+            }
 
             Array.Clear(spaceMap, 0, spaceMap.Length);
 
@@ -101,6 +129,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 for (position.Y = 0; position.Y < chunkSize.Y; position.Y++)
                     for (position.X = 0; position.X < chunkSize.X; position.X++)
                         Execute(ref position);
+
+            closeChunks.Clear();
 
             completed = true;
         }
@@ -255,7 +285,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // 面隣接ブロックを探索。
-                var neighborBlockIndex = CloseChunks.GetBlockIndex(ref neighborPosition);
+                var neighborBlockIndex = closeChunks.GetBlockIndex(ref neighborPosition);
 
                 // 未定の場合は面なしとする。
                 // 正確な描画には面なしとすべきではないが、
@@ -315,7 +345,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var occluderPosition = neighborPosition + s.Direction;
 
                 // 遮蔽対象のブロックのインデックスを取得。
-                var occluderBlockIndex = CloseChunks.GetBlockIndex(ref occluderPosition);
+                var occluderBlockIndex = closeChunks.GetBlockIndex(ref occluderPosition);
 
                 // 未定と空の場合は非遮蔽。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;

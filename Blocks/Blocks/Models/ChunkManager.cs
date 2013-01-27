@@ -349,37 +349,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 完了フラグを初期化。
             verticesBuilder.Completed = false;
-
-            // 隣接チャンク集合を構築。
-            // 非同期処理からアクティブ チャンクを探索する場合、
-            // 全アクティブ チャンクに対する同期化を必要とする問題があるが、
-            // この問題を回避するために非同期処理に入る前に探索している。
-            var centerPosition = chunk.Position;
-            for (int z = -1; z <= 1; z++)
-            {
-                for (int y = -1; y <= 1; y++)
-                {
-                    for (int x = -1; x <= 1; x++)
-                    {
-                        // 8 つの隅は不要。
-                        if (x != 0 && y != 0 && z != 0) continue;
-
-                        // 中心には自身を設定。
-                        if (x == 0 && y == 0 && z == 0)
-                        {
-                            verticesBuilder.CloseChunks[0, 0, 0] = chunk;
-                            continue;
-                        }
-
-                        var closePosition = centerPosition;
-                        closePosition.X += x;
-                        closePosition.Y += y;
-                        closePosition.Z += z;
-
-                        verticesBuilder.CloseChunks[x, y, z] = GetChunk(closePosition);
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -452,7 +421,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             builder.Chunk.VerticesBuilder = null;
             builder.Chunk = null;
-            builder.CloseChunks.Clear();
             builder.Opaque.Clear();
             builder.Translucent.Clear();
             verticesBuilderPool.Return(builder);
