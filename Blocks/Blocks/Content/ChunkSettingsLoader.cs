@@ -34,6 +34,7 @@ namespace Willcraftia.Xna.Blocks.Content
             settings.PartitionManager.ActivationCapacity = definition.ActivationCapacity;
             settings.PartitionManager.PassivationCapacity = definition.PassivationCapacity;
             settings.PartitionManager.PassivationSearchCapacity = definition.PassivationSearchCapacity;
+            settings.PartitionManager.PriorActiveDistance = definition.PriorActiveDistance;
 
             settings.PartitionManager.PartitionSize = definition.ChunkSize.ToVector3();
             settings.PartitionManager.MinActiveVolume = new DefaultActiveVolume(settings.MinActiveVolume);
@@ -57,7 +58,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 ClusterSize = settings.PartitionManager.ClusterSize,
                 ActivationCapacity = settings.PartitionManager.ActivationCapacity,
                 PassivationCapacity = settings.PartitionManager.PassivationCapacity,
-                PassivationSearchCapacity = settings.PartitionManager.PassivationSearchCapacity
+                PassivationSearchCapacity = settings.PartitionManager.PassivationSearchCapacity,
+                PriorActiveDistance = settings.PartitionManager.PriorActiveDistance
             };
 
             serializer.Serialize(resource, definition);

@@ -35,6 +35,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             int passivationSearchCapacity = 200;
 
+            float priorActiveDistance = 6 * 16;
+
             public Vector3 PartitionSize
             {
                 get { return partitionSize; }
@@ -102,6 +104,17 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
+            public float PriorActiveDistance
+            {
+                get { return priorActiveDistance; }
+                set
+                {
+                    if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                    priorActiveDistance = value;
+                }
+            }
+
             public IActiveVolume MinActiveVolume { get; set; }
 
             public IActiveVolume MaxActiveVolume { get; set; }
@@ -141,13 +154,16 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 BoundingFrustum frustum = new BoundingFrustum(Matrix.Identity);
 
+                float priorDistanceSquared;
+
                 Vector3 eyePositionWorld;
 
                 internal CandidateComparer() { }
 
-                internal void Initialize(Matrix view, Matrix projection)
+                internal void Initialize(Matrix view, Matrix projection, float priorDistance)
                 {
                     frustum.Matrix = view * projection;
+                    priorDistanceSquared = priorDistance * priorDistance;
 
                     View.GetPosition(ref view, out eyePositionWorld);
                 }
@@ -155,7 +171,17 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // I/F
                 public int Compare(Partition partition1, Partition partition2)
                 {
-                    // 視錐台に含まれるパーティションは、含まれないパーティションより優先。
+                    float distance1;
+                    Vector3.DistanceSquared(ref partition1.CenterWorld, ref eyePositionWorld, out distance1);
+
+                    float distance2;
+                    Vector3.DistanceSquared(ref partition2.CenterWorld, ref eyePositionWorld, out distance2);
+
+                    // 優先領域にある物をより優先。
+                    if (distance1 <= priorDistanceSquared && priorDistanceSquared < distance2) return -1;
+                    if (priorDistanceSquared < distance1 && distance2 <= priorDistanceSquared) return 1;
+
+                    // 視錐台に含まれる物は、含まれない物より優先。
                     bool intersected1;
                     frustum.Intersects(ref partition1.BoxWorld, out intersected1);
                     bool intersected2;
@@ -165,9 +191,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     if (!intersected1 && intersected2) return 1;
 
                     // 互いに視錐台に含まれる、あるいは、含まれない場合、
-                    // より視点に近いパーティションを優先。
-                    var distance1 = (partition1.CenterWorld - eyePositionWorld).LengthSquared();
-                    var distance2 = (partition2.CenterWorld - eyePositionWorld).LengthSquared();
+                    // より視点に近い物を優先。
 
                     if (distance1 == distance2) return 0;
                     return distance1 < distance2 ? -1 : 1;
@@ -209,7 +233,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 candidates = new PriorityQueue<Partition>(maxDistance * maxDistance * maxDistance, comparer);
             }
 
-            internal void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume)
+            internal void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume, float priorDistance)
             {
                 if (active) return;
 
@@ -218,7 +242,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 this.eyePosition = eyePosition;
                 this.volume = volume;
 
-                comparer.Initialize(view, projection);
+                comparer.Initialize(view, projection, priorDistance);
 
                 active = true;
 
@@ -366,6 +390,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         int passivationSearchCapacity;
 
+        float priorActiveDistance;
+
         /// <summary>
         /// アクティブ化タスク キュー。
         /// </summary>
@@ -486,6 +512,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             // null の場合はデフォルト実装を与える。
             minActiveVolume = settings.MinActiveVolume ?? new DefaultActiveVolume(4);
             maxActiveVolume = settings.MaxActiveVolume ?? new DefaultActiveVolume(8);
+            priorActiveDistance = settings.PriorActiveDistance;
 
             passivationSearchCapacity = settings.PassivationSearchCapacity;
         }
@@ -794,7 +821,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (!activator.Active)
             {
                 // 非同期処理中ではないならば、アクティベータの実行を開始。
-                activator.Start(view, projection, eyePosition, maxActiveVolume);
+                activator.Start(view, projection, eyePosition, maxActiveVolume, priorActiveDistance);
             }
         }
 

@@ -6,8 +6,8 @@
   },
   "MeshUpdateSearchCapacity": 100,
   "VerticesBuilderCount": 10,
-  "MinActiveRange": 7,
-  "MaxActiveRange": 16,
+  "MinActiveRange": 16,
+  "MaxActiveRange": 17,
   "ChunkPoolMaxCapacity": 0,
   "ClusterSize": {
     "X": 8,
@@ -16,5 +16,6 @@
   },
   "ActivationCapacity": 10,
   "PassivationCapacity": 10,
-  "PassivationSearchCapacity": 200
+  "PassivationSearchCapacity": 200,
+  "PriorActiveDistance": 96.0
 }

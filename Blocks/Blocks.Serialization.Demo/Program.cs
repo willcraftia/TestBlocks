@@ -1566,14 +1566,15 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 {
                     ChunkSize = new VectorI3(16),
                     MeshUpdateSearchCapacity = 100,
-                    VerticesBuilderCount = 5,
-                    MinActiveRange = 10,
-                    MaxActiveRange = 12,
+                    VerticesBuilderCount = 10,
+                    MinActiveRange = 16,
+                    MaxActiveRange = 17,
                     ChunkPoolMaxCapacity = 0,
                     ClusterSize = new VectorI3(8),
-                    ActivationCapacity = 3,
+                    ActivationCapacity = 10,
                     PassivationCapacity = 10,
                     PassivationSearchCapacity = 200,
+                    PriorActiveDistance = 6 * 16
                 };
                 SerializeAndDeserialize<ChunkSettingsDefinition>("ChunkSettings", definition);
             }

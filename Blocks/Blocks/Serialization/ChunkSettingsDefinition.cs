@@ -28,5 +28,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
         public int PassivationCapacity;
 
         public int PassivationSearchCapacity;
+
+        public float PriorActiveDistance;
     }
 }
