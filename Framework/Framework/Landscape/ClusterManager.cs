@@ -177,7 +177,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// クラスタ数を取得します。
         /// </summary>
-        internal int Count
+        internal int ClusterCount
         {
             get { return clustersByPosition.Count; }
         }

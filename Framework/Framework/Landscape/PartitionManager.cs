@@ -422,7 +422,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public int ActiveClusterCount
         {
-            get { return clusterManager.Count; }
+            get { return clusterManager.ClusterCount; }
         }
 
         /// <summary>
