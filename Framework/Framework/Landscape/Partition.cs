@@ -27,16 +27,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         public Vector3 PositionWorld;
 
         /// <summary>
-        /// ワールド空間におけるパーティションの境界ボックス。
-        /// </summary>
-        public BoundingBox BoxWorld;
-
-        /// <summary>
-        /// ワールド空間におけるパーティションの中心位置。
-        /// </summary>
-        public Vector3 CenterWorld;
-
-        /// <summary>
         /// アクティブ化が完了しているか否かを示す値。
         /// </summary>
         /// <value>
@@ -132,11 +122,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 Y = position.Y * partitionSize.Y,
                 Z = position.Z * partitionSize.Z,
             };
-
-            BoxWorld.Min = PositionWorld;
-            BoxWorld.Max = PositionWorld + partitionSize;
-
-            CenterWorld = (BoxWorld.Max + BoxWorld.Min) / 2;
 
             ActivationCompleted = false;
             PassivationCompleted = false;

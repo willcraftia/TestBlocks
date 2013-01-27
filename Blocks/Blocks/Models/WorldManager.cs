@@ -31,8 +31,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         BasicCamera defaultCamera = new BasicCamera("Default");
 
-        List<Partition> visibleChunks = new List<Partition>();
-
         public GraphicsDevice GraphicsDevice { get; private set; }
 
         public SceneManager SceneManager { get; private set; }
@@ -67,16 +65,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Scanline Scanline { get; private set; }
 
-        #region Debug
-
-        BasicEffect debugBoundingBoxEffect;
-
-        BoundingBoxDrawer debugBoundingBoxDrawer;
-
-        public bool DebugChunkBoundingBoxVisible { get; set; }
-
-        #endregion
-
         public WorldManager(IServiceProvider serviceProvider, GraphicsDevice graphicsDevice)
         {
             if (serviceProvider == null) throw new ArgumentNullException("serviceProvider");
@@ -90,13 +78,6 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(GraphicsSettings), new GraphicsSettingsLoader());
             assetManager.RegisterLoader(typeof(ChunkSettings), new ChunkSettingsLoader());
             assetManager.RegisterLoader(typeof(SceneSettings), new SceneSettingsLoader());
-
-#if DEBUG || TRACE
-            debugBoundingBoxEffect = new BasicEffect(GraphicsDevice);
-            debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
-            debugBoundingBoxEffect.VertexColorEnabled = true;
-            debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
-#endif
         }
 
         public void Initialize()
@@ -370,54 +351,17 @@ namespace Willcraftia.Xna.Blocks.Models
             SceneManager.Draw(gameTime);
 
             //----------------------------------------------------------------
-            // チャンクの境界ボックスの描画
-
-#if DEBUG || TRACE
-            // デバッグ エフェクトへカメラ情報を設定。
-            GraphicsDevice.SetRenderTarget(SceneManager.RenderTarget);
-            debugBoundingBoxEffect.View = SceneManager.ActiveCamera.View.Matrix;
-            debugBoundingBoxEffect.Projection = SceneManager.ActiveCamera.Projection.Matrix;
-            DebugDrawChunkBoundingBoxes();
-            GraphicsDevice.SetRenderTarget(null);
-#endif
-
-            //----------------------------------------------------------------
             // シーンをスクリーンへ反映
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Opaque);
             spriteBatch.Draw(SceneManager.RenderTarget, Vector2.Zero, Color.White);
             spriteBatch.End();
-
-            //----------------------------------------------------------------
-            // 後処理
-
-            visibleChunks.Clear();
         }
 
         T LoadAsset<T>(string uri)
         {
             var resource = resourceManager.Load(uri);
             return assetManager.Load<T>(resource);
-        }
-
-        [Conditional("DEBUG"), Conditional("TRACE")]
-        void DebugDrawChunkBoundingBoxes()
-        {
-            if (!DebugChunkBoundingBoxVisible) return;
-
-            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-
-            foreach (Chunk chunk in visibleChunks)
-                DebugDrawChunkBoundingBox(chunk);
-
-            GraphicsDevice.SetRenderTarget(null);
-        }
-
-        [Conditional("DEBUG"), Conditional("TRACE")]
-        void DebugDrawChunkBoundingBox(Chunk chunk)
-        {
-            var color = (0 < chunk.SolidCount) ? Color.Yellow : Color.Peru;
-            debugBoundingBoxDrawer.Draw(ref chunk.BoxWorld, debugBoundingBoxEffect, ref color);
         }
     }
 }
