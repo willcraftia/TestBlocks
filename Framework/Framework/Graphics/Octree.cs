@@ -68,6 +68,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public BoundingBox Box;
 
+        public BoundingSphere Sphere;
+
         Octree[, ,] children = new Octree[2, 2, 2];
 
         public Octree Parent { get; private set; }

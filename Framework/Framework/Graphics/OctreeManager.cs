@@ -58,6 +58,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 };
 
                 root.Box = box;
+                root.Sphere = BoundingSphere.CreateFromBoundingBox(root.Box);
 
                 rootsByPositionGrid[rootPositionGrid] = root;
             }
@@ -124,15 +125,27 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public void Execute(BoundingFrustum frustum, Action<Octree> action)
         {
+            var frustumSphere = BoundingSphere.CreateFromFrustum(frustum);
+
             foreach (var root in rootsByPositionGrid.Values)
             {
-                Execute(frustum, action, root);
+                Execute(frustum, ref frustumSphere, action, root);
             }
         }
 
-        void Execute(BoundingFrustum frustum, Action<Octree> action, Octree octree)
+        void Execute(BoundingFrustum frustum, ref BoundingSphere frustumSphere, Action<Octree> action, Octree octree)
         {
             bool intersected;
+
+            // 視錐台球 vs 八分木球
+            frustumSphere.Intersects(ref octree.Sphere, out intersected);
+            if (!intersected) return;
+
+            // 視錐台 vs 八分木球
+            frustum.Intersects(ref octree.Sphere, out intersected);
+            if (!intersected) return;
+
+            // 視錐台 vs 八分木ボックス
             frustum.Intersects(ref octree.Box, out intersected);
             if (!intersected) return;
 
@@ -147,7 +160,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                         var child = octree[x, y, z];
                         if (child != null)
                         {
-                            Execute(frustum, action, child);
+                            Execute(frustum, ref frustumSphere, action, child);
                         }
                     }
                 }
@@ -245,6 +258,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             child.Box.Min = childMin;
             child.Box.Max = childMax;
+            child.Sphere = BoundingSphere.CreateFromBoundingBox(child.Box);
         }
 
         void RemoveOctreeFromParent(Octree octree)
