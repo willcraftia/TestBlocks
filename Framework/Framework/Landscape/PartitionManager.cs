@@ -296,7 +296,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var position = eyePosition + offset;
 
                 // 既にアクティブならばスキップ。
-                if (manager.clusterManager.Contains(position)) return;
+                if (manager.ContainsPartition(position)) return;
 
                 // 既に実行中ならばスキップ。
                 if (manager.activations.Contains(position)) return;
@@ -620,6 +620,18 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             Closing = true;
             OnClosing();
+        }
+
+        /// <summary>
+        /// 指定の位置にパーティションが存在するか否かを検査します。
+        /// </summary>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
+        /// <returns>
+        /// true (パーティションが存在する場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool ContainsPartition(VectorI3 position)
+        {
+            return clusterManager.Contains(position);
         }
 
         /// <summary>
