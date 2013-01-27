@@ -231,6 +231,10 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             #endregion
 
+            // 初期容量を事前に定めることが難しい。
+            // ひとまず、最大距離であろう 16 を基準に考える。
+            const int candidateQueueCapacity = 16 * 16 * 16;
+
             PartitionManager manager;
 
             Matrix view;
@@ -259,9 +263,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 this.manager = manager;
                 collectAction = new Action<VectorI3>(Collect);
 
-                // TODO
-                const int maxDistance = 16;
-                candidates = new PriorityQueue<Candidate>(maxDistance * maxDistance * maxDistance, comparer);
+                candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
             }
 
             public void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume, float priorDistance)
