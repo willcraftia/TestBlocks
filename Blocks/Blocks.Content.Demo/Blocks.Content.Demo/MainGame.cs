@@ -349,6 +349,23 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(graphics.PreferredBackBufferWidth).Append('x');
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
 
+            // pow(2, 20)
+            const int conversion = 1024;
+            float mb = (float) (Math.Round(GC.GetTotalMemory(false) / (float) (conversion * conversion), 2));
+            sb.Append("GC Memory: ").AppendNumber(mb).Append(" MB").AppendLine();
+#if WINDOWS
+            mb = (float) (Math.Round(Process.GetCurrentProcess().PrivateMemorySize64 / (float) (conversion * conversion), 2));
+            sb.Append("Process Memory: ").AppendNumber(mb).Append(" MB").AppendLine();
+
+            sb.Append("GC: ");
+            for (int i = 0; i < GC.MaxGeneration; i++)
+            {
+                sb.Append("(").AppendNumber(i).Append(":");
+                sb.AppendNumber(GC.CollectionCount(i)).Append(") ");
+            }
+            sb.AppendLine();
+#endif
+
             var chunkManager = worldManager.ChunkManager;
             sb.Append("Chunk: ");
             sb.Append("A(").AppendNumber(chunkManager.ActiveClusterCount).Append(":");
