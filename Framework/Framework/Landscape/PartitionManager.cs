@@ -157,17 +157,17 @@ namespace Willcraftia.Xna.Framework.Landscape
                 {
                     // 視錐台に含まれるパーティションは、含まれないパーティションより優先。
                     bool intersected1;
-                    frustum.Intersects(ref partition1.BoundingBox, out intersected1);
+                    frustum.Intersects(ref partition1.BoxWorld, out intersected1);
                     bool intersected2;
-                    frustum.Intersects(ref partition2.BoundingBox, out intersected2);
+                    frustum.Intersects(ref partition2.BoxWorld, out intersected2);
 
                     if (intersected1 && !intersected2) return -1;
                     if (!intersected1 && intersected2) return 1;
 
                     // 互いに視錐台に含まれる、あるいは、含まれない場合、
                     // より視点に近いパーティションを優先。
-                    var distance1 = (partition1.Center - eyePositionWorld).LengthSquared();
-                    var distance2 = (partition2.Center - eyePositionWorld).LengthSquared();
+                    var distance1 = (partition1.CenterWorld - eyePositionWorld).LengthSquared();
+                    var distance2 = (partition2.CenterWorld - eyePositionWorld).LengthSquared();
 
                     if (distance1 == distance2) return 0;
                     return distance1 < distance2 ? -1 : 1;

@@ -417,7 +417,7 @@ namespace Willcraftia.Xna.Blocks.Models
         void DebugDrawChunkBoundingBox(Chunk chunk)
         {
             var color = (0 < chunk.SolidCount) ? Color.Yellow : Color.Peru;
-            debugBoundingBoxDrawer.Draw(ref chunk.BoundingBox, debugBoundingBoxEffect, ref color);
+            debugBoundingBoxDrawer.Draw(ref chunk.BoxWorld, debugBoundingBoxEffect, ref color);
         }
     }
 }
