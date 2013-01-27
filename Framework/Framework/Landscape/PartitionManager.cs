@@ -373,7 +373,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// 非アクティブ化実行キュー。
         /// </summary>
-        ConcurrentKeyedQueue<VectorI3, Partition> passivations;
+        Queue<Partition> passivations;
 
         /// <summary>
         /// 同時アクティブ化実行許容量。
@@ -503,8 +503,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             activations = new ConcurrentKeyedQueue<VectorI3, Partition>(
                 (i) => { return i.Position; }, activationCapacity);
-            passivations = new ConcurrentKeyedQueue<VectorI3, Partition>(
-                (i) => { return i.Position; }, passivationCapacity);
+            passivations = new Queue<Partition>(passivationCapacity);
 
             activationTaskQueue.SlotCount = activationCapacity;
             passivationTaskQueue.SlotCount = passivationCapacity;
@@ -654,8 +653,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             int partitionCount = passivations.Count;
             for (int i = 0; i < partitionCount; i++)
             {
-                Partition partition;
-                if (!passivations.TryDequeue(out partition)) break;
+                var partition = passivations.Dequeue();
 
                 if (!partition.PassivationCompleted)
                 {
@@ -892,14 +890,10 @@ namespace Willcraftia.Xna.Framework.Landscape
                 partitions.Dequeue().Dispose();
         }
 
-        void DisposePartitions(ConcurrentKeyedPriorityQueue<VectorI3, Partition> partitions)
+        void DisposePartitions(KeyedQueue<VectorI3, Partition> partitions)
         {
             while (0 < partitions.Count)
-            {
-                Partition partition;
-                if (partitions.TryDequeue(out partition))
-                    partition.Dispose();
-            }
+                partitions.Dequeue().Dispose();
         }
 
         void DisposePartitions(ConcurrentKeyedQueue<VectorI3, Partition> partitions)
