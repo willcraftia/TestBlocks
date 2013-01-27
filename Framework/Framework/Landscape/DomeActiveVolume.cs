@@ -74,11 +74,5 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             throw new NotImplementedException();
         }
-
-        // I/F
-        public void ForEach(Func<VectorI3, bool> function)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
