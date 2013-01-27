@@ -333,7 +333,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 false, format, depthFormat, multiSampleCount, RenderTargetUsage.PreserveContents);
 
             // TODO
-            octreeManager = new OctreeManager(new Vector3(256), 4);
+            octreeManager = new OctreeManager(new Vector3(256), 3);
 
             // TODO
             RootNode = new SceneNode(this, "Root");
