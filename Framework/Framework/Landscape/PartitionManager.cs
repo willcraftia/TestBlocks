@@ -295,9 +295,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var position = eyePosition + offset;
 
-                // TODO
-                // クラスタを後でスレッド セーフにする。
-
                 // 既にアクティブならばスキップ。
                 if (manager.clusterManager.Contains(position)) return;
 
