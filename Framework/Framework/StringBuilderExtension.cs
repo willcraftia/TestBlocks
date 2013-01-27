@@ -38,6 +38,11 @@ namespace Willcraftia.Xna.Framework
             return AppendNumber(builder, number, 2, options);
         }
 
+        public static StringBuilder AppendNumber(this StringBuilder builder, float number, int decimalCount)
+        {
+            return AppendNumber(builder, number, decimalCount, AppendNumberOptions.None);
+        }
+
         public static StringBuilder AppendNumber(this StringBuilder builder, float number, int decimalCount, AppendNumberOptions options)
         {
             if (float.IsNaN(number)) return builder.Append("NaN");
