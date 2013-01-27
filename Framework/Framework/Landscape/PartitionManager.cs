@@ -148,9 +148,42 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         sealed class Activator
         {
+            #region Candidate
+
+            /// <summary>
+            /// アクティブ化候補の構造体です。
+            /// </summary>
+            struct Candidate
+            {
+                /// <summary>
+                /// パーティション空間におけるパーティションの位置。
+                /// </summary>
+                public VectorI3 Position;
+
+                /// <summary>
+                /// ワールド空間におけるパーティションの原点位置。
+                /// </summary>
+                public Vector3 PositionWorld;
+
+                /// <summary>
+                /// ワールド空間におけるパーティションの境界ボックス。
+                /// </summary>
+                public BoundingBox BoxWorld;
+
+                /// <summary>
+                /// ワールド空間におけるパーティションの中心位置。
+                /// </summary>
+                public Vector3 CenterWorld;
+            }
+
+            #endregion
+
             #region CandidateComparer
 
-            sealed class CandidateComparer : IComparer<Partition>
+            /// <summary>
+            /// アクティブ化候補の優先度を決定するための比較クラスです。
+            /// </summary>
+            sealed class CandidateComparer : IComparer<Candidate>
             {
                 BoundingFrustum frustum = new BoundingFrustum(Matrix.Identity);
 
@@ -158,9 +191,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 Vector3 eyePositionWorld;
 
-                internal CandidateComparer() { }
-
-                internal void Initialize(Matrix view, Matrix projection, float priorDistance)
+                public void Initialize(Matrix view, Matrix projection, float priorDistance)
                 {
                     frustum.Matrix = view * projection;
                     priorDistanceSquared = priorDistance * priorDistance;
@@ -169,13 +200,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // I/F
-                public int Compare(Partition partition1, Partition partition2)
+                public int Compare(Candidate candidate1, Candidate candidate2)
                 {
                     float distance1;
-                    Vector3.DistanceSquared(ref partition1.CenterWorld, ref eyePositionWorld, out distance1);
+                    Vector3.DistanceSquared(ref candidate1.CenterWorld, ref eyePositionWorld, out distance1);
 
                     float distance2;
-                    Vector3.DistanceSquared(ref partition2.CenterWorld, ref eyePositionWorld, out distance2);
+                    Vector3.DistanceSquared(ref candidate2.CenterWorld, ref eyePositionWorld, out distance2);
 
                     // 優先領域にある物をより優先。
                     if (distance1 <= priorDistanceSquared && priorDistanceSquared < distance2) return -1;
@@ -183,9 +214,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                     // 視錐台に含まれる物は、含まれない物より優先。
                     bool intersected1;
-                    frustum.Intersects(ref partition1.BoxWorld, out intersected1);
+                    frustum.Intersects(ref candidate1.BoxWorld, out intersected1);
                     bool intersected2;
-                    frustum.Intersects(ref partition2.BoxWorld, out intersected2);
+                    frustum.Intersects(ref candidate2.BoxWorld, out intersected2);
 
                     if (intersected1 && !intersected2) return -1;
                     if (!intersected1 && intersected2) return 1;
@@ -210,30 +241,30 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             IActiveVolume volume;
 
-            PriorityQueue<Partition> candidates;
+            PriorityQueue<Candidate> candidates;
 
             CandidateComparer comparer = new CandidateComparer();
 
-            Func<VectorI3, bool> reviewPartitionFunc;
+            Action<VectorI3> collectAction;
 
             volatile bool active;
 
-            internal bool Active
+            public bool Active
             {
                 get { return active; }
             }
 
-            internal Activator(PartitionManager manager)
+            public Activator(PartitionManager manager)
             {
                 this.manager = manager;
-                reviewPartitionFunc = new Func<VectorI3, bool>(ReviewPartition);
+                collectAction = new Action<VectorI3>(Collect);
 
                 // TODO
                 const int maxDistance = 16;
-                candidates = new PriorityQueue<Partition>(maxDistance * maxDistance * maxDistance, comparer);
+                candidates = new PriorityQueue<Candidate>(maxDistance * maxDistance * maxDistance, comparer);
             }
 
-            internal void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume, float priorDistance)
+            public void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume, float priorDistance)
             {
                 if (active) return;
 
@@ -251,16 +282,16 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             void WaitCallback(object state)
             {
-                // アクティブ化候補を探索。
-                volume.ForEach(reviewPartitionFunc);
+                // 候補を探索。
+                volume.ForEach(collectAction);
 
-                // アクティブ化候補をアクティブ化。
-                ActivateCandidates();
+                // 候補をアクティブ化。
+                Activate();
 
                 active = false;
             }
 
-            bool ReviewPartition(VectorI3 offset)
+            void Collect(VectorI3 offset)
             {
                 var position = eyePosition + offset;
 
@@ -268,43 +299,51 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // クラスタを後でスレッド セーフにする。
 
                 // 既にアクティブならばスキップ。
-                if (manager.clusterManager.Contains(position)) return true;
+                if (manager.clusterManager.Contains(position)) return;
 
                 // 既に実行中ならばスキップ。
-                if (manager.activations.Contains(position)) return true;
+                if (manager.activations.Contains(position)) return;
 
                 // アクティブ化可能であるかどうか。
-                if (!manager.CanActivatePartition(position)) return true;
+                if (!manager.CanActivatePartition(position)) return;
 
-                // プールからパーティションを取得。
-                var partition = manager.partitionPool.Borrow();
-
-                // プール枯渇ならば終了。
-                if (partition == null) return false;
-
-                // パーティションを初期化。
-                if (partition.Initialize(position, manager.partitionSize))
+                var candidate = new Candidate();
+                candidate.Position = position;
+                candidate.PositionWorld = new Vector3
                 {
-                    // 候補コレクションへ追加。
-                    candidates.Enqueue(partition);
-                }
-                else
-                {
-                    // 初期化失敗ならば取消。
-                    manager.partitionPool.Return(partition);
-                }
+                    X = position.X * manager.partitionSize.X,
+                    Y = position.Y * manager.partitionSize.Y,
+                    Z = position.Z * manager.partitionSize.Z,
+                };
+                candidate.BoxWorld.Min = candidate.PositionWorld;
+                candidate.BoxWorld.Max = candidate.PositionWorld + manager.partitionSize;
+                candidate.CenterWorld = candidate.BoxWorld.GetCenter();
 
-                return true;
+                candidates.Enqueue(candidate);
             }
 
-            void ActivateCandidates()
+            void Activate()
             {
                 while (0 < candidates.Count)
                 {
                     // 同時実行許容量を越えるならば終了。
                     if (manager.activationCapacity <= manager.activations.Count) break;
 
-                    var partition = candidates.Dequeue();
+                    var candidate = candidates.Dequeue();
+
+                    // プールからパーティションを取得。
+                    var partition = manager.partitionPool.Borrow();
+
+                    // プール枯渇ならば終了。
+                    if (partition == null) break;
+
+                    // パーティションを初期化。
+                    if (!partition.Initialize(candidate.Position, manager.partitionSize))
+                    {
+                        // 初期化失敗ならば取消。
+                        manager.partitionPool.Return(partition);
+                        continue;
+                    }
 
                     // 実行中キューへ追加。
                     manager.activations.Enqueue(partition);
@@ -317,12 +356,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // 実行キューへ追加しなかった全てを取消。
-                while (0 < candidates.Count)
-                {
-                    var partition = candidates.Dequeue();
-                    partition.Release();
-                    manager.partitionPool.Return(partition);
-                }
+                candidates.Clear();
             }
         }
 
@@ -778,7 +812,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (!Closing)
                 {
                     if (maxActiveVolume.Contains(eyePosition, partition.Position))
-                    //if (minLandscapeVolume.Contains(eyePosition, partition.Position))
                     {
                         // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.Enqueue(partition);
@@ -819,7 +852,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (!activator.Active)
             {
                 // 非同期処理中ではないならば、アクティベータの実行を開始。
-                activator.Start(view, projection, eyePosition, maxActiveVolume, priorActiveDistance);
+                activator.Start(view, projection, eyePosition, minActiveVolume, priorActiveDistance);
             }
         }
 
