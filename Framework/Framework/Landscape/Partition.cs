@@ -98,22 +98,16 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         /// <summary>
         /// パーティションを初期化します。
-        /// このメソッドは、パーティション プールから取り出され、
-        /// アクティブ化が要求されるまえに呼び出されます。
-        /// 戻り値が false を返す場合、パーティションのアクティブ化は取り消されます。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <returns>
-        /// true (初期化に成功した場合)、false (それ以外の場合)。
-        /// </returns>
-        internal bool Initialize(VectorI3 position)
+        internal void Initialize(VectorI3 position)
         {
             Position = position;
 
             ActivationCompleted = false;
             PassivationCompleted = false;
 
-            return InitializeOverride();
+            InitializeOverride();
         }
 
         /// <summary>
@@ -201,10 +195,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションの初期化で呼び出されます。
         /// </summary>
-        /// <returns>
-        /// true (初期化に成功した場合)、false (それ以外の場合)。
-        /// </returns>
-        protected virtual bool InitializeOverride() { return true; }
+        protected virtual void InitializeOverride() { }
 
         /// <summary>
         /// アクティブ化を試行する際に呼び出されます。

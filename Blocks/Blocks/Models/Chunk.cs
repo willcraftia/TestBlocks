@@ -262,14 +262,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンクが属するリージョンを探索して関連付けます。
         /// </summary>
-        /// <returns></returns>
-        protected override bool InitializeOverride()
+        protected override void InitializeOverride()
         {
             // 対象リージョンの取得。
             if (!manager.TryGetRegion(ref Position, out region))
                 throw new InvalidOperationException("Region not found: " + Position);
 
-            return base.InitializeOverride();
+            base.InitializeOverride();
         }
 
         /// <summary>
