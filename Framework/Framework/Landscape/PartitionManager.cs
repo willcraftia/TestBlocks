@@ -311,12 +311,12 @@ namespace Willcraftia.Xna.Framework.Landscape
                 candidate.Position = position;
                 candidate.PositionWorld = new Vector3
                 {
-                    X = position.X * manager.partitionSize.X,
-                    Y = position.Y * manager.partitionSize.Y,
-                    Z = position.Z * manager.partitionSize.Z,
+                    X = position.X * manager.PartitionSize.X,
+                    Y = position.Y * manager.PartitionSize.Y,
+                    Z = position.Z * manager.PartitionSize.Z,
                 };
                 candidate.BoxWorld.Min = candidate.PositionWorld;
-                candidate.BoxWorld.Max = candidate.PositionWorld + manager.partitionSize;
+                candidate.BoxWorld.Max = candidate.PositionWorld + manager.PartitionSize;
                 candidate.CenterWorld = candidate.BoxWorld.GetCenter();
 
                 candidates.Enqueue(candidate);
@@ -338,7 +338,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     if (partition == null) break;
 
                     // パーティションを初期化。
-                    if (!partition.Initialize(candidate.Position, manager.partitionSize))
+                    if (!partition.Initialize(candidate.Position, manager.PartitionSize))
                     {
                         // 初期化失敗ならば取消。
                         manager.partitionPool.Return(partition);
@@ -367,12 +367,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
-        Vector3 partitionSize;
-
-        /// <summary>
-        /// 1 / partitionSize。
-        /// </summary>
-        Vector3 inversePartitionSize;
+        protected readonly Vector3 PartitionSize;
 
         /// <summary>
         /// パーティションのプール。
@@ -518,11 +513,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (settings == null) throw new ArgumentNullException("settings");
 
-            partitionSize = settings.PartitionSize;
-
-            inversePartitionSize.X = 1 / partitionSize.X;
-            inversePartitionSize.Y = 1 / partitionSize.Y;
-            inversePartitionSize.Z = 1 / partitionSize.Z;
+            PartitionSize = settings.PartitionSize;
 
             partitionPool = new ConcurrentPool<Partition>(CreatePartition);
             partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
@@ -566,9 +557,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             var eyePositionWorld = View.GetPosition(view);
 
-            eyePosition.X = (int) Math.Floor(eyePositionWorld.X * inversePartitionSize.X);
-            eyePosition.Y = (int) Math.Floor(eyePositionWorld.Y * inversePartitionSize.Y);
-            eyePosition.Z = (int) Math.Floor(eyePositionWorld.Z * inversePartitionSize.Z);
+            eyePosition.X = (int) Math.Floor(eyePositionWorld.X / PartitionSize.X);
+            eyePosition.Y = (int) Math.Floor(eyePositionWorld.Y / PartitionSize.Y);
+            eyePosition.Z = (int) Math.Floor(eyePositionWorld.Z / PartitionSize.Z);
 
             if (!Closing)
             {
