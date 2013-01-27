@@ -338,7 +338,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     if (partition == null) break;
 
                     // パーティションを初期化。
-                    if (!partition.Initialize(candidate.Position, manager.PartitionSize))
+                    if (!partition.Initialize(candidate.Position))
                     {
                         // 初期化失敗ならば取消。
                         manager.partitionPool.Return(partition);

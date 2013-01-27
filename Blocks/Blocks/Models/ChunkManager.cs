@@ -504,7 +504,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // メッシュに設定するワールド座標。
             // チャンクの中心をメッシュの位置とする。
-            var position = chunk.PositionWorld + ChunkMeshOffset;
+            var position = new Vector3
+            {
+                X = chunk.Position.X * PartitionSize.X + ChunkMeshOffset.X,
+                Y = chunk.Position.Y * PartitionSize.Y + ChunkMeshOffset.Y,
+                Z = chunk.Position.Z * PartitionSize.Z + ChunkMeshOffset.Z,
+            };
 
             // メッシュに設定するワールド行列。
             Matrix world;

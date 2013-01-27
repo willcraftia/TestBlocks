@@ -22,11 +22,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         public VectorI3 Position;
 
         /// <summary>
-        /// ワールド空間におけるパーティションの原点位置。
-        /// </summary>
-        public Vector3 PositionWorld;
-
-        /// <summary>
         /// アクティブ化が完了しているか否かを示す値。
         /// </summary>
         /// <value>
@@ -108,20 +103,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 戻り値が false を返す場合、パーティションのアクティブ化は取り消されます。
         /// </summary>
         /// <param name="position">パーティション空間におけるパーティションの位置。</param>
-        /// <param name="partitionSize">ワールド空間におけるパーティションのサイズ。</param>
         /// <returns>
         /// true (初期化に成功した場合)、false (それ以外の場合)。
         /// </returns>
-        internal bool Initialize(VectorI3 position, Vector3 partitionSize)
+        internal bool Initialize(VectorI3 position)
         {
             Position = position;
-
-            PositionWorld = new Vector3
-            {
-                X = position.X * partitionSize.X,
-                Y = position.Y * partitionSize.Y,
-                Z = position.Z * partitionSize.Z,
-            };
 
             ActivationCompleted = false;
             PassivationCompleted = false;
