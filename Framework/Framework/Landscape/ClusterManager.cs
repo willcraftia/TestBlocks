@@ -183,7 +183,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 指定の位置についてパーティションを取得または設定します。
+        /// 指定の位置にあるパーティションを取得します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
         /// <returns>
@@ -197,21 +197,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (cluster == null) return null;
 
                 return cluster[position];
-            }
-            set
-            {
-                VectorI3 clusterPosition;
-                CalculateClusterPosition(ref position, out clusterPosition);
-
-                Cluster cluster;
-                if (!clustersByPosition.TryGetValue(clusterPosition, out cluster))
-                {
-                    cluster = clusterPool.Borrow();
-                    cluster.Initialize(clusterPosition);
-                    clustersByPosition[clusterPosition] = cluster;
-                }
-
-                cluster[position] = value;
             }
         }
 
@@ -252,6 +237,26 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (cluster == null) return false;
 
             return cluster.Contains(position);
+        }
+
+        /// <summary>
+        /// パーティションを追加します。
+        /// </summary>
+        /// <param name="partition">パーティション。</param>
+        internal void Add(Partition partition)
+        {
+            VectorI3 clusterPosition;
+            CalculateClusterPosition(ref partition.Position, out clusterPosition);
+
+            Cluster cluster;
+            if (!clustersByPosition.TryGetValue(clusterPosition, out cluster))
+            {
+                cluster = clusterPool.Borrow();
+                cluster.Initialize(clusterPosition);
+                clustersByPosition[clusterPosition] = cluster;
+            }
+
+            cluster[partition.Position] = partition;
         }
 
         /// <summary>

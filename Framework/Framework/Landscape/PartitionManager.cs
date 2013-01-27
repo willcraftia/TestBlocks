@@ -674,7 +674,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // アクティブ リストへ追加。
-                clusterManager[partition.Position]= partition;
+                clusterManager.Add(partition);
                 partitions.Enqueue(partition);
 
                 // 完了を通知。
@@ -736,6 +736,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         void PassivatePartitions(GameTime gameTime)
         {
+            // メモ
+            //
+            // 非アクティブ化はパーティションのロックを伴う。
+            // このため、非アクティブ化判定そのものを非同期化することは難しい。
+
             int count = Math.Min(partitions.Count, passivationSearchCapacity);
 
             for (int i = 0; i < count; i++)
