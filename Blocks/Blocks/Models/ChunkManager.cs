@@ -213,7 +213,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override bool CanActivatePartition(VectorI3 position)
         {
-            if (!regionManager.RegionExists(ref position)) return false;
+            if (regionManager.GetRegionByChunkPosition(position) == null) return false;
 
             return base.CanActivatePartition(position);
         }
@@ -239,9 +239,9 @@ namespace Willcraftia.Xna.Blocks.Models
             base.UpdatePartitionsOverride(gameTime);
         }
 
-        internal bool TryGetRegion(ref VectorI3 position, out Region result)
+        internal Region GetRegion(VectorI3 chunkPosition)
         {
-            return regionManager.TryGetRegion(ref position, out result);
+            return regionManager.GetRegionByChunkPosition(chunkPosition);
         }
 
         internal ChunkData BorrowChunkData()

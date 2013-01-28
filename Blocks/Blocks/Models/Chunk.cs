@@ -265,8 +265,8 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override void InitializeOverride()
         {
             // 対象リージョンの取得。
-            if (!manager.TryGetRegion(ref Position, out region))
-                throw new InvalidOperationException("Region not found: " + Position);
+            region = manager.GetRegion(Position);
+            if (region == null) throw new InvalidOperationException("Region not found: " + Position);
 
             base.InitializeOverride();
         }

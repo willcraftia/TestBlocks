@@ -173,28 +173,19 @@ namespace Willcraftia.Xna.Blocks.Models
             return region;
         }
 
-        public bool RegionExists(ref VectorI3 position)
-        {
-            Region region;
-            return TryGetRegion(ref position, out region);
-        }
-
-        public bool TryGetRegion(ref VectorI3 position, out Region region)
+        public Region GetRegionByChunkPosition(VectorI3 chunkPosition)
         {
             lock (regions)
             {
-                foreach (var r in regions)
+                foreach (var region in regions)
                 {
-                    if (r.ContainsPosition(ref position))
+                    if (region.ContainsChunkPosition(chunkPosition))
                     {
-                        region = r;
-                        return true;
+                        return region;
                     }
                 }
             }
-
-            region = null;
-            return false;
+            return null;
         }
 
         //
