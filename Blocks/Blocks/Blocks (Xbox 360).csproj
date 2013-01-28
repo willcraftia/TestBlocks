@@ -128,7 +128,6 @@
     <Compile Include="Models\ChunkSettings.cs" />
     <Compile Include="Models\ChunkVertices.cs" />
     <Compile Include="Models\ChunkVerticesBuilder.cs" />
-    <Compile Include="Models\CloseChunks.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\DefaultTerrainProcedure.cs" />
     <Compile Include="Models\DefinedBiomeManager.cs" />

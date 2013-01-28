@@ -54,7 +54,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
     <XnaCompressContent>false</XnaCompressContent>
   </PropertyGroup>
@@ -82,7 +82,6 @@
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BlockMesh.cs" />
     <Compile Include="Models\ChunkEffect.cs" />
-    <Compile Include="Models\CloseChunks.cs" />
     <Compile Include="Models\GraphicsSettings.cs" />
     <Compile Include="Models\ChunkSettings.cs" />
     <Compile Include="Models\SceneSettings.cs" />
