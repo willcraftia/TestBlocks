@@ -79,10 +79,6 @@ namespace Willcraftia.Xna.Blocks.Models
             return true;
         }
 
-        public void Update()
-        {
-        }
-
         #region ToString
 
         public override string ToString()

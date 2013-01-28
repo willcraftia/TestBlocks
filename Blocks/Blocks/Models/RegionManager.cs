@@ -92,7 +92,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 降雪パーティクル
 
             // TODO
-            // これはバイオームで定義できるべきか？
+            // これはバイオームで定義？
             {
                 var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
                 var particleSettings = LoadAsset<ParticleSettings>("title:Resources/Particles/Snow.json");
@@ -101,14 +101,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 sceneManager.ParticleSystems.Add(snowParticleSystem);
 
-                snowParticleSystem.Enabled = true;
+                snowParticleSystem.Enabled = false;
             }
 
             //----------------------------------------------------------------
             // 降雨パーティクル
 
             // TODO
-            // これはバイオームで定義できるべきか？
+            // これはバイオームで定義？
             {
                 var particleEffect = LoadAsset<Effect>("content:Effects/Particle");
                 var particleSettings = LoadAsset<ParticleSettings>("title:Resources/Particles/Rain.json");
@@ -201,11 +201,6 @@ namespace Willcraftia.Xna.Blocks.Models
             // シーン設定
 
             SceneSettings.Update(gameTime);
-
-            //----------------------------------------------------------------
-            // リージョン
-
-            foreach (var region in regions) region.Update();
 
             //----------------------------------------------------------------
             // 降雪パーティクル
