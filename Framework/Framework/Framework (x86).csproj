@@ -287,6 +287,7 @@
     <Compile Include="IO\TitleResource.cs" />
     <Compile Include="IO\TitleResourceLoader.cs" />
     <Compile Include="IO\ResourceManager.cs" />
+    <Compile Include="Vector3Extension.cs" />
     <Compile Include="VectorI3.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>
