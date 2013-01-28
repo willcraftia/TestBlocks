@@ -200,6 +200,95 @@ namespace Willcraftia.Xna.Blocks.Models
             sceneManager.RootNode.Children.Add(ChunkRootNode);
         }
 
+        public int GetRelativeBlockPositionX(int chunkPositionX, int absoluteBlockPositionX)
+        {
+            return absoluteBlockPositionX - (chunkPositionX * ChunkSize.X);
+        }
+
+        public int GetRelativeBlockPositionY(int chunkPositionY, int absoluteBlockPositionY)
+        {
+            return absoluteBlockPositionY - (chunkPositionY * ChunkSize.Y);
+        }
+
+        public int GetRelativeBlockPositionZ(int chunkPositionZ, int absoluteBlockPositionZ)
+        {
+            return absoluteBlockPositionZ - (chunkPositionZ * ChunkSize.Z);
+        }
+
+        public void GetRelativeBlockPosition(ref VectorI3 chunkPosition, ref VectorI3 absoluteBlockPosition, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = GetRelativeBlockPositionX(absoluteBlockPosition.X, chunkPosition.X),
+                Y = GetRelativeBlockPositionY(absoluteBlockPosition.Y, chunkPosition.Y),
+                Z = GetRelativeBlockPositionZ(absoluteBlockPosition.Z, chunkPosition.Z)
+            };
+        }
+
+        public VectorI3 GetRelativeBlockPosition(VectorI3 chunkPosition, VectorI3 absoluteBlockPosition)
+        {
+            VectorI3 result;
+            GetRelativeBlockPosition(ref chunkPosition, ref absoluteBlockPosition, out result);
+            return result;
+        }
+
+        public int GetAbsoluteBlockPositionX(int chunkPositionX, int relativeBlockPositionX)
+        {
+            return chunkPositionX * ChunkSize.X + relativeBlockPositionX;
+        }
+
+        public int GetAbsoluteBlockPositionY(int chunkPositionY, int relativeBlockPositionY)
+        {
+            return chunkPositionY * ChunkSize.Y + relativeBlockPositionY;
+        }
+
+        public int GetAbsoluteBlockPositionZ(int chunkPositionZ, int relativeBlockPositionZ)
+        {
+            return chunkPositionZ * ChunkSize.Z + relativeBlockPositionZ;
+        }
+
+        public void GetAbsoluteBlockPosition(ref VectorI3 chunkPosition, ref VectorI3 relativeBlockPosition, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = GetAbsoluteBlockPositionX(chunkPosition.X, relativeBlockPosition.X),
+                Y = GetAbsoluteBlockPositionY(chunkPosition.Y, relativeBlockPosition.Y),
+                Z = GetAbsoluteBlockPositionZ(chunkPosition.Z, relativeBlockPosition.Z)
+            };
+        }
+
+        public VectorI3 GetAbsoluteBlockPosition(VectorI3 chunkPosition, VectorI3 relativeBlockPosition)
+        {
+            VectorI3 result;
+            GetAbsoluteBlockPosition(ref chunkPosition, ref relativeBlockPosition, out result);
+            return result;
+        }
+
+        public void GetChunkPositionByBlockPosition(ref VectorI3 blockPosition, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = (int) Math.Floor(blockPosition.X / (double) ChunkSize.X),
+                Y = (int) Math.Floor(blockPosition.Y / (double) ChunkSize.Y),
+                Z = (int) Math.Floor(blockPosition.Z / (double) ChunkSize.Z),
+            };
+        }
+
+        public VectorI3 GetChunkPositionByBlockPosition(VectorI3 blockPosition)
+        {
+            VectorI3 result;
+            GetChunkPositionByBlockPosition(ref blockPosition, out result);
+            return result;
+        }
+
+        public Chunk GetChunkByBlockPosition(VectorI3 blockPosition)
+        {
+            VectorI3 chunkPosition;
+            GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+
+            return this[chunkPosition] as Chunk;
+        }
+
         /// <summary>
         /// チャンクをパーティションとして生成します。
         /// </summary>
@@ -480,10 +569,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (builder.Opaque.VertexCount == 0 || builder.Opaque.IndexCount == 0)
             {
                 if (chunk.OpaqueMesh != null)
-                {
-                    //DisposeChunkMesh(chunk.OpaqueMesh);
                     chunk.OpaqueMesh = null;
-                }
             }
             else
             {
@@ -513,10 +599,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (builder.Translucent.VertexCount == 0 || builder.Translucent.IndexCount == 0)
             {
                 if (chunk.TranslucentMesh != null)
-                {
-                    //DisposeChunkMesh(chunk.TranslucentMesh);
                     chunk.TranslucentMesh = null;
-                }
             }
             else
             {

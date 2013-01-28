@@ -41,12 +41,12 @@ namespace Willcraftia.Xna.Blocks.Models
             for (int x = 0; x < chunkSize.X; x++)
             {
                 // チャンク空間における相対ブロック位置をブロック空間の位置へ変換。
-                var absoluteX = chunk.CalculateBlockPositionX(x);
+                var absoluteX = chunk.GetAbsoluteBlockPositionX(x);
 
                 for (int z = 0; z < chunkSize.Z; z++)
                 {
                     // チャンク空間における相対ブロック位置をブロック空間の位置へ変換。
-                    var absoluteZ = chunk.CalculateBlockPositionZ(z);
+                    var absoluteZ = chunk.GetAbsoluteBlockPositionZ(z);
 
                     // この XZ  におけるバイオーム要素を取得。
                     var biomeElement = biome.GetBiomeElement(absoluteX, absoluteZ);
@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     for (int y = chunkSize.Y - 1; 0 <= y; y--)
                     {
                         // チャンク空間における相対ブロック位置をブロック空間の位置へ変換。
-                        var absoluteY = chunk.CalculateBlockPositionY(y);
+                        var absoluteY = chunk.GetAbsoluteBlockPositionY(y);
 
                         // 地形密度を取得。
                         var density = biome.TerrainNoise.Sample(absoluteX, absoluteY, absoluteZ);

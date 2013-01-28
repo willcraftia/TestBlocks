@@ -52,8 +52,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         BiomeElement GetBiomeElement(Chunk chunk, IBiome biome, int x, int z)
         {
-            var absoluteX = chunk.CalculateBlockPositionX(x);
-            var absoluteZ = chunk.CalculateBlockPositionZ(z);
+            var absoluteX = chunk.GetAbsoluteBlockPositionX(x);
+            var absoluteZ = chunk.GetAbsoluteBlockPositionZ(z);
             return biome.GetBiomeElement(absoluteX, absoluteZ);
         }
 

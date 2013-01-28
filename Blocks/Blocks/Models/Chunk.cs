@@ -114,6 +114,12 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public byte this[VectorI3 position]
+        {
+            get { return this[position.X, position.Y, position.Z]; }
+            set { this[position.X, position.Y, position.Z] = value; }
+        }
+
         public SceneNode Node { get; private set; }
 
         /// <summary>
@@ -237,19 +243,43 @@ namespace Willcraftia.Xna.Blocks.Models
             manager.RequestUpdateMesh(Position);
         }
 
-        public int CalculateBlockPositionX(int x)
+        /// <summary>
+        /// 絶対ブロック位置から相対ブロック位置を取得します。
+        /// </summary>
+        /// <param name="absoluteBlockPosition">絶対ブロック位置。</param>
+        /// <returns>相対ブロック位置。</returns>
+        public VectorI3 GetRelativeBlockPosition(VectorI3 absoluteBlockPosition)
         {
-            return Position.X * manager.ChunkSize.X + x;
+            VectorI3 result;
+            manager.GetRelativeBlockPosition(ref Position, ref absoluteBlockPosition, out result);
+            return result;
         }
 
-        public int CalculateBlockPositionY(int y)
+        /// <summary>
+        /// 相対ブロック位置から絶対ブロック位置を取得します。
+        /// </summary>
+        /// <param name="relativeBlockPosition">相対ブロック位置。</param>
+        /// <returns>絶対ブロック位置。</returns>
+        public VectorI3 GetAbsoluteBlockPosition(VectorI3 relativeBlockPosition)
         {
-            return Position.Y * manager.ChunkSize.Y + y;
+            VectorI3 result;
+            manager.GetAbsoluteBlockPosition(ref Position, ref relativeBlockPosition, out result);
+            return result;
         }
 
-        public int CalculateBlockPositionZ(int z)
+        public int GetAbsoluteBlockPositionX(int relativeBlockPositionX)
         {
-            return Position.Z * manager.ChunkSize.Z + z;
+            return manager.GetAbsoluteBlockPositionX(Position.X, relativeBlockPositionX);
+        }
+
+        public int GetAbsoluteBlockPositionY(int relativeBlockPositionY)
+        {
+            return manager.GetAbsoluteBlockPositionY(Position.Y, relativeBlockPositionY);
+        }
+
+        public int GetAbsoluteBlockPositionZ(int relativeBlockPositionZ)
+        {
+            return manager.GetAbsoluteBlockPositionZ(Position.Z, relativeBlockPositionZ);
         }
 
         public bool Contains(ref VectorI3 blockPosition)
