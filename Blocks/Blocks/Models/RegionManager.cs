@@ -163,7 +163,7 @@ namespace Willcraftia.Xna.Blocks.Models
             assetManager.RegisterLoader(typeof(INoiseSource), new NoiseLoader(resourceManager));
 
             var region = assetManager.Load<Region>(resource);
-            region.Initialize(sceneManager, SceneSettings, assetManager, chunkEffect);
+            region.Initialize(assetManager, chunkEffect);
 
             lock (regions)
             {

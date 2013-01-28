@@ -21,10 +21,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public IResource Resource { get; set; }
 
-        public SceneManager SceneManager { get; private set; }
-
-        public SceneSettings SceneSettings { get; private set; }
-
         public AssetManager AssetManager { get; private set; }
 
         /// <summary>
@@ -55,15 +51,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public IChunkStore ChunkStore { get; set; }
 
-        public void Initialize(SceneManager sceneManager, SceneSettings sceneSettings, AssetManager assetManager, Effect chunkEffect)
+        public void Initialize(AssetManager assetManager, Effect chunkEffect)
         {
-            if (sceneManager == null) throw new ArgumentNullException("sceneManager");
-            if (sceneSettings == null) throw new ArgumentNullException("sceneSettings");
             if (assetManager == null) throw new ArgumentNullException("assetManager");
             if (chunkEffect == null) throw new ArgumentNullException("chunkEffect");
 
-            SceneManager = sceneManager;
-            SceneSettings = sceneSettings;
             AssetManager = assetManager;
 
             // リージョン毎にタイル カタログが異なるため、エフェクトを複製して利用。
