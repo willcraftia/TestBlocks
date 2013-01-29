@@ -197,9 +197,9 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// パーティションを初期化します。
+        /// 初期化します。
         /// </summary>
-        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
+        /// <param name="position">チャンクの位置。</param>
         internal void Initialize(VectorI3 position)
         {
             Position = position;
@@ -213,9 +213,7 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// パーティションを開放します。
-        /// このメソッドは、非アクティブ化が成功し、
-        /// パーティションがプールへ戻される直前に呼び出されます。
+        /// 開放します。
         /// </summary>
         internal void Release()
         {
