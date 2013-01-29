@@ -2,106 +2,37 @@
 
 using System;
 using System.Collections.Generic;
-using Willcraftia.Xna.Framework;
-using Willcraftia.Xna.Framework.Collections;
 
 #endregion
 
-namespace Willcraftia.Xna.Blocks.Models
+namespace Willcraftia.Xna.Blocks.Edit
 {
-    public sealed class WorldEditManager
+    public sealed class CommandManager
     {
-        #region Command
-
-        abstract class Command
-        {
-            public readonly LinkedListNode<Command> Node;
-
-            protected WorldEditManager Owner { get; private set; }
-
-            protected Command(WorldEditManager owner)
-            {
-                if (owner == null) throw new ArgumentNullException("owner");
-
-                Node = new LinkedListNode<Command>(this);
-                Owner = owner;
-            }
-
-            public abstract void Do();
-
-            public abstract void Undo();
-
-            public abstract void Return();
-        }
-
-        #endregion
-
-        #region SetBlockCommand
-
-        sealed class SetBlockCommand : Command
-        {
-            public VectorI3 BlockPosition;
-
-            public byte BlockIndex;
-
-            public byte LastBlockIndex;
-
-            public SetBlockCommand(WorldEditManager owner) : base(owner) { }
-
-            public override void Do()
-            {
-                var chunkManager = Owner.worldManager.ChunkManager;
-                var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
-                if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
-
-                var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
-
-                LastBlockIndex = chunk[relativePosition];
-
-                chunk[relativePosition] = BlockIndex;
-            }
-
-            public override void Undo()
-            {
-                var chunkManager = Owner.worldManager.ChunkManager;
-                var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
-                if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
-
-                var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
-
-                chunk[relativePosition] = LastBlockIndex;
-            }
-
-            public override void Return()
-            {
-                Owner.setBlockCommandPool.Return(this);
-            }
-        }
-
-        #endregion
-
         #region UndoCommand
 
         sealed class UndoCommand : Command
         {
-            public UndoCommand(WorldEditManager owner) : base(owner) { }
+            CommandManager owner;
+
+            public UndoCommand(CommandManager owner)
+            {
+                this.owner = owner;
+            }
 
             public override void Do()
             {
-                if (Owner.UndoStackCount == 0) return;
+                if (owner.UndoStackCount == 0) return;
 
-                var node = Owner.PopUndoStack();
+                var node = owner.PopUndoStack();
                 node.Value.Undo();
 
-                Owner.PushRedoStack(node);
+                owner.PushRedoStack(node);
             }
 
             public override void Undo() { }
 
-            public override void Return()
-            {
-                Owner.undoCommandPool.Return(this);
-            }
+            public override void Release() { }
         }
 
         #endregion
@@ -110,35 +41,29 @@ namespace Willcraftia.Xna.Blocks.Models
 
         sealed class RedoCommand : Command
         {
-            public RedoCommand(WorldEditManager owner) : base(owner) { }
+            CommandManager owner;
+
+            public RedoCommand(CommandManager owner)
+            {
+                this.owner = owner;
+            }
 
             public override void Do()
             {
-                if (Owner.RedoStackCount == 0) return;
+                if (owner.RedoStackCount == 0) return;
 
-                var node = Owner.PopRedoStack();
+                var node = owner.PopRedoStack();
                 node.Value.Do();
 
-                Owner.PushUndoStack(node);
+                owner.PushUndoStack(node);
             }
 
             public override void Undo() { }
 
-            public override void Return()
-            {
-                Owner.redoCommandPool.Return(this);
-            }
+            public override void Release() { }
         }
 
         #endregion
-
-        WorldManager worldManager;
-
-        ConcurrentPool<SetBlockCommand> setBlockCommandPool;
-
-        ConcurrentPool<UndoCommand> undoCommandPool;
-
-        ConcurrentPool<RedoCommand> redoCommandPool;
 
         LinkedList<Command> commandQueue;
 
@@ -149,6 +74,10 @@ namespace Willcraftia.Xna.Blocks.Models
         int undoCapacity = 100;
 
         int redoCapacity = 100;
+
+        UndoCommand undoCommand;
+
+        RedoCommand redoCommand;
 
         public int CommandQueueCount
         {
@@ -165,38 +94,29 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return redoStack.Count; }
         }
 
-        public WorldEditManager(WorldManager worldManager)
+        public CommandManager()
         {
-            if (worldManager == null) throw new ArgumentNullException("worldManager");
-
-            this.worldManager = worldManager;
-
-            setBlockCommandPool = new ConcurrentPool<SetBlockCommand>(() => { return new SetBlockCommand(this); });
-            undoCommandPool = new ConcurrentPool<UndoCommand>(() => { return new UndoCommand(this); });
-            redoCommandPool = new ConcurrentPool<RedoCommand>(() => { return new RedoCommand(this); });
-
             commandQueue = new LinkedList<Command>();
             undoStack = new LinkedList<Command>();
             redoStack = new LinkedList<Command>();
+
+            undoCommand = new UndoCommand(this);
+            redoCommand = new RedoCommand(this);
         }
 
-        public void RequestSetBlock(VectorI3 blockPosition, byte blockIndex)
+        public void RequestCommand(Command command)
         {
-            var command = setBlockCommandPool.Borrow();
-            command.BlockPosition = blockPosition;
-            command.BlockIndex = blockIndex;
-
             Enqueue(command.Node);
         }
 
         public void RequestUndo()
         {
-            Enqueue(undoCommandPool.Borrow().Node);
+            RequestCommand(undoCommand);
         }
 
         public void RequestRedo()
         {
-            Enqueue(redoCommandPool.Borrow().Node);
+            RequestCommand(redoCommand);
         }
 
         public void Update()
@@ -255,7 +175,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 undoStack.RemoveFirst();
 
                 // プールへ戻す。
-                oldestNode.Value.Return();
+                oldestNode.Value.Release();
             }
 
             undoStack.AddLast(commandNode);
@@ -278,7 +198,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 redoStack.RemoveFirst();
 
                 // プールへ戻す。
-                oldestNode.Value.Return();
+                oldestNode.Value.Release();
             }
 
             redoStack.AddLast(commandNode);
@@ -300,7 +220,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 undoStack.RemoveFirst();
 
                 // プールへ戻す。
-                node.Value.Return();
+                node.Value.Release();
             }
         }
 
@@ -312,7 +232,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 redoStack.RemoveFirst();
 
                 // プールへ戻す。
-                node.Value.Return();
+                node.Value.Release();
             }
         }
 
@@ -324,7 +244,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 commandQueue.RemoveFirst();
 
                 // プールへ戻す。
-                node.Value.Return();
+                node.Value.Release();
             }
         }
     }

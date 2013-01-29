@@ -111,6 +111,10 @@
     <Compile Include="Content\SkySphereLoader.cs" />
     <Compile Include="Content\TileCatalogLoader.cs" />
     <Compile Include="Content\TileLoader.cs" />
+    <Compile Include="Edit\Brush.cs" />
+    <Compile Include="Edit\Command.cs" />
+    <Compile Include="Edit\CommandManager.cs" />
+    <Compile Include="Edit\WorldCommandFactory.cs" />
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
     <Compile Include="Models\BiomeElement.cs" />
@@ -156,7 +160,6 @@
     <Compile Include="Models\TileCatalog.cs" />
     <Compile Include="Models\TimeColor.cs" />
     <Compile Include="Models\TimeColorCollection.cs" />
-    <Compile Include="Models\WorldEditManager.cs" />
     <Compile Include="Models\WorldManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\BiomeCatalogDefinition.cs" />
