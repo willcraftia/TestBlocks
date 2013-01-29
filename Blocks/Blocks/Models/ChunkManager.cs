@@ -195,12 +195,12 @@ namespace Willcraftia.Xna.Blocks.Models
             inverseChunkSize.Y = 1 / (float) ChunkSize.Y;
             inverseChunkSize.Z = 1 / (float) ChunkSize.Z;
 
-            chunkPool = new ConcurrentPool<Chunk>(CreatePooledChunk);
+            chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(this); });
             chunkPool.MaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity;
-            chunkDataPool = new ConcurrentPool<ChunkData>(CreatePooledData);
+            chunkDataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyChunkData = new ChunkData(this);
 
-            verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreatePooledVerticesBuilder)
+            verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
                 MaxCapacity = verticesBuilderCount
             };
@@ -407,6 +407,37 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
+        /// 頂点ビルダをプールへ戻します。
+        /// </summary>
+        /// <param name="builder"></param>
+        internal void ReleaseVerticesBuilder(ChunkVerticesBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException("builder");
+
+            builder.Chunk.VerticesBuilder = null;
+            builder.Chunk = null;
+            builder.Opaque.Clear();
+            builder.Translucent.Clear();
+            verticesBuilderPool.Return(builder);
+        }
+
+        /// <summary>
+        /// チャンク メッシュを破棄します。
+        /// ここでは破棄要求をキューに入れるのみであり、
+        /// Dispose メソッド呼び出しは Update メソッド内で処理されます。
+        /// </summary>
+        /// <param name="chunkMesh">チャンク メッシュ。</param>
+        internal void DisposeChunkMesh(ChunkMesh chunkMesh)
+        {
+            TotalVertexCount -= chunkMesh.VertexCount;
+            TotalIndexCount -= chunkMesh.IndexCount;
+
+            chunkMesh.Dispose();
+
+            ChunkMeshCount--;
+        }
+
+        /// <summary>
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
@@ -522,21 +553,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 頂点ビルダをプールへ戻します。
-        /// </summary>
-        /// <param name="builder"></param>
-        internal void ReleaseVerticesBuilder(ChunkVerticesBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException("builder");
-
-            builder.Chunk.VerticesBuilder = null;
-            builder.Chunk = null;
-            builder.Opaque.Clear();
-            builder.Translucent.Clear();
-            verticesBuilderPool.Return(builder);
-        }
-
-        /// <summary>
         /// チャンク メッシュを生成します。
         /// </summary>
         /// <param name="chunkEffect">チャンクのエフェクト。</param>
@@ -554,22 +570,6 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkMeshCount++;
 
             return chunkMesh;
-        }
-
-        /// <summary>
-        /// チャンク メッシュを破棄します。
-        /// ここでは破棄要求をキューに入れるのみであり、
-        /// Dispose メソッド呼び出しは Update メソッド内で処理されます。
-        /// </summary>
-        /// <param name="chunkMesh">チャンク メッシュ。</param>
-        internal void DisposeChunkMesh(ChunkMesh chunkMesh)
-        {
-            TotalVertexCount -= chunkMesh.VertexCount;
-            TotalIndexCount -= chunkMesh.IndexCount;
-
-            chunkMesh.Dispose();
-
-            ChunkMeshCount--;
         }
 
         /// <summary>
@@ -658,33 +658,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // チャンクのノードを更新。
             chunk.Node.Update(false);
-        }
-
-        /// <summary>
-        /// チャンク プールのインスタンス生成メソッドです。
-        /// </summary>
-        /// <remarks>チャンク。</remarks>
-        Chunk CreatePooledChunk()
-        {
-            return new Chunk(this);
-        }
-
-        /// <summary>
-        /// データ プールのインスタンス生成メソッドです。
-        /// </summary>
-        /// <returns>データ。</returns>
-        ChunkData CreatePooledData()
-        {
-            return new ChunkData(this);
-        }
-
-        /// <summary>
-        /// 頂点ビルダ プールのインスタンス生成メソッドです。
-        /// </summary>
-        /// <returns>頂点ビルダ。</returns>
-        ChunkVerticesBuilder CreatePooledVerticesBuilder()
-        {
-            return new ChunkVerticesBuilder(this);
         }
     }
 }
