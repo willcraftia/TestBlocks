@@ -112,6 +112,7 @@
     <Compile Include="Content\TileCatalogLoader.cs" />
     <Compile Include="Content\TileLoader.cs" />
     <Compile Include="Edit\Brush.cs" />
+    <Compile Include="Edit\BrushMesh.cs" />
     <Compile Include="Edit\Command.cs" />
     <Compile Include="Edit\CommandManager.cs" />
     <Compile Include="Edit\WorldCommandFactory.cs" />

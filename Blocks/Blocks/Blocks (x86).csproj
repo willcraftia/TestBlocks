@@ -76,6 +76,7 @@
     <Compile Include="Content\SceneSettingsLoader.cs" />
     <Compile Include="Content\SkySphereLoader.cs" />
     <Compile Include="Edit\Brush.cs" />
+    <Compile Include="Edit\BrushMesh.cs" />
     <Compile Include="Edit\Command.cs" />
     <Compile Include="Edit\WorldCommandFactory.cs" />
     <Compile Include="Models\ChunkData.cs" />
