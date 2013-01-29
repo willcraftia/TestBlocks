@@ -23,23 +23,6 @@ namespace Willcraftia.Xna.Framework
         public VectorI3 Size;
 
         /// <summary>
-        /// 境界ボックスに含まれる最大点を取得します。
-        /// この最大点は (Min + Size - VectorI3(1)) です。
-        /// </summary>
-        public VectorI3 Max
-        {
-            get
-            {
-                VectorI3 result;
-                VectorI3.Add(ref Min, ref Size, out result);
-                result.X -= 1;
-                result.Y -= 1;
-                result.Z -= 1;
-                return result;
-            }
-        }
-
-        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="min">最小点。</param>
