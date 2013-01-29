@@ -294,7 +294,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override Partition CreatePartition()
         {
-            return new Chunk(this);
+            return new Chunk(this, regionManager);
         }
 
         /// <summary>
@@ -326,11 +326,6 @@ namespace Willcraftia.Xna.Blocks.Models
             CheckChunkMeshesUpdated(gameTime);
 
             base.UpdatePartitionsOverride(gameTime);
-        }
-
-        internal Region GetRegion(VectorI3 chunkPosition)
-        {
-            return regionManager.GetRegionByChunkPosition(chunkPosition);
         }
 
         internal ChunkData BorrowChunkData()

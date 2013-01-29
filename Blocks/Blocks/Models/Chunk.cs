@@ -21,7 +21,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク マネージャ。
         /// </summary>
-        ChunkManager manager;
+        ChunkManager chunkManager;
+
+        /// <summary>
+        /// リージョン マネージャ。
+        /// </summary>
+        RegionManager regionManager;
 
         /// <summary>
         /// チャンクが属するリージョン。
@@ -60,7 +65,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public VectorI3 Size
         {
-            get { return manager.ChunkSize; }
+            get { return chunkManager.ChunkSize; }
         }
 
         /// <summary>
@@ -97,7 +102,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                     // 非空ブロックを設定しようとする場合は、
                     // チャンク マネージャからデータを借りる必要があります。
-                    data = manager.BorrowChunkData();
+                    data = chunkManager.BorrowChunkData();
                     dataChanged = true;
                 }
 
@@ -107,7 +112,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     // 全てが空ブロックになったならば、
                     // データをチャンク マネージャへ返します。
-                    manager.ReturnChunkData(data);
+                    chunkManager.ReturnChunkData(data);
                     data = null;
                     dataChanged = true;
                 }
@@ -178,14 +183,17 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="manager">チャンク マネージャ。</param>
-        public Chunk(ChunkManager manager)
+        /// <param name="chunkManager">チャンク マネージャ。</param>
+        /// <param name="regionManager">リージョン マネージャ。</param>
+        public Chunk(ChunkManager chunkManager, RegionManager regionManager)
         {
-            if (manager == null) throw new ArgumentNullException("manager");
+            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
+            if (regionManager == null) throw new ArgumentNullException("regionManager");
 
-            this.manager = manager;
+            this.chunkManager = chunkManager;
+            this.regionManager = regionManager;
 
-            Node = new SceneNode(manager.SceneManager, "Chunk" + manager.CreateChunkNodeId());
+            Node = new SceneNode(chunkManager.SceneManager, "Chunk" + chunkManager.CreateChunkNodeId());
         }
 
         /// <summary>
@@ -240,7 +248,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public void RequestUpdateMesh()
         {
-            manager.RequestUpdateMesh(Position);
+            chunkManager.RequestUpdateMesh(Position);
         }
 
         /// <summary>
@@ -251,7 +259,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public VectorI3 GetRelativeBlockPosition(VectorI3 absoluteBlockPosition)
         {
             VectorI3 result;
-            manager.GetRelativeBlockPosition(ref Position, ref absoluteBlockPosition, out result);
+            chunkManager.GetRelativeBlockPosition(ref Position, ref absoluteBlockPosition, out result);
             return result;
         }
 
@@ -263,30 +271,30 @@ namespace Willcraftia.Xna.Blocks.Models
         public VectorI3 GetAbsoluteBlockPosition(VectorI3 relativeBlockPosition)
         {
             VectorI3 result;
-            manager.GetAbsoluteBlockPosition(ref Position, ref relativeBlockPosition, out result);
+            chunkManager.GetAbsoluteBlockPosition(ref Position, ref relativeBlockPosition, out result);
             return result;
         }
 
         public int GetAbsoluteBlockPositionX(int relativeBlockPositionX)
         {
-            return manager.GetAbsoluteBlockPositionX(Position.X, relativeBlockPositionX);
+            return chunkManager.GetAbsoluteBlockPositionX(Position.X, relativeBlockPositionX);
         }
 
         public int GetAbsoluteBlockPositionY(int relativeBlockPositionY)
         {
-            return manager.GetAbsoluteBlockPositionY(Position.Y, relativeBlockPositionY);
+            return chunkManager.GetAbsoluteBlockPositionY(Position.Y, relativeBlockPositionY);
         }
 
         public int GetAbsoluteBlockPositionZ(int relativeBlockPositionZ)
         {
-            return manager.GetAbsoluteBlockPositionZ(Position.Z, relativeBlockPositionZ);
+            return chunkManager.GetAbsoluteBlockPositionZ(Position.Z, relativeBlockPositionZ);
         }
 
         public bool Contains(ref VectorI3 blockPosition)
         {
-            return 0 <= blockPosition.X && blockPosition.X < manager.ChunkSize.X &&
-                0 <= blockPosition.Y && blockPosition.Y < manager.ChunkSize.Y &&
-                0 <= blockPosition.Z && blockPosition.Z < manager.ChunkSize.Z;
+            return 0 <= blockPosition.X && blockPosition.X < chunkManager.ChunkSize.X &&
+                0 <= blockPosition.Y && blockPosition.Y < chunkManager.ChunkSize.Y &&
+                0 <= blockPosition.Z && blockPosition.Z < chunkManager.ChunkSize.Z;
         }
 
         /// <summary>
@@ -295,7 +303,7 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override void InitializeOverride()
         {
             // 対象リージョンの取得。
-            region = manager.GetRegion(Position);
+            region = regionManager.GetRegionByChunkPosition(Position);
             if (region == null) throw new InvalidOperationException("Region not found: " + Position);
 
             base.InitializeOverride();
@@ -318,13 +326,13 @@ namespace Willcraftia.Xna.Blocks.Models
             }
             if (VerticesBuilder != null)
             {
-                manager.ReleaseVerticesBuilder(VerticesBuilder);
+                chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
                 VerticesBuilder = null;
             }
 
             if (data != null)
             {
-                manager.ReturnChunkData(data);
+                chunkManager.ReturnChunkData(data);
                 data = null;
             }
             dataChanged = false;
@@ -344,7 +352,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (data != null) RequestUpdateMesh();
 
             // アクティブ化完了でノードを追加。
-            manager.ChunkRootNode.Children.Add(Node);
+            chunkManager.ChunkRootNode.Children.Add(Node);
 
             base.OnActivated();
         }
@@ -352,7 +360,7 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override void OnPassivating()
         {
             // 非アクティブ化開始でノードを削除。
-            manager.ChunkRootNode.Children.Remove(Node);
+            chunkManager.ChunkRootNode.Children.Remove(Node);
 
             base.OnPassivating();
         }
@@ -367,14 +375,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(region != null);
 
-            var d = manager.BorrowChunkData();
+            var d = chunkManager.BorrowChunkData();
 
             if (region.ChunkStore.GetChunk(Position, d))
             {
                 if (d.SolidCount == 0)
                 {
                     // 全てが空ブロックならば返却。
-                    manager.ReturnChunkData(d);
+                    chunkManager.ReturnChunkData(d);
                 }
                 else
                 {
@@ -407,7 +415,7 @@ namespace Willcraftia.Xna.Blocks.Models
             else
             {
                 // 変更があるならば空データで永続化。
-                if (dataChanged) Region.ChunkStore.AddChunk(Position, manager.EmptyChunkData);
+                if (dataChanged) Region.ChunkStore.AddChunk(Position, chunkManager.EmptyChunkData);
             }
 
             base.PassivateOverride();
@@ -449,7 +457,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Node.Objects.Remove(mesh);
 
             // マネージャへ削除要求。
-            manager.DisposeChunkMesh(mesh);
+            chunkManager.DisposeChunkMesh(mesh);
         }
     }
 }
