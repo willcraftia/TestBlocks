@@ -20,19 +20,17 @@ namespace Willcraftia.Xna.Blocks.Edit
                 this.owner = owner;
             }
 
-            public override void Do()
+            public override bool Do()
             {
-                if (owner.UndoStackCount == 0) return;
+                if (0 < owner.UndoStackCount)
+                {
+                    var node = owner.PopUndoStack();
+                    node.Value.Undo();
 
-                var node = owner.PopUndoStack();
-                node.Value.Undo();
-
-                owner.PushRedoStack(node);
+                    owner.PushRedoStack(node);
+                }
+                return false;
             }
-
-            public override void Undo() { }
-
-            public override void Release() { }
         }
 
         #endregion
@@ -48,19 +46,17 @@ namespace Willcraftia.Xna.Blocks.Edit
                 this.owner = owner;
             }
 
-            public override void Do()
+            public override bool Do()
             {
-                if (owner.RedoStackCount == 0) return;
+                if (0 < owner.RedoStackCount)
+                {
+                    var node = owner.PopRedoStack();
+                    node.Value.Do();
 
-                var node = owner.PopRedoStack();
-                node.Value.Do();
-
-                owner.PushUndoStack(node);
+                    owner.PushUndoStack(node);
+                }
+                return false;
             }
-
-            public override void Undo() { }
-
-            public override void Release() { }
         }
 
         #endregion
@@ -129,15 +125,20 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 // コマンドを実行。
                 var command = node.Value;
-                command.Do();
+                var undoSupported = command.Do();
 
-                if (!(command is UndoCommand) && !(command is RedoCommand))
+                if (undoSupported)
                 {
                     // Undo 履歴へ追加。
                     PushUndoStack(node);
 
                     // 新たなコマンドが実行されたならば Redo 履歴を全て消去。
                     ClearRedoStack();
+                }
+                else
+                {
+                    // Undo 非対応ならばプールへ戻す。
+                    command.Release();
                 }
             }
         }

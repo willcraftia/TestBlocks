@@ -16,10 +16,10 @@ namespace Willcraftia.Xna.Blocks.Edit
             Node = new LinkedListNode<Command>(this);
         }
 
-        public abstract void Do();
+        public abstract bool Do();
 
-        public abstract void Undo();
+        public virtual void Undo() { }
 
-        public abstract void Release();
+        public virtual void Release() { }
     }
 }

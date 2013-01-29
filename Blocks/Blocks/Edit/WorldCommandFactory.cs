@@ -31,7 +31,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                 this.chunkManager = chunkManager;
             }
 
-            public override void Do()
+            public override bool Do()
             {
                 var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
                 if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
@@ -41,6 +41,8 @@ namespace Willcraftia.Xna.Blocks.Edit
                 lastBlockIndex = chunk[relativePosition];
 
                 chunk[relativePosition] = BlockIndex;
+
+                return true;
             }
 
             public override void Undo()
