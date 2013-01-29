@@ -25,8 +25,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Vector3 partitionSize;
 
-            int partitionPoolMaxCapacity = 0;
-
             VectorI3 clusterSize = new VectorI3(8);
 
             int activationCapacity = 3;
@@ -46,17 +44,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                         throw new ArgumentOutOfRangeException("value");
 
                     partitionSize = value;
-                }
-            }
-
-            public int PartitionPoolMaxCapacity
-            {
-                get { return partitionPoolMaxCapacity; }
-                set
-                {
-                    if (value < 0) throw new ArgumentOutOfRangeException("value");
-
-                    partitionPoolMaxCapacity = value;
                 }
             }
 
@@ -122,30 +109,11 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         #endregion
 
-        #region VectorI3LengthComparer
-
-        sealed class VectorI3LengthComparer : IComparer<VectorI3>
-        {
-            internal static readonly VectorI3LengthComparer Instace = new VectorI3LengthComparer();
-
-            VectorI3LengthComparer() { }
-
-            // I/F
-            public int Compare(VectorI3 x, VectorI3 y)
-            {
-                var d1 = x.LengthSquared();
-                var d2 = y.LengthSquared();
-
-                if (d1 == d2) return 0;
-
-                return d1 < d2 ? -1 : 1;
-            }
-        }
-
-        #endregion
-
         #region Activator
 
+        /// <summary>
+        /// 非同期にアクティブ化判定とアクティブ化要求を実行するクラスです。
+        /// </summary>
         sealed class Activator
         {
             #region Candidate
@@ -235,29 +203,66 @@ namespace Willcraftia.Xna.Framework.Landscape
             // ひとまず、最大距離であろう 16 を基準に考える。
             const int candidateQueueCapacity = 16 * 16 * 16;
 
+            /// <summary>
+            /// パーティション マネージャ。
+            /// </summary>
             PartitionManager manager;
 
+            /// <summary>
+            /// ビュー行列。
+            /// </summary>
             Matrix view;
 
+            /// <summary>
+            /// 射影行列。
+            /// </summary>
             Matrix projection;
 
+            /// <summary>
+            /// 視点位置。
+            /// </summary>
             VectorI3 eyePosition;
 
+            /// <summary>
+            /// アクティブ領域。
+            /// </summary>
             IActiveVolume volume;
 
+            /// <summary>
+            /// 優先度付き候補キュー。
+            /// </summary>
             PriorityQueue<Candidate> candidates;
 
+            /// <summary>
+            /// 候補キューにおける優先度を判定するための比較オブジェクト。
+            /// </summary>
             CandidateComparer comparer = new CandidateComparer();
 
+            /// <summary>
+            /// Collect メソッドのデリゲート。
+            /// </summary>
             Action<VectorI3> collectAction;
 
+            /// <summary>
+            /// 非同期処理中であるか否かを示す値。
+            /// </summary>
             volatile bool active;
 
+            /// <summary>
+            /// 非同期処理中であるか否かを示す値を取得します。
+            /// </summary>
+            /// <value>
+            /// true (非同期処理中である場合)、false (それ以外の場合)。
+            /// </value>
             public bool Active
             {
                 get { return active; }
             }
 
+            /// <summary>
+            /// インスタンスを生成します。
+            /// </summary>
+            /// <param name="manager">パーティション マネージャ。</param>
             public Activator(PartitionManager manager)
             {
                 this.manager = manager;
@@ -266,6 +271,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
             }
 
+            /// <summary>
+            /// 非同期処理を開始します。
+            /// </summary>
+            /// <param name="view">ビュー行列。</param>
+            /// <param name="projection">射影行列。</param>
+            /// <param name="eyePosition">視点位置。</param>
+            /// <param name="volume">アクティブ領域。</param>
+            /// <param name="priorDistance">アクティブ化優先距離。</param>
             public void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume, float priorDistance)
             {
                 if (active) return;
@@ -282,6 +295,10 @@ namespace Willcraftia.Xna.Framework.Landscape
                 System.Threading.ThreadPool.QueueUserWorkItem(WaitCallback, null);
             }
 
+            /// <summary>
+            /// スレッド プールのコールバック メソッドです。
+            /// </summary>
+            /// <param name="state"></param>
             void WaitCallback(object state)
             {
                 // 候補を探索。
@@ -293,6 +310,11 @@ namespace Willcraftia.Xna.Framework.Landscape
                 active = false;
             }
 
+            /// <summary>
+            /// 指定のオフセット位置にあるパーティションが候補となるか否かを検査し、
+            /// 候補となる場合には候補キューへ入れます。
+            /// </summary>
+            /// <param name="offset"></param>
             void Collect(VectorI3 offset)
             {
                 var position = eyePosition + offset;
@@ -321,6 +343,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 candidates.Enqueue(candidate);
             }
 
+            /// <summary>
+            /// 候補を順にアクティブ化します。
+            /// </summary>
             void Activate()
             {
                 while (0 < candidates.Count)
@@ -700,6 +725,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 完了を通知。
                 partition.OnPassivated();
 
+                // 解放。
                 ReleasePartition(partition);
             }
         }

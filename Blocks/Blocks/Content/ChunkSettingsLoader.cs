@@ -23,13 +23,13 @@ namespace Willcraftia.Xna.Blocks.Content
             var settings = new ChunkSettings
             {
                 ChunkSize = definition.ChunkSize,
+                ChunkPoolMaxCapacity = definition.ChunkPoolMaxCapacity,
                 MeshUpdateSearchCapacity = definition.MeshUpdateSearchCapacity,
                 VerticesBuilderCount = definition.VerticesBuilderCount,
                 MinActiveVolume = definition.MinActiveRange,
                 MaxActiveVolume = definition.MaxActiveRange,
             };
 
-            settings.PartitionManager.PartitionPoolMaxCapacity = definition.ChunkPoolMaxCapacity;
             settings.PartitionManager.ClusterSize = definition.ClusterSize;
             settings.PartitionManager.ActivationCapacity = definition.ActivationCapacity;
             settings.PartitionManager.PassivationCapacity = definition.PassivationCapacity;
@@ -50,11 +50,11 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new ChunkSettingsDefinition
             {
                 ChunkSize = settings.ChunkSize,
+                ChunkPoolMaxCapacity = settings.ChunkPoolMaxCapacity,
                 MeshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity,
                 VerticesBuilderCount = settings.VerticesBuilderCount,
                 MinActiveRange = settings.MinActiveVolume,
                 MaxActiveRange = settings.MaxActiveVolume,
-                ChunkPoolMaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity,
                 ClusterSize = settings.PartitionManager.ClusterSize,
                 ActivationCapacity = settings.PartitionManager.ActivationCapacity,
                 PassivationCapacity = settings.PartitionManager.PassivationCapacity,

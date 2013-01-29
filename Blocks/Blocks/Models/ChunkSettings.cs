@@ -14,6 +14,8 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         VectorI3 chunkSize;
 
+        int partitionPoolMaxCapacity = 0;
+
         int meshUpdateSearchCapacity;
 
         int verticesBuilderCount;
@@ -41,6 +43,17 @@ namespace Willcraftia.Xna.Blocks.Models
                     throw new ArgumentException("The indices over the limit of ushort needed.", "value");
 
                 chunkSize = value;
+            }
+        }
+
+        public int ChunkPoolMaxCapacity
+        {
+            get { return partitionPoolMaxCapacity; }
+            set
+            {
+                if (value < 0) throw new ArgumentOutOfRangeException("value");
+
+                partitionPoolMaxCapacity = value;
             }
         }
 

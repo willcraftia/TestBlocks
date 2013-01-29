@@ -187,7 +187,7 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkMeshOffset = HalfChunkSize.ToVector3();
 
             chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(this); });
-            chunkPool.MaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity;
+            chunkPool.MaxCapacity = settings.ChunkPoolMaxCapacity;
             chunkDataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyChunkData = new ChunkData(this);
 
