@@ -41,6 +41,12 @@ namespace Willcraftia.Xna.Blocks.Edit
             this.commandFactory = commandFactory;
             this.node = node;
             this.mesh = mesh;
+
+            if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
+
+            Offset = 3;
+            Color = Vector3.One;
+            Alpha = 0.5f;
         }
 
         // まずはカメラを更新。
@@ -56,17 +62,32 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             eyeDirection.Normalize();
 
-            var brushPositionWorld = eyePositionWorld + eyeDirection * Offset;
+            var basePositionWorld = eyePositionWorld + eyeDirection * Offset;
 
             blockPosition = new VectorI3
             {
-                X = (int) Math.Floor(brushPositionWorld.X),
-                Y = (int) Math.Floor(brushPositionWorld.Y),
-                Z = (int) Math.Floor(brushPositionWorld.Z)
+                X = (int) Math.Floor(basePositionWorld.X),
+                Y = (int) Math.Floor(basePositionWorld.Y),
+                Z = (int) Math.Floor(basePositionWorld.Z)
             };
 
+            var meshPositionWorld = new Vector3
+            {
+                X = blockPosition.X + 0.5f,
+                Y = blockPosition.Y + 0.5f,
+                Z = blockPosition.Z + 0.5f
+            };
+
+            mesh.PositionWorld = meshPositionWorld;
+            mesh.BoxWorld.Min = meshPositionWorld - new Vector3(0.5f);
+            mesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
+
+            BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
+
+            node.Update(true);
+
             Matrix world;
-            Matrix.CreateTranslation(ref brushPositionWorld, out world);
+            Matrix.CreateTranslation(ref meshPositionWorld, out world);
 
             mesh.Effect.DiffuseColor = Color;
             mesh.Effect.Alpha = Alpha;

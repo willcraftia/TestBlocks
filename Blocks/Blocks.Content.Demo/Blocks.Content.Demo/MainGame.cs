@@ -13,6 +13,7 @@ using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
 using Willcraftia.Xna.Framework.Landscape;
+using Willcraftia.Xna.Blocks.Edit;
 using Willcraftia.Xna.Blocks.Models;
 
 #endregion
@@ -42,6 +43,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         WorldManager worldManager;
 
         Region region;
+
+        CommandManager commandManager = new CommandManager();
+
+        WorldCommandFactory worldCommandFactory;
+
+        Brush brush;
 
         #region Trace
 
@@ -208,6 +215,22 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             region = worldManager.Load("dummy");
 
             //----------------------------------------------------------------
+            // エディット
+
+            worldCommandFactory = new WorldCommandFactory(worldManager);
+
+            var brushNode = worldManager.SceneManager.CreateSceneNode("Brush");
+            worldManager.SceneManager.RootNode.Children.Add(brushNode);
+
+            var brushMesh = new BrushMesh("BrushMesh", GraphicsDevice);
+            brushNode.Objects.Add(brushMesh);
+
+            worldManager.SceneManager.UpdateOctreeSceneNode(brushNode);
+
+            brush = new Brush(commandManager, worldCommandFactory, brushNode, brushMesh);
+            brush.BlockIndex = 1;
+
+            //----------------------------------------------------------------
             // その他
 
             Content.RootDirectory = "Content";
@@ -277,6 +300,17 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // ワールドの更新
 
             worldManager.Update(gameTime);
+
+            //----------------------------------------------------------------
+            // エディット
+
+            var camera = worldManager.SceneManager.ActiveCamera;
+            brush.Update(camera.View, camera.Projection);
+
+            if (keyboardState.IsKeyUp(Keys.Space) && lastKeyboardState.IsKeyDown(Keys.Space))
+                brush.Paint();
+            if (keyboardState.IsKeyUp(Keys.Delete) && lastKeyboardState.IsKeyDown(Keys.Delete))
+                brush.Erase();
 
             //----------------------------------------------------------------
             // その他

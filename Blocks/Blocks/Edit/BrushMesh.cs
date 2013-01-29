@@ -21,19 +21,20 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             cube = new CubeMesh(graphicsDevice);
             Effect = new BasicEffect(graphicsDevice);
-            Effect.VertexColorEnabled = true;
+
+            Translucent = true;
         }
 
         public override void Draw()
         {
             var graphicsDevice = Effect.GraphicsDevice;
 
-            graphicsDevice.BlendState = BlendState.AlphaBlend;
-            graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            //graphicsDevice.BlendState = BlendState.Additive;
+            //graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
             cube.Draw(Effect);
 
-            graphicsDevice.BlendState = BlendState.Opaque;
+            //graphicsDevice.BlendState = BlendState.Opaque;
         }
 
         public override void Draw(Effect effect)
