@@ -69,6 +69,125 @@ namespace Willcraftia.Xna.Framework
             Z = z;
         }
 
+        public static VectorI3 Negate(VectorI3 value)
+        {
+            VectorI3 result;
+            Negate(ref value, out result);
+            return result;
+        }
+
+        public static void Negate(ref VectorI3 value, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = -value.X,
+                Y = -value.Y,
+                Z = -value.Z
+            };
+        }
+
+        public static VectorI3 Add(VectorI3 value1, VectorI3 value2)
+        {
+            VectorI3 result;
+            Add(ref value1, ref value2, out result);
+            return result;
+        }
+
+        public static void Add(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = value1.X + value2.X,
+                Y = value1.Y + value2.Y,
+                Z = value1.Z + value2.Z
+            };
+        }
+
+        public static VectorI3 Subtract(VectorI3 value1, VectorI3 value2)
+        {
+            VectorI3 result;
+            Subtract(ref value1, ref value2, out result);
+            return result;
+        }
+
+        public static void Subtract(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = value1.X - value2.X,
+                Y = value1.Y - value2.Y,
+                Z = value1.Z - value2.Z
+            };
+        }
+
+        public static VectorI3 Multiply(VectorI3 value1, VectorI3 value2)
+        {
+            VectorI3 result;
+            Multiply(ref value1, ref value1, out result);
+            return result;
+        }
+
+        public static void Multiply(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = value1.X * value2.X,
+                Y = value1.Y * value2.Y,
+                Z = value1.Z * value2.Z
+            };
+        }
+
+        public static VectorI3 Multiply(VectorI3 value, int scaleFactor)
+        {
+            VectorI3 result;
+            Multiply(ref value, scaleFactor, out result);
+            return result;
+        }
+
+        public static void Multiply(ref VectorI3 value, int scaleFactor, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = value.X * scaleFactor,
+                Y = value.Y * scaleFactor,
+                Z = value.Z * scaleFactor
+            };
+        }
+
+        public static VectorI3 Divide(VectorI3 value1, VectorI3 value2)
+        {
+            VectorI3 result;
+            Divide(ref value1, ref value2, out result);
+            return result;
+        }
+
+        public static void Divide(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = value1.X / value2.X,
+                Y = value1.Y / value2.Y,
+                Z = value1.Z / value2.Z
+            };
+        }
+
+        public static VectorI3 Divide(VectorI3 value, int divider)
+        {
+            VectorI3 result;
+            Divide(ref value, divider, out result);
+            return result;
+        }
+
+        public static void Divide(ref VectorI3 value, int divider, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = value.X / divider,
+                Y = value.Y / divider,
+                Z = value.Z / divider
+            };
+        }
+
         public static void Distance(ref VectorI3 v1, ref VectorI3 v2, out float result)
         {
             int distanceSquared;
@@ -103,62 +222,58 @@ namespace Willcraftia.Xna.Framework
 
         public static VectorI3 operator +(VectorI3 value1, VectorI3 value2)
         {
-            return new VectorI3
-            {
-                X = value1.X + value2.X,
-                Y = value1.Y + value2.Y,
-                Z = value1.Z + value2.Z
-            };
+            VectorI3 result;
+            Add(ref value1, ref value2, out result);
+            return result;
         }
 
         public static VectorI3 operator -(VectorI3 value)
         {
-            return new VectorI3
-            {
-                X = -value.X,
-                Y = -value.Y,
-                Z = -value.Z
-            };
+            VectorI3 result;
+            Negate(ref value, out result);
+            return result;
         }
 
         public static VectorI3 operator -(VectorI3 value1, VectorI3 value2)
         {
-            return new VectorI3
-            {
-                X = value1.X - value2.X,
-                Y = value1.Y - value2.Y,
-                Z = value1.Z - value2.Z
-            };
+            VectorI3 result;
+            Subtract(ref value1, ref value2, out result);
+            return result;
+        }
+
+        public static VectorI3 operator *(VectorI3 value1, VectorI3 value2)
+        {
+            VectorI3 result;
+            Multiply(ref value1, ref value2, out result);
+            return result;
         }
 
         public static VectorI3 operator *(int scaleFactor, VectorI3 value)
         {
-            return new VectorI3
-            {
-                X = value.X * scaleFactor,
-                Y = value.Y * scaleFactor,
-                Z = value.Z * scaleFactor
-            };
+            VectorI3 result;
+            Multiply(ref value, scaleFactor, out result);
+            return result;
         }
 
         public static VectorI3 operator *(VectorI3 value, int scaleFactor)
         {
-            return new VectorI3
-            {
-                X = value.X * scaleFactor,
-                Y = value.Y * scaleFactor,
-                Z = value.Z * scaleFactor
-            };
+            VectorI3 result;
+            Multiply(ref value, scaleFactor, out result);
+            return result;
+        }
+
+        public static VectorI3 operator /(VectorI3 value1, VectorI3 value2)
+        {
+            VectorI3 result;
+            Divide(ref value1, ref value2, out result);
+            return result;
         }
 
         public static VectorI3 operator /(VectorI3 value, int divider)
         {
-            return new VectorI3
-            {
-                X = value.X / divider,
-                Y = value.Y / divider,
-                Z = value.Z / divider
-            };
+            VectorI3 result;
+            Divide(ref value, divider, out result);
+            return result;
         }
 
         #endregion
