@@ -63,6 +63,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         Vector3 inverseChunkSize;
 
+        /// <summary>
+        /// チャンクのプール。
+        /// </summary>
+        ConcurrentPool<Chunk> chunkPool;
+
+        /// <summary>
+        /// データのプール。
+        /// </summary>
         ConcurrentPool<ChunkData> chunkDataPool;
 
         /// <summary>
@@ -96,6 +104,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public SceneManager SceneManager { get; private set; }
 
+        /// <summary>
+        /// チャンク ノードを関連付けるためのノード。
+        /// </summary>
         public SceneNode ChunkRootNode { get; private set; }
 
         /// <summary>
@@ -147,6 +158,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public int MaxIndexCount { get; private set; }
 
+        /// <summary>
+        /// 空データを取得します。
+        /// </summary>
         internal ChunkData EmptyChunkData { get; private set; }
 
         /// <summary>
@@ -181,10 +195,12 @@ namespace Willcraftia.Xna.Blocks.Models
             inverseChunkSize.Y = 1 / (float) ChunkSize.Y;
             inverseChunkSize.Z = 1 / (float) ChunkSize.Z;
 
-            chunkDataPool = new ConcurrentPool<ChunkData>(CreateData);
+            chunkPool = new ConcurrentPool<Chunk>(CreatePooledChunk);
+            chunkPool.MaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity;
+            chunkDataPool = new ConcurrentPool<ChunkData>(CreatePooledData);
             EmptyChunkData = new ChunkData(this);
 
-            verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreateVerticesBuilder)
+            verticesBuilderPool = new Pool<ChunkVerticesBuilder>(CreatePooledVerticesBuilder)
             {
                 MaxCapacity = verticesBuilderCount
             };
@@ -290,14 +306,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// チャンクをパーティションとして生成します。
-        /// </summary>
-        protected override Partition CreatePartition()
-        {
-            return new Chunk(this, regionManager);
-        }
-
-        /// <summary>
         /// 指定の位置を含むリージョンがある場合、アクティブ化可能であると判定します。
         /// </summary>
         protected override bool CanActivatePartition(VectorI3 position)
@@ -305,6 +313,36 @@ namespace Willcraftia.Xna.Blocks.Models
             if (regionManager.GetRegionByChunkPosition(position) == null) return false;
 
             return base.CanActivatePartition(position);
+        }
+
+        /// <summary>
+        /// プールからチャンクを取得して返します。
+        /// プールが枯渇している場合は null を返します。
+        /// </summary>
+        protected override Partition CreatePartition(VectorI3 position)
+        {
+            // プールから取得。
+            var chunk = chunkPool.Borrow();
+            if (chunk == null) return null;
+
+            // 初期化。
+            chunk.Initialize(position);
+
+            return chunk;
+        }
+
+        /// <summary>
+        /// プールへチャンクを戻します。
+        /// </summary>
+        protected override void ReleasePartition(Partition partition)
+        {
+            var chunk = partition as Chunk;
+
+            // 解放。
+            chunk.Release();
+
+            // プールへ戻す。
+            chunkPool.Return(chunk);
         }
 
         /// <summary>
@@ -326,6 +364,16 @@ namespace Willcraftia.Xna.Blocks.Models
             CheckChunkMeshesUpdated(gameTime);
 
             base.UpdatePartitionsOverride(gameTime);
+        }
+
+        protected override void DisposeOverride(bool disposing)
+        {
+            // TODO
+            // プール内チャンクの破棄。
+
+            chunkPool.Clear();
+
+            base.DisposeOverride(disposing);
         }
 
         internal ChunkData BorrowChunkData()
@@ -469,20 +517,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        ChunkData CreateData()
-        {
-            return new ChunkData(this);
-        }
-
-        /// <summary>
-        /// 頂点ビルダ プールのインスタンス生成メソッドです。
-        /// </summary>
-        /// <returns>頂点ビルダ。</returns>
-        ChunkVerticesBuilder CreateVerticesBuilder()
-        {
-            return new ChunkVerticesBuilder(this);
-        }
-
         /// <summary>
         /// 頂点ビルダをプールへ戻します。
         /// </summary>
@@ -620,6 +654,33 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // チャンクのノードを更新。
             chunk.Node.Update(false);
+        }
+
+        /// <summary>
+        /// チャンク プールのインスタンス生成メソッドです。
+        /// </summary>
+        /// <remarks>チャンク。</remarks>
+        Chunk CreatePooledChunk()
+        {
+            return new Chunk(this, regionManager);
+        }
+
+        /// <summary>
+        /// データ プールのインスタンス生成メソッドです。
+        /// </summary>
+        /// <returns>データ。</returns>
+        ChunkData CreatePooledData()
+        {
+            return new ChunkData(this);
+        }
+
+        /// <summary>
+        /// 頂点ビルダ プールのインスタンス生成メソッドです。
+        /// </summary>
+        /// <returns>頂点ビルダ。</returns>
+        ChunkVerticesBuilder CreatePooledVerticesBuilder()
+        {
+            return new ChunkVerticesBuilder(this);
         }
     }
 }

@@ -197,6 +197,64 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
+        /// パーティションを初期化します。
+        /// </summary>
+        /// <param name="position">パーティション空間におけるパーティションの位置。</param>
+        internal void Initialize(VectorI3 position)
+        {
+            Position = position;
+
+            // 対象リージョンの取得。
+            region = regionManager.GetRegionByChunkPosition(Position);
+            if (region == null) throw new InvalidOperationException("Region not found: " + Position);
+
+            ActivationCompleted = false;
+            PassivationCompleted = false;
+
+            //InitializeOverride();
+        }
+
+        /// <summary>
+        /// パーティションを開放します。
+        /// このメソッドは、非アクティブ化が成功し、
+        /// パーティションがプールへ戻される直前に呼び出されます。
+        /// </summary>
+        internal void Release()
+        {
+            Position = VectorI3.Zero;
+
+            if (opaqueMesh != null)
+            {
+                DetachMesh(opaqueMesh);
+                opaqueMesh = null;
+            }
+            if (translucentMesh != null)
+            {
+                DetachMesh(translucentMesh);
+                translucentMesh = null;
+            }
+            if (VerticesBuilder != null)
+            {
+                chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
+                VerticesBuilder = null;
+            }
+
+            if (data != null)
+            {
+                chunkManager.ReturnChunkData(data);
+                data = null;
+            }
+            dataChanged = false;
+
+            region = null;
+
+            ActivationCompleted = false;
+            PassivationCompleted = false;
+
+            //ReleaseOverride();
+        }
+
+        /// <summary>
         /// 指定のチャンク サイズで起こりうる最大の頂点数を計算します。
         /// </summary>
         /// <param name="chunkSize">チャンク サイズ。</param>
@@ -300,47 +358,47 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンクが属するリージョンを探索して関連付けます。
         /// </summary>
-        protected override void InitializeOverride()
-        {
-            // 対象リージョンの取得。
-            region = regionManager.GetRegionByChunkPosition(Position);
-            if (region == null) throw new InvalidOperationException("Region not found: " + Position);
+        //protected override void InitializeOverride()
+        //{
+        //    // 対象リージョンの取得。
+        //    region = regionManager.GetRegionByChunkPosition(Position);
+        //    if (region == null) throw new InvalidOperationException("Region not found: " + Position);
 
-            base.InitializeOverride();
-        }
+        //    base.InitializeOverride();
+        //}
 
         /// <summary>
         /// 内部状態を初期化します。
         /// </summary>
-        protected override void ReleaseOverride()
-        {
-            if (opaqueMesh != null)
-            {
-                DetachMesh(opaqueMesh);
-                opaqueMesh = null;
-            }
-            if (translucentMesh != null)
-            {
-                DetachMesh(translucentMesh);
-                translucentMesh = null;
-            }
-            if (VerticesBuilder != null)
-            {
-                chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
-                VerticesBuilder = null;
-            }
+        //protected override void ReleaseOverride()
+        //{
+        //    if (opaqueMesh != null)
+        //    {
+        //        DetachMesh(opaqueMesh);
+        //        opaqueMesh = null;
+        //    }
+        //    if (translucentMesh != null)
+        //    {
+        //        DetachMesh(translucentMesh);
+        //        translucentMesh = null;
+        //    }
+        //    if (VerticesBuilder != null)
+        //    {
+        //        chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
+        //        VerticesBuilder = null;
+        //    }
 
-            if (data != null)
-            {
-                chunkManager.ReturnChunkData(data);
-                data = null;
-            }
-            dataChanged = false;
+        //    if (data != null)
+        //    {
+        //        chunkManager.ReturnChunkData(data);
+        //        data = null;
+        //    }
+        //    dataChanged = false;
 
-            region = null;
+        //    region = null;
 
-            base.ReleaseOverride();
-        }
+        //    base.ReleaseOverride();
+        //}
 
         /// <summary>
         /// メッシュ更新をチャンク マネージャへ要求します。

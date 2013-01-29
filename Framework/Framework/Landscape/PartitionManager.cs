@@ -328,16 +328,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                     // 同時実行許容量を越えるならば終了。
                     if (manager.activationCapacity <= manager.activations.Count) break;
 
+                    // 候補を取得。
                     var candidate = candidates.Dequeue();
 
-                    // プールからパーティションを取得。
-                    var partition = manager.partitionPool.Borrow();
+                    // インスタンス生成。
+                    var partition = manager.CreatePartition(candidate.Position);
 
-                    // プール枯渇ならば終了。
+                    // 生成が拒否されたら終了。
                     if (partition == null) break;
-
-                    // パーティションを初期化。
-                    partition.Initialize(candidate.Position);
 
                     // 実行中キューへ追加。
                     manager.activations.Enqueue(partition);
@@ -362,11 +360,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
         protected readonly Vector3 PartitionSize;
-
-        /// <summary>
-        /// パーティションのプール。
-        /// </summary>
-        ConcurrentPool<Partition> partitionPool;
 
         /// <summary>
         /// クラスタ マネージャ。
@@ -521,9 +514,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             PartitionSize = settings.PartitionSize;
 
-            partitionPool = new ConcurrentPool<Partition>(CreatePartition);
-            partitionPool.MaxCapacity = settings.PartitionPoolMaxCapacity;
-
             clusterManager = new ClusterManager(settings.ClusterSize, settings.PartitionSize);
             partitions = new Queue<Partition>();
 
@@ -637,16 +627,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 事前にパーティション プールにインスタンスを生成する場合に、
-        /// サブクラスのコンストラクタで呼び出します。
-        /// </summary>
-        /// <param name="initialCapacity">パーティション プールの初期容量。</param>
-        protected void PrepareInitialPartitions(int initialCapacity)
-        {
-            partitionPool.Prepare(initialCapacity);
-        }
-
-        /// <summary>
         /// クローズ処理が開始する時に呼び出されます。
         /// </summary>
         protected virtual void OnClosing() { }
@@ -657,15 +637,26 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected virtual void OnClosed() { }
 
         /// <summary>
-        /// パーティション プールでパーティションの新規生成が必要となる際に呼び出されます。
+        /// アクティブ化でパーティションを生成する際に呼び出されます。
+        /// null を戻り値とした場合、その時点では、それ以上のアクティブ化が抑制されます。
         /// </summary>
-        /// <returns>パーティション。</returns>
-        protected abstract Partition CreatePartition();
+        /// <param name="position">パーティションの位置。</param>
+        /// <returns>
+        /// パーティション、あるいは、アクティブ化を抑制する場合には null。
+        /// </returns>
+        protected abstract Partition CreatePartition(VectorI3 position);
+
+        /// <summary>
+        /// 非アクティブ化でパーティションを解放する際に呼び出されます。
+        /// </summary>
+        /// <param name="partition">パーティション。</param>
+        protected abstract void ReleasePartition(Partition partition);
 
         /// <summary>
         /// パーティションがアクティブ化可能であるか否かを検査します。
-        /// パーティション マネージャは、アクティブ領域の観点からアクティブ化すべきパーティションの位置を決定しますが、
-        /// 実際にその位置にパーティションが存在するか否かは実装によります。
+        /// パーティション マネージャは、
+        /// アクティブ領域からアクティブ化対象のパーティションの位置を決定しますが、
+        /// 実際にその位置でパーティションをアクティブ化すべきであるか否かは実装によります。
         /// </summary>
         /// <param name="position">アクティブ化しようとするパーティションの位置。</param>
         /// <returns>
@@ -709,11 +700,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 完了を通知。
                 partition.OnPassivated();
 
-                // 解放。
-                partition.Release();
-
-                // プールへ戻す。
-                partitionPool.Return(partition);
+                ReleasePartition(partition);
             }
         }
 
@@ -899,24 +886,17 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (disposed) return;
 
-            //================================================================
-            // Subclass
+            //----------------------------------------------------------------
+            // サブクラスにおける破棄。
 
             DisposeOverride(disposing);
 
-            //================================================================
-            // Dispose all partitions.
+            //----------------------------------------------------------------
+            // 全パーティションの破棄。
 
-            partitionPool.Clear();
             DisposePartitions(partitions);
             DisposePartitions(activations);
             DisposePartitions(passivations);
-            
-            //================================================================
-            // Clear all tasks.
-
-            activationTaskQueue.Clear();
-            passivationTaskQueue.Clear();
 
             disposed = true;
         }
