@@ -210,8 +210,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             ActivationCompleted = false;
             PassivationCompleted = false;
-
-            //InitializeOverride();
         }
 
         /// <summary>
@@ -250,8 +248,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             ActivationCompleted = false;
             PassivationCompleted = false;
-
-            //ReleaseOverride();
         }
 
         /// <summary>
@@ -354,51 +350,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 0 <= blockPosition.Y && blockPosition.Y < chunkManager.ChunkSize.Y &&
                 0 <= blockPosition.Z && blockPosition.Z < chunkManager.ChunkSize.Z;
         }
-
-        /// <summary>
-        /// チャンクが属するリージョンを探索して関連付けます。
-        /// </summary>
-        //protected override void InitializeOverride()
-        //{
-        //    // 対象リージョンの取得。
-        //    region = regionManager.GetRegionByChunkPosition(Position);
-        //    if (region == null) throw new InvalidOperationException("Region not found: " + Position);
-
-        //    base.InitializeOverride();
-        //}
-
-        /// <summary>
-        /// 内部状態を初期化します。
-        /// </summary>
-        //protected override void ReleaseOverride()
-        //{
-        //    if (opaqueMesh != null)
-        //    {
-        //        DetachMesh(opaqueMesh);
-        //        opaqueMesh = null;
-        //    }
-        //    if (translucentMesh != null)
-        //    {
-        //        DetachMesh(translucentMesh);
-        //        translucentMesh = null;
-        //    }
-        //    if (VerticesBuilder != null)
-        //    {
-        //        chunkManager.ReleaseVerticesBuilder(VerticesBuilder);
-        //        VerticesBuilder = null;
-        //    }
-
-        //    if (data != null)
-        //    {
-        //        chunkManager.ReturnChunkData(data);
-        //        data = null;
-        //    }
-        //    dataChanged = false;
-
-        //    region = null;
-
-        //    base.ReleaseOverride();
-        //}
 
         /// <summary>
         /// メッシュ更新をチャンク マネージャへ要求します。
