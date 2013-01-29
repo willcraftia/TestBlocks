@@ -920,9 +920,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             //----------------------------------------------------------------
             // 全パーティションの破棄。
 
-            DisposePartitions(partitions);
-            DisposePartitions(activations);
-            DisposePartitions(passivations);
+            if (disposing)
+            {
+                DisposePartitions(partitions);
+                DisposePartitions(activations);
+                DisposePartitions(passivations);
+            }
 
             disposed = true;
         }
