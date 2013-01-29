@@ -16,8 +16,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Region : IAsset, IDisposable
     {
-        BoundingBoxI bounds;
-
         // I/F
         public IResource Resource { get; set; }
 
@@ -33,11 +31,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public BoundingBoxI Bounds
-        {
-            get { return bounds; }
-            set { bounds = value; }
-        }
+        public BoundingBoxI Box;
 
         public TileCatalog TileCatalog { get; set; }
 

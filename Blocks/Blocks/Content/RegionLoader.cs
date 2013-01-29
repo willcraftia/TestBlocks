@@ -67,7 +67,7 @@ namespace Willcraftia.Xna.Blocks.Content
             var region = new Region
             {
                 Name = definition.Name,
-                Bounds = definition.Bounds,
+                Box = definition.Box,
                 TileCatalog = Load<TileCatalog>(resource, definition.TileCatalog),
                 BlockCatalog = Load<BlockCatalog>(resource, definition.BlockCatalog),
                 BiomeManager = Load<IBiomeManager>(resource, definition.BiomeManager),
@@ -87,7 +87,7 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new RegionDefinition
             {
                 Name = region.Name,
-                Bounds = region.Bounds,
+                Box = region.Box,
                 TileCatalog = ToUri(resource, region.TileCatalog),
                 BlockCatalog = ToUri(resource, region.BlockCatalog),
                 BiomeManager = ToUri(resource, region.BiomeManager),

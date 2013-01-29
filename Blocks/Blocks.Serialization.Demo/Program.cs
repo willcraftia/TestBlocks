@@ -1445,7 +1445,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var definition = new RegionDefinition
                 {
                     Name = "Default",
-                    Bounds = new BoundingBoxI
+                    Box = new BoundingBoxI
                     {
                         Min = new VectorI3(-128, 0, -128),
                         Size = new VectorI3(256, 16, 256)

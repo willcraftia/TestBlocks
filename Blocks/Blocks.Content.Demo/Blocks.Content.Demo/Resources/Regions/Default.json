@@ -1,6 +1,6 @@
 {
   "Name": "Default",
-  "Bounds": {
+  "Box": {
     "Min": {
       "X": -128,
       "Y": 0,
