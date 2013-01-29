@@ -81,6 +81,7 @@
     <Compile Include="Edit\WorldCommandFactory.cs" />
     <Compile Include="Models\ChunkData.cs" />
     <Compile Include="Edit\CommandManager.cs" />
+    <Compile Include="Models\LocalWorld.cs" />
     <Compile Include="Models\MaxVerticesChunkProcedure.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
     <Compile Include="Models\BiomeElement.cs" />
