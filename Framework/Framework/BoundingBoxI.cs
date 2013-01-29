@@ -50,6 +50,29 @@ namespace Willcraftia.Xna.Framework
             Size = size;
         }
 
+        public static BoundingBoxI CreateFromCenterExtents(VectorI3 center, VectorI3 extents)
+        {
+            BoundingBoxI result;
+            CreateFromCenterExtents(ref center, ref extents, out result);
+            return result;
+        }
+
+        public static void CreateFromCenterExtents(ref VectorI3 center, ref VectorI3 extents, out BoundingBoxI result)
+        {
+            result.Min = new VectorI3
+            {
+                X = center.X - extents.X,
+                Y = center.Y - extents.Y,
+                Z = center.Z - extents.Z,
+            };
+            result.Size = new VectorI3
+            {
+                X = extents.X * 2 + 1,
+                Y = extents.Y * 2 + 1,
+                Z = extents.Z * 2 + 1
+            };
+        }
+
         /// <summary>
         /// 指定の点が境界ボックスに含まれるか否かを検査します。
         /// </summary>
