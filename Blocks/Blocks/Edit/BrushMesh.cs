@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Graphics;
 
 #endregion
@@ -11,38 +12,26 @@ namespace Willcraftia.Xna.Blocks.Edit
 {
     public sealed class BrushMesh : SceneObject, IDisposable
     {
-        CubeMesh mesh;
+        CubeMesh cube;
 
-        BasicEffect effect;
-
-        public Vector3 Color
-        {
-            get { return effect.DiffuseColor; }
-            set { effect.DiffuseColor = value; }
-        }
-
-        public float Alpha
-        {
-            get { return effect.Alpha; }
-            set { effect.Alpha = value; }
-        }
+        public BasicEffect Effect { get; private set; }
 
         public BrushMesh(string name, GraphicsDevice graphicsDevice)
             : base(name)
         {
-            mesh = new CubeMesh(graphicsDevice);
-            effect = new BasicEffect(graphicsDevice);
-            effect.VertexColorEnabled = true;
+            cube = new CubeMesh(graphicsDevice);
+            Effect = new BasicEffect(graphicsDevice);
+            Effect.VertexColorEnabled = true;
         }
 
         public override void Draw()
         {
-            var graphicsDevice = effect.GraphicsDevice;
+            var graphicsDevice = Effect.GraphicsDevice;
 
             graphicsDevice.BlendState = BlendState.AlphaBlend;
             graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
 
-            mesh.Draw(effect);
+            cube.Draw(Effect);
 
             graphicsDevice.BlendState = BlendState.Opaque;
         }
@@ -73,8 +62,8 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             if (disposing)
             {
-                mesh.Dispose();
-                effect.Dispose();
+                cube.Dispose();
+                Effect.Dispose();
             }
 
             disposed = true;
