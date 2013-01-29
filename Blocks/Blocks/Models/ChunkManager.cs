@@ -325,8 +325,12 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = chunkPool.Borrow();
             if (chunk == null) return null;
 
+            // 対象リージョンの取得。
+            var region = regionManager.GetRegionByChunkPosition(position);
+            if (region == null) throw new InvalidOperationException("Region not found: ChunkPosition = " + position);
+
             // 初期化。
-            chunk.Initialize(position);
+            chunk.Initialize(position, region);
 
             return chunk;
         }
@@ -662,7 +666,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <remarks>チャンク。</remarks>
         Chunk CreatePooledChunk()
         {
-            return new Chunk(this, regionManager);
+            return new Chunk(this);
         }
 
         /// <summary>

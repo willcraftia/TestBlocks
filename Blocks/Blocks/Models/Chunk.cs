@@ -24,11 +24,6 @@ namespace Willcraftia.Xna.Blocks.Models
         ChunkManager chunkManager;
 
         /// <summary>
-        /// リージョン マネージャ。
-        /// </summary>
-        RegionManager regionManager;
-
-        /// <summary>
         /// チャンクが属するリージョン。
         /// </summary>
         Region region;
@@ -184,14 +179,11 @@ namespace Willcraftia.Xna.Blocks.Models
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="chunkManager">チャンク マネージャ。</param>
-        /// <param name="regionManager">リージョン マネージャ。</param>
-        public Chunk(ChunkManager chunkManager, RegionManager regionManager)
+        public Chunk(ChunkManager chunkManager)
         {
             if (chunkManager == null) throw new ArgumentNullException("chunkManager");
-            if (regionManager == null) throw new ArgumentNullException("regionManager");
 
             this.chunkManager = chunkManager;
-            this.regionManager = regionManager;
 
             Node = new SceneNode(chunkManager.SceneManager, "Chunk" + chunkManager.CreateChunkNodeId());
         }
@@ -200,13 +192,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 初期化します。
         /// </summary>
         /// <param name="position">チャンクの位置。</param>
-        internal void Initialize(VectorI3 position)
+        /// <param name="region">リージョン。</param>
+        internal void Initialize(VectorI3 position, Region region)
         {
             Position = position;
 
             // 対象リージョンの取得。
-            region = regionManager.GetRegionByChunkPosition(Position);
-            if (region == null) throw new InvalidOperationException("Region not found: " + Position);
+            this.region = region;
 
             ActivationCompleted = false;
             PassivationCompleted = false;
