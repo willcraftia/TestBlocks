@@ -59,11 +59,6 @@ namespace Willcraftia.Xna.Blocks.Models
         int chunkNodeIdSequence;
 
         /// <summary>
-        /// 1 / chunkSize。
-        /// </summary>
-        Vector3 inverseChunkSize;
-
-        /// <summary>
         /// チャンクのプール。
         /// </summary>
         ConcurrentPool<Chunk> chunkPool;
@@ -190,10 +185,6 @@ namespace Willcraftia.Xna.Blocks.Models
             HalfChunkSize.Z /= 2;
 
             ChunkMeshOffset = HalfChunkSize.ToVector3();
-
-            inverseChunkSize.X = 1 / (float) ChunkSize.X;
-            inverseChunkSize.Y = 1 / (float) ChunkSize.Y;
-            inverseChunkSize.Z = 1 / (float) ChunkSize.Z;
 
             chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(this); });
             chunkPool.MaxCapacity = settings.PartitionManager.PartitionPoolMaxCapacity;
