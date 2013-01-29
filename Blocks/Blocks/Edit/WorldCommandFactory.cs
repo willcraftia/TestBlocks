@@ -67,6 +67,8 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public WorldCommandFactory(WorldManager worldManager)
         {
+            if (worldManager == null) throw new ArgumentNullException("worldManager");
+
             this.worldManager = worldManager;
 
             setBlockCommandPool = new ConcurrentPool<SetBlockCommand>(CreatePooledSetBlockCommand);
