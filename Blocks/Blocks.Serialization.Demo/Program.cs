@@ -1448,7 +1448,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     Bounds = new BoundingBoxI
                     {
                         Min = new VectorI3(-128, 0, -128),
-                        Max = new VectorI3(128, 16, 128)
+                        Size = new VectorI3(256, 16, 256)
                     },
                     TileCatalog = "../TileCatalogs/Default.json",
                     BlockCatalog = "../BlockCatalogs/Default.json",

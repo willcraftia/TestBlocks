@@ -179,7 +179,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 foreach (var region in regions)
                 {
-                    if (region.ContainsChunkPosition(chunkPosition))
+                    if (region.Bounds.Contains(chunkPosition))
                     {
                         return region;
                     }

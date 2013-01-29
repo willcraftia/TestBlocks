@@ -68,17 +68,6 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkEffect.SpecularMap = TileCatalog.SpecularColorMap;
         }
 
-        public bool ContainsChunkPosition(VectorI3 chunkPosition)
-        {
-            // BoundingBoxI.Contains では Max 境界も含めてしまうため、
-            // それを用いずに判定する。
-            if (chunkPosition.X < bounds.Min.X || chunkPosition.Y < bounds.Min.Y || chunkPosition.Z < bounds.Min.Z ||
-                bounds.Max.X <= chunkPosition.X || bounds.Max.Y <= chunkPosition.Y || bounds.Max.Z <= chunkPosition.Z)
-                return false;
-
-            return true;
-        }
-
         #region ToString
 
         public override string ToString()
