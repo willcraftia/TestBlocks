@@ -34,6 +34,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         KeyboardState lastKeyboardState;
 
+        MouseState lastMouseState;
+
         FreeViewInput viewInput = new FreeViewInput();
 
         float moveVelocity = 10;
@@ -227,7 +229,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             worldManager.SceneManager.UpdateOctreeSceneNode(brushNode);
 
-            brush = new Brush(commandManager, worldCommandFactory, brushNode, brushMesh);
+            brush = new Brush(commandManager, worldCommandFactory, brushNode, brushMesh, worldManager.ChunkManager);
             brush.BlockIndex = 1;
 
             //----------------------------------------------------------------
@@ -265,9 +267,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // モニタ
             DiagnosticsMonitor.Begin(MonitorUpdate);
 
-            // キーボード状態
+            //----------------------------------------------------------------
+            // マウスとキーボード状態の取得
+
             var keyboardState = Keyboard.GetState();
-            // マウス状態
             var mouseState = Mouse.GetState();
 
             //----------------------------------------------------------------
@@ -309,10 +312,16 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var camera = worldManager.SceneManager.ActiveCamera;
             brush.Update(camera.View, camera.Projection);
 
+            // 左ボタンでブロック消去。
+            // ブロック消去は消去対象の判定との兼ね合いから、
+            // ボタンの押下から解放を行った時にだけ実行。
+            if (mouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed &&
+                mouseState.RightButton == ButtonState.Released)
+                brush.Erase();
+
+            // 右ボタンでブロック配置。
             if (mouseState.LeftButton == ButtonState.Released && mouseState.RightButton == ButtonState.Pressed)
                 brush.Paint();
-            if (mouseState.LeftButton == ButtonState.Pressed && mouseState.RightButton == ButtonState.Released)
-                brush.Erase();
 
             // コマンド実行。
             commandManager.Update();
@@ -334,9 +343,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 textureDisplay.Visible = !textureDisplay.Visible;
 
             //----------------------------------------------------------------
-            // キーボード状態の記録
+            // マウスとキーボード状態の記録
 
             lastKeyboardState = keyboardState;
+            lastMouseState = mouseState;
 
             base.Update(gameTime);
 

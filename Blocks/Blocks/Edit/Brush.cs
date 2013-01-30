@@ -20,33 +20,38 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         BrushMesh mesh;
 
+        ChunkManager chunkManager;
+
         VectorI3 blockPosition;
 
         public byte BlockIndex { get; set; }
 
-        public float Offset { get; set; }
+        //public float Offset { get; set; }
 
         public Vector3 Color { get; set; }
 
         public float Alpha { get; set; }
 
-        public Brush(CommandManager commandManager, WorldCommandFactory commandFactory, SceneNode node, BrushMesh mesh)
+        public Brush(CommandManager commandManager, WorldCommandFactory commandFactory,
+            SceneNode node, BrushMesh mesh, ChunkManager chunkManager)
         {
             if (commandManager == null) throw new ArgumentNullException("commandManager");
             if (commandFactory == null) throw new ArgumentNullException("commandFactory");
             if (node == null) throw new ArgumentNullException("node");
             if (mesh == null) throw new ArgumentNullException("mesh");
+            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
 
             this.commandManager = commandManager;
             this.commandFactory = commandFactory;
             this.node = node;
             this.mesh = mesh;
+            this.chunkManager = chunkManager;
 
             if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
 
-            Offset = 4;
-            Color = Vector3.Zero;
-            Alpha = 0.3f;
+            //Offset = 4;
+            Color = new Vector3(1, 0, 0);
+            Alpha = 0.5f;
         }
 
         // まずはカメラを更新。
@@ -62,14 +67,45 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             eyeDirection.Normalize();
 
-            var basePositionWorld = eyePositionWorld + eyeDirection * Offset;
-
-            blockPosition = new VectorI3
+            bool blockExists = false;
+            for (int i = 1; i < 10; i++)
             {
-                X = (int) Math.Floor(basePositionWorld.X),
-                Y = (int) Math.Floor(basePositionWorld.Y),
-                Z = (int) Math.Floor(basePositionWorld.Z)
-            };
+                var basePositionWorld = eyePositionWorld + eyeDirection * i;
+
+                var testBlockPosition = new VectorI3
+                {
+                    X = (int) Math.Floor(basePositionWorld.X),
+                    Y = (int) Math.Floor(basePositionWorld.Y),
+                    Z = (int) Math.Floor(basePositionWorld.Z)
+                };
+
+                var chunk = chunkManager.GetChunkByBlockPosition(testBlockPosition);
+                if (chunk == null) continue;
+
+                var relativeBlockPosition = chunk.GetRelativeBlockPosition(testBlockPosition);
+
+                var blockIndex = chunk[relativeBlockPosition];
+
+                if (blockIndex != Block.EmptyIndex)
+                {
+                    blockExists = true;
+                    blockPosition = testBlockPosition;
+                    break;
+                }
+            }
+
+            if (!blockExists)
+            {
+                const int offset = 4;
+                var basePositionWorld = eyePositionWorld + eyeDirection * offset;
+
+                blockPosition = new VectorI3
+                {
+                    X = (int) Math.Floor(basePositionWorld.X),
+                    Y = (int) Math.Floor(basePositionWorld.Y),
+                    Z = (int) Math.Floor(basePositionWorld.Z)
+                };
+            }
 
             var meshPositionWorld = new Vector3
             {
