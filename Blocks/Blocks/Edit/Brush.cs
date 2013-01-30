@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             Offset = 3;
             Color = Vector3.One;
-            Alpha = 0.5f;
+            Alpha = 0.2f;
         }
 
         // まずはカメラを更新。
