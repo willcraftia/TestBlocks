@@ -44,9 +44,9 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
 
-            Offset = 3;
-            Color = Vector3.One;
-            Alpha = 0.2f;
+            Offset = 4;
+            Color = Vector3.Zero;
+            Alpha = 0.3f;
         }
 
         // まずはカメラを更新。

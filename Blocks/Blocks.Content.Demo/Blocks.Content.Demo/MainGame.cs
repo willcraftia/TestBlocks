@@ -265,8 +265,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // モニタ
             DiagnosticsMonitor.Begin(MonitorUpdate);
 
-            // キーボード状態の取得
+            // キーボード状態
             var keyboardState = Keyboard.GetState();
+            // マウス状態
+            var mouseState = Mouse.GetState();
 
             //----------------------------------------------------------------
             // アプリケーション終了
@@ -307,9 +309,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var camera = worldManager.SceneManager.ActiveCamera;
             brush.Update(camera.View, camera.Projection);
 
-            if (keyboardState.IsKeyUp(Keys.Space) && lastKeyboardState.IsKeyDown(Keys.Space))
+            if (mouseState.LeftButton == ButtonState.Pressed && mouseState.RightButton == ButtonState.Released)
                 brush.Paint();
-            if (keyboardState.IsKeyUp(Keys.Delete) && lastKeyboardState.IsKeyDown(Keys.Delete))
+            if (mouseState.LeftButton == ButtonState.Released && mouseState.RightButton == ButtonState.Pressed)
                 brush.Erase();
 
             // コマンド実行。

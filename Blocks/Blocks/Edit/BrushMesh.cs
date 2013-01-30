@@ -14,27 +14,45 @@ namespace Willcraftia.Xna.Blocks.Edit
     {
         CubeMesh cube;
 
+        RasterizerState wireframe;
+
         public BasicEffect Effect { get; private set; }
 
         public BrushMesh(string name, GraphicsDevice graphicsDevice)
             : base(name)
         {
-            cube = new CubeMesh(graphicsDevice);
+            cube = new CubeMesh(graphicsDevice, 1.0001f);
             Effect = new BasicEffect(graphicsDevice);
 
             Translucent = true;
+
+            wireframe = new RasterizerState
+            {
+                CullMode = CullMode.CullCounterClockwiseFace,
+                FillMode = FillMode.WireFrame
+            };
         }
 
         public override void Draw()
         {
             var graphicsDevice = Effect.GraphicsDevice;
 
-            //graphicsDevice.BlendState = BlendState.Additive;
-            //graphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            var prevBlendState = graphicsDevice.BlendState;
+            var prevAlpha = Effect.Alpha;
+
+            graphicsDevice.RasterizerState = wireframe;
+            graphicsDevice.BlendState = BlendState.Opaque;
+            Effect.Alpha = 1;
+            cube.Draw(Effect);
+
+            graphicsDevice.BlendState = prevBlendState;
+            Effect.Alpha = prevAlpha;
+
+            graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
             cube.Draw(Effect);
 
-            //graphicsDevice.BlendState = BlendState.Opaque;
+            graphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
         }
 
         public override void Draw(Effect effect)
