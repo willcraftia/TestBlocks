@@ -334,13 +334,6 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunkManager.GetAbsoluteBlockPositionZ(Position.Z, relativeBlockPositionZ);
         }
 
-        public bool Contains(ref VectorI3 blockPosition)
-        {
-            return 0 <= blockPosition.X && blockPosition.X < chunkManager.ChunkSize.X &&
-                0 <= blockPosition.Y && blockPosition.Y < chunkManager.ChunkSize.Y &&
-                0 <= blockPosition.Z && blockPosition.Z < chunkManager.ChunkSize.Z;
-        }
-
         /// <summary>
         /// メッシュ更新をチャンク マネージャへ要求します。
         /// </summary>
