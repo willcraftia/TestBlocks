@@ -226,9 +226,9 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             result = new VectorI3
             {
-                X = GetRelativeBlockPositionX(absoluteBlockPosition.X, chunkPosition.X),
-                Y = GetRelativeBlockPositionY(absoluteBlockPosition.Y, chunkPosition.Y),
-                Z = GetRelativeBlockPositionZ(absoluteBlockPosition.Z, chunkPosition.Z)
+                X = GetRelativeBlockPositionX(chunkPosition.X, absoluteBlockPosition.X),
+                Y = GetRelativeBlockPositionY(chunkPosition.Y, absoluteBlockPosition.Y),
+                Z = GetRelativeBlockPositionZ(chunkPosition.Z, absoluteBlockPosition.Z)
             };
         }
 
