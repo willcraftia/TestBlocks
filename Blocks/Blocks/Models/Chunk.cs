@@ -193,7 +193,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         /// <param name="position">チャンクの位置。</param>
         /// <param name="region">リージョン。</param>
-        internal void Initialize(VectorI3 position, Region region)
+        public void Initialize(VectorI3 position, Region region)
         {
             Position = position;
 
@@ -207,7 +207,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 開放します。
         /// </summary>
-        internal void Release()
+        public void Release()
         {
             Position = VectorI3.Zero;
 
