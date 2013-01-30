@@ -312,6 +312,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (keyboardState.IsKeyUp(Keys.Delete) && lastKeyboardState.IsKeyDown(Keys.Delete))
                 brush.Erase();
 
+            // コマンド実行。
+            commandManager.Update();
+
             //----------------------------------------------------------------
             // その他
 
