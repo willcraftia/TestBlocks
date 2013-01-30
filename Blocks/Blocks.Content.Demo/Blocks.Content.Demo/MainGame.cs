@@ -309,9 +309,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             var camera = worldManager.SceneManager.ActiveCamera;
             brush.Update(camera.View, camera.Projection);
 
-            if (mouseState.LeftButton == ButtonState.Pressed && mouseState.RightButton == ButtonState.Released)
-                brush.Paint();
             if (mouseState.LeftButton == ButtonState.Released && mouseState.RightButton == ButtonState.Pressed)
+                brush.Paint();
+            if (mouseState.LeftButton == ButtonState.Pressed && mouseState.RightButton == ButtonState.Released)
                 brush.Erase();
 
             // コマンド実行。
