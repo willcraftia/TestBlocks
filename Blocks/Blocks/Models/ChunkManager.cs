@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク メッシュのオフセット。
         /// </summary>
-        public readonly Vector3 ChunkMeshOffset;
+        public readonly Vector3 MeshOffset;
 
         /// <summary>
         /// メッシュ更新の最大試行数。
@@ -56,7 +56,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         RegionManager regionManager;
 
-        int chunkNodeIdSequence;
+        int nodeIdSequence;
 
         /// <summary>
         /// チャンクのプール。
@@ -66,7 +66,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// データのプール。
         /// </summary>
-        ConcurrentPool<ChunkData> chunkDataPool;
+        ConcurrentPool<ChunkData> dataPool;
 
         /// <summary>
         /// 頂点ビルダ実行待ちチャンクのキュー。
@@ -102,17 +102,17 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク ノードを関連付けるためのノード。
         /// </summary>
-        public SceneNode ChunkRootNode { get; private set; }
+        public SceneNode BaseNode { get; private set; }
 
         /// <summary>
         /// チャンク メッシュの数を取得します。
         /// </summary>
-        public int ChunkMeshCount { get; private set; }
+        public int MeshCount { get; private set; }
 
         /// <summary>
         /// 頂点ビルダの総数を取得します。
         /// </summary>
-        public int TotalChunkVerticesBuilderCount
+        public int TotalVerticesBuilderCount
         {
             get { return verticesBuilderPool.TotalObjectCount; }
         }
@@ -120,7 +120,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 未使用の頂点ビルダの数を取得します。
         /// </summary>
-        public int PassiveChunkVerticesBuilderCount
+        public int PassiveVerticesBuilderCount
         {
             get { return verticesBuilderPool.Count; }
         }
@@ -128,9 +128,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 使用中の頂点ビルダの数を取得します。
         /// </summary>
-        public int ActiveChunkVerticesBuilderCount
+        public int ActiveVerticesBuilderCount
         {
-            get { return TotalChunkVerticesBuilderCount - PassiveChunkVerticesBuilderCount; }
+            get { return TotalVerticesBuilderCount - PassiveVerticesBuilderCount; }
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 空データを取得します。
         /// </summary>
-        internal ChunkData EmptyChunkData { get; private set; }
+        internal ChunkData EmptyData { get; private set; }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -184,12 +184,12 @@ namespace Willcraftia.Xna.Blocks.Models
             HalfChunkSize.Y /= 2;
             HalfChunkSize.Z /= 2;
 
-            ChunkMeshOffset = HalfChunkSize.ToVector3();
+            MeshOffset = HalfChunkSize.ToVector3();
 
             chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(this); });
             chunkPool.MaxCapacity = settings.ChunkPoolMaxCapacity;
-            chunkDataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
-            EmptyChunkData = new ChunkData(this);
+            dataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
+            EmptyData = new ChunkData(this);
 
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
@@ -203,8 +203,8 @@ namespace Willcraftia.Xna.Blocks.Models
             waitBuildVerticesQueue = new Queue<VectorI3>();
             buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
 
-            ChunkRootNode = sceneManager.CreateSceneNode("ChunkRoot");
-            sceneManager.RootNode.Children.Add(ChunkRootNode);
+            BaseNode = sceneManager.CreateSceneNode("ChunkRoot");
+            sceneManager.RootNode.Children.Add(BaseNode);
         }
 
         public void GetChunkPositionByBlockPosition(ref VectorI3 blockPosition, out VectorI3 result)
@@ -284,7 +284,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             // メッシュ更新が必要なチャンクを探索して更新要求を追加。
             // ただし、クローズが開始したら行わない。
-            if (!Closing) CheckDirtyChunkMeshes(gameTime);
+            if (!Closing) CheckDirtyMeshes(gameTime);
 
             // 頂点ビルダのタスク キューを更新。
             verticesBuilderTaskQueue.Update();
@@ -292,7 +292,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // メッシュ更新完了を監視。
             // メッシュ更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
-            CheckChunkMeshesUpdated(gameTime);
+            CheckMeshesUpdated(gameTime);
 
             base.UpdateOverride(gameTime);
         }
@@ -307,15 +307,15 @@ namespace Willcraftia.Xna.Blocks.Models
             base.DisposeOverride(disposing);
         }
 
-        internal ChunkData BorrowChunkData()
+        internal ChunkData BorrowData()
         {
-            return chunkDataPool.Borrow();
+            return dataPool.Borrow();
         }
 
-        internal void ReturnChunkData(ChunkData data)
+        internal void ReturnData(ChunkData data)
         {
             data.Clear();
-            chunkDataPool.Return(data);
+            dataPool.Return(data);
         }
 
         /// <summary>
@@ -328,9 +328,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 waitBuildVerticesQueue.Enqueue(chunkPosition);
         }
 
-        internal int CreateChunkNodeId()
+        internal int CreateNodeId()
         {
-            return chunkNodeIdSequence++;
+            return nodeIdSequence++;
         }
 
         /// <summary>
@@ -354,21 +354,21 @@ namespace Willcraftia.Xna.Blocks.Models
         /// Dispose メソッド呼び出しは Update メソッド内で処理されます。
         /// </summary>
         /// <param name="chunkMesh">チャンク メッシュ。</param>
-        internal void DisposeChunkMesh(ChunkMesh chunkMesh)
+        internal void DisposeMesh(ChunkMesh chunkMesh)
         {
             TotalVertexCount -= chunkMesh.VertexCount;
             TotalIndexCount -= chunkMesh.IndexCount;
 
             chunkMesh.Dispose();
 
-            ChunkMeshCount--;
+            MeshCount--;
         }
 
         /// <summary>
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void CheckDirtyChunkMeshes(GameTime gameTime)
+        void CheckDirtyMeshes(GameTime gameTime)
         {
             // メッシュ更新が必要なチャンクを探索。
 
@@ -450,7 +450,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 完了しているならば頂点バッファへの反映を試みます。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void CheckChunkMeshesUpdated(GameTime gameTime)
+        void CheckMeshesUpdated(GameTime gameTime)
         {
             // 頂点ビルダの監視。
             int count = buildVerticesQueue.Count;
@@ -466,7 +466,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // クローズ中は頂点バッファ反映をスキップ。
-                if (!Closing) UpdateChunkMesh(chunk);
+                if (!Closing) UpdateMesh(chunk);
 
                 // 頂点ビルダを解放。
                 ReleaseVerticesBuilder(chunk.VerticesBuilder);
@@ -482,19 +482,19 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク メッシュを生成します。
         /// </summary>
-        /// <param name="chunkEffect">チャンクのエフェクト。</param>
+        /// <param name="effect">チャンクのエフェクト。</param>
         /// <param name="translucent">
         /// true (半透明の場合)、false (それ以外の場合)。
         /// </param>
         /// <returns>チャンク メッシュ。</returns>
-        ChunkMesh CreateChunkMesh(ChunkEffect chunkEffect, bool translucent)
+        ChunkMesh CreateMesh(ChunkEffect effect, bool translucent)
         {
             var name = (translucent) ? "TranslucentMesh" : "OpaqueMesh";
 
-            var chunkMesh = new ChunkMesh(name, chunkEffect);
+            var chunkMesh = new ChunkMesh(name, effect);
             chunkMesh.Translucent = translucent;
 
-            ChunkMeshCount++;
+            MeshCount++;
 
             return chunkMesh;
         }
@@ -503,7 +503,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンクに関連付けられた頂点ビルダの結果で頂点バッファを更新します。
         /// </summary>
         /// <param name="chunk">チャンク。</param>
-        void UpdateChunkMesh(Chunk chunk)
+        void UpdateMesh(Chunk chunk)
         {
             var builder = chunk.VerticesBuilder;
 
@@ -511,9 +511,9 @@ namespace Willcraftia.Xna.Blocks.Models
             // チャンクの中心をメッシュの位置とする。
             var position = new Vector3
             {
-                X = chunk.Position.X * PartitionSize.X + ChunkMeshOffset.X,
-                Y = chunk.Position.Y * PartitionSize.Y + ChunkMeshOffset.Y,
-                Z = chunk.Position.Z * PartitionSize.Z + ChunkMeshOffset.Z,
+                X = chunk.Position.X * PartitionSize.X + MeshOffset.X,
+                Y = chunk.Position.Y * PartitionSize.Y + MeshOffset.Y,
+                Z = chunk.Position.Z * PartitionSize.Z + MeshOffset.Z,
             };
 
             // メッシュに設定するワールド行列。
@@ -521,7 +521,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Matrix.CreateTranslation(ref position, out world);
 
             // メッシュに設定するエフェクト。
-            var chunkEffect = chunk.Region.ChunkEffect;
+            var effect = chunk.Region.ChunkEffect;
 
             //----------------------------------------------------------------
             // 不透明メッシュ
@@ -535,7 +535,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (chunk.OpaqueMesh == null)
                 {
-                    chunk.OpaqueMesh = CreateChunkMesh(chunkEffect, false);
+                    chunk.OpaqueMesh = CreateMesh(effect, false);
                 }
                 else
                 {
@@ -565,7 +565,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (chunk.TranslucentMesh == null)
                 {
-                    chunk.TranslucentMesh = CreateChunkMesh(chunkEffect, true);
+                    chunk.TranslucentMesh = CreateMesh(effect, true);
                 }
                 else
                 {

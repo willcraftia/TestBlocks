@@ -505,7 +505,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 vertex.Position += blockMeshOffset;
 
                 // チャンク メッシュはチャンクの中心位置を原点とするため、半チャンク移動。
-                vertex.Position -= manager.ChunkMeshOffset;
+                vertex.Position -= manager.MeshOffset;
 
                 destination.AddVertex(ref vertex);
             }

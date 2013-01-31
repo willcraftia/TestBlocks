@@ -97,7 +97,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                     // 非空ブロックを設定しようとする場合は、
                     // チャンク マネージャからデータを借りる必要があります。
-                    data = chunkManager.BorrowChunkData();
+                    data = chunkManager.BorrowData();
                     dataChanged = true;
                 }
 
@@ -107,7 +107,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     // 全てが空ブロックになったならば、
                     // データをチャンク マネージャへ返します。
-                    chunkManager.ReturnChunkData(data);
+                    chunkManager.ReturnData(data);
                     data = null;
                     dataChanged = true;
                 }
@@ -185,7 +185,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.chunkManager = chunkManager;
 
-            Node = new SceneNode(chunkManager.SceneManager, "Chunk" + chunkManager.CreateChunkNodeId());
+            Node = new SceneNode(chunkManager.SceneManager, "Chunk" + chunkManager.CreateNodeId());
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (data != null)
             {
-                chunkManager.ReturnChunkData(data);
+                chunkManager.ReturnData(data);
                 data = null;
             }
             dataChanged = false;
@@ -379,7 +379,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (data != null) RequestUpdateMesh();
 
             // アクティブ化完了でノードを追加。
-            chunkManager.ChunkRootNode.Children.Add(Node);
+            chunkManager.BaseNode.Children.Add(Node);
 
             base.OnActivated();
         }
@@ -387,7 +387,7 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override void OnPassivating()
         {
             // 非アクティブ化開始でノードを削除。
-            chunkManager.ChunkRootNode.Children.Remove(Node);
+            chunkManager.BaseNode.Children.Remove(Node);
 
             base.OnPassivating();
         }
@@ -402,14 +402,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(region != null);
 
-            var d = chunkManager.BorrowChunkData();
+            var d = chunkManager.BorrowData();
 
             if (region.ChunkStore.GetChunk(Position, d))
             {
                 if (d.SolidCount == 0)
                 {
                     // 全てが空ブロックならば返却。
-                    chunkManager.ReturnChunkData(d);
+                    chunkManager.ReturnData(d);
                 }
                 else
                 {
@@ -442,7 +442,7 @@ namespace Willcraftia.Xna.Blocks.Models
             else
             {
                 // 変更があるならば空データで永続化。
-                if (dataChanged) Region.ChunkStore.AddChunk(Position, chunkManager.EmptyChunkData);
+                if (dataChanged) Region.ChunkStore.AddChunk(Position, chunkManager.EmptyData);
             }
 
             base.PassivateOverride();
@@ -484,7 +484,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Node.Objects.Remove(mesh);
 
             // マネージャへ削除要求。
-            chunkManager.DisposeChunkMesh(mesh);
+            chunkManager.DisposeMesh(mesh);
         }
     }
 }
