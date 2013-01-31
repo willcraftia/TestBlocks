@@ -328,9 +328,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 waitBuildVerticesQueue.Enqueue(chunkPosition);
         }
 
-        internal int CreateNodeId()
+        internal SceneNode CreateNode()
         {
-            return nodeIdSequence++;
+            nodeIdSequence++;
+            return new SceneNode(SceneManager, "Chunk" + nodeIdSequence);
         }
 
         /// <summary>

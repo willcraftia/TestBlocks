@@ -185,7 +185,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.manager = manager;
 
-            Node = new SceneNode(manager.SceneManager, "Chunk" + manager.CreateNodeId());
+            Node = manager.CreateNode();
         }
 
         /// <summary>
