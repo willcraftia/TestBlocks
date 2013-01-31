@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Content;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.IO;
@@ -45,6 +46,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
         WorldManager worldManager;
 
         Region region;
+
+        ResourceManager editorResourceManager = new ResourceManager();
+
+        AssetManager editorAssetManager;
 
         CommandManager commandManager = new CommandManager();
 
@@ -225,12 +230,18 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //----------------------------------------------------------------
             // エディット
 
+            editorAssetManager = new AssetManager(Services);
+            editorAssetManager.RegisterLoader(typeof(Mesh), new MeshLoader());
+
+            var cubeMeshResource = editorResourceManager.Load("title:Resources/Meshes/Cube.json");
+            var cubeMesh = editorAssetManager.Load<Mesh>(cubeMeshResource);
+
             worldCommandFactory = new WorldCommandFactory(worldManager);
 
             var brushNode = worldManager.SceneManager.CreateSceneNode("Brush");
             worldManager.SceneManager.RootNode.Children.Add(brushNode);
 
-            var brushMesh = new BrushMesh("BrushMesh", GraphicsDevice);
+            var brushMesh = new BrushMesh("BrushMesh", GraphicsDevice, cubeMesh);
             brushNode.Objects.Add(brushMesh);
 
             worldManager.SceneManager.UpdateOctreeSceneNode(brushNode);

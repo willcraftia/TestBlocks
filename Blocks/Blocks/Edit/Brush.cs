@@ -138,8 +138,14 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             node.Update(true);
 
+            Matrix translation;
+            Matrix.CreateTranslation(ref meshPositionWorld, out translation);
+
+            Matrix scale;
+            Matrix.CreateScale(1.001f, out scale);
+
             Matrix world;
-            Matrix.CreateTranslation(ref meshPositionWorld, out world);
+            Matrix.Multiply(ref scale, ref translation, out world);
 
             mesh.Effect.DiffuseColor = Color;
             mesh.Effect.Alpha = Alpha;
