@@ -292,6 +292,7 @@
     <Compile Include="StorageManager.cs" />
     <Compile Include="StringBuilderExtension.cs" />
     <Compile Include="Threading\TaskQueue.cs" />
+    <Compile Include="Triangle.cs" />
     <Compile Include="Vector3Extension.cs" />
     <Compile Include="VectorI3.cs" />
     <Compile Include="View.cs" />
