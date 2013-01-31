@@ -529,6 +529,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
                 foreach (var obj in node.Objects)
                 {
+                    // Visible = false は除外。
+                    if (!obj.Visible) continue;
+
+                    // 半透明と不透明で分類。
                     if (obj.Translucent)
                     {
                         translucentObjects.Add(obj);
@@ -538,6 +542,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                         opaqueObjects.Add(obj);
                     }
 
+                    // 投影可か否か。
                     var shadowCaster = obj as ShadowCaster;
                     if (shadowCaster != null)
                     {
