@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         WorldCommandFactory worldCommandFactory;
 
-        Brush brush;
+        StickyBrush brush;
 
         VectorI3 lastPaintBrushPosition;
 
@@ -246,7 +246,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             worldManager.SceneManager.UpdateOctreeSceneNode(brushNode);
 
-            brush = new Brush(commandManager, worldCommandFactory, brushNode, brushMesh, worldManager.ChunkManager);
+            brush = new StickyBrush(commandManager, worldCommandFactory, brushNode, brushMesh, worldManager.ChunkManager);
             brush.BlockIndex = 1;
 
             eraser = new Eraser(commandManager, worldCommandFactory, worldManager.ChunkManager);

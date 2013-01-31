@@ -10,7 +10,7 @@ using Willcraftia.Xna.Blocks.Models;
 
 namespace Willcraftia.Xna.Blocks.Edit
 {
-    public sealed class Brush
+    public sealed class FreeBrush
     {
         CommandManager commandManager;
 
@@ -39,7 +39,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public float Alpha { get; set; }
 
-        public Brush(CommandManager commandManager, WorldCommandFactory commandFactory,
+        public FreeBrush(CommandManager commandManager, WorldCommandFactory commandFactory,
             SceneNode node, BrushMesh mesh, ChunkManager chunkManager)
         {
             if (commandManager == null) throw new ArgumentNullException("commandManager");
@@ -56,7 +56,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
 
-            //Offset = 4;
             Color = new Vector3(1, 0, 0);
             Alpha = 0.5f;
 
@@ -76,52 +75,16 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             eyeDirection.Normalize();
 
-            // グリッドに沿っていない視点方向を考慮しての float によるオフセット。
-            var prevTestPosition = new VectorI3();
-            bool blockExists = false;
-            for (float offset = 0.5f; offset < 10; offset += 0.2f)
+            const int offset = 4;
+            var basePositionWorld = eyePositionWorld + eyeDirection * offset;
+
+            position = new VectorI3
             {
-                var basePositionWorld = eyePositionWorld + eyeDirection * offset;
-
-                var testPosition = new VectorI3
-                {
-                    X = (int) Math.Floor(basePositionWorld.X),
-                    Y = (int) Math.Floor(basePositionWorld.Y),
-                    Z = (int) Math.Floor(basePositionWorld.Z)
-                };
-
-                if (prevTestPosition == testPosition) continue;
-
-                var chunk = chunkManager.GetChunkByBlockPosition(testPosition);
-                if (chunk == null) continue;
-
-                var relativePosition = chunk.GetRelativeBlockPosition(testPosition);
-
-                var blockIndex = chunk[relativePosition];
-                if (blockIndex != Block.EmptyIndex)
-                {
-                    blockExists = true;
-                    position = testPosition;
-                    currentBlockIndex = blockIndex;
-                    break;
-                }
-
-                prevTestPosition = testPosition;
-            }
-
-            if (!blockExists)
-            {
-                const int offset = 4;
-                var basePositionWorld = eyePositionWorld + eyeDirection * offset;
-
-                position = new VectorI3
-                {
-                    X = (int) Math.Floor(basePositionWorld.X),
-                    Y = (int) Math.Floor(basePositionWorld.Y),
-                    Z = (int) Math.Floor(basePositionWorld.Z)
-                };
-                currentBlockIndex = Block.EmptyIndex;
-            }
+                X = (int) Math.Floor(basePositionWorld.X),
+                Y = (int) Math.Floor(basePositionWorld.Y),
+                Z = (int) Math.Floor(basePositionWorld.Z)
+            };
+            currentBlockIndex = Block.EmptyIndex;
 
             var meshPositionWorld = new Vector3
             {
