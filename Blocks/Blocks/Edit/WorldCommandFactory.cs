@@ -45,41 +45,9 @@ namespace Willcraftia.Xna.Blocks.Edit
                 chunk[relativePosition] = BlockIndex;
                 chunkManager.RequestUpdateMesh(chunk.Position, UpdateMeshPriority);
 
-                if (relativePosition.X == 0)
-                {
-                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Left);
-                }
-                else if (relativePosition.X == (chunkManager.ChunkSize.X - 1))
-                {
-                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Right);
-                }
-
-                if (relativePosition.Y == 0)
-                {
-                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Bottom);
-                }
-                else if (relativePosition.Y == (chunkManager.ChunkSize.Y - 1))
-                {
-                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Top);
-                }
-
-                if (relativePosition.Z == 0)
-                {
-                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Back);
-                }
-                else if (relativePosition.Z == (chunkManager.ChunkSize.Z - 1))
-                {
-                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Front);
-                }
+                RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
 
                 return true;
-            }
-
-            void RequestUpdateMeshForNeighbor(VectorI3 basePosition, CubicSide side)
-            {
-                var neighborPosition = basePosition + side.Direction;
-                if (chunkManager.Contains(neighborPosition))
-                    chunkManager.RequestUpdateMesh(neighborPosition, UpdateMeshPriority);
             }
 
             public override void Undo()
@@ -91,6 +59,8 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 chunk[relativePosition] = lastBlockIndex;
                 chunkManager.RequestUpdateMesh(chunk.Position, UpdateMeshPriority);
+
+                RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
             }
 
             public override void Release()
@@ -98,6 +68,43 @@ namespace Willcraftia.Xna.Blocks.Edit
                 UpdateMeshPriority = ChunkManager.SystemEditUpdateMeshPriority;
 
                 pool.Return(this);
+            }
+
+            void RequestUpdateMeshForNeighbors(ref VectorI3 baseChunkPosition, ref VectorI3 blockPosition)
+            {
+                if (blockPosition.X == 0)
+                {
+                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Left);
+                }
+                else if (blockPosition.X == (chunkManager.ChunkSize.X - 1))
+                {
+                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Right);
+                }
+
+                if (blockPosition.Y == 0)
+                {
+                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Bottom);
+                }
+                else if (blockPosition.Y == (chunkManager.ChunkSize.Y - 1))
+                {
+                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Top);
+                }
+
+                if (blockPosition.Z == 0)
+                {
+                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Back);
+                }
+                else if (blockPosition.Z == (chunkManager.ChunkSize.Z - 1))
+                {
+                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Front);
+                }
+            }
+
+            void RequestUpdateMeshForNeighbor(ref VectorI3 basePosition, CubicSide side)
+            {
+                var neighborPosition = basePosition + side.Direction;
+                if (chunkManager.Contains(neighborPosition))
+                    chunkManager.RequestUpdateMesh(neighborPosition, UpdateMeshPriority);
             }
         }
 
