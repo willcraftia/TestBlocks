@@ -292,7 +292,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public void RequestUpdateMesh()
         {
-            manager.RequestUpdateMesh(Position);
+            manager.RequestUpdateMesh(Position, ChunkManager.ActivationUpdateMeshPriority);
         }
 
         public int GetRelativeBlockPositionX(int absoluteBlockPositionX)

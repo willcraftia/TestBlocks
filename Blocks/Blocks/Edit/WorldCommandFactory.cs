@@ -19,6 +19,8 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             public byte BlockIndex;
 
+            public int UpdateMeshPriority = ChunkManager.SystemEditUpdateMeshPriority;
+
             ChunkManager chunkManager;
 
             ConcurrentPool<SetBlockCommand> pool;
@@ -41,7 +43,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                 lastBlockIndex = chunk[relativePosition];
 
                 chunk[relativePosition] = BlockIndex;
-                chunkManager.RequestUpdateMesh(chunk.Position);
+                chunkManager.RequestUpdateMesh(chunk.Position, UpdateMeshPriority);
 
                 return true;
             }
@@ -54,11 +56,13 @@ namespace Willcraftia.Xna.Blocks.Edit
                 var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
 
                 chunk[relativePosition] = lastBlockIndex;
-                chunkManager.RequestUpdateMesh(chunk.Position);
+                chunkManager.RequestUpdateMesh(chunk.Position, UpdateMeshPriority);
             }
 
             public override void Release()
             {
+                UpdateMeshPriority = ChunkManager.SystemEditUpdateMeshPriority;
+
                 pool.Return(this);
             }
         }

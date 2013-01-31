@@ -26,7 +26,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public byte BlockIndex { get; set; }
 
-        //public float Offset { get; set; }
+        public int UpdateMeshPriority { get; set; }
 
         public Vector3 Color { get; set; }
 
@@ -144,6 +144,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             command.BlockPosition = blockPosition;
             command.BlockIndex = BlockIndex;
+            command.UpdateMeshPriority = UpdateMeshPriority;
 
             commandManager.RequestCommand(command);
         }
@@ -154,6 +155,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             command.BlockPosition = blockPosition;
             command.BlockIndex = Block.EmptyIndex;
+            command.UpdateMeshPriority = UpdateMeshPriority;
 
             commandManager.RequestCommand(command);
         }
