@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Edit
         public BrushMesh(string name, GraphicsDevice graphicsDevice)
             : base(name)
         {
-            cube = new CubeMesh(graphicsDevice, 1.0001f);
+            cube = new CubeMesh(graphicsDevice, 1.001f);
             Effect = new BasicEffect(graphicsDevice);
 
             Translucent = true;
