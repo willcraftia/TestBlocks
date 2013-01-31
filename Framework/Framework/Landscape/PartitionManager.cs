@@ -499,15 +499,17 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// アクティブ クラスタ数を取得します。
         /// </summary>
-        public int ActiveClusterCount
+        public int ClusterCount
         {
             get { return clusterManager.ClusterCount; }
         }
 
         /// <summary>
-        /// アクティブ パーティション数を取得します。
+        /// パーティション数を取得します。
+        /// この数には、アクティブ化が完了していないパーティション、および、
+        /// 非アクティブ化の開始したパーティションは含まれません。
         /// </summary>
-        public int ActivePartitionCount
+        public int Count
         {
             get { return partitions.Count; }
         }
@@ -515,7 +517,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// アクティブ化中パーティション数を取得します。
         /// </summary>
-        public int ActivatingPartitionCount
+        public int ActivationCount
         {
             get { return activations.Count; }
         }
@@ -523,7 +525,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// 非アクティブ化中パーティション数を取得します。
         /// </summary>
-        public int PassivatingPartitionCount
+        public int PassivationCount
         {
             get { return passivations.Count; }
         }

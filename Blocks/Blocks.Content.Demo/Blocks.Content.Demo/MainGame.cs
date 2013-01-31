@@ -417,10 +417,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             var chunkManager = worldManager.ChunkManager;
             sb.Append("Chunk: ");
-            sb.Append("A(").AppendNumber(chunkManager.ActiveClusterCount).Append(":");
-            sb.AppendNumber(chunkManager.ActivePartitionCount).Append(") ");
-            sb.Append("W(").AppendNumber(chunkManager.ActivatingPartitionCount).Append(") ");
-            sb.Append("P(").AppendNumber(chunkManager.PassivatingPartitionCount).Append(")").AppendLine();
+            sb.Append("A(").AppendNumber(chunkManager.ClusterCount).Append(":");
+            sb.AppendNumber(chunkManager.Count).Append(") ");
+            sb.Append("W(").AppendNumber(chunkManager.ActivationCount).Append(") ");
+            sb.Append("P(").AppendNumber(chunkManager.PassivationCount).Append(")").AppendLine();
 
             sb.Append("Mesh: ").AppendNumber(chunkManager.ChunkMeshCount).Append(" ");
             sb.Append("Inter: ").AppendNumber(chunkManager.ActiveChunkVerticesBuilderCount).Append("/");
