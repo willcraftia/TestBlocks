@@ -295,6 +295,31 @@ namespace Willcraftia.Xna.Blocks.Models
             chunkManager.RequestUpdateMesh(Position);
         }
 
+        public int GetRelativeBlockPositionX(int absoluteBlockPositionX)
+        {
+            return absoluteBlockPositionX - (Position.X * chunkManager.ChunkSize.X);
+        }
+
+        public int GetRelativeBlockPositionY(int absoluteBlockPositionY)
+        {
+            return absoluteBlockPositionY - (Position.Y * chunkManager.ChunkSize.Y);
+        }
+
+        public int GetRelativeBlockPositionZ(int absoluteBlockPositionZ)
+        {
+            return absoluteBlockPositionZ - (Position.Z * chunkManager.ChunkSize.Z);
+        }
+
+        public void GetRelativeBlockPosition(ref VectorI3 absoluteBlockPosition, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = GetRelativeBlockPositionX(absoluteBlockPosition.X),
+                Y = GetRelativeBlockPositionY(absoluteBlockPosition.Y),
+                Z = GetRelativeBlockPositionZ(absoluteBlockPosition.Z)
+            };
+        }
+
         /// <summary>
         /// 絶対ブロック位置から相対ブロック位置を取得します。
         /// </summary>
@@ -303,8 +328,33 @@ namespace Willcraftia.Xna.Blocks.Models
         public VectorI3 GetRelativeBlockPosition(VectorI3 absoluteBlockPosition)
         {
             VectorI3 result;
-            chunkManager.GetRelativeBlockPosition(ref Position, ref absoluteBlockPosition, out result);
+            GetRelativeBlockPosition(ref absoluteBlockPosition, out result);
             return result;
+        }
+
+        public int GetAbsoluteBlockPositionX(int relativeBlockPositionX)
+        {
+            return Position.X * chunkManager.ChunkSize.X + relativeBlockPositionX;
+        }
+
+        public int GetAbsoluteBlockPositionY(int relativeBlockPositionY)
+        {
+            return Position.Y * chunkManager.ChunkSize.Y + relativeBlockPositionY;
+        }
+
+        public int GetAbsoluteBlockPositionZ(int relativeBlockPositionZ)
+        {
+            return Position.Z * chunkManager.ChunkSize.Z + relativeBlockPositionZ;
+        }
+
+        public void GetAbsoluteBlockPosition(ref VectorI3 relativeBlockPosition, out VectorI3 result)
+        {
+            result = new VectorI3
+            {
+                X = GetAbsoluteBlockPositionX(relativeBlockPosition.X),
+                Y = GetAbsoluteBlockPositionY(relativeBlockPosition.Y),
+                Z = GetAbsoluteBlockPositionZ(relativeBlockPosition.Z)
+            };
         }
 
         /// <summary>
@@ -315,23 +365,8 @@ namespace Willcraftia.Xna.Blocks.Models
         public VectorI3 GetAbsoluteBlockPosition(VectorI3 relativeBlockPosition)
         {
             VectorI3 result;
-            chunkManager.GetAbsoluteBlockPosition(ref Position, ref relativeBlockPosition, out result);
+            GetAbsoluteBlockPosition(ref relativeBlockPosition, out result);
             return result;
-        }
-
-        public int GetAbsoluteBlockPositionX(int relativeBlockPositionX)
-        {
-            return chunkManager.GetAbsoluteBlockPositionX(Position.X, relativeBlockPositionX);
-        }
-
-        public int GetAbsoluteBlockPositionY(int relativeBlockPositionY)
-        {
-            return chunkManager.GetAbsoluteBlockPositionY(Position.Y, relativeBlockPositionY);
-        }
-
-        public int GetAbsoluteBlockPositionZ(int relativeBlockPositionZ)
-        {
-            return chunkManager.GetAbsoluteBlockPositionZ(Position.Z, relativeBlockPositionZ);
         }
 
         /// <summary>
