@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
@@ -22,6 +23,20 @@ namespace Willcraftia.Xna.Blocks.Edit
         CubicCollection<IndexBuffer> indexBuffers = new CubicCollection<IndexBuffer>();
 
         Texture2D fillTexture;
+
+        Matrix scale;
+
+        public Vector3 Color
+        {
+            get { return Effect.DiffuseColor; }
+            set { Effect.DiffuseColor = value; }
+        }
+
+        public float Alpha
+        {
+            get { return Effect.Alpha; }
+            set { Effect.Alpha = value; }
+        }
 
         public BasicEffect Effect { get; private set; }
 
@@ -58,10 +73,22 @@ namespace Willcraftia.Xna.Blocks.Edit
             fillTexture = Texture2DHelper.CreateFillTexture(graphicsDevice);
             Effect.Texture = fillTexture;
             Effect.TextureEnabled = true;
+
+            Matrix.CreateScale(1.001f, out scale);
         }
 
         public override void Draw()
         {
+            Parent.Manager.UpdateEffect(Effect);
+
+            Matrix translation;
+            Matrix.CreateTranslation(ref PositionWorld, out translation);
+
+            Matrix world;
+            Matrix.Multiply(ref scale, ref translation, out world);
+
+            Effect.World = world;
+
             Effect.CurrentTechnique.Passes[0].Apply();
 
             foreach (var side in CubicSide.Items)

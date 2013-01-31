@@ -242,6 +242,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             worldManager.SceneManager.RootNode.Children.Add(brushNode);
 
             var brushMesh = new BrushMesh("BrushMesh", GraphicsDevice, cubeMesh);
+            brushMesh.Color = new Vector3(1, 0, 0);
+            brushMesh.Alpha = 0.5f;
             brushNode.Objects.Add(brushMesh);
 
             worldManager.SceneManager.UpdateOctreeSceneNode(brushNode);

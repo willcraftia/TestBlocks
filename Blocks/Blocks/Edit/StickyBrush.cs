@@ -35,10 +35,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public int UpdateMeshPriority { get; set; }
 
-        public Vector3 Color { get; set; }
-
-        public float Alpha { get; set; }
-
         public bool CanPaint { get; set; }
 
         public StickyBrush(CommandManager commandManager, WorldCommandFactory commandFactory,
@@ -57,9 +53,6 @@ namespace Willcraftia.Xna.Blocks.Edit
             this.chunkManager = chunkManager;
 
             if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
-
-            Color = new Vector3(1, 0, 0);
-            Alpha = 0.5f;
 
             UpdateMeshPriority = ChunkManager.UserEditUpdateMeshPriority;
         }
@@ -129,21 +122,6 @@ namespace Willcraftia.Xna.Blocks.Edit
             BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
 
             node.Update(true);
-
-            Matrix translation;
-            Matrix.CreateTranslation(ref meshPositionWorld, out translation);
-
-            Matrix scale;
-            Matrix.CreateScale(1.001f, out scale);
-
-            Matrix world;
-            Matrix.Multiply(ref scale, ref translation, out world);
-
-            mesh.Effect.DiffuseColor = Color;
-            mesh.Effect.Alpha = Alpha;
-            mesh.Effect.World = world;
-            mesh.Effect.View = view.Matrix;
-            mesh.Effect.Projection = projection.Matrix;
         }
 
         public void Paint()
