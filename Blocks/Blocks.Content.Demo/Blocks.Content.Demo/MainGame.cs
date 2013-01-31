@@ -55,9 +55,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         WorldCommandFactory worldCommandFactory;
 
-        StickyBrush brush;
+        StickyBrush stickyBrush;
 
-        VectorI3 lastPaintBrushPosition;
+        VectorI3 lastPaintPosition;
 
         byte lastPaintBlockIndex;
 
@@ -248,8 +248,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             worldManager.SceneManager.UpdateOctreeSceneNode(brushNode);
 
-            brush = new StickyBrush(commandManager, worldCommandFactory, brushNode, brushMesh, worldManager.ChunkManager);
-            brush.BlockIndex = 1;
+            stickyBrush = new StickyBrush(commandManager, worldCommandFactory, brushNode, brushMesh, worldManager.ChunkManager);
+            stickyBrush.BlockIndex = 1;
 
             eraser = new Eraser(commandManager, worldCommandFactory, worldManager.ChunkManager);
 
@@ -331,7 +331,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // エディット
 
             var camera = worldManager.SceneManager.ActiveCamera;
-            brush.Update(camera.View, camera.Projection);
+            stickyBrush.Update(camera.View, camera.Projection);
 
             // 左ボタンでブロック消去。
             // ブロック消去は消去対象の判定との兼ね合いから、
@@ -339,25 +339,31 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (mouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed &&
                 mouseState.RightButton == ButtonState.Released)
             {
-                eraser.Position = brush.Position;
+                eraser.Position = stickyBrush.Position;
                 eraser.Erase();
             }
 
-            // ブラシ移動時は右ボタンの解放無しで連続してブロック配置。
-            // ただし、同一でブロック変化を起こさない場合は抑制。
-            if (mouseState.RightButton == ButtonState.Pressed && mouseState.LeftButton == ButtonState.Released)
+            // TODO
+            //
+            // 連続配置と非連続配置の切替が分からない。
+            //
+            // 任意配置ブラシの場合、連続配置可としたい。
+            // 粘着配置ブラシの場合、連続配置不可としたい。
+            //
+            if (mouseState.RightButton == ButtonState.Released && lastMouseState.RightButton == ButtonState.Pressed &&
+                mouseState.LeftButton == ButtonState.Released)
             {
-                if (brush.Position != lastPaintBrushPosition || brush.BlockIndex != lastPaintBlockIndex)
+                if (stickyBrush.PaintPosition != lastPaintPosition || stickyBrush.BlockIndex != lastPaintBlockIndex)
                 {
-                    brush.Paint();
+                    stickyBrush.Paint();
 
-                    lastPaintBrushPosition = brush.Position;
-                    lastPaintBlockIndex = brush.BlockIndex;
+                    lastPaintPosition = stickyBrush.PaintPosition;
+                    lastPaintBlockIndex = stickyBrush.BlockIndex;
                 }
             }
             if (mouseState.RightButton == ButtonState.Released)
             {
-                lastPaintBrushPosition = new VectorI3(int.MaxValue);
+                lastPaintPosition = new VectorI3(int.MaxValue);
                 lastPaintBlockIndex = Block.EmptyIndex;
             }
 
@@ -511,6 +517,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(camera.View.Direction.X).Append(", ");
             sb.AppendNumber(camera.View.Direction.Y).Append(", ");
             sb.AppendNumber(camera.View.Direction.Z).Append(")").AppendLine();
+
+            sb.Append("Brush: (");
+            sb.AppendNumber(stickyBrush.Position.X).Append(", ");
+            sb.AppendNumber(stickyBrush.Position.Y).Append(", ");
+            sb.AppendNumber(stickyBrush.Position.Z).Append(")").AppendLine();
 
             sb.Append("Near/Far: ").AppendNumber(camera.Projection.NearPlaneDistance).Append("/");
             sb.AppendNumber(camera.Projection.FarPlaneDistance);

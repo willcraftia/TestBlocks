@@ -111,6 +111,8 @@ namespace Willcraftia.Xna.Blocks.Edit
             mesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
 
             BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
+
+            mesh.VisibleAllFaces = true;
         }
     }
 }

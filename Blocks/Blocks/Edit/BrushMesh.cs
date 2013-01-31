@@ -18,6 +18,8 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         Mesh mesh;
 
+        BasicEffect effect;
+
         CubicCollection<VertexBuffer> vertexBuffers = new CubicCollection<VertexBuffer>();
 
         CubicCollection<IndexBuffer> indexBuffers = new CubicCollection<IndexBuffer>();
@@ -28,17 +30,19 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public Vector3 Color
         {
-            get { return Effect.DiffuseColor; }
-            set { Effect.DiffuseColor = value; }
+            get { return effect.DiffuseColor; }
+            set { effect.DiffuseColor = value; }
         }
 
         public float Alpha
         {
-            get { return Effect.Alpha; }
-            set { Effect.Alpha = value; }
+            get { return effect.Alpha; }
+            set { effect.Alpha = value; }
         }
 
-        public BasicEffect Effect { get; private set; }
+        public bool VisibleAllFaces { get; set; }
+
+        public CubicSide VisibleFace { get; set; }
 
         public BrushMesh(string name, GraphicsDevice graphicsDevice, Mesh mesh)
             : base(name)
@@ -49,7 +53,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             this.graphicsDevice = graphicsDevice;
             this.mesh = mesh;
 
-            Effect = new BasicEffect(graphicsDevice);
+            effect = new BasicEffect(graphicsDevice);
 
             Translucent = true;
 
@@ -71,15 +75,15 @@ namespace Willcraftia.Xna.Blocks.Edit
             }
 
             fillTexture = Texture2DHelper.CreateFillTexture(graphicsDevice);
-            Effect.Texture = fillTexture;
-            Effect.TextureEnabled = true;
+            effect.Texture = fillTexture;
+            effect.TextureEnabled = true;
 
             Matrix.CreateScale(1.001f, out scale);
         }
 
         public override void Draw()
         {
-            Parent.Manager.UpdateEffect(Effect);
+            Parent.Manager.UpdateEffect(effect);
 
             Matrix translation;
             Matrix.CreateTranslation(ref PositionWorld, out translation);
@@ -87,12 +91,14 @@ namespace Willcraftia.Xna.Blocks.Edit
             Matrix world;
             Matrix.Multiply(ref scale, ref translation, out world);
 
-            Effect.World = world;
+            effect.World = world;
 
-            Effect.CurrentTechnique.Passes[0].Apply();
+            effect.CurrentTechnique.Passes[0].Apply();
 
             foreach (var side in CubicSide.Items)
             {
+                if (!VisibleAllFaces && VisibleFace != side) continue;
+
                 var vertexBuffer = vertexBuffers[side];
                 var indexBuffer = indexBuffers[side];
 
@@ -136,7 +142,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                     if (indexBuffers[side] != null) indexBuffers[side].Dispose();
                 }
                 fillTexture.Dispose();
-                Effect.Dispose();
+                effect.Dispose();
             }
 
             disposed = true;
