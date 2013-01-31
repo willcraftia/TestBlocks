@@ -45,7 +45,41 @@ namespace Willcraftia.Xna.Blocks.Edit
                 chunk[relativePosition] = BlockIndex;
                 chunkManager.RequestUpdateMesh(chunk.Position, UpdateMeshPriority);
 
+                if (relativePosition.X == 0)
+                {
+                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Left);
+                }
+                else if (relativePosition.X == (chunkManager.ChunkSize.X - 1))
+                {
+                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Right);
+                }
+
+                if (relativePosition.Y == 0)
+                {
+                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Bottom);
+                }
+                else if (relativePosition.Y == (chunkManager.ChunkSize.Y - 1))
+                {
+                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Top);
+                }
+
+                if (relativePosition.Z == 0)
+                {
+                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Back);
+                }
+                else if (relativePosition.Z == (chunkManager.ChunkSize.Z - 1))
+                {
+                    RequestUpdateMeshForNeighbor(chunk.Position, CubicSide.Front);
+                }
+
                 return true;
+            }
+
+            void RequestUpdateMeshForNeighbor(VectorI3 basePosition, CubicSide side)
+            {
+                var neighborPosition = basePosition + side.Direction;
+                if (chunkManager.Contains(neighborPosition))
+                    chunkManager.RequestUpdateMesh(neighborPosition, UpdateMeshPriority);
             }
 
             public override void Undo()
