@@ -235,18 +235,18 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 指定の位置を含むリージョンがある場合、アクティブ化可能であると判定します。
         /// </summary>
-        protected override bool CanActivatePartition(VectorI3 position)
+        protected override bool CanActivate(VectorI3 position)
         {
             if (regionManager.GetRegionByChunkPosition(position) == null) return false;
 
-            return base.CanActivatePartition(position);
+            return base.CanActivate(position);
         }
 
         /// <summary>
         /// プールからチャンクを取得して返します。
         /// プールが枯渇している場合は null を返します。
         /// </summary>
-        protected override Partition CreatePartition(VectorI3 position)
+        protected override Partition Create(VectorI3 position)
         {
             // プールから取得。
             var chunk = chunkPool.Borrow();
@@ -265,7 +265,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// プールへチャンクを戻します。
         /// </summary>
-        protected override void ReleasePartition(Partition partition)
+        protected override void Release(Partition partition)
         {
             var chunk = partition as Chunk;
 

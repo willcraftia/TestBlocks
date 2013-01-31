@@ -320,13 +320,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var position = eyePosition + offset;
 
                 // 既にアクティブならばスキップ。
-                if (manager.ContainsPartition(position)) return;
+                if (manager.Contains(position)) return;
 
                 // 既に実行中ならばスキップ。
                 if (manager.activations.Contains(position)) return;
 
                 // アクティブ化可能であるかどうか。
-                if (!manager.CanActivatePartition(position)) return;
+                if (!manager.CanActivate(position)) return;
 
                 var candidate = new Candidate();
                 candidate.Position = position;
@@ -357,7 +357,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     var candidate = candidates.Dequeue();
 
                     // インスタンス生成。
-                    var partition = manager.CreatePartition(candidate.Position);
+                    var partition = manager.Create(candidate.Position);
 
                     // 生成が拒否されたら終了。
                     if (partition == null) break;
@@ -590,8 +590,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 CheckPassivations(gameTime);
                 CheckActivations(gameTime);
 
-                PassivatePartitions(gameTime);
-                ActivatePartitions(gameTime);
+                Passivate(gameTime);
+                Activate(gameTime);
 
                 // サブクラスにおける追加の更新処理。
                 UpdateOverride(gameTime);
@@ -603,12 +603,12 @@ namespace Willcraftia.Xna.Framework.Landscape
                     activationTaskQueue.Clear();
                 
                 if (activations.Count != 0)
-                    DisposePartitions(activations);
+                    DisposeConcurrentKeyedQueue(activations);
 
                 // 非アクティブ化関連を処理。
                 passivationTaskQueue.Update();
                 CheckPassivations(gameTime);
-                PassivatePartitions(gameTime);
+                Passivate(gameTime);
 
                 // サブクラスにおける追加の更新処理。
                 // クローズ中に行うべきこともある。
@@ -648,7 +648,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool ContainsPartition(VectorI3 position)
+        public bool Contains(VectorI3 position)
         {
             return clusterManager.Contains(position);
         }
@@ -671,13 +671,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、アクティブ化を抑制する場合には null。
         /// </returns>
-        protected abstract Partition CreatePartition(VectorI3 position);
+        protected abstract Partition Create(VectorI3 position);
 
         /// <summary>
         /// 非アクティブ化でパーティションを解放する際に呼び出されます。
         /// </summary>
         /// <param name="partition">パーティション。</param>
-        protected abstract void ReleasePartition(Partition partition);
+        protected abstract void Release(Partition partition);
 
         /// <summary>
         /// パーティションがアクティブ化可能であるか否かを検査します。
@@ -689,7 +689,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (指定の位置でパーティションをアクティブ化できる場合)、false (それ以外の場合)。
         /// </returns>
-        protected virtual bool CanActivatePartition(VectorI3 position)
+        protected virtual bool CanActivate(VectorI3 position)
         {
             return true;
         }
@@ -728,7 +728,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 partition.OnPassivated();
 
                 // 解放。
-                ReleasePartition(partition);
+                Release(partition);
             }
         }
 
@@ -812,7 +812,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 上限に到達した場合には、このフレームでの非アクティブ化は保留されます。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void PassivatePartitions(GameTime gameTime)
+        void Passivate(GameTime gameTime)
         {
             // メモ
             //
@@ -866,7 +866,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 上限に到達した場合には、このフレームでのアクティブ化は保留されます。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void ActivatePartitions(GameTime gameTime)
+        void Activate(GameTime gameTime)
         {
             if (!activator.Active)
             {
@@ -912,27 +912,21 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             if (disposing)
             {
-                DisposePartitions(partitions);
-                DisposePartitions(activations);
-                DisposePartitions(passivations);
+                DisposeQueue(partitions);
+                DisposeConcurrentKeyedQueue(activations);
+                DisposeQueue(passivations);
             }
 
             disposed = true;
         }
 
-        void DisposePartitions(Queue<Partition> partitions)
+        void DisposeQueue(Queue<Partition> partitions)
         {
             while (0 < partitions.Count)
                 partitions.Dequeue().Dispose();
         }
 
-        void DisposePartitions(KeyedQueue<VectorI3, Partition> partitions)
-        {
-            while (0 < partitions.Count)
-                partitions.Dequeue().Dispose();
-        }
-
-        void DisposePartitions(ConcurrentKeyedQueue<VectorI3, Partition> partitions)
+        void DisposeConcurrentKeyedQueue(ConcurrentKeyedQueue<VectorI3, Partition> partitions)
         {
             while (0 < partitions.Count)
             {
