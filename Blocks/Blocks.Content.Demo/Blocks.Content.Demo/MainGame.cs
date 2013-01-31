@@ -52,6 +52,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         Brush brush;
 
+        VectorI3 lastPaintBrushPosition;
+
+        byte lastPaintBlockIndex;
+
+        Eraser eraser;
+
         #region Trace
 
         TimeRuler timeRuler;
@@ -232,6 +238,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             brush = new Brush(commandManager, worldCommandFactory, brushNode, brushMesh, worldManager.ChunkManager);
             brush.BlockIndex = 1;
 
+            eraser = new Eraser(commandManager, worldCommandFactory, worldManager.ChunkManager);
+
             //----------------------------------------------------------------
             // その他
 
@@ -317,11 +325,38 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // ボタンの押下から解放を行った時にだけ実行。
             if (mouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed &&
                 mouseState.RightButton == ButtonState.Released)
-                brush.Erase();
+            {
+                eraser.Position = brush.Position;
+                eraser.Erase();
+            }
 
-            // 右ボタンでブロック配置。
-            if (mouseState.LeftButton == ButtonState.Released && mouseState.RightButton == ButtonState.Pressed)
-                brush.Paint();
+            // ブラシ移動時は右ボタンの解放無しで連続してブロック配置。
+            // ただし、同一でブロック変化を起こさない場合は抑制。
+            if (mouseState.RightButton == ButtonState.Pressed && mouseState.LeftButton == ButtonState.Released)
+            {
+                if (brush.Position != lastPaintBrushPosition || brush.BlockIndex != lastPaintBlockIndex)
+                {
+                    brush.Paint();
+
+                    lastPaintBrushPosition = brush.Position;
+                    lastPaintBlockIndex = brush.BlockIndex;
+                }
+            }
+            if (mouseState.RightButton == ButtonState.Released)
+            {
+                lastPaintBrushPosition = new VectorI3(int.MaxValue);
+                lastPaintBlockIndex = Block.EmptyIndex;
+            }
+
+            // Undo。
+            if (keyboardState.IsKeyDown(Keys.LeftControl) &&
+                keyboardState.IsKeyUp(Keys.Z) && lastKeyboardState.IsKeyDown(Keys.Z))
+                commandManager.RequestUndo();
+
+            // Redo。
+            if (keyboardState.IsKeyDown(Keys.LeftControl) &&
+                keyboardState.IsKeyUp(Keys.Y) && lastKeyboardState.IsKeyDown(Keys.Y))
+                commandManager.RequestUndo();
 
             // コマンド実行。
             commandManager.Update();

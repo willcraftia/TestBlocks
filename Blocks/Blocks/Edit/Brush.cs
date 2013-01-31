@@ -22,7 +22,14 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         ChunkManager chunkManager;
 
-        VectorI3 blockPosition;
+        VectorI3 position;
+
+        byte currentBlockIndex;
+
+        public VectorI3 Position
+        {
+            get { return position; }
+        }
 
         public byte BlockIndex { get; set; }
 
@@ -52,6 +59,8 @@ namespace Willcraftia.Xna.Blocks.Edit
             //Offset = 4;
             Color = new Vector3(1, 0, 0);
             Alpha = 0.5f;
+
+            UpdateMeshPriority = ChunkManager.UserEditUpdateMeshPriority;
         }
 
         // まずはカメラを更新。
@@ -74,30 +83,30 @@ namespace Willcraftia.Xna.Blocks.Edit
             {
                 var basePositionWorld = eyePositionWorld + eyeDirection * offset;
 
-                var testBlockPosition = new VectorI3
+                var testPosition = new VectorI3
                 {
                     X = (int) Math.Floor(basePositionWorld.X),
                     Y = (int) Math.Floor(basePositionWorld.Y),
                     Z = (int) Math.Floor(basePositionWorld.Z)
                 };
 
-                if (prevTestPosition == testBlockPosition) continue;
+                if (prevTestPosition == testPosition) continue;
 
-                var chunk = chunkManager.GetChunkByBlockPosition(testBlockPosition);
+                var chunk = chunkManager.GetChunkByBlockPosition(testPosition);
                 if (chunk == null) continue;
 
-                var relativeBlockPosition = chunk.GetRelativeBlockPosition(testBlockPosition);
+                var relativePosition = chunk.GetRelativeBlockPosition(testPosition);
 
-                var blockIndex = chunk[relativeBlockPosition];
-
+                var blockIndex = chunk[relativePosition];
                 if (blockIndex != Block.EmptyIndex)
                 {
                     blockExists = true;
-                    blockPosition = testBlockPosition;
+                    position = testPosition;
+                    currentBlockIndex = blockIndex;
                     break;
                 }
 
-                prevTestPosition = testBlockPosition;
+                prevTestPosition = testPosition;
             }
 
             if (!blockExists)
@@ -105,19 +114,20 @@ namespace Willcraftia.Xna.Blocks.Edit
                 const int offset = 4;
                 var basePositionWorld = eyePositionWorld + eyeDirection * offset;
 
-                blockPosition = new VectorI3
+                position = new VectorI3
                 {
                     X = (int) Math.Floor(basePositionWorld.X),
                     Y = (int) Math.Floor(basePositionWorld.Y),
                     Z = (int) Math.Floor(basePositionWorld.Z)
                 };
+                currentBlockIndex = Block.EmptyIndex;
             }
 
             var meshPositionWorld = new Vector3
             {
-                X = blockPosition.X + 0.5f,
-                Y = blockPosition.Y + 0.5f,
-                Z = blockPosition.Z + 0.5f
+                X = position.X + 0.5f,
+                Y = position.Y + 0.5f,
+                Z = position.Z + 0.5f
             };
 
             mesh.PositionWorld = meshPositionWorld;
@@ -140,21 +150,13 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public void Paint()
         {
+            // 既存のブロックと同じブロックを配置しようとしているならば抑制。
+            if (currentBlockIndex == BlockIndex) return;
+
             var command = commandFactory.CreateSetBlockCommand();
 
-            command.BlockPosition = blockPosition;
+            command.BlockPosition = position;
             command.BlockIndex = BlockIndex;
-            command.UpdateMeshPriority = UpdateMeshPriority;
-
-            commandManager.RequestCommand(command);
-        }
-
-        public void Erase()
-        {
-            var command = commandFactory.CreateSetBlockCommand();
-
-            command.BlockPosition = blockPosition;
-            command.BlockIndex = Block.EmptyIndex;
             command.UpdateMeshPriority = UpdateMeshPriority;
 
             commandManager.RequestCommand(command);

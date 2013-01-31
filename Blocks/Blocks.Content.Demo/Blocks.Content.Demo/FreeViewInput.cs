@@ -77,12 +77,15 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (keyboardState.IsKeyDown(Keys.LeftShift) || keyboardState.IsKeyDown(Keys.RightShift))
                 distance *= DashFactor;
 
-            if (keyboardState.IsKeyDown(Keys.W)) Move(distance);
-            if (keyboardState.IsKeyDown(Keys.S)) Move(-distance);
-            if (keyboardState.IsKeyDown(Keys.A)) Strafe(distance);
-            if (keyboardState.IsKeyDown(Keys.D)) Strafe(-distance);
-            if (keyboardState.IsKeyDown(Keys.Q)) MoveUp(distance);
-            if (keyboardState.IsKeyDown(Keys.Z)) MoveUp(-distance);
+            if (keyboardState.IsKeyUp(Keys.LeftControl))
+            {
+                if (keyboardState.IsKeyDown(Keys.W)) Move(distance);
+                if (keyboardState.IsKeyDown(Keys.S)) Move(-distance);
+                if (keyboardState.IsKeyDown(Keys.A)) Strafe(distance);
+                if (keyboardState.IsKeyDown(Keys.D)) Strafe(-distance);
+                if (keyboardState.IsKeyDown(Keys.Q)) MoveUp(distance);
+                if (keyboardState.IsKeyDown(Keys.Z)) MoveUp(-distance);
+            }
 
             Matrix rotation;
             Matrix.CreateFromYawPitchRoll(yaw, pitch, roll, out rotation);

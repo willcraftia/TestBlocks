@@ -78,6 +78,7 @@
     <Compile Include="Edit\Brush.cs" />
     <Compile Include="Edit\BrushMesh.cs" />
     <Compile Include="Edit\Command.cs" />
+    <Compile Include="Edit\Eraser.cs" />
     <Compile Include="Edit\WorldCommandFactory.cs" />
     <Compile Include="Models\ChunkData.cs" />
     <Compile Include="Edit\CommandManager.cs" />

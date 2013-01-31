@@ -115,6 +115,7 @@
     <Compile Include="Edit\BrushMesh.cs" />
     <Compile Include="Edit\Command.cs" />
     <Compile Include="Edit\CommandManager.cs" />
+    <Compile Include="Edit\Eraser.cs" />
     <Compile Include="Edit\WorldCommandFactory.cs" />
     <Compile Include="Models\BiomeBounds.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
