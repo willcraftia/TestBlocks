@@ -53,7 +53,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         VectorI3 paintPosition;
 
-        CubicSide visibleFace;
+        CubicSide paintFace;
 
         byte currentBlockIndex;
 
@@ -65,6 +65,11 @@ namespace Willcraftia.Xna.Blocks.Edit
         public VectorI3 PaintPosition
         {
             get { return paintPosition; }
+        }
+
+        public CubicSide PaintFace
+        {
+            get { return paintFace; }
         }
 
         public byte BlockIndex { get; set; }
@@ -94,6 +99,9 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             triangleInfos = new TriangleInfo[2 * 6];
 
+            // 原点中心の立方体をブロックのグリッドへ移動させるための行列。
+            var transform = Matrix.CreateTranslation(new Vector3(0.5f));
+
             int i = 0;
             foreach (var side in CubicSide.Items)
             {
@@ -102,10 +110,17 @@ namespace Willcraftia.Xna.Blocks.Edit
                 var side1 = new Vector3(normal.Y, normal.Z, normal.X);
                 var side2 = Vector3.Cross(normal, side1);
 
+                // (0,0,0) を原点に頂点を算出。
                 var v0 = (normal - side1 - side2) * 0.5f;
                 var v1 = (normal - side1 + side2) * 0.5f;
                 var v2 = (normal + side1 + side2) * 0.5f;
                 var v3 = (normal + side1 - side2) * 0.5f;
+
+                // ブロックのグリッドに移動。
+                Vector3.Transform(ref v0, ref transform, out v0);
+                Vector3.Transform(ref v1, ref transform, out v1);
+                Vector3.Transform(ref v2, ref transform, out v2);
+                Vector3.Transform(ref v3, ref transform, out v3);
 
                 triangleInfos[i] = new TriangleInfo(side)
                 {
@@ -183,22 +198,20 @@ namespace Willcraftia.Xna.Blocks.Edit
         bool ResolvePaintPosition(ref Ray ray, ref VectorI3 brushPosition)
         {
             var brushPositionWorld = brushPosition.ToVector3();
-            brushPositionWorld.X += 0.5f;
-            brushPositionWorld.Y += 0.5f;
-            brushPositionWorld.Z += 0.5f;
 
             Matrix world;
             Matrix.CreateTranslation(ref brushPositionWorld, out world);
 
+            var rayDirection = ray.Direction;
+            rayDirection.Normalize();
+
             for (int i = 0; i < triangleInfos.Length; i++)
             {
-                Triangle triangleWorld;
-                triangleInfos[i].CreateTriangleWorld(ref world, out triangleWorld);
+                // 背面は判定から除外。
+                if (IsBackFace(triangleInfos[i].Side, ref rayDirection)) continue;
 
-                float? distance;
-                triangleWorld.Intersects(ref ray, out distance);
-
-                if (distance != null)
+                // 面と視線が交差するか否か。
+                if (Intersects(ref ray, triangleInfos[i], ref world))
                 {
                     var testPosition = brushPosition + triangleInfos[i].Side.Direction;
                     var chunk = chunkManager.GetChunkByBlockPosition(testPosition);
@@ -210,7 +223,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                     {
                         paintPosition = testPosition;
                         currentBlockIndex = blockIndex;
-                        visibleFace = triangleInfos[i].Side;
+                        paintFace = triangleInfos[i].Side;
                         return true;
                     }
                 }
@@ -235,6 +248,26 @@ namespace Willcraftia.Xna.Blocks.Edit
             commandManager.RequestCommand(command);
         }
 
+        bool IsBackFace(CubicSide side, ref Vector3 eyeDirection)
+        {
+            var normal = side.Direction.ToVector3();
+
+            float dot;
+            Vector3.Dot(ref eyeDirection, ref normal, out dot);
+            return (0 < dot);
+        }
+
+        bool Intersects(ref Ray ray, TriangleInfo triangleInfo, ref Matrix world)
+        {
+            Triangle triangleWorld;
+            triangleInfo.CreateTriangleWorld(ref world, out triangleWorld);
+
+            float? distance;
+            triangleWorld.Intersects(ref ray, out distance);
+
+            return distance != null;
+        }
+
         void UpdateMesh()
         {
             var meshPositionWorld = new Vector3
@@ -251,7 +284,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
 
             mesh.VisibleAllFaces = false;
-            mesh.VisibleFace = visibleFace;
+            mesh.VisibleFace = paintFace;
         }
     }
 }

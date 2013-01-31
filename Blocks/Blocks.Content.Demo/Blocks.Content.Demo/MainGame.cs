@@ -519,6 +519,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(camera.View.Direction.Z).Append(")").AppendLine();
 
             sb.Append("Brush: (");
+            sb.Append(stickyBrush.PaintFace).Append(": ");
             sb.AppendNumber(stickyBrush.Position.X).Append(", ");
             sb.AppendNumber(stickyBrush.Position.Y).Append(", ");
             sb.AppendNumber(stickyBrush.Position.Z).Append(")").AppendLine();
