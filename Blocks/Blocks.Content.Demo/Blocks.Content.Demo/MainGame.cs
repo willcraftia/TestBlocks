@@ -367,7 +367,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // Redo。
             if (keyboardState.IsKeyDown(Keys.LeftControl) &&
                 keyboardState.IsKeyUp(Keys.Y) && lastKeyboardState.IsKeyDown(Keys.Y))
-                commandManager.RequestUndo();
+                commandManager.RequestRedo();
 
             // コマンド実行。
             commandManager.Update();
