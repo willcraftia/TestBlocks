@@ -108,19 +108,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             if (!CanPaint) return;
 
-            var meshPositionWorld = new Vector3
-            {
-                X = position.X + 0.5f,
-                Y = position.Y + 0.5f,
-                Z = position.Z + 0.5f
-            };
-
-            mesh.PositionWorld = meshPositionWorld;
-            mesh.BoxWorld.Min = meshPositionWorld - new Vector3(0.5f);
-            mesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
-
-            BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
-
+            UpdateMesh();
             node.Update(true);
         }
 
@@ -138,6 +126,22 @@ namespace Willcraftia.Xna.Blocks.Edit
             command.UpdateMeshPriority = UpdateMeshPriority;
 
             commandManager.RequestCommand(command);
+        }
+
+        void UpdateMesh()
+        {
+            var meshPositionWorld = new Vector3
+            {
+                X = position.X + 0.5f,
+                Y = position.Y + 0.5f,
+                Z = position.Z + 0.5f
+            };
+
+            mesh.PositionWorld = meshPositionWorld;
+            mesh.BoxWorld.Min = meshPositionWorld - new Vector3(0.5f);
+            mesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
+
+            BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
         }
     }
 }
