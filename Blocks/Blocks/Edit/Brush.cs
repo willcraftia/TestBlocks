@@ -67,10 +67,12 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             eyeDirection.Normalize();
 
+            // グリッドに沿っていない視点方向を考慮しての float によるオフセット。
+            var prevTestPosition = new VectorI3();
             bool blockExists = false;
-            for (int i = 1; i < 10; i++)
+            for (float offset = 0.5f; offset < 10; offset += 0.2f)
             {
-                var basePositionWorld = eyePositionWorld + eyeDirection * i;
+                var basePositionWorld = eyePositionWorld + eyeDirection * offset;
 
                 var testBlockPosition = new VectorI3
                 {
@@ -78,6 +80,8 @@ namespace Willcraftia.Xna.Blocks.Edit
                     Y = (int) Math.Floor(basePositionWorld.Y),
                     Z = (int) Math.Floor(basePositionWorld.Z)
                 };
+
+                if (prevTestPosition == testBlockPosition) continue;
 
                 var chunk = chunkManager.GetChunkByBlockPosition(testBlockPosition);
                 if (chunk == null) continue;
@@ -92,6 +96,8 @@ namespace Willcraftia.Xna.Blocks.Edit
                     blockPosition = testBlockPosition;
                     break;
                 }
+
+                prevTestPosition = testBlockPosition;
             }
 
             if (!blockExists)
