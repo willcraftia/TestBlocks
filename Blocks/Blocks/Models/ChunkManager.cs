@@ -280,7 +280,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 新たなメッシュ更新の開始、メッシュ更新完了の監視を行います。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        protected override void UpdatePartitionsOverride(GameTime gameTime)
+        protected override void UpdateOverride(GameTime gameTime)
         {
             // メッシュ更新が必要なチャンクを探索して更新要求を追加。
             // ただし、クローズが開始したら行わない。
@@ -294,7 +294,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
             CheckChunkMeshesUpdated(gameTime);
 
-            base.UpdatePartitionsOverride(gameTime);
+            base.UpdateOverride(gameTime);
         }
 
         protected override void DisposeOverride(bool disposing)

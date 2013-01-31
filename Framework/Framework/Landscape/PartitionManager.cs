@@ -593,7 +593,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 PassivatePartitions(gameTime);
                 ActivatePartitions(gameTime);
 
-                UpdatePartitions(gameTime);
+                // サブクラスにおける追加の更新処理。
+                UpdateOverride(gameTime);
             }
             else
             {
@@ -609,8 +610,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 CheckPassivations(gameTime);
                 PassivatePartitions(gameTime);
 
-                // パーティション内部でも必要に応じてクローズのための更新を行う。
-                UpdatePartitions(gameTime);
+                // サブクラスにおける追加の更新処理。
+                // クローズ中に行うべきこともある。
+                UpdateOverride(gameTime);
 
                 // 全ての非アクティブ化が完了していればクローズ完了。
                 if (passivations.Count == 0 && partitions.Count == 0)
@@ -696,7 +698,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティション更新処理で呼び出されます。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        protected virtual void UpdatePartitionsOverride(GameTime gameTime) { }
+        protected virtual void UpdateOverride(GameTime gameTime) { }
 
         /// <summary>
         /// 非アクティブ化の完了を検査します。
@@ -871,18 +873,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 非同期処理中ではないならば、アクティベータの実行を開始。
                 activator.Start(view, projection, eyePosition, minActiveVolume, priorActiveDistance);
             }
-        }
-
-        /// <summary>
-        /// パーティションを更新します。
-        /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void UpdatePartitions(GameTime gameTime)
-        {
-            // TODO
-            // モニタ
-
-            UpdatePartitionsOverride(gameTime);
         }
 
         /// <summary>
