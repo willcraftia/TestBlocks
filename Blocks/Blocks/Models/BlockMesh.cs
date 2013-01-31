@@ -46,8 +46,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             for (int j = 0; j < newVertices.Length; j++)
             {
-                newVertices[j].TextureCoordinate.X *= Tile.InverseSize;
-                newVertices[j].TextureCoordinate.Y *= Tile.InverseSize;
+                newVertices[j].TextureCoordinate.X /= Tile.Size;
+                newVertices[j].TextureCoordinate.Y /= Tile.Size;
                 newVertices[j].TextureCoordinate.X += texCoordOffset.X;
                 newVertices[j].TextureCoordinate.Y += texCoordOffset.Y;
             }

@@ -13,8 +13,6 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public const int Size = 16;
 
-        public const float InverseSize = 1 / 16f;
-
         public const byte EmptyIndex = 0;
 
         Vector3 diffuseColor;
