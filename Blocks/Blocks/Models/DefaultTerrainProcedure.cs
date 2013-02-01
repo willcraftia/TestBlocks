@@ -85,7 +85,8 @@ namespace Willcraftia.Xna.Blocks.Models
                             topBlockExists = false;
                         }
 
-                        chunk[x, y, z] = blockIndex;
+                        var position = new VectorI3(x, y, z);
+                        chunk.SetBlockIndex(ref position, blockIndex);
                     }
                 }
             }

@@ -237,7 +237,7 @@ namespace Willcraftia.Xna.Blocks.Models
             VectorI3 absoluteBlockPosition;
             Chunk.GetAbsoluteBlockPosition(ref relativeBlockPosition, out absoluteBlockPosition);
 
-            var blockIndex = Chunk[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z];
+            var blockIndex = Chunk.GetBlockIndex(ref relativeBlockPosition);
 
             // 空ならば頂点は存在しない。
             if (Block.EmptyIndex == blockIndex) return;

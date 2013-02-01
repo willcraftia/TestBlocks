@@ -72,51 +72,6 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return region; }
         }
 
-        /// <summary>
-        /// ブロックのインデックスを取得または設定します。
-        /// </summary>
-        /// <remarks>
-        /// ブロック位置は、チャンク内相対座標で指定します。
-        /// </remarks>
-        /// <param name="x">チャンク内相対ブロック位置 X。</param>
-        /// <param name="y">チャンク内相対ブロック位置 Y。</param>
-        /// <param name="z">チャンク内相対ブロック位置 Z。</param>
-        /// <returns></returns>
-        public byte this[int x, int y, int z]
-        {
-            get
-            {
-                if (data == null) return Block.EmptyIndex;
-
-                return data[x, y, z];
-            }
-            set
-            {
-                if (data == null)
-                {
-                    // データが null で空ブロックを設定しようとする場合は、
-                    // データに変更がないため、即座に処理を終えます。
-                    if (value == Block.EmptyIndex) return;
-
-                    // 非空ブロックを設定しようとする場合は、
-                    // チャンク マネージャからデータを借りる必要があります。
-                    data = manager.BorrowData();
-                    dataChanged = true;
-                }
-
-                data[x, y, z] = value;
-
-                if (data.SolidCount == 0)
-                {
-                    // 全てが空ブロックになったならば、
-                    // データをチャンク マネージャへ返します。
-                    manager.ReturnData(data);
-                    data = null;
-                    dataChanged = true;
-                }
-            }
-        }
-
         public SceneNode Node { get; private set; }
 
         /// <summary>
@@ -282,12 +237,35 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte GetBlockIndex(ref VectorI3 position)
         {
-            return this[position.X, position.Y, position.Z];
+            if (data == null) return Block.EmptyIndex;
+
+            return data.GetBlockIndex(ref position);
         }
 
         public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
         {
-            this[position.X, position.Y, position.Z] = blockIndex;
+            if (data == null)
+            {
+                // データが null で空ブロックを設定しようとする場合は、
+                // データに変更がないため、即座に処理を終えます。
+                if (blockIndex == Block.EmptyIndex) return;
+
+                // 非空ブロックを設定しようとする場合は、
+                // チャンク マネージャからデータを借りる必要があります。
+                data = manager.BorrowData();
+                dataChanged = true;
+            }
+
+            data.SetBlockIndex(ref position, blockIndex);
+
+            if (data.SolidCount == 0)
+            {
+                // 全てが空ブロックになったならば、
+                // データをチャンク マネージャへ返します。
+                manager.ReturnData(data);
+                data = null;
+                dataChanged = true;
+            }
         }
 
         public int GetRelativeBlockPositionX(int absoluteBlockPositionX)

@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Component;
 using Willcraftia.Xna.Framework.IO;
 
@@ -49,7 +50,8 @@ namespace Willcraftia.Xna.Blocks.Models
                                 blockIndex = Region.BlockCatalog.DirtIndex;
                         }
 
-                        chunk[x, y, z] = blockIndex;
+                        var position = new VectorI3(x, y, z);
+                        chunk.SetBlockIndex(ref position, blockIndex);
                     }
                 }
             }

@@ -21,49 +21,6 @@ namespace Willcraftia.Xna.Blocks.Models
         byte[] blockIndices;
 
         /// <summary>
-        /// ブロックのインデックスを取得または設定します。
-        /// ブロック位置は、チャンク空間における相対座標で指定します。
-        /// </summary>
-        /// <param name="x">チャンク空間における相対ブロック位置 X。</param>
-        /// <param name="y">チャンク空間における相対ブロック位置 Y。</param>
-        /// <param name="z">チャンク空間における相対ブロック位置 Z。</param>
-        /// <returns></returns>
-        public byte this[int x, int y, int z]
-        {
-            get
-            {
-                if (x < 0 || chunkManager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || chunkManager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || chunkManager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
-
-                var index = x + y * chunkManager.ChunkSize.X + z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
-                return blockIndices[index];
-            }
-            set
-            {
-                if (x < 0 || chunkManager.ChunkSize.X < x) throw new ArgumentOutOfRangeException("x");
-                if (y < 0 || chunkManager.ChunkSize.Y < y) throw new ArgumentOutOfRangeException("y");
-                if (z < 0 || chunkManager.ChunkSize.Z < z) throw new ArgumentOutOfRangeException("z");
-
-                var index = x + y * chunkManager.ChunkSize.X + z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
-
-                if (blockIndices[index] == value) return;
-
-                blockIndices[index] = value;
-                Dirty = true;
-
-                if (value != Block.EmptyIndex)
-                {
-                    SolidCount++;
-                }
-                else
-                {
-                    SolidCount--;
-                }
-            }
-        }
-
-        /// <summary>
         /// ブロックの総数を取得します。
         /// </summary>
         public int Count
@@ -95,6 +52,51 @@ namespace Willcraftia.Xna.Blocks.Models
             this.chunkManager = chunkManager;
 
             blockIndices = new byte[chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y * chunkManager.ChunkSize.Z];
+        }
+
+        /// <summary>
+        /// ブロックのインデックスを取得します。
+        /// </summary>
+        /// <param name="position">ブロックの位置。</param>
+        /// <returns>ブロックのインデックス。</returns>
+        public byte GetBlockIndex(ref VectorI3 position)
+        {
+            if (position.X < 0 || chunkManager.ChunkSize.X < position.X ||
+                position.Y < 0 || chunkManager.ChunkSize.Y < position.Y ||
+                position.Z < 0 || chunkManager.ChunkSize.Z < position.Z)
+                throw new ArgumentOutOfRangeException("position");
+
+            var index = position.X + position.Y * chunkManager.ChunkSize.X + position.Z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
+            return blockIndices[index];
+        }
+
+        /// <summary>
+        /// ブロックのインデックスを設定します。
+        /// </summary>
+        /// <param name="position">ブロックの位置。</param>
+        /// <param name="blockIndex">ブロックのインデックス。</param>
+        public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
+        {
+            if (position.X < 0 || chunkManager.ChunkSize.X < position.X ||
+                position.Y < 0 || chunkManager.ChunkSize.Y < position.Y ||
+                position.Z < 0 || chunkManager.ChunkSize.Z < position.Z)
+                throw new ArgumentOutOfRangeException("position");
+
+            var index = position.X + position.Y * chunkManager.ChunkSize.X + position.Z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
+
+            if (blockIndices[index] == blockIndex) return;
+
+            blockIndices[index] = blockIndex;
+            Dirty = true;
+
+            if (blockIndex != Block.EmptyIndex)
+            {
+                SolidCount++;
+            }
+            else
+            {
+                SolidCount--;
+            }
         }
 
         /// <summary>
