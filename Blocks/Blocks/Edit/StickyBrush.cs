@@ -167,7 +167,8 @@ namespace Willcraftia.Xna.Blocks.Edit
                 var chunk = chunkManager.GetChunkByBlockPosition(testPosition);
                 if (chunk == null) continue;
 
-                var relativePosition = chunk.GetRelativeBlockPosition(testPosition);
+                VectorI3 relativePosition;
+                chunk.GetRelativeBlockPosition(ref testPosition, out relativePosition);
 
                 var blockIndex = chunk.GetBlockIndex(ref relativePosition);
                 if (blockIndex != Block.EmptyIndex)
@@ -213,7 +214,8 @@ namespace Willcraftia.Xna.Blocks.Edit
                     var chunk = chunkManager.GetChunkByBlockPosition(testPosition);
                     if (chunk == null) continue;
 
-                    var relativePosition = chunk.GetRelativeBlockPosition(testPosition);
+                    VectorI3 relativePosition;
+                    chunk.GetRelativeBlockPosition(ref testPosition, out relativePosition);
                     var blockIndex = chunk.GetBlockIndex(ref relativePosition);
                     if (blockIndex == Block.EmptyIndex)
                     {

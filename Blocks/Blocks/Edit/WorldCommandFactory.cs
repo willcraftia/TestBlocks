@@ -36,7 +36,8 @@ namespace Willcraftia.Xna.Blocks.Edit
                 var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
                 if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
-                var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
+                VectorI3 relativePosition;
+                chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
 
                 lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
 
@@ -53,7 +54,8 @@ namespace Willcraftia.Xna.Blocks.Edit
                 var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
                 if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
-                var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
+                VectorI3 relativePosition;
+                chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
 
                 chunk.SetBlockIndex(ref relativePosition, lastBlockIndex);
                 chunkManager.RequestUpdateMesh(chunk.Position, ChunkManager.UpdateMeshPriority.High);

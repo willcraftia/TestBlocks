@@ -325,18 +325,6 @@ namespace Willcraftia.Xna.Blocks.Models
             };
         }
 
-        /// <summary>
-        /// 絶対ブロック位置から相対ブロック位置を取得します。
-        /// </summary>
-        /// <param name="absoluteBlockPosition">絶対ブロック位置。</param>
-        /// <returns>相対ブロック位置。</returns>
-        public VectorI3 GetRelativeBlockPosition(VectorI3 absoluteBlockPosition)
-        {
-            VectorI3 result;
-            GetRelativeBlockPosition(ref absoluteBlockPosition, out result);
-            return result;
-        }
-
         public int GetAbsoluteBlockPositionX(int relativeBlockPositionX)
         {
             return Position.X * manager.ChunkSize.X + relativeBlockPositionX;
@@ -360,18 +348,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 Y = GetAbsoluteBlockPositionY(relativeBlockPosition.Y),
                 Z = GetAbsoluteBlockPositionZ(relativeBlockPosition.Z)
             };
-        }
-
-        /// <summary>
-        /// 相対ブロック位置から絶対ブロック位置を取得します。
-        /// </summary>
-        /// <param name="relativeBlockPosition">相対ブロック位置。</param>
-        /// <returns>絶対ブロック位置。</returns>
-        public VectorI3 GetAbsoluteBlockPosition(VectorI3 relativeBlockPosition)
-        {
-            VectorI3 result;
-            GetAbsoluteBlockPosition(ref relativeBlockPosition, out result);
-            return result;
         }
 
         /// <summary>

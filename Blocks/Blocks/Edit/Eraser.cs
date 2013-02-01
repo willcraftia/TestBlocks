@@ -34,7 +34,8 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             var chunkPosition = chunkManager.GetChunkPositionByBlockPosition(Position);
             var chunk = chunkManager[chunkPosition] as Chunk;
-            var relativePosition = chunk.GetRelativeBlockPosition(Position);
+            VectorI3 relativePosition;
+            chunk.GetRelativeBlockPosition(ref Position, out relativePosition);
 
             // 既にブロックが存在しないならば抑制。
             if (chunk.GetBlockIndex(ref relativePosition) == Block.EmptyIndex) return;
