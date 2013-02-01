@@ -702,6 +702,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         protected virtual void UpdateOverride(GameTime gameTime) { }
 
+        protected virtual void OnActivated(Partition partition) { }
+
+        protected virtual void OnPassivating(Partition partition) { }
+
+        protected virtual void OnPassivated(Partition partition) { }
+
         /// <summary>
         /// 非アクティブ化の完了を検査します。
         /// </summary>
@@ -723,11 +729,14 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 非アクティブ化の開始で取得したロックを解放。
                 partition.ExitLock();
 
+                // 完了を通知。
+                partition.OnPassivated();
+
                 // 隣接パーティションへ通知。
                 NortifyNeighborPassivated(partition);
 
-                // 完了を通知。
-                partition.OnPassivated();
+                // サブクラスへも通知。
+                OnPassivated(partition);
 
                 // 解放。
                 Release(partition);
@@ -762,6 +771,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // 隣接パーティションへ通知。
                 NotifyNeighborActivated(partition);
+
+                // サブクラスへも通知。
+                OnActivated(partition);
             }
         }
 
@@ -855,6 +867,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // 開始を通知。
                 partition.OnPassivating();
+
+                // サブクラスへも通知。
+                OnPassivating(partition);
 
                 // 非同期処理を要求。
                 passivationTaskQueue.Enqueue(partition.PassivateAction);
