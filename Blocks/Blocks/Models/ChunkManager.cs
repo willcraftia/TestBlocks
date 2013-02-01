@@ -344,7 +344,8 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = partition as Chunk;
             if (0 < chunk.SolidCount)
             {
-                RequestUpdateMesh(chunk.Position, UpdateMeshPriority.Normal);
+                var bounds = BoundingBoxI.CreateFromCenterExtents(partition.Position, new VectorI3(1));
+                RequestUpdateMesh(bounds, UpdateMeshPriority.Normal);
             }
 
             // ノードを追加。

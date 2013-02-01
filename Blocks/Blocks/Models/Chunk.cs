@@ -196,8 +196,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Initialize(VectorI3 position, Region region)
         {
             Position = position;
-
-            // 対象リージョンの取得。
             this.region = region;
 
             ActivationCompleted = false;
@@ -423,30 +421,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             base.PassivateOverride();
-        }
-
-        /// <summary>
-        /// メッシュ更新をチャンク マネージャへ要求します。
-        /// </summary>
-        protected override void OnNeighborActivated(Partition neighbor, CubicSide side)
-        {
-            // メッシュ更新要求を追加。
-            // データが空の場合は更新するメッシュが無い。
-            if (data != null) RequestUpdateMesh();
-
-            base.OnNeighborActivated(neighbor, side);
-        }
-
-        /// <summary>
-        /// メッシュ更新をチャンク マネージャへ要求します。
-        /// </summary>
-        protected override void OnNeighborPassivated(Partition neighbor, CubicSide side)
-        {
-            // メッシュ更新要求を追加。
-            // データが空の場合は更新するメッシュが無い。
-            if (data != null) RequestUpdateMesh();
-
-            base.OnNeighborPassivated(neighbor, side);
         }
 
         void AttachMesh(ChunkMesh mesh)
