@@ -327,7 +327,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             // メッシュ更新が必要なチャンクを探索して更新要求を追加。
             // ただし、クローズが開始したら行わない。
-            if (!Closing) CheckDirtyMeshes(gameTime);
+            if (!Closing) CheckUpdateMesheRequests(gameTime);
 
             // 頂点ビルダのタスク キューを更新。
             verticesBuilderTaskQueue.Update();
@@ -478,7 +478,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void CheckDirtyMeshes(GameTime gameTime)
+        void CheckUpdateMesheRequests(GameTime gameTime)
         {
             // メッシュ更新が必要なチャンクを探索。
 
