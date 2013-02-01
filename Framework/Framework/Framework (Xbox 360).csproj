@@ -209,6 +209,7 @@
     <Compile Include="Graphics\VertexPositionNormal.cs" />
     <Compile Include="Graphics\VertexPositionNormalColorTexture.cs" />
     <Compile Include="Graphics\WritableVertexBuffer.cs" />
+    <Compile Include="HalfByteArray3.cs" />
     <Compile Include="IInitializingObject.cs" />
     <Compile Include="IO\ContentResource.cs" />
     <Compile Include="IO\ContentResourceLoader.cs" />
