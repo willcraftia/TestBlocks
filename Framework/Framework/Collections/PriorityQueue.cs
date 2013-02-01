@@ -10,13 +10,14 @@ namespace Willcraftia.Xna.Framework.Collections
     /// <summary>
     /// 優先度付き待ち行列です。
     /// この待ち行列の先頭は、指定された順序付けにおける最小の要素です。
-    /// 
+    /// </summary>
+    /// <remarks>
     /// このクラスの実装は、下記サイトを参考にしています。
     /// 
     /// http://ufcpp.net/study/algorithm/col_heap.html
     /// 
     /// なお、上記サイトでは、指定された順序付けにおける最大の要素を待ち行列の先頭にしています。
-    /// </summary>
+    /// </remarks>
     /// <typeparam name="T">キュー内の要素の型。</typeparam>
     public sealed class PriorityQueue<T> : IEnumerable<T>
     {
