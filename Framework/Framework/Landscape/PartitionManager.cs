@@ -640,7 +640,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public bool Contains(ref VectorI3 position)
         {
-            return clusterManager.Contains(position);
+            return clusterManager.Contains(ref position);
         }
 
         /// <summary>
@@ -860,7 +860,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (!partition.EnterLock()) continue;
 
                 // アクティブではない状態にする。
-                clusterManager.Remove(partition.Position);
+                clusterManager.Remove(ref partition.Position);
 
                 // 実行キューへ追加。
                 passivations.Enqueue(partition);

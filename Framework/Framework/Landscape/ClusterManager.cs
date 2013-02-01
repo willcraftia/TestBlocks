@@ -114,7 +114,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <returns>
             /// true (パーティションが存在する場合)、false (それ以外の場合)。
             /// </returns>
-            public bool Contains(VectorI3 position)
+            public bool Contains(ref VectorI3 position)
             {
                 lock (partitionsByPosition)
                 {
@@ -242,12 +242,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool Contains(VectorI3 position)
+        public bool Contains(ref VectorI3 position)
         {
-            var cluster = GetCluster(position);
+            var cluster = GetCluster(ref position);
             if (cluster == null) return false;
 
-            return cluster.Contains(position);
+            return cluster.Contains(ref position);
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </returns>
         public Partition GetPartition(ref VectorI3 position)
         {
-            var cluster = GetCluster(position);
+            var cluster = GetCluster(ref position);
             if (cluster == null) return null;
 
             return cluster.GetPartition(ref position);
@@ -295,9 +295,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// クラスタを削除してプールへ戻します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
-        public bool Remove(VectorI3 position)
+        public bool Remove(ref VectorI3 position)
         {
-            var cluster = GetCluster(position);
+            var cluster = GetCluster(ref position);
             if (cluster == null) return false;
 
             var result = cluster.Remove(position);
@@ -338,7 +338,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// クラスタ、あるいは、該当するクラスタが存在しない場合は null。
         /// </returns>
-        Cluster GetCluster(VectorI3 position)
+        Cluster GetCluster(ref VectorI3 position)
         {
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref position, out clusterPosition);
