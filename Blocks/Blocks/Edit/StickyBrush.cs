@@ -74,8 +74,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public byte BlockIndex { get; set; }
 
-        public int UpdateMeshPriority { get; set; }
-
         public bool CanPaint { get; set; }
 
         public StickyBrush(CommandManager commandManager, WorldCommandFactory commandFactory,
@@ -94,8 +92,6 @@ namespace Willcraftia.Xna.Blocks.Edit
             this.chunkManager = chunkManager;
 
             if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
-
-            UpdateMeshPriority = ChunkManager.UserEditUpdateMeshPriority;
 
             triangleInfos = new TriangleInfo[2 * 6];
 
@@ -243,7 +239,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             command.BlockPosition = paintPosition;
             command.BlockIndex = BlockIndex;
-            command.UpdateMeshPriority = UpdateMeshPriority;
 
             commandManager.RequestCommand(command);
         }

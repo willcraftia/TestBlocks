@@ -33,8 +33,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public byte BlockIndex { get; set; }
 
-        public int UpdateMeshPriority { get; set; }
-
         public FreeBrush(CommandManager commandManager, WorldCommandFactory commandFactory,
             SceneNode node, BrushMesh mesh, ChunkManager chunkManager)
         {
@@ -51,8 +49,6 @@ namespace Willcraftia.Xna.Blocks.Edit
             this.chunkManager = chunkManager;
 
             if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
-
-            UpdateMeshPriority = ChunkManager.UserEditUpdateMeshPriority;
         }
 
         // まずはカメラを更新。
@@ -92,7 +88,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             command.BlockPosition = position;
             command.BlockIndex = BlockIndex;
-            command.UpdateMeshPriority = UpdateMeshPriority;
 
             commandManager.RequestCommand(command);
         }

@@ -21,35 +21,25 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class ChunkManager : PartitionManager
     {
-        #region UpdateMeshRequest
+        #region UpdateMeshPriority
 
-        struct UpdateMeshRequest
+        /// <summary>
+        /// メッシュ更新の優先度を示す列挙型です。
+        /// </summary>
+        public enum UpdateMeshPriority
         {
-            public VectorI3 Position;
+            /// <summary>
+            /// 通常優先度。
+            /// </summary>
+            Normal,
 
-            public int Priority;
+            /// <summary>
+            /// 高優先度。
+            /// </summary>
+            High
         }
 
         #endregion
-
-        #region UpdateMeshRequestPriorityComparer
-
-        sealed class UpdateMeshRequestPriorityComparer : IComparer<UpdateMeshRequest>
-        {
-            public int Compare(UpdateMeshRequest x, UpdateMeshRequest y)
-            {
-                if (x.Priority == y.Priority) return 0;
-                return x.Priority < y.Priority ? -1 : 1;
-            }
-        }
-
-        #endregion
-
-        public const int UserEditUpdateMeshPriority = 0;
-
-        public const int SystemEditUpdateMeshPriority = 10;
-
-        public const int ActivationUpdateMeshPriority = 100;
 
         /// <summary>
         /// チャンク サイズ。
@@ -99,15 +89,14 @@ namespace Willcraftia.Xna.Blocks.Models
         ConcurrentPool<ChunkData> dataPool;
 
         /// <summary>
-        /// 頂点ビルダ実行待ちチャンクのキュー。
-        /// このキューではチャンクそのものではなく、その位置を管理する。
-        /// 頂点ビルダ実行判定では、管理している位置からアクティブ リストを参照し、
-        /// 処理対象のチャンクを取得するという手順を採る。
-        /// つまり、非アクティブ化が開始したチャンクは、
-        /// その開始によりアクティブ リストから除外されるため、
-        /// 頂点ビルダ実行判定からも除外される。
+        /// 通常優先度のメッシュ更新要求のキュー。
         /// </summary>
-        PriorityQueue<UpdateMeshRequest> waitBuildVerticesQueue;
+        Queue<VectorI3> normalUpdateMeshRequests;
+
+        /// <summary>
+        /// 高優先度のメッシュ更新要求のキュー。
+        /// </summary>
+        Queue<VectorI3> highUpdateMeshRequests;
 
         /// <summary>
         /// 頂点ビルダ実行中チャンクのキュー。
@@ -230,7 +219,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 SlotCount = verticesBuilderCount
             };
 
-            waitBuildVerticesQueue = new PriorityQueue<UpdateMeshRequest>(new UpdateMeshRequestPriorityComparer());
+            normalUpdateMeshRequests = new Queue<VectorI3>();
+            highUpdateMeshRequests = new Queue<VectorI3>();
+
             buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
 
             BaseNode = sceneManager.CreateSceneNode("ChunkRoot");
@@ -353,7 +344,7 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = partition as Chunk;
             if (0 < chunk.SolidCount)
             {
-                RequestUpdateMesh(chunk.Position, ActivationUpdateMeshPriority);
+                RequestUpdateMesh(chunk.Position, UpdateMeshPriority.Normal);
             }
 
             // ノードを追加。
@@ -411,19 +402,23 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンクのメッシュ更新要求を追加します。
         /// </summary>
         /// <param name="position">チャンクの位置。</param>
-        internal void RequestUpdateMesh(VectorI3 position, int priority)
+        /// <param name="priority">優先度。</param>
+        internal void RequestUpdateMesh(VectorI3 position, UpdateMeshPriority priority)
         {
-            var request = new UpdateMeshRequest
+            switch (priority)
             {
-                Position = position,
-                Priority = priority
-            };
-
-            if (!waitBuildVerticesQueue.Contains(request))
-                waitBuildVerticesQueue.Enqueue(request);
+                case UpdateMeshPriority.Normal:
+                    if (!normalUpdateMeshRequests.Contains(position))
+                        normalUpdateMeshRequests.Enqueue(position);
+                    break;
+                case UpdateMeshPriority.High:
+                    if (!highUpdateMeshRequests.Contains(position))
+                        highUpdateMeshRequests.Enqueue(position);
+                    break;
+            }
         }
 
-        internal void RequestUpdateMesh(BoundingBoxI bounds, int priority)
+        internal void RequestUpdateMesh(BoundingBoxI bounds, UpdateMeshPriority priority)
         {
             for (int z = bounds.Min.Z; z < (bounds.Min.Z + bounds.Size.Z); z++)
             {
@@ -480,30 +475,33 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="gameTime">ゲーム時間。</param>
         void CheckUpdateMesheRequests(GameTime gameTime)
         {
-            // メッシュ更新が必要なチャンクを探索。
+            CheckUpdateMesheRequests(gameTime, highUpdateMeshRequests);
+            CheckUpdateMesheRequests(gameTime, normalUpdateMeshRequests);
+        }
 
+        void CheckUpdateMesheRequests(GameTime gameTime, Queue<VectorI3> requestQueue)
+        {
             var searchCapacity = meshUpdateSearchCapacity;
-            if (gameTime.IsRunningSlowly) searchCapacity /= 2;
 
-            int count = waitBuildVerticesQueue.Count;
+            int count = requestQueue.Count;
             for (int i = 0; i < count && i < meshUpdateSearchCapacity; i++)
             {
-                var request = waitBuildVerticesQueue.Peek();
+                var position = requestQueue.Peek();
 
                 // アクティブ チャンクを取得。
-                var chunk = this[request.Position] as Chunk;
+                var chunk = this[position] as Chunk;
                 if (chunk == null)
                 {
                     // 存在しない場合はメッシュ更新要求を取り消す。
-                    waitBuildVerticesQueue.Dequeue();
+                    requestQueue.Dequeue();
                     continue;
                 }
 
                 // チャンクがメッシュ更新中ならば待機キューへ戻す。
                 if (buildVerticesQueue.Contains(chunk))
                 {
-                    waitBuildVerticesQueue.Dequeue();
-                    waitBuildVerticesQueue.Enqueue(request);
+                    requestQueue.Dequeue();
+                    requestQueue.Enqueue(position);
                     continue;
                 }
 
@@ -525,8 +523,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (!chunk.EnterLock())
                 {
                     // ロックを取得できない場合は待機キューへ戻す。
-                    waitBuildVerticesQueue.Dequeue();
-                    waitBuildVerticesQueue.Enqueue(request);
+                    requestQueue.Dequeue();
+                    requestQueue.Enqueue(position);
                     continue;
                 }
 
@@ -537,7 +535,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
 
                 buildVerticesQueue.Enqueue(chunk);
-                waitBuildVerticesQueue.Dequeue();
+                requestQueue.Dequeue();
             }
         }
 

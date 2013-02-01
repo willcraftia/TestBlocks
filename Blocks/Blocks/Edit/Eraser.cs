@@ -18,8 +18,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public VectorI3 Position;
 
-        public int UpdateMeshPriority { get; set; }
-
         public Eraser(CommandManager commandManager, WorldCommandFactory commandFactory,
             ChunkManager chunkManager)
         {
@@ -30,8 +28,6 @@ namespace Willcraftia.Xna.Blocks.Edit
             this.commandManager = commandManager;
             this.commandFactory = commandFactory;
             this.chunkManager = chunkManager;
-
-            UpdateMeshPriority = ChunkManager.UserEditUpdateMeshPriority;
         }
 
         public void Erase()
@@ -47,7 +43,6 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             command.BlockPosition = Position;
             command.BlockIndex = Block.EmptyIndex;
-            command.UpdateMeshPriority = UpdateMeshPriority;
 
             commandManager.RequestCommand(command);
         }
