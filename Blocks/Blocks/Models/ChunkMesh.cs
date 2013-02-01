@@ -24,9 +24,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool occlusionQueryActive;
 
-        VertexBuffer vertexBuffer;
+        DynamicVertexBuffer vertexBuffer;
 
-        IndexBuffer indexBuffer;
+        DynamicIndexBuffer indexBuffer;
 
         public Matrix World
         {
@@ -123,8 +123,25 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (vertexCount != 0)
             {
-                vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.None);
-                vertexBuffer.SetData(vertices, 0, vertexCount);
+                if (vertexBuffer != null && vertexBuffer.VertexCount != vertexCount)
+                {
+                    vertexBuffer.Dispose();
+                    vertexBuffer = null;
+                }
+
+                if (vertexBuffer == null)
+                    vertexBuffer = new DynamicVertexBuffer(
+                        graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.None);
+                
+                vertexBuffer.SetData(vertices, 0, vertexCount, SetDataOptions.Discard);
+            }
+            else
+            {
+                if (vertexBuffer != null)
+                {
+                    vertexBuffer.Dispose();
+                    vertexBuffer = null;
+                }
             }
         }
 
@@ -138,8 +155,25 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (indexCount != 0)
             {
-                indexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
-                indexBuffer.SetData(indices, 0, indexCount);
+                if (indexBuffer != null && indexBuffer.IndexCount != indexCount)
+                {
+                    indexBuffer.Dispose();
+                    indexBuffer = null;
+                }
+
+                if (indexBuffer == null)
+                    indexBuffer = new DynamicIndexBuffer(
+                        graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
+
+                indexBuffer.SetData(indices, 0, indexCount, SetDataOptions.Discard);
+            }
+            else
+            {
+                if (indexBuffer != null)
+                {
+                    indexBuffer.Dispose();
+                    indexBuffer = null;
+                }
             }
         }
 
