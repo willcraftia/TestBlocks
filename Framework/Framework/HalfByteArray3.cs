@@ -128,5 +128,13 @@ namespace Willcraftia.Xna.Framework
 
             array = new byte[halfSize];
         }
+
+        /// <summary>
+        /// 全ての要素を 0 でリセットします。
+        /// </summary>
+        public void Clear()
+        {
+            Array.Clear(array, 0, array.Length);
+        }
     }
 }
