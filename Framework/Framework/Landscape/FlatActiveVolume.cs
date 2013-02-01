@@ -40,7 +40,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public bool Contains(VectorI3 eyePosition, VectorI3 point)
+        public bool Contains(ref VectorI3 eyePosition, ref VectorI3 point)
         {
             eyePosition.Y = 0;
             point.Y = 0;
@@ -52,7 +52,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public void ForEach(Action<VectorI3> action)
+        public void ForEach(ForEachAction action)
         {
             throw new NotImplementedException();
         }

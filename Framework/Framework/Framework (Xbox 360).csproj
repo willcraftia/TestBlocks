@@ -228,6 +228,7 @@
     <Compile Include="Landscape\DefaultActiveVolume.cs" />
     <Compile Include="Landscape\DomeActiveVolume.cs" />
     <Compile Include="Landscape\FlatActiveVolume.cs" />
+    <Compile Include="Landscape\ForEachAction.cs" />
     <Compile Include="Landscape\IActiveVolume.cs" />
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />

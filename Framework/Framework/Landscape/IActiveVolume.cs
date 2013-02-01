@@ -21,13 +21,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションの位置が領域に含まれる場合)、false (それ以外の場合)。
         /// </returns>
-        bool Contains(VectorI3 eyePosition, VectorI3 point);
+        bool Contains(ref VectorI3 eyePosition, ref VectorI3 point);
 
         /// <summary>
         /// 領域に含まれるパーティション位置に対して指定のメソッドを実行します。
         /// メソッドに渡されるパーティション位置はオフセット値です。
         /// </summary>
         /// <param name="action">実行するメソッド。</param>
-        void ForEach(Action<VectorI3> action);
+        void ForEach(ForEachAction action);
     }
 }

@@ -241,7 +241,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <summary>
             /// Collect メソッドのデリゲート。
             /// </summary>
-            Action<VectorI3> collectAction;
+            ForEachAction collectAction;
 
             /// <summary>
             /// 非同期処理中であるか否かを示す値。
@@ -266,7 +266,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             public Activator(PartitionManager manager)
             {
                 this.manager = manager;
-                collectAction = new Action<VectorI3>(Collect);
+                collectAction = new ForEachAction(Collect);
 
                 candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
             }
@@ -315,7 +315,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// 候補となる場合には候補キューへ入れます。
             /// </summary>
             /// <param name="offset"></param>
-            void Collect(VectorI3 offset)
+            void Collect(ref VectorI3 offset)
             {
                 var position = eyePosition + offset;
 
@@ -844,7 +844,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (maxActiveVolume.Contains(eyePosition, partition.Position))
+                    if (maxActiveVolume.Contains(ref eyePosition, ref partition.Position))
                     {
                         // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.Enqueue(partition);
