@@ -250,7 +250,12 @@ namespace Willcraftia.Xna.Blocks.Models
             VectorI3 chunkPosition;
             GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
 
-            return this[chunkPosition] as Chunk;
+            return GetChunk(ref chunkPosition);
+        }
+
+        public Chunk GetChunk(ref VectorI3 chunkPosition)
+        {
+            return GetPartition(ref chunkPosition) as Chunk;
         }
 
         /// <summary>
@@ -490,7 +495,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var position = requestQueue.Peek();
 
                 // アクティブ チャンクを取得。
-                var chunk = this[position] as Chunk;
+                var chunk = GetChunk(ref position);
                 if (chunk == null)
                 {
                     // 存在しない場合はメッシュ更新要求を取り消す。

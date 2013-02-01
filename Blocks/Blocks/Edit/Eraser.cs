@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Edit
         public void Erase()
         {
             var chunkPosition = chunkManager.GetChunkPositionByBlockPosition(Position);
-            var chunk = chunkManager[chunkPosition] as Chunk;
+            var chunk = chunkManager.GetChunk(ref chunkPosition);
             VectorI3 relativePosition;
             chunk.GetRelativeBlockPosition(ref Position, out relativePosition);
 

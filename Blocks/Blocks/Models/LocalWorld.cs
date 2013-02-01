@@ -61,7 +61,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         position.Y = min.Y + y;
                         position.Z = min.Z + z;
 
-                        chunks[x, y, z] = manager[position] as Chunk;
+                        chunks[x, y, z] = manager.GetChunk(ref position);
                     }
                 }
             }

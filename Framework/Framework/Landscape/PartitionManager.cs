@@ -475,9 +475,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
         /// </returns>
-        public Partition this[VectorI3 position]
+        public Partition GetPartition(ref VectorI3 position)
         {
-            get { return clusterManager[position]; }
+            return clusterManager[position];
         }
 
         /// <summary>
