@@ -290,16 +290,6 @@ namespace Willcraftia.Xna.Blocks.Models
             this[position.X, position.Y, position.Z] = blockIndex;
         }
 
-        /// <summary>
-        /// メッシュの更新を要求します。
-        /// ブロックの状態を変更した場合、このメソッドを呼び出し、
-        /// メッシュの更新をチャンク マネージャへ依頼します。
-        /// </summary>
-        public void RequestUpdateMesh()
-        {
-            manager.RequestUpdateMesh(Position, ChunkManager.UpdateMeshPriority.Normal);
-        }
-
         public int GetRelativeBlockPositionX(int absoluteBlockPositionX)
         {
             return absoluteBlockPositionX - (Position.X * manager.ChunkSize.X);

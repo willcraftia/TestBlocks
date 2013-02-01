@@ -238,14 +238,7 @@ namespace Willcraftia.Xna.Blocks.Models
             };
         }
 
-        public VectorI3 GetChunkPositionByBlockPosition(VectorI3 blockPosition)
-        {
-            VectorI3 result;
-            GetChunkPositionByBlockPosition(ref blockPosition, out result);
-            return result;
-        }
-
-        public Chunk GetChunkByBlockPosition(VectorI3 blockPosition)
+        public Chunk GetChunkByBlockPosition(ref VectorI3 blockPosition)
         {
             VectorI3 chunkPosition;
             GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
@@ -264,11 +257,11 @@ namespace Willcraftia.Xna.Blocks.Models
         /// ・指定の位置を含むリージョンがある場合、アクティブ化可能であると判定。
         /// 
         /// </summary>
-        protected override bool CanActivate(VectorI3 position)
+        protected override bool CanActivate(ref VectorI3 position)
         {
-            if (regionManager.GetRegionByChunkPosition(position) == null) return false;
+            if (regionManager.GetRegionByChunkPosition(ref position) == null) return false;
 
-            return base.CanActivate(position);
+            return base.CanActivate(ref position);
         }
 
         /// <summary>
@@ -277,14 +270,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// ・プールからチャンクを取得して返却。ただし、プールが枯渇している場合は null。
         /// 
         /// </summary>
-        protected override Partition Create(VectorI3 position)
+        protected override Partition Create(ref VectorI3 position)
         {
             // プールから取得。
             var chunk = chunkPool.Borrow();
             if (chunk == null) return null;
 
             // 対象リージョンの取得。
-            var region = regionManager.GetRegionByChunkPosition(position);
+            var region = regionManager.GetRegionByChunkPosition(ref position);
             if (region == null) throw new InvalidOperationException("Region not found: ChunkPosition = " + position);
 
             // 初期化。
@@ -350,7 +343,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (0 < chunk.SolidCount)
             {
                 var bounds = BoundingBoxI.CreateFromCenterExtents(partition.Position, new VectorI3(1));
-                RequestUpdateMesh(bounds, UpdateMeshPriority.Normal);
+                RequestUpdateMesh(ref bounds, UpdateMeshPriority.Normal);
             }
 
             // ノードを追加。
@@ -409,7 +402,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         /// <param name="position">チャンクの位置。</param>
         /// <param name="priority">優先度。</param>
-        internal void RequestUpdateMesh(VectorI3 position, UpdateMeshPriority priority)
+        internal void RequestUpdateMesh(ref VectorI3 position, UpdateMeshPriority priority)
         {
             switch (priority)
             {
@@ -424,7 +417,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        internal void RequestUpdateMesh(BoundingBoxI bounds, UpdateMeshPriority priority)
+        internal void RequestUpdateMesh(ref BoundingBoxI bounds, UpdateMeshPriority priority)
         {
             for (int z = bounds.Min.Z; z < (bounds.Min.Z + bounds.Size.Z); z++)
             {
@@ -432,7 +425,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     for (int x = bounds.Min.X; x < (bounds.Min.X + bounds.Size.X); x++)
                     {
-                        RequestUpdateMesh(new VectorI3(x, y, z), priority);
+                        var position = new VectorI3(x, y, z);
+                        RequestUpdateMesh(ref position, priority);
                     }
                 }
             }

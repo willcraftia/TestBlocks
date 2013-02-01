@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             public override bool Do()
             {
-                var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
+                var chunk = chunkManager.GetChunkByBlockPosition(ref BlockPosition);
                 if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
                 VectorI3 relativePosition;
@@ -42,7 +42,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                 lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
 
                 chunk.SetBlockIndex(ref relativePosition, BlockIndex);
-                chunkManager.RequestUpdateMesh(chunk.Position, ChunkManager.UpdateMeshPriority.High);
+                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkManager.UpdateMeshPriority.High);
 
                 RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
 
@@ -51,14 +51,14 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             public override void Undo()
             {
-                var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
+                var chunk = chunkManager.GetChunkByBlockPosition(ref BlockPosition);
                 if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
                 VectorI3 relativePosition;
                 chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
 
                 chunk.SetBlockIndex(ref relativePosition, lastBlockIndex);
-                chunkManager.RequestUpdateMesh(chunk.Position, ChunkManager.UpdateMeshPriority.High);
+                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkManager.UpdateMeshPriority.High);
 
                 RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
             }
@@ -101,8 +101,8 @@ namespace Willcraftia.Xna.Blocks.Edit
             void RequestUpdateMeshForNeighbor(ref VectorI3 basePosition, CubicSide side)
             {
                 var neighborPosition = basePosition + side.Direction;
-                if (chunkManager.Contains(neighborPosition))
-                    chunkManager.RequestUpdateMesh(neighborPosition, ChunkManager.UpdateMeshPriority.High);
+                if (chunkManager.Contains(ref neighborPosition))
+                    chunkManager.RequestUpdateMesh(ref neighborPosition, ChunkManager.UpdateMeshPriority.High);
             }
         }
 

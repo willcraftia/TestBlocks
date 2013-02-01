@@ -164,7 +164,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 if (prevTestPosition == testPosition) continue;
 
-                var chunk = chunkManager.GetChunkByBlockPosition(testPosition);
+                var chunk = chunkManager.GetChunkByBlockPosition(ref testPosition);
                 if (chunk == null) continue;
 
                 VectorI3 relativePosition;
@@ -211,7 +211,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                 if (Intersects(ref ray, triangleInfos[i], ref world))
                 {
                     var testPosition = brushPosition + triangleInfos[i].Side.Direction;
-                    var chunk = chunkManager.GetChunkByBlockPosition(testPosition);
+                    var chunk = chunkManager.GetChunkByBlockPosition(ref testPosition);
                     if (chunk == null) continue;
 
                     VectorI3 relativePosition;

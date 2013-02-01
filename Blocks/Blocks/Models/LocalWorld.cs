@@ -67,11 +67,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public Chunk GetChunk(VectorI3 chunkPosition)
-        {
-            return GetChunk(ref chunkPosition);
-        }
-
         public Chunk GetChunk(ref VectorI3 chunkPosition)
         {
             var relative = chunkPosition - min;
@@ -84,11 +79,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             return chunks[relative.X, relative.Y, relative.Z];
-        }
-
-        public byte? GetBlockIndex(VectorI3 blockPosition)
-        {
-            return GetBlockIndex(ref blockPosition);
         }
 
         public byte? GetBlockIndex(ref VectorI3 blockPosition)

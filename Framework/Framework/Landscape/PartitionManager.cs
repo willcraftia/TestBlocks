@@ -320,13 +320,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var position = eyePosition + offset;
 
                 // 既にアクティブならばスキップ。
-                if (manager.Contains(position)) return;
+                if (manager.Contains(ref position)) return;
 
                 // 既に実行中ならばスキップ。
                 if (manager.activations.Contains(position)) return;
 
                 // アクティブ化可能であるかどうか。
-                if (!manager.CanActivate(position)) return;
+                if (!manager.CanActivate(ref position)) return;
 
                 var candidate = new Candidate();
                 candidate.Position = position;
@@ -357,7 +357,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     var candidate = candidates.Dequeue();
 
                     // インスタンス生成。
-                    var partition = manager.Create(candidate.Position);
+                    var partition = manager.Create(ref candidate.Position);
 
                     // 生成が拒否されたら終了。
                     if (partition == null) break;
@@ -638,7 +638,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool Contains(VectorI3 position)
+        public bool Contains(ref VectorI3 position)
         {
             return clusterManager.Contains(position);
         }
@@ -673,7 +673,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、アクティブ化を抑制する場合には null。
         /// </returns>
-        protected abstract Partition Create(VectorI3 position);
+        protected abstract Partition Create(ref VectorI3 position);
 
         /// <summary>
         /// 非アクティブ化でパーティションを解放する際に呼び出されます。
@@ -691,7 +691,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (指定の位置でパーティションをアクティブ化できる場合)、false (それ以外の場合)。
         /// </returns>
-        protected virtual bool CanActivate(VectorI3 position)
+        protected virtual bool CanActivate(ref VectorI3 position)
         {
             return true;
         }
