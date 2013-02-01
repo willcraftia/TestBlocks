@@ -24,15 +24,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool occlusionQueryActive;
 
+        VertexBuffer vertexBuffer;
+
+        IndexBuffer indexBuffer;
+
         public Matrix World
         {
             get { return world; }
             set { world = value; }
         }
-
-        public VertexBuffer VertexBuffer { get; private set; }
-
-        public IndexBuffer IndexBuffer { get; private set; }
 
         public int VertexCount { get; private set; }
 
@@ -123,8 +123,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (vertexCount != 0)
             {
-                VertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.None);
-                VertexBuffer.SetData(vertices, 0, vertexCount);
+                vertexBuffer = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.None);
+                vertexBuffer.SetData(vertices, 0, vertexCount);
             }
         }
 
@@ -138,15 +138,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (indexCount != 0)
             {
-                IndexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
-                IndexBuffer.SetData(indices, 0, indexCount);
+                indexBuffer = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
+                indexBuffer.SetData(indices, 0, indexCount);
             }
         }
 
         void DrawCore()
         {
-            graphicsDevice.SetVertexBuffer(VertexBuffer);
-            graphicsDevice.Indices = IndexBuffer;
+            graphicsDevice.SetVertexBuffer(vertexBuffer);
+            graphicsDevice.Indices = indexBuffer;
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, VertexCount, 0, PrimitiveCount);
         }
 
@@ -171,8 +171,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (disposing)
             {
-                if (VertexBuffer != null) VertexBuffer.Dispose();
-                if (IndexBuffer != null) IndexBuffer.Dispose();
+                if (vertexBuffer != null) vertexBuffer.Dispose();
+                if (indexBuffer != null) indexBuffer.Dispose();
             }
 
             disposed = true;
