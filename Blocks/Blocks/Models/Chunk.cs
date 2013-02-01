@@ -370,29 +370,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// メッシュ更新をチャンク マネージャへ要求します。
-        /// </summary>
-        protected override void OnActivated()
-        {
-            // メッシュ更新要求を追加。
-            // データが空の場合は更新するメッシュが無い。
-            if (data != null) RequestUpdateMesh();
-
-            // アクティブ化完了でノードを追加。
-            manager.BaseNode.Children.Add(Node);
-
-            base.OnActivated();
-        }
-
-        protected override void OnPassivating()
-        {
-            // 非アクティブ化開始でノードを削除。
-            manager.BaseNode.Children.Remove(Node);
-
-            base.OnPassivating();
-        }
-
-        /// <summary>
         /// リージョンが提供するチャンク ストアに永続化されている場合、
         /// チャンク ストアからチャンクをロードします。
         /// リージョンが提供するチャンク ストアに永続化されていない場合、
