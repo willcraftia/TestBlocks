@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <summary>
             /// パーティション数を取得します。
             /// </summary>
-            public int Count
+            public int PartitionCount
             {
                 get
                 {
@@ -114,7 +114,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <returns>
             /// true (パーティションが存在する場合)、false (それ以外の場合)。
             /// </returns>
-            public bool Contains(ref VectorI3 position)
+            public bool ContainsPartition(ref VectorI3 position)
             {
                 lock (partitionsByPosition)
                 {
@@ -143,7 +143,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// パーティションを追加します。
             /// </summary>
             /// <param name="partition">パーティション。</param>
-            public void Add(Partition partition)
+            public void AddPartition(Partition partition)
             {
                 lock (partitionsByPosition)
                 {
@@ -155,7 +155,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// 指定の位置にあるパーティションを削除します。
             /// </summary>
             /// <param name="position">パーティションの位置。</param>
-            public bool Remove(VectorI3 position)
+            public bool RemovePartition(VectorI3 position)
             {
                 lock (partitionsByPosition)
                 {
@@ -166,7 +166,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <summary>
             /// 全てのパーティションを削除します。
             /// </summary>
-            public void Clear()
+            public void ClearPartitions()
             {
                 lock (partitionsByPosition)
                 {
@@ -242,12 +242,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool Contains(ref VectorI3 position)
+        public bool ContainsPartition(ref VectorI3 position)
         {
             var cluster = GetCluster(ref position);
             if (cluster == null) return false;
 
-            return cluster.Contains(ref position);
+            return cluster.ContainsPartition(ref position);
         }
 
         /// <summary>
@@ -269,7 +269,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションを追加します。
         /// </summary>
         /// <param name="partition">パーティション。</param>
-        public void Add(Partition partition)
+        public void AddPartition(Partition partition)
         {
             VectorI3 clusterPosition;
             CalculateClusterPosition(ref partition.Position, out clusterPosition);
@@ -286,7 +286,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            cluster.Add(partition);
+            cluster.AddPartition(partition);
         }
 
         /// <summary>
@@ -295,14 +295,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// クラスタを削除してプールへ戻します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
-        public bool Remove(ref VectorI3 position)
+        public bool RemovePartition(ref VectorI3 position)
         {
             var cluster = GetCluster(ref position);
             if (cluster == null) return false;
 
-            var result = cluster.Remove(position);
+            var result = cluster.RemovePartition(position);
 
-            if (cluster.Count == 0)
+            if (cluster.PartitionCount == 0)
             {
                 lock (clustersByPosition)
                 {
@@ -318,12 +318,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// 全てのパーティションおよび全てのクラスタを削除します。
         /// </summary>
-        public void Clear()
+        public void ClearPartitions()
         {
             lock (clustersByPosition)
             {
                 foreach (var cluster in clustersByPosition.Values)
-                    cluster.Clear();
+                    cluster.ClearPartitions();
 
                 clustersByPosition.Clear();
             }

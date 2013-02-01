@@ -320,7 +320,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var position = eyePosition + offset;
 
                 // 既にアクティブならばスキップ。
-                if (manager.Contains(ref position)) return;
+                if (manager.ContainsPartition(ref position)) return;
 
                 // 既に実行中ならばスキップ。
                 if (manager.activations.Contains(position)) return;
@@ -638,9 +638,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool Contains(ref VectorI3 position)
+        public bool ContainsPartition(ref VectorI3 position)
         {
-            return clusterManager.Contains(ref position);
+            return clusterManager.ContainsPartition(ref position);
         }
 
         /// <summary>
@@ -763,7 +763,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // アクティブ リストへ追加。
-                clusterManager.Add(partition);
+                clusterManager.AddPartition(partition);
                 partitions.Enqueue(partition);
 
                 // 完了を通知。
@@ -860,7 +860,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (!partition.EnterLock()) continue;
 
                 // アクティブではない状態にする。
-                clusterManager.Remove(ref partition.Position);
+                clusterManager.RemovePartition(ref partition.Position);
 
                 // 実行キューへ追加。
                 passivations.Enqueue(partition);

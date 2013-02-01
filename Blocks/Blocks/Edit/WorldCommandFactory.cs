@@ -101,7 +101,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             void RequestUpdateMeshForNeighbor(ref VectorI3 basePosition, CubicSide side)
             {
                 var neighborPosition = basePosition + side.Direction;
-                if (chunkManager.Contains(ref neighborPosition))
+                if (chunkManager.ContainsPartition(ref neighborPosition))
                     chunkManager.RequestUpdateMesh(ref neighborPosition, ChunkManager.UpdateMeshPriority.High);
             }
         }
