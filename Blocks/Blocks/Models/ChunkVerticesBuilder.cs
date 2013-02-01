@@ -12,103 +12,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkVerticesBuilder
     {
-        #region CloseChunks
-
-        /// <summary>
-        /// 隣接チャンク集合を管理するクラスです。
-        /// </summary>
-        sealed class CloseChunks
-        {
-            /// <summary>
-            /// チャンクのサイズ。
-            /// </summary>
-            VectorI3 chunkSize;
-
-            /// <summary>
-            /// 隣接チャンク集合。
-            /// (1, 1, 1) が中心位置。
-            /// </summary>
-            Chunk[, ,] chunks = new Chunk[3, 3, 3];
-
-            /// <summary>
-            /// 指定の位置のチャンクを取得または設定します。
-            /// インデックスは、(0, 0, 0) を中心位置としたオフセット値として [-1, 1] で指定します。
-            /// </summary>
-            /// <param name="x">X オフセット。</param>
-            /// <param name="y">Y オフセット</param>
-            /// <param name="z">Z オフセット。</param>
-            /// <returns>チャンク。</returns>
-            public Chunk this[int x, int y, int z]
-            {
-                get { return chunks[x + 1, y + 1, z + 1]; }
-                set { chunks[x + 1, y + 1, z + 1] = value; }
-            }
-
-            /// <summary>
-            /// インスタンスを生成します。
-            /// </summary>
-            /// <param name="chunkSize">チャンクのサイズ。</param>
-            public CloseChunks(VectorI3 chunkSize)
-            {
-                if (chunkSize.X < 1 || chunkSize.Y < 1 || chunkSize.Z < 1)
-                    throw new ArgumentOutOfRangeException("chunkSize");
-
-                this.chunkSize = chunkSize;
-            }
-
-            /// <summary>
-            /// 状態を初期化します。
-            /// </summary>
-            public void Clear()
-            {
-                Array.Clear(chunks, 0, chunks.Length);
-            }
-
-            /// <summary>
-            /// 指定の位置にあるブロックのインデックスを取得します。
-            /// 指定するブロックの位置は、中心チャンク内における相対位置です。
-            /// 指定の位置が中心チャンク内に無い場合、隣接チャンクから取得を試みますが、
-            /// いずれの隣接チャンクにも含まれない場合には、未定として null を返します。
-            /// </summary>
-            /// <param name="blockPosition">中心チャンク内における相対ブロック位置。</param>
-            /// <returns>
-            /// ブロックのインデックス、あるいは、指定のブロック位置が範囲外ならば null。
-            /// </returns>
-            public byte? GetBlockIndex(ref VectorI3 blockPosition)
-            {
-                var x = (blockPosition.X < 0) ? -1 : (blockPosition.X < chunkSize.X) ? 0 : 1;
-                var y = (blockPosition.Y < 0) ? -1 : (blockPosition.Y < chunkSize.Y) ? 0 : 1;
-                var z = (blockPosition.Z < 0) ? -1 : (blockPosition.Z < chunkSize.Z) ? 0 : 1;
-
-                // メモ
-                //
-                // 実際には、隣接チャンク集合には、
-                // ゲーム スレッドにて非アクティブ化されてしまったものも含まれる可能性がある。
-                // しかし、それら全てを同期することは負荷が高いため、
-                // ここでは無視している。
-                // なお、非アクティブ化されたものが含まれる場合、
-                // 再度、メッシュ更新要求が発生するはずである。
-
-                // ブロックが隣接チャンクに含まれている場合。
-                var closeChunk = this[x, y, z];
-
-                // 隣接チャンクがないならば未定として null。
-                if (closeChunk == null) return null;
-
-                // 隣接チャンクにおける相対ブロック座標を算出。
-                var relativeX = blockPosition.X % chunkSize.X;
-                var relativeY = blockPosition.Y % chunkSize.Y;
-                var relativeZ = blockPosition.Z % chunkSize.Z;
-                if (relativeX < 0) relativeX += chunkSize.X;
-                if (relativeY < 0) relativeY += chunkSize.Y;
-                if (relativeZ < 0) relativeZ += chunkSize.Z;
-
-                return closeChunk[relativeX, relativeY, relativeZ];
-            }
-        }
-
-        #endregion
-
 #if OCCLUSION_SPACE_TEST
         #region SpaceTypes
 
@@ -144,7 +47,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager manager;
 
-        CloseChunks closeChunks;
+        LocalWorld localWorld;
 
 #if OCCLUSION_SPACE_TEST
         SpaceTypes[, ,] spaceMap;
@@ -170,7 +73,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.manager = manager;
 
-            closeChunks = new CloseChunks(manager.ChunkSize);
+            localWorld = new LocalWorld(manager, new VectorI3(3));
             Opaque = new ChunkVertices(manager.ChunkSize);
             Translucent = new ChunkVertices(manager.ChunkSize);
             ExecuteAction = new Action(Execute);
@@ -184,79 +87,54 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(!completed);
             Debug.Assert(Chunk != null);
 
-            // 隣接チャンク集合を構築。
-            var centerPosition = Chunk.Position;
-            for (int z = -1; z <= 1; z++)
-            {
-                for (int y = -1; y <= 1; y++)
-                {
-                    for (int x = -1; x <= 1; x++)
-                    {
-                        // 8 つの隅は不要。
-                        if (x != 0 && y != 0 && z != 0) continue;
-
-                        // 中心には自身を設定。
-                        if (x == 0 && y == 0 && z == 0)
-                        {
-                            closeChunks[0, 0, 0] = Chunk;
-                            continue;
-                        }
-
-                        var closePosition = centerPosition;
-                        closePosition.X += x;
-                        closePosition.Y += y;
-                        closePosition.Z += z;
-
-                        closeChunks[x, y, z] = manager[closePosition] as Chunk;
-                    }
-                }
-            }
+            // 周囲のチャンクを収集。
+            localWorld.FetchByCenter(Chunk.Position);
 
             var chunkSize = manager.ChunkSize;
-            var position = new VectorI3();
+            var relativeBlockPosition = new VectorI3();
 
 #if OCCLUSION_SPACE_TEST
             Array.Clear(spaceMap, 0, spaceMap.Length);
 
             // 解放状態マップを構築。
-            for (position.Z = 0; position.Z < chunkSize.Z; position.Z++)
-                for (position.Y = 0; position.Y < chunkSize.Y; position.Y++)
-                    for (position.X = 0; position.X < chunkSize.X; position.X++)
+            for (relativeBlockPosition.Z = 0; relativeBlockPosition.Z < chunkSize.Z; relativeBlockPosition.Z++)
+                for (relativeBlockPosition.Y = 0; relativeBlockPosition.Y < chunkSize.Y; relativeBlockPosition.Y++)
+                    for (relativeBlockPosition.X = 0; relativeBlockPosition.X < chunkSize.X; relativeBlockPosition.X++)
                     {
-                        TestOpen(ref position);
+                        TestOpen(ref relativeBlockPosition);
 
-                        Debug.Assert(spaceMap[position.X, position.Y, position.Z] != SpaceTypes.Mark);
+                        Debug.Assert(spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] != SpaceTypes.Mark);
                     }
 #endif
 
             // メッシュを更新。
-            for (position.Z = 0; position.Z < chunkSize.Z; position.Z++)
-                for (position.Y = 0; position.Y < chunkSize.Y; position.Y++)
-                    for (position.X = 0; position.X < chunkSize.X; position.X++)
-                        Execute(ref position);
+            for (relativeBlockPosition.Z = 0; relativeBlockPosition.Z < chunkSize.Z; relativeBlockPosition.Z++)
+                for (relativeBlockPosition.Y = 0; relativeBlockPosition.Y < chunkSize.Y; relativeBlockPosition.Y++)
+                    for (relativeBlockPosition.X = 0; relativeBlockPosition.X < chunkSize.X; relativeBlockPosition.X++)
+                        Execute(ref relativeBlockPosition);
 
-            closeChunks.Clear();
+            localWorld.Clear();
 
             completed = true;
         }
 
 #if OCCLUSION_SPACE_TEST
-        void TestOpen(ref VectorI3 position)
+        void TestOpen(ref VectorI3 relativeBlockPosition)
         {
             int markCount = 0;
 
-            if (spaceMap[position.X, position.Y, position.Z] == SpaceTypes.None)
+            if (spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] == SpaceTypes.None)
             {
                 // None ならば検査を開始。
                 // Mark は検査前であるため存在し得ない。
                 // Open/Closed 確定の要素は検査不要。
-                TestOpen(ref position, ref markCount);
+                TestOpen(ref relativeBlockPosition, ref markCount);
             }
         }
 
-        bool TestOpen(ref VectorI3 position, ref int markCount)
+        bool TestOpen(ref VectorI3 relativeBlockPosition, ref int markCount)
         {
-            var blockIndex = Chunk[position.X, position.Y, position.Z];
+            var blockIndex = Chunk[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z];
             if (blockIndex != Block.EmptyIndex)
             {
                 var block = Chunk.Region.BlockCatalog[blockIndex];
@@ -269,15 +147,15 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunkSize = manager.ChunkSize;
 
             // 空、流体、半透明ブロックである場合。
-            if (position.X == 0 || position.X == (chunkSize.X - 1) ||
-                position.Y == 0 || position.Y == (chunkSize.Y - 1) ||
-                position.Z == 0 || position.Z == (chunkSize.Z - 1))
+            if (relativeBlockPosition.X == 0 || relativeBlockPosition.X == (chunkSize.X - 1) ||
+                relativeBlockPosition.Y == 0 || relativeBlockPosition.Y == (chunkSize.Y - 1) ||
+                relativeBlockPosition.Z == 0 || relativeBlockPosition.Z == (chunkSize.Z - 1))
             {
                 // 縁にあるならば Open 確定。
-                spaceMap[position.X, position.Y, position.Z] = SpaceTypes.Open;
+                spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] = SpaceTypes.Open;
             }
 
-            var currentResult = spaceMap[position.X, position.Y, position.Z];
+            var currentResult = spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z];
 
             if (currentResult == SpaceTypes.Open)
             {
@@ -321,12 +199,12 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // None ならば Mark を設定して隣接位置を検査。
-            spaceMap[position.X, position.Y, position.Z] = SpaceTypes.Mark;
+            spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] = SpaceTypes.Mark;
             markCount++;
 
             foreach (var side in CubicSide.Items)
             {
-                var neighborPosition = position + side.Direction;
+                var neighborPosition = relativeBlockPosition + side.Direction;
 
                 if (TestOpen(ref neighborPosition, ref markCount))
                 {
@@ -354,10 +232,12 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 #endif
 
-        // position はチャンク内の相対ブロック座標。
-        void Execute(ref VectorI3 position)
+        void Execute(ref VectorI3 relativeBlockPosition)
         {
-            var blockIndex = Chunk[position.X, position.Y, position.Z];
+            VectorI3 absoluteBlockPosition;
+            Chunk.GetAbsoluteBlockPosition(ref relativeBlockPosition, out absoluteBlockPosition);
+
+            var blockIndex = Chunk[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z];
 
             // 空ならば頂点は存在しない。
             if (Block.EmptyIndex == blockIndex) return;
@@ -376,8 +256,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 対象面が存在しない場合はスキップ。
                 if (meshPart == null) continue;
 
-                // 面隣接ブロックの座標 (現在のチャンク内での相対ブロック座標)
-                var neighborPosition = position + side.Direction;
+                // 面隣接ブロックの座標
+                var absoluteNeighborBlockPosition = absoluteBlockPosition + side.Direction;
 
 #if OCCLUSION_SPACE_TEST
                 // 自チャンク内位置ならば、閉塞空間判定を試行。
@@ -394,7 +274,7 @@ namespace Willcraftia.Xna.Blocks.Models
 #endif
 
                 // 面隣接ブロックを探索。
-                var neighborBlockIndex = closeChunks.GetBlockIndex(ref neighborPosition);
+                var neighborBlockIndex = localWorld.GetBlockIndex(ref absoluteNeighborBlockPosition);
 
                 // 未定の場合は面なしとする。
                 // 正確な描画には面なしとすべきではないが、
@@ -416,7 +296,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // 環境光遮蔽を計算。
-                var ambientOcclusion = CalculateAmbientOcclusion(ref neighborPosition, side);
+                var ambientOcclusion = CalculateAmbientOcclusion(ref absoluteNeighborBlockPosition, side);
 
                 // 環境光遮蔽に基づいた頂点色を計算。
                 // 一切の遮蔽が無い場合は Color.White、
@@ -426,16 +306,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 // メッシュを追加。
                 if (block.Fluid || block.Translucent)
                 {
-                    AddMesh(ref position, ref vertexColor, meshPart, Translucent);
+                    AddMesh(ref relativeBlockPosition, ref vertexColor, meshPart, Translucent);
                 }
                 else
                 {
-                    AddMesh(ref position, ref vertexColor, meshPart, Opaque);
+                    AddMesh(ref relativeBlockPosition, ref vertexColor, meshPart, Opaque);
                 }
             }
         }
 
-        float CalculateAmbientOcclusion(ref VectorI3 neighborPosition, CubicSide side)
+        float CalculateAmbientOcclusion(ref VectorI3 absoluteNeighborBlockPosition, CubicSide side)
         {
             const float occlusionPerFace = 1 / 5f;
 
@@ -451,10 +331,10 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (mySide == s) continue;
 
                 // 遮蔽対象のブロック位置を算出。
-                var occluderPosition = neighborPosition + s.Direction;
+                var occluderPosition = absoluteNeighborBlockPosition + s.Direction;
 
                 // 遮蔽対象のブロックのインデックスを取得。
-                var occluderBlockIndex = closeChunks.GetBlockIndex(ref occluderPosition);
+                var occluderBlockIndex = localWorld.GetBlockIndex(ref occluderPosition);
 
                 // 未定と空の場合は非遮蔽。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
