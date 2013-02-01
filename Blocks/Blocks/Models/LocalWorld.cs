@@ -15,6 +15,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Chunk[, ,] chunks;
 
+        VectorI3 min;
+
         public Chunk this[int x, int y, int z]
         {
             get { return chunks[x, y, z]; }
@@ -45,6 +47,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void FetchByMin(VectorI3 min)
         {
+            this.min = min;
+
             var position = new VectorI3();
 
             for (int z = 0; z < Size.Z; z++)
@@ -61,6 +65,34 @@ namespace Willcraftia.Xna.Blocks.Models
                     }
                 }
             }
+        }
+
+        public Chunk GetChunk(VectorI3 chunkPosition)
+        {
+            var relative = chunkPosition - min;
+
+            if (relative.X < 0 || Size.X <= relative.X ||
+                relative.Y < 0 || Size.Y <= relative.Y ||
+                relative.Z < 0 || Size.Z <= relative.Z)
+            {
+                return null;
+            }
+
+            return chunks[relative.X, relative.Y, relative.Z];
+        }
+
+        public byte? GetBlockIndex(VectorI3 blockPosition)
+        {
+            VectorI3 chunkPosition;
+            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+
+            var chunk = GetChunk(chunkPosition);
+            if (chunk == null) return null;
+
+            VectorI3 relativeBlockPosition;
+            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+
+            return chunk[relativeBlockPosition];
         }
 
         /// <summary>
