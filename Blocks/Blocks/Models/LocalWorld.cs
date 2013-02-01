@@ -69,6 +69,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Chunk GetChunk(VectorI3 chunkPosition)
         {
+            return GetChunk(ref chunkPosition);
+        }
+
+        public Chunk GetChunk(ref VectorI3 chunkPosition)
+        {
             var relative = chunkPosition - min;
 
             if (relative.X < 0 || Size.X <= relative.X ||
@@ -83,10 +88,15 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte? GetBlockIndex(VectorI3 blockPosition)
         {
+            return GetBlockIndex(ref blockPosition);
+        }
+
+        public byte? GetBlockIndex(ref VectorI3 blockPosition)
+        {
             VectorI3 chunkPosition;
             manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
 
-            var chunk = GetChunk(chunkPosition);
+            var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return null;
 
             VectorI3 relativeBlockPosition;
