@@ -14,11 +14,11 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkMesh : ShadowCaster, IDisposable
     {
+        public Matrix World = Matrix.Identity;
+
         ChunkEffect chunkEffect;
 
         GraphicsDevice graphicsDevice;
-
-        Matrix world = Matrix.Identity;
 
         OcclusionQuery occlusionQuery;
 
@@ -27,12 +27,6 @@ namespace Willcraftia.Xna.Blocks.Models
         DynamicVertexBuffer vertexBuffer;
 
         DynamicIndexBuffer indexBuffer;
-
-        public Matrix World
-        {
-            get { return world; }
-            set { world = value; }
-        }
 
         public int VertexCount { get; private set; }
 
@@ -69,7 +63,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunkEffect.EnableOcclusionQueryTechnique();
 
-            chunkEffect.World = world;
+            chunkEffect.World = World;
             chunkEffect.CurrentTechnique.Passes[0].Apply();
 
             //----------------------------------------------------------------
@@ -90,7 +84,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             chunkEffect.ResolveCurrentTechnique();
 
-            chunkEffect.World = world;
+            chunkEffect.World = World;
             chunkEffect.CurrentTechnique.Passes[0].Apply();
 
             //----------------------------------------------------------------
@@ -104,7 +98,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (Occluded) return;
 
             var effectMatrices = effect as IEffectMatrices;
-            if (effectMatrices != null) effectMatrices.World = world;
+            if (effectMatrices != null) effectMatrices.World = World;
 
             foreach (var pass in effect.CurrentTechnique.Passes)
             {
