@@ -30,7 +30,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         /// <summary>
         /// チャンク データ。
-        /// 
+        /// </summary>
+        /// <remarks>
         /// 初めて空ブロック以外が設定される際には、
         /// チャンク マネージャでプーリングされているデータを借り、
         /// このフィールドへ設定します。
@@ -40,7 +41,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 
         /// この仕組により、空 (そら) を表すチャンクではメモリが節約され、
         /// また、null の場合にメッシュ更新を要求しないことで、無駄なメッシュ更新を回避できます。
-        /// </summary>
+        /// </remarks>
         ChunkData data;
 
         bool dataChanged;
@@ -73,11 +74,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         /// <summary>
         /// ブロックのインデックスを取得または設定します。
-        /// ブロック位置は、チャンク空間における相対座標で指定します。
         /// </summary>
-        /// <param name="x">チャンク空間における相対ブロック位置 X。</param>
-        /// <param name="y">チャンク空間における相対ブロック位置 Y。</param>
-        /// <param name="z">チャンク空間における相対ブロック位置 Z。</param>
+        /// <remarks>
+        /// ブロック位置は、チャンク内相対座標で指定します。
+        /// </remarks>
+        /// <param name="x">チャンク内相対ブロック位置 X。</param>
+        /// <param name="y">チャンク内相対ブロック位置 Y。</param>
+        /// <param name="z">チャンク内相対ブロック位置 Z。</param>
         /// <returns></returns>
         public byte this[int x, int y, int z]
         {
@@ -112,12 +115,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     dataChanged = true;
                 }
             }
-        }
-
-        public byte this[VectorI3 position]
-        {
-            get { return this[position.X, position.Y, position.Z]; }
-            set { this[position.X, position.Y, position.Z] = value; }
         }
 
         public SceneNode Node { get; private set; }
@@ -281,6 +278,16 @@ namespace Willcraftia.Xna.Blocks.Models
         public static int CalculateIndexCount(int vertexCount)
         {
             return (vertexCount / 4) * 6;
+        }
+
+        public byte GetBlockIndex(ref VectorI3 position)
+        {
+            return this[position.X, position.Y, position.Z];
+        }
+
+        public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
+        {
+            this[position.X, position.Y, position.Z] = blockIndex;
         }
 
         /// <summary>

@@ -102,7 +102,7 @@ namespace Willcraftia.Xna.Blocks.Models
             VectorI3 relativeBlockPosition;
             chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
 
-            return chunk[relativeBlockPosition];
+            return chunk.GetBlockIndex(ref relativeBlockPosition);
         }
 
         /// <summary>

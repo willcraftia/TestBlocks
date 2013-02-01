@@ -37,7 +37,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             var relativePosition = chunk.GetRelativeBlockPosition(Position);
 
             // 既にブロックが存在しないならば抑制。
-            if (chunk[relativePosition] == Block.EmptyIndex) return;
+            if (chunk.GetBlockIndex(ref relativePosition) == Block.EmptyIndex) return;
 
             var command = commandFactory.CreateSetBlockCommand();
 

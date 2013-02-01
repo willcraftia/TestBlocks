@@ -38,9 +38,9 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
 
-                lastBlockIndex = chunk[relativePosition];
+                lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
 
-                chunk[relativePosition] = BlockIndex;
+                chunk.SetBlockIndex(ref relativePosition, BlockIndex);
                 chunkManager.RequestUpdateMesh(chunk.Position, ChunkManager.UpdateMeshPriority.High);
 
                 RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
 
-                chunk[relativePosition] = lastBlockIndex;
+                chunk.SetBlockIndex(ref relativePosition, lastBlockIndex);
                 chunkManager.RequestUpdateMesh(chunk.Position, ChunkManager.UpdateMeshPriority.High);
 
                 RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);

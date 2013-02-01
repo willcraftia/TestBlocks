@@ -169,7 +169,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 var relativePosition = chunk.GetRelativeBlockPosition(testPosition);
 
-                var blockIndex = chunk[relativePosition];
+                var blockIndex = chunk.GetBlockIndex(ref relativePosition);
                 if (blockIndex != Block.EmptyIndex)
                 {
                     if (ResolvePaintPosition(ref ray, ref testPosition))
@@ -214,7 +214,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                     if (chunk == null) continue;
 
                     var relativePosition = chunk.GetRelativeBlockPosition(testPosition);
-                    var blockIndex = chunk[relativePosition];
+                    var blockIndex = chunk.GetBlockIndex(ref relativePosition);
                     if (blockIndex == Block.EmptyIndex)
                     {
                         paintPosition = testPosition;
