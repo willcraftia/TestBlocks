@@ -67,26 +67,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
 
             /// <summary>
-            /// 指定の位置にあるパーティションを取得します。
-            /// </summary>
-            /// <param name="position">パーティションの位置。</param>
-            /// <returns>
-            /// パーティション、あるいは、指定の位置にパーティションが存在しないならば null。
-            /// </returns>
-            public Partition this[VectorI3 position]
-            {
-                get
-                {
-                    lock (partitionsByPosition)
-                    {
-                        Partition result;
-                        partitionsByPosition.TryGetValue(position, out result);
-                        return result;
-                    }
-                }
-            }
-
-            /// <summary>
             /// インスタンスを生成します。
             /// </summary>
             /// <param name="manager">クラスタ マネージャ。</param>
@@ -139,6 +119,23 @@ namespace Willcraftia.Xna.Framework.Landscape
                 lock (partitionsByPosition)
                 {
                     return partitionsByPosition.ContainsKey(position);
+                }
+            }
+
+            /// <summary>
+            /// 指定の位置にあるパーティションを取得します。
+            /// </summary>
+            /// <param name="position">パーティションの位置。</param>
+            /// <returns>
+            /// パーティション、あるいは、指定の位置にパーティションが存在しないならば null。
+            /// </returns>
+            public Partition GetPartition(ref VectorI3 position)
+            {
+                lock (partitionsByPosition)
+                {
+                    Partition result;
+                    partitionsByPosition.TryGetValue(position, out result);
+                    return result;
                 }
             }
 
@@ -215,24 +212,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
-        /// 指定の位置にあるパーティションを取得します。
-        /// </summary>
-        /// <param name="position">パーティションの位置。</param>
-        /// <returns>
-        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
-        /// </returns>
-        public Partition this[VectorI3 position]
-        {
-            get
-            {
-                var cluster = GetCluster(position);
-                if (cluster == null) return null;
-
-                return cluster[position];
-            }
-        }
-
-        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="size">パーティション空間におけるクラスタのサイズ。</param>
@@ -269,6 +248,21 @@ namespace Willcraftia.Xna.Framework.Landscape
             if (cluster == null) return false;
 
             return cluster.Contains(position);
+        }
+
+        /// <summary>
+        /// 指定の位置にあるパーティションを取得します。
+        /// </summary>
+        /// <param name="position">パーティションの位置。</param>
+        /// <returns>
+        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
+        /// </returns>
+        public Partition GetPartition(ref VectorI3 position)
+        {
+            var cluster = GetCluster(position);
+            if (cluster == null) return null;
+
+            return cluster.GetPartition(ref position);
         }
 
         /// <summary>

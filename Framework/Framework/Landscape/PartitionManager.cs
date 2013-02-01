@@ -469,18 +469,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         Matrix projection;
 
         /// <summary>
-        /// 指定の位置にあるアクティブなパーティションを取得します。
-        /// </summary>
-        /// <param name="position">パーティションの位置。</param>
-        /// <returns>
-        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
-        /// </returns>
-        public Partition GetPartition(ref VectorI3 position)
-        {
-            return clusterManager[position];
-        }
-
-        /// <summary>
         /// クローズ処理中であるか否かを示す値を取得します。
         /// </summary>
         /// <value>
@@ -656,6 +644,18 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         /// <summary>
+        /// 指定の位置にあるアクティブなパーティションを取得します。
+        /// </summary>
+        /// <param name="position">パーティションの位置。</param>
+        /// <returns>
+        /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
+        /// </returns>
+        public Partition GetPartition(ref VectorI3 position)
+        {
+            return clusterManager.GetPartition(ref position);
+        }
+
+        /// <summary>
         /// クローズ処理が開始する時に呼び出されます。
         /// </summary>
         protected virtual void OnClosing() { }
@@ -787,7 +787,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = clusterManager[nearbyPosition];
+                var neighbor = clusterManager.GetPartition(ref nearbyPosition);
                 if (neighbor == null) continue;
 
                 var reverseSide = side.Reverse();
@@ -805,7 +805,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = clusterManager[nearbyPosition];
+                var neighbor = clusterManager.GetPartition(ref nearbyPosition);
                 if (neighbor == null) continue;
 
                 // 自身へアクティブな隣接パーティションを通知。
