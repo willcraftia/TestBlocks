@@ -263,7 +263,10 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 指定の位置を含むリージョンがある場合、アクティブ化可能であると判定します。
+        /// このクラスの実装では、以下の処理を行います。
+        /// 
+        /// ・指定の位置を含むリージョンがある場合、アクティブ化可能であると判定。
+        /// 
         /// </summary>
         protected override bool CanActivate(VectorI3 position)
         {
@@ -273,8 +276,10 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// プールからチャンクを取得して返します。
-        /// プールが枯渇している場合は null を返します。
+        /// このクラスの実装では、以下の処理を行います。
+        /// 
+        /// ・プールからチャンクを取得して返却。ただし、プールが枯渇している場合は null。
+        /// 
         /// </summary>
         protected override Partition Create(VectorI3 position)
         {
@@ -293,7 +298,11 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// プールへチャンクを戻します。
+        /// このクラスの実装では、以下の処理を行います。
+        /// 
+        /// ・チャンクの解放処理の呼び出し。
+        /// ・プールへチャンクを返却。
+        /// 
         /// </summary>
         protected override void Release(Partition partition)
         {
@@ -307,7 +316,11 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 新たなメッシュ更新の開始、メッシュ更新完了の監視を行います。
+        /// このクラスの実装では、以下の処理を行います。
+        /// 
+        /// ・新たなメッシュ更新の開始。
+        /// ・メッシュ更新完了の監視。
+        /// 
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
         protected override void UpdateOverride(GameTime gameTime)
@@ -327,6 +340,52 @@ namespace Willcraftia.Xna.Blocks.Models
             base.UpdateOverride(gameTime);
         }
 
+        /// <summary>
+        /// このクラスの実装では、以下の処理を行います。
+        ///
+        /// ・チャンクのメッシュ更新を要求。
+        /// ・チャンクのノードをノード グラフへ追加。
+        /// 
+        /// </summary>
+        /// <param name="partition"></param>
+        protected override void OnActivated(Partition partition)
+        {
+            var chunk = partition as Chunk;
+            if (0 < chunk.SolidCount)
+            {
+                RequestUpdateMesh(chunk.Position, ActivationUpdateMeshPriority);
+            }
+
+            // ノードを追加。
+            BaseNode.Children.Add(chunk.Node);
+
+            base.OnActivated(partition);
+        }
+
+        /// <summary>
+        /// このクラスの実装では、以下の処理を行います。
+        /// 
+        /// ・ノード グラフからチャンクのノードを削除。
+        /// 
+        /// </summary>
+        /// <param name="partition"></param>
+        protected override void OnPassivating(Partition partition)
+        {
+            var chunk = partition as Chunk;
+            
+            // ノードを削除。
+            BaseNode.Children.Remove(chunk.Node);
+
+            base.OnPassivating(partition);
+        }
+
+        /// <summary>
+        /// このクラスの実装では、以下の処理を行います。
+        /// 
+        /// ・プールにある全てのチャンクの削除。
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void DisposeOverride(bool disposing)
         {
             // TODO
@@ -362,6 +421,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (!waitBuildVerticesQueue.Contains(request))
                 waitBuildVerticesQueue.Enqueue(request);
+        }
+
+        internal void RequestUpdateMesh(BoundingBoxI bounds, int priority)
+        {
+            for (int z = bounds.Min.Z; z < (bounds.Min.Z + bounds.Size.Z); z++)
+            {
+                for (int y = bounds.Min.Y; y < (bounds.Min.Y + bounds.Size.Y); y++)
+                {
+                    for (int x = bounds.Min.X; x < (bounds.Min.X + bounds.Size.X); x++)
+                    {
+                        RequestUpdateMesh(new VectorI3(x, y, z), priority);
+                    }
+                }
+            }
         }
 
         internal SceneNode CreateNode()
