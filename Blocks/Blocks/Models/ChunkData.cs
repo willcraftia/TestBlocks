@@ -13,7 +13,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク マネージャ。
         /// </summary>
-        ChunkManager chunkManager;
+        ChunkManager manager;
 
         /// <summary>
         /// チャンクが参照するブロックのインデックス。
@@ -44,14 +44,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="chunkManager">チャンク マネージャ。</param>
-        public ChunkData(ChunkManager chunkManager)
+        /// <param name="manager">チャンク マネージャ。</param>
+        public ChunkData(ChunkManager manager)
         {
-            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
+            if (manager == null) throw new ArgumentNullException("manager");
 
-            this.chunkManager = chunkManager;
+            this.manager = manager;
 
-            blockIndices = new byte[chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y * chunkManager.ChunkSize.Z];
+            blockIndices = new byte[manager.ChunkSize.X * manager.ChunkSize.Y * manager.ChunkSize.Z];
         }
 
         /// <summary>
@@ -61,12 +61,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <returns>ブロックのインデックス。</returns>
         public byte GetBlockIndex(ref VectorI3 position)
         {
-            if (position.X < 0 || chunkManager.ChunkSize.X < position.X ||
-                position.Y < 0 || chunkManager.ChunkSize.Y < position.Y ||
-                position.Z < 0 || chunkManager.ChunkSize.Z < position.Z)
+            if (position.X < 0 || manager.ChunkSize.X < position.X ||
+                position.Y < 0 || manager.ChunkSize.Y < position.Y ||
+                position.Z < 0 || manager.ChunkSize.Z < position.Z)
                 throw new ArgumentOutOfRangeException("position");
 
-            var index = position.X + position.Y * chunkManager.ChunkSize.X + position.Z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
+            var index = GetArrayIndex(ref position);
             return blockIndices[index];
         }
 
@@ -77,13 +77,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="blockIndex">ブロックのインデックス。</param>
         public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
         {
-            if (position.X < 0 || chunkManager.ChunkSize.X < position.X ||
-                position.Y < 0 || chunkManager.ChunkSize.Y < position.Y ||
-                position.Z < 0 || chunkManager.ChunkSize.Z < position.Z)
+            if (position.X < 0 || manager.ChunkSize.X < position.X ||
+                position.Y < 0 || manager.ChunkSize.Y < position.Y ||
+                position.Z < 0 || manager.ChunkSize.Z < position.Z)
                 throw new ArgumentOutOfRangeException("position");
 
-            var index = position.X + position.Y * chunkManager.ChunkSize.X + position.Z * chunkManager.ChunkSize.X * chunkManager.ChunkSize.Y;
-
+            var index = GetArrayIndex(ref position);
             if (blockIndices[index] == blockIndex) return;
 
             blockIndices[index] = blockIndex;
@@ -133,6 +132,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
             for (int i = 0; i < blockIndices.Length; i++)
                 writer.Write(blockIndices[i]);
+        }
+
+        /// <summary>
+        /// 指定のブロック位置を示すブロック配列のインデックスを取得します。
+        /// </summary>
+        /// <param name="position">ブロック位置。</param>
+        /// <returns>ブロック配列のインデックス。</returns>
+        int GetArrayIndex(ref VectorI3 position)
+        {
+            return position.X + position.Y * manager.ChunkSize.X + position.Z * manager.ChunkSize.X * manager.ChunkSize.Y;
         }
     }
 }
