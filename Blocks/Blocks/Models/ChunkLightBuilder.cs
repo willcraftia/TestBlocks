@@ -16,6 +16,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Chunk Chunk { get; internal set; }
 
+        public bool PropagateToNeighbors { get; set; }
+
         public bool Completed
         {
             get { return completed; }
@@ -38,7 +40,11 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(Chunk != null);
 
             // 空チャンクならば頂点が存在しないため、天空光の処理そのものが不要。
-            if (Chunk.SolidCount == 0) return;
+            if (Chunk.SolidCount == 0)
+            {
+                completed = true;
+                return;
+            }
 
             var topNeighborPosition = Chunk.Position + CubicSide.Top.Direction;
             var topNeighbor = manager.GetChunk(ref topNeighborPosition);
