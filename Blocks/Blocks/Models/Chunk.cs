@@ -115,6 +115,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public ChunkVerticesBuilder VerticesBuilder { get; internal set; }
 
+        public ChunkLightBuilder LightBuilder { get; internal set; }
+
         /// <summary>
         /// 非空ブロックの総数を取得します。
         /// </summary>
@@ -235,6 +237,29 @@ namespace Willcraftia.Xna.Blocks.Models
             return (vertexCount / 4) * 6;
         }
 
+        public Block GetBlock(int x, int y, int z)
+        {
+            var blockIndex = GetBlockIndex(x, y, z);
+            if (blockIndex == Block.EmptyIndex) return null;
+
+            return region.BlockCatalog[blockIndex];
+        }
+
+        public Block GetBlock(ref VectorI3 position)
+        {
+            var blockIndex = GetBlockIndex(ref position);
+            if (blockIndex == Block.EmptyIndex) return null;
+
+            return region.BlockCatalog[blockIndex];
+        }
+
+        public byte GetBlockIndex(int x, int y, int z)
+        {
+            if (data == null) return Block.EmptyIndex;
+
+            return data.GetBlockIndex(x, y, z);
+        }
+
         public byte GetBlockIndex(ref VectorI3 position)
         {
             if (data == null) return Block.EmptyIndex;
@@ -266,6 +291,36 @@ namespace Willcraftia.Xna.Blocks.Models
                 data = null;
                 dataChanged = true;
             }
+        }
+
+        public byte GetSkylightLevel(int x, int y, int z)
+        {
+            if (data == null) return 15;
+
+            return data.GetSkylightLevel(x, y, z);
+        }
+
+        public byte GetSkylightLevel(ref VectorI3 position)
+        {
+            if (data == null) return 15;
+
+            return data.GetSkylightLevel(ref position);
+        }
+
+        public void SetSkylightLevel(int x, int y, int z, byte value)
+        {
+            // 完全空チャンクの場合、光量データは不要。
+            if (data == null) return;
+
+            data.SetSkylightLevel(x, y, z, value);
+        }
+
+        public void SetSkylightLevel(ref VectorI3 position, byte value)
+        {
+            // 完全空チャンクの場合、光量データは不要。
+            if (data == null) return;
+
+            data.SetSkylightLevel(ref position, value);
         }
 
         public int GetRelativeBlockPositionX(int absoluteBlockPositionX)
@@ -349,6 +404,9 @@ namespace Willcraftia.Xna.Blocks.Models
                 foreach (var procedure in region.ChunkProcesures)
                     procedure.Generate(this);
             }
+
+            // 天空光による各ブロックにおける光量を算出。
+            //ProcessSkyLights();
 
             base.ActivateOverride();
         }

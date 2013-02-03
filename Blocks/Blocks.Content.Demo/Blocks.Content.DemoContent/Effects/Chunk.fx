@@ -365,12 +365,13 @@ float4 PSNmTxVcFog(VSOutputNmTxVcFog input) : COLOR0
     color *= input.Color;
 
     // Lighting
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLight(E, N, input.TexCoord);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
-
+*/
     // Fog
     color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
 

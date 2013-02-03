@@ -95,6 +95,20 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunk.GetBlockIndex(ref relativeBlockPosition);
         }
 
+        public byte GetSkyLight(ref VectorI3 blockPosition)
+        {
+            VectorI3 chunkPosition;
+            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+
+            var chunk = GetChunk(ref chunkPosition);
+            if (chunk == null) return 15;
+
+            VectorI3 relativeBlockPosition;
+            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+
+            return chunk.GetSkylightLevel(ref relativeBlockPosition);
+        }
+
         /// <summary>
         /// 状態を初期化します。
         /// </summary>

@@ -20,6 +20,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         byte[] blockIndices;
 
+        HalfByteArray3 skylightLevels;
+
         /// <summary>
         /// ブロックの総数を取得します。
         /// </summary>
@@ -52,6 +54,18 @@ namespace Willcraftia.Xna.Blocks.Models
             this.manager = manager;
 
             blockIndices = new byte[manager.ChunkSize.X * manager.ChunkSize.Y * manager.ChunkSize.Z];
+            skylightLevels = new HalfByteArray3(manager.ChunkSize.X, manager.ChunkSize.Y, manager.ChunkSize.Z);
+        }
+
+        public byte GetBlockIndex(int x, int y, int z)
+        {
+            if (x < 0 || manager.ChunkSize.X < x ||
+                y < 0 || manager.ChunkSize.Y < y ||
+                z < 0 || manager.ChunkSize.Z < z)
+                throw new ArgumentOutOfRangeException("position");
+
+            var index = GetArrayIndex(x, y, z);
+            return blockIndices[index];
         }
 
         /// <summary>
@@ -98,6 +112,26 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public byte GetSkylightLevel(int x, int y, int z)
+        {
+            return skylightLevels[x, y, z];
+        }
+
+        public byte GetSkylightLevel(ref VectorI3 position)
+        {
+            return skylightLevels[position.X, position.Y, position.Z];
+        }
+
+        public void SetSkylightLevel(int x, int y, int z, byte value)
+        {
+            skylightLevels[x, y, z] = value;
+        }
+
+        public void SetSkylightLevel(ref VectorI3 position, byte value)
+        {
+            skylightLevels[position.X, position.Y, position.Z] = value;
+        }
+
         /// <summary>
         /// 初期化します。
         /// </summary>
@@ -105,6 +139,8 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Array.Clear(blockIndices, 0, blockIndices.Length);
             SolidCount = 0;
+
+            skylightLevels.Clear();
         }
 
         public void Read(BinaryReader reader)
@@ -132,6 +168,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
             for (int i = 0; i < blockIndices.Length; i++)
                 writer.Write(blockIndices[i]);
+        }
+
+        int GetArrayIndex(int x, int y, int z)
+        {
+            return x + y * manager.ChunkSize.X + z * manager.ChunkSize.X * manager.ChunkSize.Y;
         }
 
         /// <summary>

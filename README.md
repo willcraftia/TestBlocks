@@ -1,21 +1,20 @@
 TestBlocks
 ==========
-Windows ‚Æ Xbox ‘Î‰ž‚Åì¬‚µ‚Ä‚¢‚é‚ªAXbox ‚ÉŠÖ‚µ‚Ä‚Íƒrƒ‹ƒhŠm”F‚ðs‚È‚Á‚Ä‚¢‚é‚Ì‚Ý‚Å‚ ‚èAXbox 360 ‚Ö‚Ì”z’u‚ð”º‚Á‚½ƒfƒoƒbƒO‚Ís‚È‚Á‚Ä‚¢‚È‚¢B
 
-‚Ü‚½A.NET Compact Framework for Xbox 360 ‚Å‘Î‰ž‚µ‚Ä‚¢‚È‚¢ƒNƒ‰ƒX‚à—p‚¢‚Ä‚¨‚èA‚»‚Ì‚æ‚¤‚ÈƒNƒ‰ƒX‚ðŽÀ‘•‚·‚éê‡‚É‚ÍƒvƒƒWƒFƒNƒg‚ð•ª‚¯AXbox ƒrƒ‹ƒh‚Å‚Í‘ã‘ÖŽÀ‘•‚ ‚é‚¢‚Í Mock ŽÀ‘•‚Æ‚µ‚Ä”ñƒTƒ|[ƒg‹@”\‚Æ‚µ‚Ä‚¢‚éB
+# ’ˆÓ
 
-‚È‚¨AXNA Game Studio 4.0 ‚É‚¨‚¯‚é .NET Compact Framework for Xbox 360 ‚ÌƒTƒ|[ƒgó‹µ‚É‚Â‚¢‚Ä‚Í [.NET Compact Framework for Xbox 360 ‚Ì–¼‘O‹óŠÔAŒ^A‚¨‚æ‚Ñƒƒ“ƒo[](http://msdn.microsoft.com/ja-jp/library/bb203915\(XNAGameStudio.40\).aspx) ‚ðŽQÆ‚Ì‚±‚ÆB
+Šô‚Â‚©‚ÌƒvƒƒWƒFƒNƒg‚ÍA.NET Compact Framework for Xbox 360 ‚Å‘Î‰ž‚µ‚Ä‚¢‚È‚¢ƒNƒ‰ƒX‚ðŽg—p‚µ‚Ä‚¢‚éB
+
+XNA Game Studio 4.0 ‚É‚¨‚¯‚é .NET Compact Framework for Xbox 360 ‚ÌƒTƒ|[ƒgó‹µ‚É‚Â‚¢‚Ä‚Í [.NET Compact Framework for Xbox 360 ‚Ì–¼‘O‹óŠÔAŒ^A‚¨‚æ‚Ñƒƒ“ƒo[](http://msdn.microsoft.com/ja-jp/library/bb203915\(XNAGameStudio.40\).aspx) ‚ðŽQÆ‚Ì‚±‚ÆB
 
 # ˆË‘¶ƒ‰ƒCƒuƒ‰ƒŠ
-‚±‚±‚ÉŠÜ‚ß‚Ä‚¢‚éŠeƒvƒƒWƒFƒNƒg‚ÍAŠô‚Â‚©‚ÌƒI[ƒvƒ“ƒ\[ƒX ƒ‰ƒCƒuƒ‰ƒŠ‚ÉˆË‘¶‚µ‚Ä‚¢‚éB‚±‚Ì‚½‚ßAŠeƒvƒƒWƒFƒNƒg‚ðƒrƒ‹ƒh‚µ‚ÄŽÀs‚·‚é‚É‚ÍA‚»‚ê‚çƒ‰ƒCƒuƒ‰ƒŠ‚ðŽ©g‚Åƒ_ƒEƒ“ƒ[ƒh‚µAŠeƒvƒƒWƒFƒNƒg‚Ì [ŽQÆÝ’è] ‚Åƒ‰ƒCƒuƒ‰ƒŠ‚ðŠÖ˜A•t‚¯‚é•K—v‚ª‚ ‚éB
+Šô‚Â‚©‚ÌƒvƒƒWƒFƒNƒg‚ÍAƒI[ƒvƒ“ƒ\[ƒX ƒ‰ƒCƒuƒ‰ƒŠ‚ÉˆË‘¶‚µ‚Ä‚¢‚éB‚±‚Ì‚½‚ßA‚»‚ê‚çƒvƒƒWƒFƒNƒg‚Ìƒrƒ‹ƒh‚Å‚ÍAˆË‘¶‚·‚éƒI[ƒvƒ“ ƒ\[ƒX ƒ‰ƒCƒuƒ‰ƒŠ‚ðŽ©g‚Åƒ_ƒEƒ“ƒ[ƒh‚µAŠeƒvƒƒWƒFƒNƒg‚Ì [ŽQÆÝ’è] ‚ÅŠÖ˜A•t‚¯‚é•K—v‚ª‚ ‚éB
 
 ## DotNetZip
 [DotNetZip](http://dotnetzip.codeplex.com/)Bƒo[ƒWƒ‡ƒ“ v1.9.1.8 ACompactFramework —p DLLB  
 
 ## Json.NET
 [Json.NET](http://json.codeplex.com/)Bƒo[ƒWƒ‡ƒ“ 4.5 Release 11ANET40 —p DLLB
-
-ƒfƒtƒHƒ‹ƒg‚Ì Xbox ƒvƒƒWƒFƒNƒg‚ª\¬‚·‚éƒ‰ƒCƒuƒ‰ƒŠ‚Å‚Í Json.NET ‚ð—˜—p‚Å‚«‚È‚¢B‚±‚Ì‚½‚ßAXbox ƒrƒ‹ƒh‚Å‚Í Json.NET ‚ðŠÜ‚ß‚¸A‚±‚ê‚ÉˆË‘¶‚·‚éƒƒ\ƒbƒh‚Í Mock ŽÀ‘•‚Æ‚µ‚Ä‚¢‚éB
 
 # ƒvƒƒWƒFƒNƒg•ªŠ„•ûj
 
@@ -26,10 +25,10 @@ Windows ‚Æ Xbox ‘Î‰ž‚Åì¬‚µ‚Ä‚¢‚é‚ªAXbox ‚ÉŠÖ‚µ‚Ä‚Íƒrƒ‹ƒhŠm”F‚ðs‚È‚Á‚Ä‚¢‚é‚Ì‚
 ‚½‚¾‚µAFramework ƒvƒƒWƒFƒNƒg‚Æ“¯—l‚Ì•ûj‚É‚æ‚èA•K—v‚É‰ž‚¶‚Äê—p‚ÌƒvƒƒWƒFƒNƒg‚Ö‚Ü‚Æ‚ß‚éB
 
 # ƒvƒƒWƒFƒNƒgŠT—v
-‚±‚±‚ÅŠJ”­‚µ‚Ä‚¢‚éŽÀÛ‚ÌƒAƒZƒ“ƒuƒŠ–¼‚¨‚æ‚Ñ–¼‘O‹óŠÔ‚Å‚ÍAÚ“ªŒê‚Æ‚µ‚Ä Willcraftia.Xna ‚ð•t‚¯‚Ä‚¢‚é‚ªA‚±‚±‚Å‚Í‚±‚ê‚ðœ‚¢‚½ŠÈ—ª•\‹L‚Å‹LÚ‚·‚éB
+ŽÀÛ‚ÌƒAƒZƒ“ƒuƒŠ–¼‚¨‚æ‚Ñ–¼‘O‹óŠÔ‚Å‚ÍÚ“ªŒê‚ð Willcraftia.Xna ‚Æ‚µ‚Ä‚¢‚é‚ªA‚±‚±‚Å‚Í‚±‚ê‚ðœ‚¢‚½ŠÈ—ª•\‹L‚Å‹LÚ‚·‚éB
 
 ## All
-‘SƒvƒƒWƒFƒNƒg‚ðˆê‚Â‚É‚Ü‚Æ‚ß‚½ƒ\ƒŠƒ…[ƒVƒ‡ƒ“BƒŠƒtƒ@ƒNƒ^ƒŠƒ“ƒO‚Ì‚½‚ß‚É—p‚¢‚Ä‚¢‚éB
+‘SƒvƒƒWƒFƒNƒg‚ðˆê‚Â‚É‚Ü‚Æ‚ß‚½ƒ\ƒŠƒ…[ƒVƒ‡ƒ“B
 
 ## Framework
 Šî‘b‚Æ‚È‚éƒNƒ‰ƒX‚ð‚Ü‚Æ‚ß‚½ƒ‰ƒCƒuƒ‰ƒŠB  

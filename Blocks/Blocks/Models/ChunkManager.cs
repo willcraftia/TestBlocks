@@ -113,6 +113,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         TaskQueue verticesBuilderTaskQueue;
 
+        Queue<VectorI3> updateLightRequests;
+
+        Queue<Chunk> buildLightQueue;
+
+        Pool<ChunkLightBuilder> lightBuilderPool;
+
+        TaskQueue lightBuilderTaskQueue;
+
         /// <summary>
         /// シーン マネージャ。
         /// </summary>
@@ -210,6 +218,9 @@ namespace Willcraftia.Xna.Blocks.Models
             dataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyData = new ChunkData(this);
 
+            normalUpdateMeshRequests = new Queue<VectorI3>();
+            highUpdateMeshRequests = new Queue<VectorI3>();
+            buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
                 MaxCapacity = verticesBuilderCount
@@ -219,10 +230,18 @@ namespace Willcraftia.Xna.Blocks.Models
                 SlotCount = verticesBuilderCount
             };
 
-            normalUpdateMeshRequests = new Queue<VectorI3>();
-            highUpdateMeshRequests = new Queue<VectorI3>();
-
-            buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
+            updateLightRequests = new Queue<VectorI3>();
+            buildLightQueue = new Queue<Chunk>();
+            lightBuilderPool = new Pool<ChunkLightBuilder>(() => { return new ChunkLightBuilder(this); })
+            {
+                // TODO
+                MaxCapacity = 5
+            };
+            lightBuilderTaskQueue = new TaskQueue
+            {
+                // TODO
+                SlotCount = 5
+            };
 
             BaseNode = sceneManager.CreateSceneNode("ChunkRoot");
             sceneManager.RootNode.Children.Add(BaseNode);
@@ -314,17 +333,23 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="gameTime">ゲーム時間。</param>
         protected override void UpdateOverride(GameTime gameTime)
         {
-            // メッシュ更新が必要なチャンクを探索して更新要求を追加。
+            // 更新が必要なチャンクを探索して更新要求を追加。
             // ただし、クローズが開始したら行わない。
-            if (!Closing) CheckUpdateMesheRequests(gameTime);
+            if (!Closing)
+            {
+                CheckUpdateMesheRequests(gameTime);
+                CheckUpdateLightRequests(gameTime);
+            }
 
-            // 頂点ビルダのタスク キューを更新。
+            // ビルダのタスク キューを更新。
             verticesBuilderTaskQueue.Update();
+            lightBuilderTaskQueue.Update();
 
-            // メッシュ更新完了を監視。
-            // メッシュ更新中はチャンクの更新ロックを取得したままであるため、
+            // 更新完了を監視。
+            // 更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
             CheckMeshesUpdated(gameTime);
+            CheckLightUpdated(gameTime);
 
             base.UpdateOverride(gameTime);
         }
@@ -344,6 +369,8 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var bounds = BoundingBoxI.CreateFromCenterExtents(partition.Position, new VectorI3(1));
                 RequestUpdateMesh(ref bounds, UpdateMeshPriority.Normal);
+                
+                RequestUpdateLight(ref chunk.Position);
             }
 
             // ノードを追加。
@@ -432,6 +459,12 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        internal void RequestUpdateLight(ref VectorI3 position)
+        {
+            if (!updateLightRequests.Contains(position))
+                updateLightRequests.Enqueue(position);
+        }
+
         internal SceneNode CreateNode()
         {
             nodeIdSequence++;
@@ -453,6 +486,15 @@ namespace Willcraftia.Xna.Blocks.Models
             verticesBuilderPool.Return(builder);
         }
 
+        internal void ReleaseLightBuilder(ChunkLightBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException("builder");
+
+            builder.Chunk.LightBuilder = null;
+            builder.Chunk = null;
+            lightBuilderPool.Return(builder);
+        }
+
         /// <summary>
         /// チャンク メッシュを破棄します。
         /// ここでは破棄要求をキューに入れるのみであり、
@@ -469,6 +511,69 @@ namespace Willcraftia.Xna.Blocks.Models
             MeshCount--;
         }
 
+        void CheckUpdateLightRequests(GameTime gameTime)
+        {
+            // TODO
+            var searchCapacity = 10;
+
+            int count = updateLightRequests.Count;
+            for (int i = 0; i < count && i < searchCapacity; i++)
+            {
+                var position = updateLightRequests.Peek();
+
+                // アクティブ チャンクを取得。
+                var chunk = GetChunk(ref position);
+                if (chunk == null)
+                {
+                    // 存在しない場合は要求を取り消す。
+                    updateLightRequests.Dequeue();
+                    continue;
+                }
+
+                // チャンクが更新中ならば待機キューへ戻す。
+                if (buildLightQueue.Contains(chunk))
+                {
+                    updateLightRequests.Dequeue();
+                    updateLightRequests.Enqueue(position);
+                    continue;
+                }
+
+                var lightBuilder = lightBuilderPool.Borrow();
+                if (lightBuilder == null)
+                {
+                    // プール枯渇の場合は次フレームでの再更新判定に期待。
+                    break;
+                }
+
+                // 更新が終わるまで非アクティブ化を抑制。
+                // パーティション マネージャは非アクティブ化前にロック取得を試みるが、
+                // チャンク マネージャはそのサブクラスでロックを取得しているため、
+                // ロックだけでは非アクティブ化を抑制できない事に注意。
+                chunk.SuppressPassivation = true;
+
+                // チャンクのロックを試行。
+                // 更新が完了するまでロックを維持。
+                if (!chunk.EnterLock())
+                {
+                    // ロックを取得できない場合は待機キューへ戻す。
+                    updateLightRequests.Dequeue();
+                    updateLightRequests.Enqueue(position);
+                    continue;
+                }
+
+                // ビルダを初期化。
+                lightBuilder.Chunk = chunk;
+                chunk.LightBuilder = lightBuilder;
+                lightBuilder.Completed = false;
+
+                // ビルダを登録。
+                lightBuilderTaskQueue.Enqueue(lightBuilder.ExecuteAction);
+
+                buildLightQueue.Enqueue(chunk);
+                updateLightRequests.Dequeue();
+            }
+        }
+
         /// <summary>
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
@@ -481,8 +586,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void CheckUpdateMesheRequests(GameTime gameTime, Queue<VectorI3> requestQueue)
         {
-            var searchCapacity = meshUpdateSearchCapacity;
-
             int count = requestQueue.Count;
             for (int i = 0; i < count && i < meshUpdateSearchCapacity; i++)
             {
@@ -551,6 +654,36 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 完了フラグを初期化。
             verticesBuilder.Completed = false;
+        }
+
+        void CheckLightUpdated(GameTime gameTime)
+        {
+            // ビルダの監視。
+            int count = buildLightQueue.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var chunk = buildLightQueue.Dequeue();
+
+                if (!chunk.LightBuilder.Completed)
+                {
+                    // 未完ならば更新キューへ戻す。
+                    buildLightQueue.Enqueue(chunk);
+                    continue;
+                }
+
+                // ビルダを解放。
+                ReleaseLightBuilder(chunk.LightBuilder);
+
+                // 更新開始で取得したロックを解放。
+                chunk.ExitLock();
+
+                // 非アクティブ化の抑制を解除。
+                chunk.SuppressPassivation = false;
+
+                // 非クローズ中ならばメッシュ更新を要求。
+                if (!Closing)
+                    RequestUpdateMesh(ref chunk.Position, UpdateMeshPriority.Normal);
+            }
         }
 
         /// <summary>

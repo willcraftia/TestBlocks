@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework (Xbox 360)", "Framework\Framework (Xbox 360).csproj", "{69D1A7DE-A718-49EA-8314-C47DC521227E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework (x86)", "Framework\Framework (x86).csproj", "{2E15AFAD-6982-45D4-86B3-F5950139EFD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework.Serialization.Demo", "Framework.Serialization.Demo\Framework.Serialization.Demo.csproj", "{B1D5B66E-FA3D-4256-906D-C8ABA37DAE8E}"
@@ -19,18 +17,6 @@ Global
 		Release|Xbox 360 = Release|Xbox 360
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Debug|Mixed Platforms.ActiveCfg = Debug|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Debug|Mixed Platforms.Build.0 = Debug|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Debug|x86.ActiveCfg = Debug|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Debug|x86.Build.0 = Debug|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Debug|Xbox 360.ActiveCfg = Debug|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Debug|Xbox 360.Build.0 = Debug|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Release|Mixed Platforms.ActiveCfg = Release|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Release|Mixed Platforms.Build.0 = Release|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Release|x86.ActiveCfg = Release|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Release|x86.Build.0 = Release|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Release|Xbox 360.ActiveCfg = Release|Xbox 360
-		{69D1A7DE-A718-49EA-8314-C47DC521227E}.Release|Xbox 360.Build.0 = Release|Xbox 360
 		{2E15AFAD-6982-45D4-86B3-F5950139EFD8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{2E15AFAD-6982-45D4-86B3-F5950139EFD8}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{2E15AFAD-6982-45D4-86B3-F5950139EFD8}.Debug|x86.ActiveCfg = Debug|x86

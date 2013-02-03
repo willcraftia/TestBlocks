@@ -295,13 +295,20 @@ namespace Willcraftia.Xna.Blocks.Models
                     if (!neighborBlock.Translucent) continue;
                 }
 
+                float lightIntensity = 1;
+
+                // 面隣接ブロックにおける天空光による光量を取得。
+                var skyLight = localWorld.GetSkyLight(ref absoluteNeighborBlockPosition);
+
+                lightIntensity *= (skyLight / 15f);
+
                 // 環境光遮蔽を計算。
                 var ambientOcclusion = CalculateAmbientOcclusion(ref absoluteNeighborBlockPosition, side);
 
-                // 環境光遮蔽に基づいた頂点色を計算。
-                // 一切の遮蔽が無い場合は Color.White、
-                // 現在対象とする面を遮蔽するブロックが存在する程に Color.Block へ近づく。
-                var vertexColor = new Color(ambientOcclusion, ambientOcclusion, ambientOcclusion);
+                lightIntensity *= ambientOcclusion;
+
+                // 光量に基づいた頂点色を計算。
+                var vertexColor = new Color(lightIntensity, lightIntensity, lightIntensity);
 
                 // メッシュを追加。
                 if (block.Fluid || block.Translucent)
