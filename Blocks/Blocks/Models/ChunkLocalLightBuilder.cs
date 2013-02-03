@@ -8,23 +8,17 @@ using Willcraftia.Xna.Framework;
 
 namespace Willcraftia.Xna.Blocks.Models
 {
-    public sealed class ChunkLightBuilder
+    public sealed class ChunkLocalLightBuilder
     {
         ChunkManager manager;
 
-        volatile bool completed;
+        public volatile bool Completed;
 
         public Chunk Chunk { get; internal set; }
 
-        public bool Completed
-        {
-            get { return completed; }
-            set { completed = value; }
-        }
-
         public Action ExecuteAction { get; private set; }
 
-        public ChunkLightBuilder(ChunkManager manager)
+        public ChunkLocalLightBuilder(ChunkManager manager)
         {
             if (manager == null) throw new ArgumentNullException("manager");
 
@@ -34,14 +28,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Execute()
         {
-            Debug.Assert(!completed);
+            Debug.Assert(!Completed);
             Debug.Assert(Chunk != null);
             Debug.Assert(0 < Chunk.SolidCount);
 
             FallSkylight();
             DiffuseSkylight();
 
-            completed = true;
+            Completed = true;
         }
 
         void FallSkylight()

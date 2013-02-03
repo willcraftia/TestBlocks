@@ -115,9 +115,11 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public ChunkVerticesBuilder VerticesBuilder { get; internal set; }
 
-        public ChunkLightBuilder LightBuilder { get; internal set; }
+        public ChunkLocalLightBuilder LocalLightBuilder { get; internal set; }
 
         volatile internal bool LocalLightingCompleted;
+
+        public ChunkLightPropagator LightPropagator { get; internal set; }
 
         /// <summary>
         /// 非空ブロックの総数を取得します。
