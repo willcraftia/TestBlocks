@@ -117,6 +117,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public ChunkLightBuilder LightBuilder { get; internal set; }
 
+        volatile internal bool LocalLightingCompleted;
+
         /// <summary>
         /// 非空ブロックの総数を取得します。
         /// </summary>
@@ -187,6 +189,8 @@ namespace Willcraftia.Xna.Blocks.Models
             dataChanged = false;
 
             region = null;
+
+            LocalLightingCompleted = false;
 
             ActivationCompleted = false;
             PassivationCompleted = false;

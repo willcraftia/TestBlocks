@@ -16,8 +16,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Chunk Chunk { get; internal set; }
 
-        public bool PropagateToNeighbors { get; set; }
-
         public bool Completed
         {
             get { return completed; }
@@ -38,55 +36,39 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(!completed);
             Debug.Assert(Chunk != null);
+            Debug.Assert(0 < Chunk.SolidCount);
 
-            // 空チャンクならば頂点が存在しないため、天空光の処理そのものが不要。
-            if (Chunk.SolidCount == 0)
-            {
-                completed = true;
-                return;
-            }
-
-            var topNeighborPosition = Chunk.Position + CubicSide.Top.Direction;
-            var topNeighbor = manager.GetChunk(ref topNeighborPosition);
-
-            FallSkylight(topNeighbor);
-            PropagateSkylight();
+            FallSkylight();
+            DiffuseSkylight();
 
             completed = true;
         }
 
-        void FallSkylight(Chunk topNeighbor)
+        void FallSkylight()
         {
+            var topNeighborChunkPosition = Chunk.Position + CubicSide.Top.Direction;
+            var topNeighborChunk = manager.GetChunk(ref topNeighborChunkPosition);
+            if (topNeighborChunk != null && !topNeighborChunk.LocalLightingCompleted)
+                topNeighborChunk = null;
+
             for (int z = 0; z < manager.ChunkSize.Z; z++)
             {
                 for (int x = 0; x < manager.ChunkSize.X; x++)
                 {
                     Block topBlock = null;
 
-                    if (topNeighbor != null)
-                    {
-                        // TODO
-                        //
-                        // ここで、まだ光レベルを構築していないチャンクを参照する場合があり、
-                        // そこでは全て光レベル 0 であり、自身も全て光レベル 0 となってしまう。
+                    // 上隣接チャンクが存在し、かつ、ローカル光レベル更新済みであり、
+                    // 対象とする位置に直射日光が到達していないならば、
+                    // 上隣接チャンク内で既に遮蔽状態となっている。
+                    if (topNeighborChunk != null && topNeighborChunk.GetSkylightLevel(x, 0, z) < 15)
+                        continue;
 
-                        // 上にチャンクがあるならば、その情報を参照。
-                        if (topNeighbor.GetSkylightLevel(x, 0, z) < 15)
-                        {
-                            // 既に減衰した光量の場合、上のチャンク内のどこかで遮蔽されているため、
-                            // 直接的な天空光の到達はこれ以上ない。
-                            continue;
-                        }
-
-                        topBlock = topNeighbor.GetBlock(x, 0, z);
-                    }
-
-                    // 上から順に天空光の到達を試行。
+                    // 上から順に擬似直射日光の到達を試行。
                     for (int y = manager.ChunkSize.Y - 1; 0 <= y; y--)
                     {
                         if (topBlock == null || topBlock.Translucent)
                         {
-                            // 上が空ブロック、あるいは、半透明ブロックならば、光は減衰せずに伝播。
+                            // 上が空ブロック、あるいは、半透明ブロックならば、直射日光が到達。
                             Chunk.SetSkylightLevel(x, y, z, 15);
 
                             // 次のループのために今のブロックを上のブロックとして設定。
@@ -94,7 +76,7 @@ namespace Willcraftia.Xna.Blocks.Models
                         }
                         else
                         {
-                            // 上が不透明ブロックならば、それより下にある全部ブロック位置で光の伝播をスキップ。
+                            // 上が不透明ブロックならば、以下全ての位置は遮蔽状態。
                             break;
                         }
                     }
@@ -102,15 +84,8 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        void PropagateSkylight()
+        void DiffuseSkylight()
         {
-            PropagateSkylightFromTopNeighbor();
-            PropagateSkylightFromBottomNeighbor();
-            PropagateSkylightFromFrontNeighbor();
-            PropagateSkylightFromBackNeighbor();
-            PropagateSkylightFromLeftNeighbor();
-            PropagateSkylightFromRightNeighbor();
-
             for (int z = 0; z < manager.ChunkSize.Z; z++)
             {
                 for (int x = 0; x < manager.ChunkSize.X; x++)
@@ -118,133 +93,18 @@ namespace Willcraftia.Xna.Blocks.Models
                     for (int y = manager.ChunkSize.Y - 1; 0 <= y; y--)
                     {
                         var blockPosition = new VectorI3(x, y, z);
-                        PropagateSkylight(ref blockPosition);
+                        DiffuseSkylight(ref blockPosition);
                     }
                 }
             }
         }
 
-        void PropagateSkylightFromNeighbor(int x, int y, int z, byte sourceLevel)
+        void DiffuseSkylight(ref VectorI3 blockPosition)
         {
-            const int attenuation = 1;
+            var level = Chunk.GetSkylightLevel(ref blockPosition);
 
-            if (sourceLevel <= 1) return;
-
-            if (sourceLevel <= Chunk.GetSkylightLevel(x, y, z)) return;
-
-            var block = Chunk.GetBlock(x, y, z);
-            if (block == null || block.Translucent)
-            {
-                //Chunk.SetSkylightLevel(x, y, z, (byte) (sourceLevel - 1));
-
-                var value = sourceLevel - attenuation;
-                if (value < 0) value = 0;
-                Chunk.SetSkylightLevel(x, y, z, (byte) value);
-            }
-        }
-
-        void PropagateSkylightFromTopNeighbor()
-        {
-            var neighborChunkPosition = Chunk.Position + CubicSide.Top.Direction;
-            var neighborChunk = manager.GetChunk(ref neighborChunkPosition);
-            if (neighborChunk == null) return;
-
-            for (int z = 0; z < manager.ChunkSize.Z; z++)
-            {
-                for (int x = 0; x < manager.ChunkSize.X; x++)
-                {
-                    var skyLight = neighborChunk.GetSkylightLevel(x, 0, z);
-                    PropagateSkylightFromNeighbor(x, manager.ChunkSize.Y - 1, z, skyLight);
-                }
-            }
-        }
-
-        void PropagateSkylightFromBottomNeighbor()
-        {
-            var neighborChunkPosition = Chunk.Position + CubicSide.Bottom.Direction;
-            var neighborChunk = manager.GetChunk(ref neighborChunkPosition);
-            if (neighborChunk == null) return;
-
-            for (int z = 0; z < manager.ChunkSize.Z; z++)
-            {
-                for (int x = 0; x < manager.ChunkSize.X; x++)
-                {
-                    var skyLight = neighborChunk.GetSkylightLevel(x, manager.ChunkSize.Y - 1, z);
-                    PropagateSkylightFromNeighbor(x, 0, z, skyLight);
-                }
-            }
-        }
-
-        void PropagateSkylightFromFrontNeighbor()
-        {
-            var neighborChunkPosition = Chunk.Position + CubicSide.Front.Direction;
-            var neighborChunk = manager.GetChunk(ref neighborChunkPosition);
-            if (neighborChunk == null) return;
-
-            for (int y = 0; y < manager.ChunkSize.Y; y++)
-            {
-                for (int x = 0; x < manager.ChunkSize.X; x++)
-                {
-                    var skyLight = neighborChunk.GetSkylightLevel(x, y, 0);
-                    PropagateSkylightFromNeighbor(x, y, manager.ChunkSize.Z - 1, skyLight);
-                }
-            }
-        }
-
-        void PropagateSkylightFromBackNeighbor()
-        {
-            var neighborChunkPosition = Chunk.Position + CubicSide.Back.Direction;
-            var neighborChunk = manager.GetChunk(ref neighborChunkPosition);
-            if (neighborChunk == null) return;
-
-            for (int y = 0; y < manager.ChunkSize.Y; y++)
-            {
-                for (int x = 0; x < manager.ChunkSize.X; x++)
-                {
-                    var skyLight = neighborChunk.GetSkylightLevel(x, y, manager.ChunkSize.Z - 1);
-                    PropagateSkylightFromNeighbor(x, y, 0, skyLight);
-                }
-            }
-        }
-
-        void PropagateSkylightFromLeftNeighbor()
-        {
-            var neighborChunkPosition = Chunk.Position + CubicSide.Left.Direction;
-            var neighborChunk = manager.GetChunk(ref neighborChunkPosition);
-            if (neighborChunk == null) return;
-
-            for (int z = 0; z < manager.ChunkSize.Z; z++)
-            {
-                for (int y = 0; y < manager.ChunkSize.Y; y++)
-                {
-                    var skyLight = neighborChunk.GetSkylightLevel(manager.ChunkSize.X - 1, y, z);
-                    PropagateSkylightFromNeighbor(0, y, z, skyLight);
-                }
-            }
-        }
-
-        void PropagateSkylightFromRightNeighbor()
-        {
-            var neighborChunkPosition = Chunk.Position + CubicSide.Right.Direction;
-            var neighborChunk = manager.GetChunk(ref neighborChunkPosition);
-            if (neighborChunk == null) return;
-
-            for (int z = 0; z < manager.ChunkSize.Z; z++)
-            {
-                for (int y = 0; y < manager.ChunkSize.Y; y++)
-                {
-                    var skyLight = neighborChunk.GetSkylightLevel(0, y, z);
-                    PropagateSkylightFromNeighbor(manager.ChunkSize.X - 1, y, z, skyLight);
-                }
-            }
-        }
-
-        void PropagateSkylight(ref VectorI3 blockPosition)
-        {
-            var skyLight = Chunk.GetSkylightLevel(ref blockPosition);
-
-            // 1 以下はこれ以上伝搬できない。
-            if (skyLight <= 1) return;
+            // 1 以下はこれ以上拡散できない。
+            if (level <= 1) return;
 
             var block = Chunk.GetBlock(ref blockPosition);
 
@@ -252,21 +112,23 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var neighborBlockPosition = blockPosition + side.Direction;
 
-                // チャンクの外になる場合はスキップ。
+                // チャンク外はスキップ。
                 if (neighborBlockPosition.X < 0 || manager.ChunkSize.X <= neighborBlockPosition.X ||
                     neighborBlockPosition.Y < 0 || manager.ChunkSize.Y <= neighborBlockPosition.Y ||
                     neighborBlockPosition.Z < 0 || manager.ChunkSize.Z <= neighborBlockPosition.Z)
                     continue;
 
-                // より光量の多い位置へは伝播する必要がない。
-                if (skyLight <= Chunk.GetSkylightLevel(ref neighborBlockPosition)) continue;
+                var diffuseLevel = (byte) (level - 1);
+
+                // 光レベルの高い位置へは拡散しない。
+                if (diffuseLevel <= Chunk.GetSkylightLevel(ref neighborBlockPosition)) continue;
 
                 var neighborBlock = Chunk.GetBlock(ref neighborBlockPosition);
                 if (neighborBlock == null || neighborBlock.Translucent)
                 {
-                    Chunk.SetSkylightLevel(ref neighborBlockPosition, (byte) (skyLight - 1));
+                    Chunk.SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
 
-                    PropagateSkylight(ref neighborBlockPosition);
+                    DiffuseSkylight(ref neighborBlockPosition);
                 }
             }
         }

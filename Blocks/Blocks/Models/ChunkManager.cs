@@ -41,45 +41,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
-        struct UpdateLightRequest : IEquatable<UpdateLightRequest>
-        {
-            public VectorI3 Position;
-
-            public bool PropagateToNeighbors;
-
-            #region Equatable
-
-            public static bool operator ==(UpdateLightRequest value1, UpdateLightRequest value2)
-            {
-                return value1.Position.Equals(value2.Position);
-            }
-
-            public static bool operator !=(UpdateLightRequest value1, UpdateLightRequest value2)
-            {
-                return !value1.Equals(value2);
-            }
-
-            // I/F
-            public bool Equals(UpdateLightRequest other)
-            {
-                return Position == other.Position;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (obj == null || GetType() != obj.GetType()) return false;
-
-                return Equals((UpdateLightRequest) obj);
-            }
-
-            public override int GetHashCode()
-            {
-                return Position.GetHashCode();
-            }
-
-            #endregion
-        }
-
         /// <summary>
         /// チャンク サイズ。
         /// </summary>
@@ -152,7 +113,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         TaskQueue verticesBuilderTaskQueue;
 
-        Queue<UpdateLightRequest> updateLightRequests;
+        Queue<VectorI3> updateLightRequests;
 
         Queue<Chunk> buildLightQueue;
 
@@ -269,7 +230,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 SlotCount = verticesBuilderCount
             };
 
-            updateLightRequests = new Queue<UpdateLightRequest>();
+            updateLightRequests = new Queue<VectorI3>();
             buildLightQueue = new Queue<Chunk>();
             lightBuilderPool = new Pool<ChunkLightBuilder>(() => { return new ChunkLightBuilder(this); })
             {
@@ -409,7 +370,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var bounds = BoundingBoxI.CreateFromCenterExtents(partition.Position, new VectorI3(1));
                 RequestUpdateMesh(ref bounds, UpdateMeshPriority.Normal);
                 
-                RequestUpdateLight(ref chunk.Position, true);
+                RequestUpdateLight(ref chunk.Position);
             }
 
             // ノードを追加。
@@ -498,15 +459,10 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        internal void RequestUpdateLight(ref VectorI3 position, bool propagateToNeighbors)
+        internal void RequestUpdateLight(ref VectorI3 position)
         {
-            var request = new UpdateLightRequest
-            {
-                Position = position,
-                PropagateToNeighbors = propagateToNeighbors
-            };
-            if (!updateLightRequests.Contains(request))
-                updateLightRequests.Enqueue(request);
+            if (!updateLightRequests.Contains(position))
+                updateLightRequests.Enqueue(position);
         }
 
         internal SceneNode CreateNode()
@@ -563,13 +519,20 @@ namespace Willcraftia.Xna.Blocks.Models
             int count = updateLightRequests.Count;
             for (int i = 0; i < count && i < searchCapacity; i++)
             {
-                var request = updateLightRequests.Peek();
+                var position = updateLightRequests.Peek();
 
                 // アクティブ チャンクを取得。
-                var chunk = GetChunk(ref request.Position);
+                var chunk = GetChunk(ref position);
                 if (chunk == null)
                 {
                     // 存在しない場合は要求を取り消す。
+                    updateLightRequests.Dequeue();
+                    continue;
+                }
+
+                if (chunk.SolidCount == 0)
+                {
+                    // 空チャンクならば光レベルの更新は不要。
                     updateLightRequests.Dequeue();
                     continue;
                 }
@@ -578,7 +541,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (buildLightQueue.Contains(chunk))
                 {
                     updateLightRequests.Dequeue();
-                    updateLightRequests.Enqueue(request);
+                    updateLightRequests.Enqueue(position);
                     continue;
                 }
 
@@ -601,14 +564,13 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     // ロックを取得できない場合は待機キューへ戻す。
                     updateLightRequests.Dequeue();
-                    updateLightRequests.Enqueue(request);
+                    updateLightRequests.Enqueue(position);
                     continue;
                 }
 
                 // ビルダを初期化。
                 lightBuilder.Chunk = chunk;
                 chunk.LightBuilder = lightBuilder;
-                lightBuilder.PropagateToNeighbors = request.PropagateToNeighbors;
                 lightBuilder.Completed = false;
 
                 // ビルダを登録。
@@ -716,7 +678,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                var propagateToNeighbors = chunk.LightBuilder.PropagateToNeighbors;
+                // 完了フラグ ON。
+                chunk.LocalLightingCompleted = true;
 
                 // ビルダを解放。
                 ReleaseLightBuilder(chunk.LightBuilder);
@@ -732,15 +695,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     // 非クローズ中ならばメッシュ更新を要求。
                     RequestUpdateMesh(ref chunk.Position, UpdateMeshPriority.High);
 
-                    if (propagateToNeighbors)
-                    {
-                        // 隣接チャンクへ更新を伝播。
-                        foreach (var side in CubicSide.Items)
-                        {
-                            var neighborPosition = chunk.Position + side.Direction;
-                            RequestUpdateLight(ref neighborPosition, false);
-                        }
-                    }
+                    var bottomNeighbor = chunk.Position + CubicSide.Bottom.Direction;
+                    RequestUpdateLight(ref bottomNeighbor);
                 }
             }
         }
