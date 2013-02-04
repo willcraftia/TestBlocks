@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
@@ -132,6 +133,8 @@ namespace Willcraftia.Xna.Blocks.Models
         Pool<ChunkLightPropagator> lightPropagatorPool;
 
         TaskQueue lightPropagatorTaskQueue;
+
+        StringBuilder meshNameBuilder = new StringBuilder(18);
 
         /// <summary>
         /// シーン マネージャ。
@@ -954,7 +957,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var mesh = chunk.GetOpaqueMesh(segmentX, segmentY, segmentZ);
                 if (mesh == null)
                 {
-                    mesh = CreateMesh(effect, false);
+                    mesh = CreateMesh(effect, false, segmentX, segmentY, segmentZ);
                     chunk.SetOpaqueMesh(segmentX, segmentY, segmentZ, mesh);
                 }
                 else
@@ -986,7 +989,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var mesh = chunk.GetTranslucentMesh(segmentX, segmentY, segmentZ);
                 if (mesh == null)
                 {
-                    mesh = CreateMesh(effect, true);
+                    mesh = CreateMesh(effect, true, segmentX, segmentY, segmentZ);
                     chunk.SetTranslucentMesh(segmentX, segmentY, segmentZ, mesh);
                 }
                 else
@@ -1014,9 +1017,15 @@ namespace Willcraftia.Xna.Blocks.Models
         /// true (半透明の場合)、false (それ以外の場合)。
         /// </param>
         /// <returns>チャンク メッシュ。</returns>
-        ChunkMesh CreateMesh(ChunkEffect effect, bool translucent)
+        ChunkMesh CreateMesh(ChunkEffect effect, bool translucent, int segmentX, int segmentY, int segmentZ)
         {
-            var name = (translucent) ? "TranslucentMesh" : "OpaqueMesh";
+            meshNameBuilder.Length = 0;
+            meshNameBuilder.Append((translucent) ? "TranslucentMesh" : "OpaqueMesh");
+            meshNameBuilder.Append('_').AppendNumber(segmentX);
+            meshNameBuilder.Append('_').AppendNumber(segmentY);
+            meshNameBuilder.Append('_').AppendNumber(segmentZ);
+
+            var name = meshNameBuilder.ToString();
 
             var mesh = new ChunkMesh(name, effect);
             mesh.Translucent = translucent;

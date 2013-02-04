@@ -55,8 +55,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     for (int x = 0; x < manager.MeshSegments.X; x++)
                     {
                         var segmentPosition = new VectorI3(x, y, z);
-                        opaques[x, y, z] = new ChunkVertices(manager.ChunkSize, segmentPosition);
-                        translucences[x, y, z] = new ChunkVertices(manager.ChunkSize, segmentPosition);
+                        opaques[x, y, z] = new ChunkVertices();
+                        translucences[x, y, z] = new ChunkVertices();
                     }
                 }
             }

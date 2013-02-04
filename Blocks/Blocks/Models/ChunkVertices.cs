@@ -15,8 +15,6 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class ChunkVertices
     {
-        public readonly VectorI3 SegmentPosition;
-
         /// <summary>
         /// 頂点情報。
         /// </summary>
@@ -60,15 +58,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="chunkSize">チャンクのサイズ。</param>
-        public ChunkVertices(VectorI3 chunkSize, VectorI3 segmentPosition)
+        public ChunkVertices()
         {
-            if (chunkSize.X < 1 || chunkSize.Y < 1 || chunkSize.Z < 1)
-                throw new ArgumentOutOfRangeException("chunkSize");
-
-            SegmentPosition = segmentPosition;
-
-            VertexCapacity = Chunk.CalculateMaxVertexCount(chunkSize);
+            VertexCapacity = Chunk.CalculateMaxVertexCount(ChunkManager.MeshSize);
             IndexCapacity = Chunk.CalculateIndexCount(VertexCapacity);
 
             if (ushort.MaxValue < IndexCapacity)
