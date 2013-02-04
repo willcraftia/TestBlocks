@@ -15,6 +15,8 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class ChunkVertices
     {
+        public readonly VectorI3 SegmentPosition;
+
         /// <summary>
         /// 頂点情報。
         /// </summary>
@@ -28,7 +30,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 全頂点を内包する BoundingBox。
         /// </summary>
-        BoundingBox boundingBox;
+        BoundingBox box;
 
         /// <summary>
         /// BoundingBox のコーナを取得するために用いるバッファ。
@@ -59,10 +61,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="chunkSize">チャンクのサイズ。</param>
-        public ChunkVertices(VectorI3 chunkSize)
+        public ChunkVertices(VectorI3 chunkSize, VectorI3 segmentPosition)
         {
             if (chunkSize.X < 1 || chunkSize.Y < 1 || chunkSize.Z < 1)
                 throw new ArgumentOutOfRangeException("chunkSize");
+
+            SegmentPosition = segmentPosition;
 
             VertexCapacity = Chunk.CalculateMaxVertexCount(chunkSize);
             IndexCapacity = Chunk.CalculateIndexCount(VertexCapacity);
@@ -84,8 +88,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // メッシュの BoundingBox。
             var transform = mesh.World;
-            Vector3.Transform(ref boundingBox.Min, ref transform, out mesh.BoxWorld.Min);
-            Vector3.Transform(ref boundingBox.Max, ref transform, out mesh.BoxWorld.Max);
+            Vector3.Transform(ref box.Min, ref transform, out mesh.BoxWorld.Min);
+            Vector3.Transform(ref box.Max, ref transform, out mesh.BoxWorld.Max);
 
             // メッシュの BoundingSphere。
             mesh.BoxWorld.GetCorners(corners);
@@ -114,8 +118,8 @@ namespace Willcraftia.Xna.Blocks.Models
             vertices[VertexCount++] = vertex;
 
             // AABB を更新。
-            Vector3.Max(ref boundingBox.Max, ref vertex.Position, out boundingBox.Max);
-            Vector3.Min(ref boundingBox.Min, ref vertex.Position, out boundingBox.Min);
+            Vector3.Max(ref box.Max, ref vertex.Position, out box.Max);
+            Vector3.Min(ref box.Min, ref vertex.Position, out box.Min);
         }
 
         /// <summary>
@@ -125,7 +129,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             VertexCount = 0;
             IndexCount = 0;
-            boundingBox = BoundingBoxHelper.Empty;
+            box = BoundingBoxHelper.Empty;
         }
     }
 }

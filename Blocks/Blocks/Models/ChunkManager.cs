@@ -41,10 +41,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        public static readonly VectorI3 MeshSize = new VectorI3(16);
+
         /// <summary>
         /// チャンク サイズ。
         /// </summary>
         public readonly VectorI3 ChunkSize;
+
+        public readonly VectorI3 MeshSegments;
 
         /// <summary>
         /// 半チャンク サイズ。
@@ -214,12 +218,23 @@ namespace Willcraftia.Xna.Blocks.Models
             meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
             verticesBuilderCount = settings.VerticesBuilderCount;
 
+            MeshSegments = new VectorI3
+            {
+                X = ChunkSize.X / MeshSize.X,
+                Y = ChunkSize.Y / MeshSize.Y,
+                Z = ChunkSize.Z / MeshSize.Z
+            };
+
             HalfChunkSize = ChunkSize;
             HalfChunkSize.X /= 2;
             HalfChunkSize.Y /= 2;
             HalfChunkSize.Z /= 2;
 
-            MeshOffset = HalfChunkSize.ToVector3();
+            var halfMeshSize = MeshSize;
+            halfMeshSize.X /= 2;
+            halfMeshSize.Y /= 2;
+            halfMeshSize.Z /= 2;
+            MeshOffset = halfMeshSize.ToVector3();
 
             chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(this); });
             chunkPool.MaxCapacity = settings.ChunkPoolMaxCapacity;
@@ -506,10 +521,7 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (builder == null) throw new ArgumentNullException("builder");
 
-            builder.Chunk.VerticesBuilder = null;
-            builder.Chunk = null;
-            builder.Opaque.Clear();
-            builder.Translucent.Clear();
+            builder.Clear();
             verticesBuilderPool.Return(builder);
         }
 
@@ -886,6 +898,115 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
+        /// チャンクに関連付けられた頂点ビルダの結果で頂点バッファを更新します。
+        /// </summary>
+        /// <param name="chunk">チャンク。</param>
+        void UpdateMesh(Chunk chunk)
+        {
+            for (int z = 0; z < MeshSegments.Z; z++)
+            {
+                for (int y = 0; y < MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < MeshSegments.X; x++)
+                    {
+                        UpdateMesh(chunk, x, y, z);
+                    }
+                }
+            }
+
+            // チャンクのノードを更新。
+            chunk.Node.Update(false);
+        }
+
+        void UpdateMesh(Chunk chunk, int segmentX, int segmentY, int segmentZ)
+        {
+            var builder = chunk.VerticesBuilder;
+
+            // メッシュに設定するワールド座標。
+            // メッシュの中心をメッシュの位置とする。
+            var position = new Vector3
+            {
+                X = chunk.Position.X * PartitionSize.X + segmentX * MeshSize.X + MeshOffset.X,
+                Y = chunk.Position.Y * PartitionSize.Y + segmentY * MeshSize.Y + MeshOffset.Y,
+                Z = chunk.Position.Z * PartitionSize.Z + segmentZ * MeshSize.Z + MeshOffset.Z
+            };
+
+            // メッシュに設定するワールド行列。
+            Matrix world;
+            Matrix.CreateTranslation(ref position, out world);
+
+            // メッシュに設定するエフェクト。
+            var effect = chunk.Region.ChunkEffect;
+
+            var opaque = builder.GetOpaque(segmentX, segmentY, segmentZ);
+            var translucence = builder.GetTranslucence(segmentX, segmentY, segmentZ);
+
+            //----------------------------------------------------------------
+            // 不透明メッシュ
+
+            if (opaque.VertexCount == 0 || opaque.IndexCount == 0)
+            {
+                if (chunk.GetOpaqueMesh(segmentX, segmentY, segmentZ) != null)
+                    chunk.SetOpaqueMesh(segmentX, segmentY, segmentZ, null);
+            }
+            else
+            {
+                var mesh = chunk.GetOpaqueMesh(segmentX, segmentY, segmentZ);
+                if (mesh == null)
+                {
+                    mesh = CreateMesh(effect, false);
+                    chunk.SetOpaqueMesh(segmentX, segmentY, segmentZ, mesh);
+                }
+                else
+                {
+                    TotalVertexCount -= mesh.VertexCount;
+                    TotalIndexCount -= mesh.IndexCount;
+                }
+
+                mesh.PositionWorld = position;
+                mesh.World = world;
+                opaque.Populate(mesh);
+
+                TotalVertexCount += mesh.VertexCount;
+                TotalIndexCount += mesh.IndexCount;
+                MaxVertexCount = Math.Max(MaxVertexCount, mesh.VertexCount);
+                MaxIndexCount = Math.Max(MaxIndexCount, mesh.IndexCount);
+            }
+
+            //----------------------------------------------------------------
+            // 半透明メッシュ
+
+            if (translucence.VertexCount == 0 || translucence.IndexCount == 0)
+            {
+                if (chunk.GetTranslucentMesh(segmentX, segmentY, segmentZ) != null)
+                    chunk.SetTranslucentMesh(segmentX, segmentY, segmentZ, null);
+            }
+            else
+            {
+                var mesh = chunk.GetTranslucentMesh(segmentX, segmentY, segmentZ);
+                if (mesh == null)
+                {
+                    mesh = CreateMesh(effect, true);
+                    chunk.SetTranslucentMesh(segmentX, segmentY, segmentZ, mesh);
+                }
+                else
+                {
+                    TotalVertexCount -= mesh.VertexCount;
+                    TotalIndexCount -= mesh.IndexCount;
+                }
+
+                mesh.PositionWorld = position;
+                mesh.World = world;
+                translucence.Populate(mesh);
+
+                TotalVertexCount += mesh.VertexCount;
+                TotalIndexCount += mesh.IndexCount;
+                MaxVertexCount = Math.Max(MaxVertexCount, mesh.VertexCount);
+                MaxIndexCount = Math.Max(MaxIndexCount, mesh.IndexCount);
+            }
+        }
+
+        /// <summary>
         /// チャンク メッシュを生成します。
         /// </summary>
         /// <param name="effect">チャンクのエフェクト。</param>
@@ -897,100 +1018,12 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             var name = (translucent) ? "TranslucentMesh" : "OpaqueMesh";
 
-            var chunkMesh = new ChunkMesh(name, effect);
-            chunkMesh.Translucent = translucent;
+            var mesh = new ChunkMesh(name, effect);
+            mesh.Translucent = translucent;
 
             MeshCount++;
 
-            return chunkMesh;
-        }
-
-        /// <summary>
-        /// チャンクに関連付けられた頂点ビルダの結果で頂点バッファを更新します。
-        /// </summary>
-        /// <param name="chunk">チャンク。</param>
-        void UpdateMesh(Chunk chunk)
-        {
-            var builder = chunk.VerticesBuilder;
-
-            // メッシュに設定するワールド座標。
-            // チャンクの中心をメッシュの位置とする。
-            var position = new Vector3
-            {
-                X = chunk.Position.X * PartitionSize.X + MeshOffset.X,
-                Y = chunk.Position.Y * PartitionSize.Y + MeshOffset.Y,
-                Z = chunk.Position.Z * PartitionSize.Z + MeshOffset.Z,
-            };
-
-            // メッシュに設定するワールド行列。
-            Matrix world;
-            Matrix.CreateTranslation(ref position, out world);
-
-            // メッシュに設定するエフェクト。
-            var effect = chunk.Region.ChunkEffect;
-
-            //----------------------------------------------------------------
-            // 不透明メッシュ
-
-            if (builder.Opaque.VertexCount == 0 || builder.Opaque.IndexCount == 0)
-            {
-                if (chunk.OpaqueMesh != null)
-                    chunk.OpaqueMesh = null;
-            }
-            else
-            {
-                if (chunk.OpaqueMesh == null)
-                {
-                    chunk.OpaqueMesh = CreateMesh(effect, false);
-                }
-                else
-                {
-                    TotalVertexCount -= chunk.OpaqueMesh.VertexCount;
-                    TotalIndexCount -= chunk.OpaqueMesh.IndexCount;
-                }
-
-                chunk.OpaqueMesh.PositionWorld = position;
-                chunk.OpaqueMesh.World = world;
-                builder.Opaque.Populate(chunk.OpaqueMesh);
-
-                TotalVertexCount += chunk.OpaqueMesh.VertexCount;
-                TotalIndexCount += chunk.OpaqueMesh.IndexCount;
-                MaxVertexCount = Math.Max(MaxVertexCount, chunk.OpaqueMesh.VertexCount);
-                MaxIndexCount = Math.Max(MaxIndexCount, chunk.OpaqueMesh.IndexCount);
-            }
-
-            //----------------------------------------------------------------
-            // 半透明メッシュ
-
-            if (builder.Translucent.VertexCount == 0 || builder.Translucent.IndexCount == 0)
-            {
-                if (chunk.TranslucentMesh != null)
-                    chunk.TranslucentMesh = null;
-            }
-            else
-            {
-                if (chunk.TranslucentMesh == null)
-                {
-                    chunk.TranslucentMesh = CreateMesh(effect, true);
-                }
-                else
-                {
-                    TotalVertexCount -= chunk.TranslucentMesh.VertexCount;
-                    TotalIndexCount -= chunk.TranslucentMesh.IndexCount;
-                }
-
-                chunk.TranslucentMesh.PositionWorld = position;
-                chunk.TranslucentMesh.World = world;
-                builder.Translucent.Populate(chunk.TranslucentMesh);
-
-                TotalVertexCount += chunk.TranslucentMesh.VertexCount;
-                TotalIndexCount += chunk.TranslucentMesh.IndexCount;
-                MaxVertexCount = Math.Max(MaxVertexCount, chunk.TranslucentMesh.VertexCount);
-                MaxIndexCount = Math.Max(MaxIndexCount, chunk.TranslucentMesh.IndexCount);
-            }
-
-            // チャンクのノードを更新。
-            chunk.Node.Update(false);
+            return mesh;
         }
     }
 }

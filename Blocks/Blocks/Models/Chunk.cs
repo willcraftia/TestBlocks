@@ -47,14 +47,16 @@ namespace Willcraftia.Xna.Blocks.Models
         bool dataChanged;
 
         /// <summary>
-        /// 不透明メッシュ。
+        /// 不透明メッシュ配列。
+        /// 添字はセグメント位置です。
         /// </summary>
-        ChunkMesh opaqueMesh;
+        ChunkMesh[, ,] opaqueMeshes;
 
         /// <summary>
         /// 半透明メッシュ。
+        /// 添字はセグメント位置です。
         /// </summary>
-        ChunkMesh translucentMesh;
+        ChunkMesh[, ,] translucentMeshes;
 
         /// <summary>
         /// チャンクのサイズを取得します。
@@ -73,42 +75,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         public SceneNode Node { get; private set; }
-
-        /// <summary>
-        /// 不透明メッシュを取得または設定します。
-        /// </summary>
-        public ChunkMesh OpaqueMesh
-        {
-            get { return opaqueMesh; }
-            internal set
-            {
-                if (opaqueMesh != null)
-                    DetachMesh(opaqueMesh);
-
-                opaqueMesh = value;
-
-                if (opaqueMesh != null)
-                    AttachMesh(opaqueMesh);
-            }
-        }
-
-        /// <summary>
-        /// 半透明メッシュを取得または設定します。
-        /// </summary>
-        public ChunkMesh TranslucentMesh
-        {
-            get { return translucentMesh; }
-            internal set
-            {
-                if (translucentMesh != null)
-                    DetachMesh(translucentMesh);
-
-                translucentMesh = value;
-
-                if (translucentMesh != null)
-                    AttachMesh(translucentMesh);
-            }
-        }
 
         /// <summary>
         /// メッシュ更新のための頂点ビルダを取得または設定します。
@@ -143,6 +109,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.manager = manager;
 
+            opaqueMeshes = new ChunkMesh[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
+            translucentMeshes = new ChunkMesh[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
+
             Node = manager.CreateNode();
         }
 
@@ -167,16 +136,26 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Position = VectorI3.Zero;
 
-            if (opaqueMesh != null)
+            for (int z = 0; z < manager.MeshSegments.Z; z++)
             {
-                DetachMesh(opaqueMesh);
-                opaqueMesh = null;
+                for (int y = 0; y < manager.MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < manager.MeshSegments.X; x++)
+                    {
+                        if (opaqueMeshes[x, y, z] != null)
+                        {
+                            DetachMesh(opaqueMeshes[x, y, z]);
+                            opaqueMeshes[x, y, z] = null;
+                        }
+                        if (translucentMeshes[x, y, z] != null)
+                        {
+                            DetachMesh(translucentMeshes[x, y, z]);
+                            translucentMeshes[x, y, z] = null;
+                        }
+                    }
+                }
             }
-            if (translucentMesh != null)
-            {
-                DetachMesh(translucentMesh);
-                translucentMesh = null;
-            }
+
             if (VerticesBuilder != null)
             {
                 manager.ReleaseVerticesBuilder(VerticesBuilder);
@@ -377,6 +356,40 @@ namespace Willcraftia.Xna.Blocks.Models
                 Y = GetAbsoluteBlockPositionY(relativeBlockPosition.Y),
                 Z = GetAbsoluteBlockPositionZ(relativeBlockPosition.Z)
             };
+        }
+
+        public ChunkMesh GetOpaqueMesh(int segmentX, int segmentY, int segmentZ)
+        {
+            return opaqueMeshes[segmentX, segmentY, segmentZ];
+        }
+
+        public ChunkMesh GetTranslucentMesh(int segmentX, int segmentY, int segmentZ)
+        {
+            return translucentMeshes[segmentX, segmentY, segmentZ];
+        }
+
+        public void SetOpaqueMesh(int segmentX, int segmentY, int segmentZ, ChunkMesh mesh)
+        {
+            var oldMesh = opaqueMeshes[segmentX, segmentY, segmentZ];
+            if (oldMesh != null)
+                DetachMesh(oldMesh);
+
+            opaqueMeshes[segmentX, segmentY, segmentZ] = mesh;
+
+            if (mesh != null)
+                AttachMesh(mesh);
+        }
+
+        public void SetTranslucentMesh(int segmentX, int segmentY, int segmentZ, ChunkMesh mesh)
+        {
+            var oldMesh = translucentMeshes[segmentX, segmentY, segmentZ];
+            if (oldMesh != null)
+                DetachMesh(oldMesh);
+
+            translucentMeshes[segmentX, segmentY, segmentZ] = mesh;
+
+            if (mesh != null)
+                AttachMesh(mesh);
         }
 
         /// <summary>

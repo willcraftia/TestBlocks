@@ -1,6 +1,7 @@
 ﻿#region Using
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
@@ -20,11 +21,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         LocalWorld localWorld;
 
+        ChunkVertices[, ,] opaques;
+
+        ChunkVertices[, ,] translucences;
+
         public Chunk Chunk { get; internal set; }
-
-        public ChunkVertices Translucent { get; private set; }
-
-        public ChunkVertices Opaque { get; private set; }
 
         public bool Completed
         {
@@ -41,9 +42,52 @@ namespace Willcraftia.Xna.Blocks.Models
             this.manager = manager;
 
             localWorld = new LocalWorld(manager, new VectorI3(3));
-            Opaque = new ChunkVertices(manager.ChunkSize);
-            Translucent = new ChunkVertices(manager.ChunkSize);
             ExecuteAction = new Action(Execute);
+
+            var segmentCount = manager.MeshSegments.X * manager.MeshSegments.Y * manager.MeshSegments.Z;
+            opaques = new ChunkVertices[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
+            translucences = new ChunkVertices[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
+
+            for (int z = 0; z < manager.MeshSegments.Z; z++)
+            {
+                for (int y = 0; y < manager.MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < manager.MeshSegments.X; x++)
+                    {
+                        var segmentPosition = new VectorI3(x, y, z);
+                        opaques[x, y, z] = new ChunkVertices(manager.ChunkSize, segmentPosition);
+                        translucences[x, y, z] = new ChunkVertices(manager.ChunkSize, segmentPosition);
+                    }
+                }
+            }
+        }
+
+        public ChunkVertices GetOpaque(int segmentX, int segmentY, int segmentZ)
+        {
+            return opaques[segmentX, segmentY, segmentZ];
+        }
+
+        public ChunkVertices GetTranslucence(int segmentX, int segmentY, int segmentZ)
+        {
+            return translucences[segmentX, segmentY, segmentZ];
+        }
+
+        public void Clear()
+        {
+            if (Chunk != null && Chunk.VerticesBuilder != null) Chunk.VerticesBuilder = null;
+            Chunk = null;
+
+            for (int z = 0; z < manager.MeshSegments.Z; z++)
+            {
+                for (int y = 0; y < manager.MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < manager.MeshSegments.X; x++)
+                    {
+                        opaques[x, y, z].Clear();
+                        translucences[x, y, z].Clear();
+                    }
+                }
+            }
         }
 
         void Execute()
@@ -54,22 +98,48 @@ namespace Willcraftia.Xna.Blocks.Models
             // 周囲のチャンクを収集。
             localWorld.FetchByCenter(Chunk.Position);
 
-            var chunkSize = manager.ChunkSize;
-            var relativeBlockPosition = new VectorI3();
-
             // メッシュを更新。
-            for (relativeBlockPosition.Z = 0; relativeBlockPosition.Z < chunkSize.Z; relativeBlockPosition.Z++)
-                for (relativeBlockPosition.Y = 0; relativeBlockPosition.Y < chunkSize.Y; relativeBlockPosition.Y++)
-                    for (relativeBlockPosition.X = 0; relativeBlockPosition.X < chunkSize.X; relativeBlockPosition.X++)
-                        Execute(ref relativeBlockPosition);
+            for (int z = 0; z < manager.MeshSegments.Z; z++)
+            {
+                for (int y = 0; y < manager.MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < manager.MeshSegments.X; x++)
+                    {
+                        BuildSegment(x, y, z);
+                    }
+                }
+            }
 
             localWorld.Clear();
 
             completed = true;
         }
 
-        void Execute(ref VectorI3 relativeBlockPosition)
+        void BuildSegment(int segmentX, int segmentY, int segmentZ)
         {
+            for (int z = 0; z < ChunkManager.MeshSize.Z; z++)
+            {
+                for (int y = 0; y < ChunkManager.MeshSize.Y; y++)
+                {
+                    for (int x = 0; x < ChunkManager.MeshSize.X; x++)
+                    {
+                        BuildBlock(segmentX, segmentY, segmentZ, x, y, z);
+                    }
+                }
+            }
+        }
+
+        void BuildBlock(int segmentX, int segmentY, int segmentZ, int x, int y, int z)
+        {
+            // チャンク内相対ブロック位置。
+            var relativeBlockPosition = new VectorI3
+            {
+                X = segmentX * ChunkManager.MeshSize.X + x,
+                Y = segmentY * ChunkManager.MeshSize.Y + y,
+                Z = segmentZ * ChunkManager.MeshSize.Z + z
+            };
+
+            // ワールド内絶対ブロック位置。
             VectorI3 absoluteBlockPosition;
             Chunk.GetAbsoluteBlockPosition(ref relativeBlockPosition, out absoluteBlockPosition);
 
@@ -80,11 +150,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var block = Chunk.Region.BlockCatalog[blockIndex];
 
-            var chunkSize = manager.ChunkSize;
-
             // MeshPart が必ずしも平面であるとは限らないが、
             // ここでは平面を仮定して隣接状態を考える。
-
             foreach (var side in CubicSide.Items)
             {
                 var meshPart = block.Mesh.MeshParts[side];
@@ -133,14 +200,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 var vertexColor = new Color(lightIntensity, lightIntensity, lightIntensity);
 
                 // メッシュを追加。
+                ChunkVertices vertices;
                 if (block.Fluid || block.Translucent)
                 {
-                    AddMesh(ref relativeBlockPosition, ref vertexColor, meshPart, Translucent);
+                    vertices = translucences[segmentX, segmentY, segmentZ];
                 }
                 else
                 {
-                    AddMesh(ref relativeBlockPosition, ref vertexColor, meshPart, Opaque);
+                    vertices = opaques[segmentX, segmentY, segmentZ];
                 }
+                AddMesh(x, y, z, ref vertexColor, meshPart, vertices);
             }
         }
 
@@ -187,7 +256,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return occlustion;
         }
 
-        void AddMesh(ref VectorI3 position, ref Color color, MeshPart source, ChunkVertices destination)
+        void AddMesh(int x, int y, int z, ref Color color, MeshPart source, ChunkVertices destination)
         {
             foreach (var index in source.Indices)
                 destination.AddIndex(index);
@@ -205,15 +274,15 @@ namespace Willcraftia.Xna.Blocks.Models
                     TextureCoordinate = sourceVertex.TextureCoordinate
                 };
 
-                // チャンク座標内での位置へ移動。
-                vertex.Position.X += position.X;
-                vertex.Position.Y += position.Y;
-                vertex.Position.Z += position.Z;
+                // ブロック位置へ移動。
+                vertex.Position.X += x;
+                vertex.Position.Y += y;
+                vertex.Position.Z += z;
 
                 // ブロックの MeshPart はその中心に原点があるため、半ブロック移動。
                 vertex.Position += blockMeshOffset;
 
-                // チャンク メッシュはチャンクの中心位置を原点とするため、半チャンク移動。
+                // チャンク メッシュはメッシュの中心位置を原点とするため、半メッシュ移動。
                 vertex.Position -= manager.MeshOffset;
 
                 destination.AddVertex(ref vertex);
