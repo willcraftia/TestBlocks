@@ -174,11 +174,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #region Debug
 
-        BasicEffect debugBoundingBoxEffect;
+        BasicEffect debugBoxEffect;
 
-        BoundingBoxDrawer debugBoundingBoxDrawer;
+        BoundingBoxDrawer debugBoxDrawer;
 
-        public static bool DebugBoundingBoxVisible { get; set; }
+        public static bool DebugBoxVisible { get; set; }
 
         #endregion
 
@@ -339,10 +339,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             RootNode = new SceneNode(this, "Root");
 
 #if DEBUG || TRACE
-            debugBoundingBoxEffect = new BasicEffect(GraphicsDevice);
-            debugBoundingBoxEffect.AmbientLightColor = Vector3.One;
-            debugBoundingBoxEffect.VertexColorEnabled = true;
-            debugBoundingBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
+            debugBoxEffect = new BasicEffect(GraphicsDevice);
+            debugBoxEffect.AmbientLightColor = Vector3.One;
+            debugBoxEffect.VertexColorEnabled = true;
+            debugBoxDrawer = new BoundingBoxDrawer(GraphicsDevice);
 #endif
         }
 
@@ -377,8 +377,8 @@ namespace Willcraftia.Xna.Framework.Graphics
 
 #if DEBUG || TRACE
             // デバッグ エフェクトへカメラ情報を設定。
-            debugBoundingBoxEffect.View = activeCamera.View.Matrix;
-            debugBoundingBoxEffect.Projection = activeCamera.Projection.Matrix;
+            debugBoxEffect.View = activeCamera.View.Matrix;
+            debugBoxEffect.Projection = activeCamera.Projection.Matrix;
 #endif
 
             octreeManager.Execute(activeCamera.Frustum, collectObjectsAction);
@@ -713,7 +713,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         [Conditional("DEBUG"), Conditional("TRACE")]
         void DebugDrawBoundingBoxes()
         {
-            if (!DebugBoundingBoxVisible) return;
+            if (!DebugBoxVisible) return;
 
             GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
             GraphicsDevice.SetRenderTarget(RenderTarget);
@@ -731,7 +731,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         void DebugDrawBoundingBox(SceneObject sceneObject)
         {
             var color = (sceneObject.Occluded) ? Color.Gray : Color.White;
-            debugBoundingBoxDrawer.Draw(ref sceneObject.BoxWorld, debugBoundingBoxEffect, ref color);
+            debugBoxDrawer.Draw(ref sceneObject.BoxWorld, debugBoxEffect, ref color);
         }
     }
 }
