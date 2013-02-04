@@ -5,16 +5,16 @@
     "Z": 32
   },
   "MeshUpdateSearchCapacity": 100,
-  "VerticesBuilderCount": 10,
+  "VerticesBuilderCount": 5,
   "MinActiveRange": 8,
   "MaxActiveRange": 9,
   "ChunkPoolMaxCapacity": 0,
   "ClusterSize": {
-    "X": 16,
-    "Y": 16,
-    "Z": 16
+    "X": 8,
+    "Y": 8,
+    "Z": 8
   },
-  "ActivationCapacity": 2,
+  "ActivationCapacity": 1,
   "PassivationCapacity": 10,
   "PassivationSearchCapacity": 200,
   "PriorActiveDistance": 96.0
