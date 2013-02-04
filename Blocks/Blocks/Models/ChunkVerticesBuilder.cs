@@ -12,35 +12,6 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkVerticesBuilder
     {
-#if OCCLUSION_SPACE_TEST
-        #region SpaceTypes
-
-        /// <summary>
-        /// あるブロック位置における空間の解放および閉塞状態を示す列挙型です。
-        /// </summary>
-        enum SpaceTypes
-        {
-            /// <summary>
-            /// 不明あるいは未使用。
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// 探索で通過した位置のマーキング。
-            /// </summary>
-            Mark,
-            /// <summary>
-            /// 解放空間。
-            /// </summary>
-            Open,
-            /// <summary>
-            /// 閉塞空間。
-            /// </summary>
-            Closed
-        }
-
-        #endregion
-#endif
-
         static readonly Vector3 blockMeshOffset = new Vector3(0.5f);
 
         volatile bool completed;
@@ -48,10 +19,6 @@ namespace Willcraftia.Xna.Blocks.Models
         ChunkManager manager;
 
         LocalWorld localWorld;
-
-#if OCCLUSION_SPACE_TEST
-        SpaceTypes[, ,] spaceMap;
-#endif
 
         public Chunk Chunk { get; internal set; }
 
@@ -77,9 +44,6 @@ namespace Willcraftia.Xna.Blocks.Models
             Opaque = new ChunkVertices(manager.ChunkSize);
             Translucent = new ChunkVertices(manager.ChunkSize);
             ExecuteAction = new Action(Execute);
-#if OCCLUSION_SPACE_TEST
-            spaceMap = new SpaceTypes[manager.ChunkSize.X, manager.ChunkSize.Y, manager.ChunkSize.Z];
-#endif
         }
 
         void Execute()
@@ -93,20 +57,6 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunkSize = manager.ChunkSize;
             var relativeBlockPosition = new VectorI3();
 
-#if OCCLUSION_SPACE_TEST
-            Array.Clear(spaceMap, 0, spaceMap.Length);
-
-            // 解放状態マップを構築。
-            for (relativeBlockPosition.Z = 0; relativeBlockPosition.Z < chunkSize.Z; relativeBlockPosition.Z++)
-                for (relativeBlockPosition.Y = 0; relativeBlockPosition.Y < chunkSize.Y; relativeBlockPosition.Y++)
-                    for (relativeBlockPosition.X = 0; relativeBlockPosition.X < chunkSize.X; relativeBlockPosition.X++)
-                    {
-                        TestOpen(ref relativeBlockPosition);
-
-                        Debug.Assert(spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] != SpaceTypes.Mark);
-                    }
-#endif
-
             // メッシュを更新。
             for (relativeBlockPosition.Z = 0; relativeBlockPosition.Z < chunkSize.Z; relativeBlockPosition.Z++)
                 for (relativeBlockPosition.Y = 0; relativeBlockPosition.Y < chunkSize.Y; relativeBlockPosition.Y++)
@@ -117,120 +67,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             completed = true;
         }
-
-#if OCCLUSION_SPACE_TEST
-        void TestOpen(ref VectorI3 relativeBlockPosition)
-        {
-            int markCount = 0;
-
-            if (spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] == SpaceTypes.None)
-            {
-                // None ならば検査を開始。
-                // Mark は検査前であるため存在し得ない。
-                // Open/Closed 確定の要素は検査不要。
-                TestOpen(ref relativeBlockPosition, ref markCount);
-            }
-        }
-
-        bool TestOpen(ref VectorI3 relativeBlockPosition, ref int markCount)
-        {
-            var blockIndex = Chunk[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z];
-            if (blockIndex != Block.EmptyIndex)
-            {
-                var block = Chunk.Region.BlockCatalog[blockIndex];
-                
-                // 空、流体、半透明ではないブロックならば不要な位置であるため None のまま。
-                // 呼び出し元で隣接位置の探索を試行。
-                if (!block.Fluid && !block.Translucent) return false;
-            }
-
-            var chunkSize = manager.ChunkSize;
-
-            // 空、流体、半透明ブロックである場合。
-            if (relativeBlockPosition.X == 0 || relativeBlockPosition.X == (chunkSize.X - 1) ||
-                relativeBlockPosition.Y == 0 || relativeBlockPosition.Y == (chunkSize.Y - 1) ||
-                relativeBlockPosition.Z == 0 || relativeBlockPosition.Z == (chunkSize.Z - 1))
-            {
-                // 縁にあるならば Open 確定。
-                spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] = SpaceTypes.Open;
-            }
-
-            var currentResult = spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z];
-
-            if (currentResult == SpaceTypes.Open)
-            {
-                // Open 確定ならば Mark に設定した位置も全て Open 確定。
-                if (0 < markCount)
-                {
-                    for (int z = 0; z < chunkSize.Z; z++)
-                        for (int y = 0; y < chunkSize.Y; y++)
-                            for (int x = 0; x < chunkSize.X; x++)
-                            {
-                                if (spaceMap[x, y, z] == SpaceTypes.Mark)
-                                    spaceMap[x, y, z] = SpaceTypes.Open;
-                            }
-                }
-                // 処理完了。
-                return true;
-            }
-
-            if (currentResult == SpaceTypes.Closed)
-            {
-                // ※ここの処理には入り得ないが念のため。
-                // Closed 確定ならば Mark に設定した位置も全て Closed 確定。
-                if (0 < markCount)
-                {
-                    for (int z = 0; z < chunkSize.Z; z++)
-                        for (int y = 0; y < chunkSize.Y; y++)
-                            for (int x = 0; x < chunkSize.X; x++)
-                            {
-                                if (spaceMap[x, y, z] == SpaceTypes.Mark)
-                                    spaceMap[x, y, z] = SpaceTypes.Closed;
-                            }
-                }
-                // 処理完了。
-                return true;
-            }
-
-            if (currentResult == SpaceTypes.Mark)
-            {
-                // Mark ならば Mark のままとし、呼び出し元での他の隣接位置の検査に委ねる。
-                return false;
-            }
-
-            // None ならば Mark を設定して隣接位置を検査。
-            spaceMap[relativeBlockPosition.X, relativeBlockPosition.Y, relativeBlockPosition.Z] = SpaceTypes.Mark;
-            markCount++;
-
-            foreach (var side in CubicSide.Items)
-            {
-                var neighborPosition = relativeBlockPosition + side.Direction;
-
-                if (TestOpen(ref neighborPosition, ref markCount))
-                {
-                    // 戻り値が処理完了を表す true ならば処理完了。
-                    return true;
-                }
-
-                // 戻り値が処理未完を表す false ならば次の隣接位置の検査を試行。
-            }
-
-            // 再帰的に隣接位置を検査しても以前未完のままならば、
-            // 最早辿れる位置が無いため、Closed 確定。
-            if (0 < markCount)
-            {
-                for (int z = 0; z < chunkSize.Z; z++)
-                    for (int y = 0; y < chunkSize.Y; y++)
-                        for (int x = 0; x < chunkSize.X; x++)
-                        {
-                            if (spaceMap[x, y, z] == SpaceTypes.Mark)
-                                spaceMap[x, y, z] = SpaceTypes.Closed;
-                        }
-            }
-            // 処理終了。
-            return true;
-        }
-#endif
 
         void Execute(ref VectorI3 relativeBlockPosition)
         {
@@ -258,20 +94,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 // 面隣接ブロックの座標
                 var absoluteNeighborBlockPosition = absoluteBlockPosition + side.Direction;
-
-#if OCCLUSION_SPACE_TEST
-                // 自チャンク内位置ならば、閉塞空間判定を試行。
-                if (0 <= neighborPosition.X && neighborPosition.X < chunkSize.X &&
-                    0 <= neighborPosition.Y && neighborPosition.Y < chunkSize.Y &&
-                    0 <= neighborPosition.Z && neighborPosition.Z < chunkSize.Z)
-                {
-                    if (spaceMap[neighborPosition.X, neighborPosition.Y, neighborPosition.Z] == SpaceTypes.Closed)
-                    {
-                        // 隣接位置が閉塞空間ならば面は不要。
-                        continue;
-                    }
-                }
-#endif
 
                 // 面隣接ブロックを探索。
                 var neighborBlockIndex = localWorld.GetBlockIndex(ref absoluteNeighborBlockPosition);
