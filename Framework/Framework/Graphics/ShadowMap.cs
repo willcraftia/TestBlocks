@@ -461,7 +461,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.View.Position = viewerCamera.View.Position;
             internalCamera.View.Direction = viewerCamera.View.Direction;
             internalCamera.View.Up = viewerCamera.View.Up;
-            internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
+            //internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
+            // TODO
+            internalCamera.Projection.Fov = MathHelper.PiOver4 / 2;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
             internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
             internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
@@ -477,7 +479,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             internalCamera.View.Position = viewerCamera.View.Position;
             internalCamera.View.Direction = viewerCamera.View.Direction;
             internalCamera.View.Up = viewerCamera.View.Up;
-            internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
+            //internalCamera.Projection.Fov = viewerCamera.Projection.Fov;
+            // TODO
+            internalCamera.Projection.Fov = MathHelper.PiOver4 / 2;
             internalCamera.Projection.AspectRatio = viewerCamera.Projection.AspectRatio;
             internalCamera.Projection.NearPlaneDistance = viewerCamera.Projection.NearPlaneDistance;
             internalCamera.Projection.FarPlaneDistance = settings.FarPlaneDistance;
