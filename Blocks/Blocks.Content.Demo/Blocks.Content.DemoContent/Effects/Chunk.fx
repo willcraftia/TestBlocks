@@ -12,7 +12,16 @@ float4x4 Projection;
 
 float3 EyePosition;
 
+// メモ
+//
+// 指向性光源 (directional light) は、
+// 洞窟内ブロックへ不自然なライティングを行うため、持ちない。
+// よって、指向性光源に依存する拡散色 (diffuse) および
+// 反射色 (specular) を用いない。
+// 放射色 (emissive) は光源に依存しないため用いる。
+// 環境光 (ambient) は光源の方向に依存しないため用いる。
 float3 AmbientLightColor;
+
 float3 DirLight0Direction;
 float3 DirLight0DiffuseColor;
 float3 DirLight0SpecularColor;
@@ -68,6 +77,11 @@ sampler SpecularMapSampler = sampler_state
 
 //-----------------------------------------------------------------------------
 // シャドウ マッピング用
+
+// メモ
+//
+// 動的シャドウはブロック世界との相性が悪いため、
+// 機能としては残すが、基本的には用いない考え。
 
 float ShadowMapDepthBias;
 
@@ -342,16 +356,21 @@ float4 PSNmTxVc(VSOutputNmTxVc input) : COLOR0
 {
     float4 color = float4(0, 0, 0, 1);
 
-    // Base color
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // Lighting
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLight(E, N, input.TexCoord);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     return color;
 }
@@ -360,11 +379,14 @@ float4 PSNmTxVcFog(VSOutputNmTxVcFog input) : COLOR0
 {
     float4 color = float4(0, 0, 0, 1);
 
-    // Base color
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // Lighting
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 一般的なライティング。
 /*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
@@ -372,6 +394,7 @@ float4 PSNmTxVcFog(VSOutputNmTxVcFog input) : COLOR0
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
 */
+
     // Fog
     color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
 
@@ -411,16 +434,24 @@ float4 PSShadowBasic(VSOutputNmTxVcShadow input) : COLOR0
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     return color;
 }
@@ -448,16 +479,24 @@ float4 PSFogShadowBasic(VSOutputNmTxVcFogShadow input) : COLOR0
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     // フォグ
     color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
@@ -487,16 +526,24 @@ float4 PSShadowPcf2x2(VSOutputNmTxVcShadow input) : COLOR
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     return color;
 }
@@ -523,16 +570,24 @@ float4 PSFogShadowPcf2x2(VSOutputNmTxVcFogShadow input) : COLOR
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     // フォグ
     color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
@@ -562,16 +617,24 @@ float4 PSShadowPcf3x3(VSOutputNmTxVcShadow input) : COLOR
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     return color;
 }
@@ -598,16 +661,24 @@ float4 PSFogShadowPcf3x3(VSOutputNmTxVcFogShadow input) : COLOR
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     // フォグ
     color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
@@ -636,17 +707,24 @@ float4 PSShadowVsm(VSOutputNmTxVcShadow input) : COLOR0
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
-
+*/
     return color;
 }
 
@@ -671,16 +749,24 @@ float4 PSFogShadowVsm(VSOutputNmTxVcFogShadow input) : COLOR0
 
     float4 color = float4(0, 0, 0, 1);
 
-    // 基本カラー
+    // テクスチャ。
     color += tex2D(TileMapSampler, input.TexCoord);
     color *= input.Color;
 
-    // ライティング
+    // 環境光および放射光。
+    color.rgb *= AmbientLightColor + tex2D(EmissiveMapSampler, input.TexCoord);
+
+    // 影
+    color.rgb *= shadow;
+
+    // 一般的なライティング。
+/*
     float3 E = normalize(-EyePosition);
     float3 N = normalize(input.Normal);
     ColorPair light = CalculateLightWithShadow(E, N, input.TexCoord, shadow);
     color.rgb *= light.Diffuse;
     color.rgb += light.Specular;
+*/
 
     // フォグ
     color.rgb = lerp(color.rgb, FogColor, input.FogFactor);
