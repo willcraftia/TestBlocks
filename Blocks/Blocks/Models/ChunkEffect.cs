@@ -11,8 +11,24 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     using XnaDirectionalLight = Microsoft.Xna.Framework.Graphics.DirectionalLight;
 
+    /// <summary>
+    /// チャンクの描画に使用するエフェクトです。
+    /// </summary>
+    /// <remarks>
+    /// チャンクの描画では、指向性光源を用いません。
+    /// このため、指向性光源を設定するためのプロパティは機能せず、
+    /// 指向性光源の方向に依存する拡散色 (diffuse) および反射色 (specular) を
+    /// 指定することもできません。
+    /// 指向性光源に対応しない理由は、
+    /// 光が到達し得ない空間における期待しないライティングを避けることにあります。
+    /// 例えば、洞窟のような空間では、
+    /// シェーダ内での指向性光源によるライティングをすべきではありません。
+    /// なお、光源の方向に依存しない環境光 (ambient) および放射色 (emissive) は利用します。
+    /// </remarks>
     public sealed class ChunkEffect : Effect, IEffectMatrices, IEffectEye, IEffectLights, IEffectFog, IEffectShadowMap
     {
+        readonly XnaDirectionalLight nullDirectionalLight = new XnaDirectionalLight(null, null, null, null);
+
         Texture2D[] shadowMapBuffer = new Texture2D[ShadowMap.Settings.MaxSplitCount];
 
         //====================================================================
@@ -38,11 +54,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         EffectParameter tileMap;
 
-        EffectParameter diffuseMap;
-
         EffectParameter emissiveMap;
-
-        EffectParameter specularMap;
 
         //--------------------------------------------------------------------
         // シャドウ マップ用
@@ -125,11 +137,20 @@ namespace Willcraftia.Xna.Blocks.Models
             set { ambientLightColor.SetValue(value); }
         }
 
-        public XnaDirectionalLight DirectionalLight0 { get; private set; }
+        public XnaDirectionalLight DirectionalLight0
+        {
+            get { return nullDirectionalLight; }
+        }
 
-        public XnaDirectionalLight DirectionalLight1 { get; private set; }
+        public XnaDirectionalLight DirectionalLight1
+        {
+            get { return nullDirectionalLight; }
+        }
 
-        public XnaDirectionalLight DirectionalLight2 { get; private set; }
+        public XnaDirectionalLight DirectionalLight2
+        {
+            get { return nullDirectionalLight; }
+        }
 
         public void EnableDefaultLighting()
         {
@@ -234,22 +255,10 @@ namespace Willcraftia.Xna.Blocks.Models
             set { tileMap.SetValue(value); }
         }
 
-        public Texture2D DiffuseMap
-        {
-            get { return diffuseMap.GetValueTexture2D(); }
-            set { diffuseMap.SetValue(value); }
-        }
-
         public Texture2D EmissiveMap
         {
             get { return emissiveMap.GetValueTexture2D(); }
             set { emissiveMap.SetValue(value); }
-        }
-
-        public Texture2D SpecularMap
-        {
-            get { return specularMap.GetValueTexture2D(); }
-            set { specularMap.SetValue(value); }
         }
 
         public bool WireframeEnabled { get; set; }
@@ -309,18 +318,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        protected override void OnApply()
-        {
-            if (!LightingEnabled)
-            {
-                DirectionalLight0.Enabled = false;
-                DirectionalLight1.Enabled = false;
-                DirectionalLight2.Enabled = false;
-            }
-
-            base.OnApply();
-        }
-
         void CacheEffectParameters()
         {
             world = Parameters["World"];
@@ -330,13 +327,6 @@ namespace Willcraftia.Xna.Blocks.Models
             eyePosition = Parameters["EyePosition"];
 
             ambientLightColor = Parameters["AmbientLightColor"];
-            DirectionalLight0 = new XnaDirectionalLight(
-                Parameters["DirLight0Direction"],
-                Parameters["DirLight0DiffuseColor"],
-                Parameters["DirLight0SpecularColor"],
-                null);
-            DirectionalLight1 = new XnaDirectionalLight(null, null, null, null);
-            DirectionalLight2 = new XnaDirectionalLight(null, null, null, null);
 
             fogEnabled = Parameters["FogEnabled"];
             fogStart = Parameters["FogStart"];
@@ -355,9 +345,7 @@ namespace Willcraftia.Xna.Blocks.Models
             shadowMapSize = Parameters["ShadowMapSize"];
 
             tileMap = Parameters["TileMap"];
-            diffuseMap = Parameters["DiffuseMap"];
             emissiveMap = Parameters["EmissiveMap"];
-            specularMap = Parameters["SpecularMap"];
         }
 
         void CacheEffectTechniques()
