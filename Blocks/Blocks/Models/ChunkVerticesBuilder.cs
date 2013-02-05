@@ -72,6 +72,26 @@ namespace Willcraftia.Xna.Blocks.Models
             return translucences[segmentX, segmentY, segmentZ];
         }
 
+        public bool Initialize(Chunk chunk)
+        {
+            foreach (var side in CubicSide.Items)
+            {
+                var neighborPosition = chunk.Position + side.Direction;
+                if (!manager.ContainsPartition(ref neighborPosition))
+                {
+                    return false;
+                }
+            }
+
+            Chunk = chunk;
+            chunk.VerticesBuilder = this;
+
+            // 完了フラグを初期化。
+            Completed = false;
+
+            return true;
+        }
+
         public void Clear()
         {
             if (Chunk != null && Chunk.VerticesBuilder != null) Chunk.VerticesBuilder = null;
@@ -187,9 +207,15 @@ namespace Willcraftia.Xna.Blocks.Models
                 float lightIntensity = 1;
 
                 // 面隣接ブロックにおける天空光による光量を取得。
-                var skyLight = localWorld.GetSkyLight(ref absoluteNeighborBlockPosition);
 
-                lightIntensity *= (skyLight / 15f);
+                // TODO
+                if (Chunk.LightState == ChunkLightState.Complete)
+                //if (ChunkLightState.WaitPropagate <= Chunk.LightState)
+                {
+                    var skyLight = localWorld.GetSkyLight(ref absoluteNeighborBlockPosition);
+
+                    lightIntensity *= (skyLight / 15f);
+                }
 
                 // 環境光遮蔽を計算。
                 var ambientOcclusion = CalculateAmbientOcclusion(ref absoluteNeighborBlockPosition, side);

@@ -46,6 +46,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool dataChanged;
 
+        volatile ChunkLightState lightState;
+
         /// <summary>
         /// 不透明メッシュ配列。
         /// 添字はセグメント位置です。
@@ -76,16 +78,19 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public SceneNode Node { get; private set; }
 
+        public ChunkLightState LightState
+        {
+            get { return lightState; }
+        }
+
+        public Action BuildLocalLightsTask { get; private set; }
+
+        public Action PropagateLightsTask { get; private set; }
+
         /// <summary>
         /// メッシュ更新のための頂点ビルダを取得または設定します。
         /// </summary>
         public ChunkVerticesBuilder VerticesBuilder { get; internal set; }
-
-        public ChunkLocalLightBuilder LocalLightBuilder { get; internal set; }
-
-        volatile internal bool LocalLightingCompleted;
-
-        public ChunkLightPropagator LightPropagator { get; internal set; }
 
         /// <summary>
         /// 非空ブロックの総数を取得します。
@@ -113,6 +118,9 @@ namespace Willcraftia.Xna.Blocks.Models
             translucentMeshes = new ChunkMesh[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
 
             Node = manager.CreateNode();
+
+            BuildLocalLightsTask = new Action(BuildLocalLights);
+            PropagateLightsTask = new Action(PropagateLights);
         }
 
         /// <summary>
@@ -171,7 +179,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             region = null;
 
-            LocalLightingCompleted = false;
+            lightState = ChunkLightState.WaitBuildLocal;
 
             ActivationCompleted = false;
             PassivationCompleted = false;
@@ -424,9 +432,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     procedure.Generate(this);
             }
 
-            // 天空光による各ブロックにおける光量を算出。
-            //ProcessSkyLights();
-
             base.ActivateOverride();
         }
 
@@ -464,6 +469,205 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // マネージャへ削除要求。
             manager.DisposeMesh(mesh);
+        }
+
+        public void BuildLocalLights()
+        {
+            if (SolidCount == 0)
+            {
+                lightState = ChunkLightState.Complete;
+                return;
+            }
+
+            var topNeighborChunk = GetNeighborChunk(CubicSide.Top);
+            if (topNeighborChunk == null || topNeighborChunk.LightState < ChunkLightState.WaitPropagate)
+            {
+                // 再試行。
+                manager.RequestBuildLocalLights(ref Position);
+                return;
+            }
+
+            FallSkylight(topNeighborChunk);
+            DiffuseSkylight();
+
+            lightState = ChunkLightState.WaitPropagate;
+
+            // 隣接チャンクへの伝播を要求。
+            manager.RequestPropagateLights(ref Position);
+        }
+
+        void FallSkylight(Chunk topNeighborChunk)
+        {
+            for (int z = 0; z < manager.ChunkSize.Z; z++)
+            {
+                for (int x = 0; x < manager.ChunkSize.X; x++)
+                {
+                    Block topBlock = null;
+
+                    // 上隣接チャンクの対象位置に直射日光が到達していないならば、
+                    // 上隣接チャンク内で既に遮蔽状態となっている。
+                    if (topNeighborChunk != null && topNeighborChunk.GetSkylightLevel(x, 0, z) < 15)
+                        continue;
+
+                    // 上から順に擬似直射日光の到達を試行。
+                    for (int y = manager.ChunkSize.Y - 1; 0 <= y; y--)
+                    {
+                        if (topBlock == null || topBlock.Translucent)
+                        {
+                            // 上が空ブロック、あるいは、半透明ブロックならば、直射日光が到達。
+                            SetSkylightLevel(x, y, z, 15);
+
+                            // 次のループのために今のブロックを上のブロックとして設定。
+                            topBlock = GetBlock(x, y, z);
+                        }
+                        else
+                        {
+                            // 上が不透明ブロックならば、以下全ての位置は遮蔽状態。
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        void DiffuseSkylight()
+        {
+            for (int z = 0; z < manager.ChunkSize.Z; z++)
+            {
+                for (int x = 0; x < manager.ChunkSize.X; x++)
+                {
+                    for (int y = manager.ChunkSize.Y - 1; 0 <= y; y--)
+                    {
+                        var blockPosition = new VectorI3(x, y, z);
+                        DiffuseSkylight(ref blockPosition);
+                    }
+                }
+            }
+        }
+
+        void DiffuseSkylight(ref VectorI3 blockPosition)
+        {
+            // 1 以下はこれ以上拡散できない。
+            var level = GetSkylightLevel(ref blockPosition);
+            if (level <= 1) return;
+
+            if (!CanPenetrateLight(ref blockPosition)) return;
+
+            foreach (var side in CubicSide.Items)
+            {
+                var neighborBlockPosition = blockPosition + side.Direction;
+
+                // チャンク外はスキップ。
+                if (neighborBlockPosition.X < 0 || manager.ChunkSize.X <= neighborBlockPosition.X ||
+                    neighborBlockPosition.Y < 0 || manager.ChunkSize.Y <= neighborBlockPosition.Y ||
+                    neighborBlockPosition.Z < 0 || manager.ChunkSize.Z <= neighborBlockPosition.Z)
+                    continue;
+
+                // 光レベルの高い位置へは拡散しない。
+                var diffuseLevel = (byte) (level - 1);
+                if (diffuseLevel <= GetSkylightLevel(ref neighborBlockPosition)) continue;
+
+                if (!CanPenetrateLight(ref neighborBlockPosition)) continue;
+
+                SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
+                DiffuseSkylight(ref neighborBlockPosition);
+            }
+        }
+
+        public void PropagateLights()
+        {
+            if (SolidCount == 0)
+            {
+                lightState = ChunkLightState.Complete;
+                return;
+            }
+
+            var neighbors = new Neighbors<Chunk>();
+            foreach (var side in CubicSide.Items)
+            {
+                var neighbor = GetPropagatableNeighborChunk(side);
+                if (neighbor == null)
+                {
+                    // 再試行。
+                    manager.RequestPropagateLights(ref Position);
+                    return;
+                }
+                neighbors[side] = neighbor;
+            }
+
+            for (int y = 0; y < manager.ChunkSize.Y; y++)
+            {
+                for (int x = 0; x < manager.ChunkSize.X; x++)
+                {
+                    var frontBlockPosition = new VectorI3(x, y, manager.ChunkSize.Z - 1);
+                    var frontNeighborBlockPosition = new VectorI3(x, y, 0);
+                    PropagateLights(ref frontBlockPosition, neighbors.Front, ref frontNeighborBlockPosition);
+
+                    var backBlockPosition = new VectorI3(x, y, 0);
+                    var backNeighborBlockPosition = new VectorI3(x, y, manager.ChunkSize.Z - 1);
+                    PropagateLights(ref backBlockPosition, neighbors.Back, ref backNeighborBlockPosition);
+                }
+            }
+
+            for (int z = 0; z < manager.ChunkSize.Z; z++)
+            {
+                for (int y = 0; y < manager.ChunkSize.Y; y++)
+                {
+                    var leftBlockPosition = new VectorI3(0, y, z);
+                    var leftBlockNeighborPosition = new VectorI3(manager.ChunkSize.X - 1, y, z);
+                    PropagateLights(ref leftBlockPosition, neighbors.Left, ref leftBlockNeighborPosition);
+
+                    var rightBlockPosition = new VectorI3(manager.ChunkSize.X - 1, y, z);
+                    var rightBlockNeighborPosition = new VectorI3(0, y, z);
+                    PropagateLights(ref rightBlockPosition, neighbors.Right, ref rightBlockNeighborPosition);
+                }
+            }
+
+            lightState = ChunkLightState.Complete;
+
+            manager.RequestUpdateMesh(ref Position, ChunkManager.UpdateMeshPriority.Normal);
+
+            // TODO
+            manager.RequestUpdateMesh(ref neighbors.Front.Position, ChunkManager.UpdateMeshPriority.Normal);
+            manager.RequestUpdateMesh(ref neighbors.Back.Position, ChunkManager.UpdateMeshPriority.Normal);
+            manager.RequestUpdateMesh(ref neighbors.Left.Position, ChunkManager.UpdateMeshPriority.Normal);
+            manager.RequestUpdateMesh(ref neighbors.Right.Position, ChunkManager.UpdateMeshPriority.Normal);
+        }
+
+        void PropagateLights(ref VectorI3 blockPosition, Chunk neighborChunk, ref VectorI3 neighborBlockPosition)
+        {
+            var level = GetSkylightLevel(ref blockPosition);
+            if (level <= 1) return;
+
+            var diffuseLevel = (byte) (level - 1);
+            if (diffuseLevel <= neighborChunk.GetSkylightLevel(ref neighborBlockPosition)) return;
+
+            if (!CanPenetrateLight(ref blockPosition)) return;
+            if (!CanPenetrateLight(ref neighborBlockPosition)) return;
+
+            neighborChunk.SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
+            neighborChunk.DiffuseSkylight(ref neighborBlockPosition);
+        }
+
+        bool CanPenetrateLight(ref VectorI3 blockPosition)
+        {
+            var block = GetBlock(ref blockPosition);
+            return block == null || block.Translucent;
+        }
+
+        Chunk GetPropagatableNeighborChunk(CubicSide side)
+        {
+            var neighbor = GetNeighborChunk(side);
+            if (neighbor == null || neighbor.LightState < ChunkLightState.WaitPropagate)
+                return null;
+            
+            return neighbor;
+        }
+
+        Chunk GetNeighborChunk(CubicSide side)
+        {
+            var neighborPosition = Position + side.Direction;
+            return manager.GetChunk(ref neighborPosition);
         }
     }
 }
