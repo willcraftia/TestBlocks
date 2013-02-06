@@ -8,51 +8,50 @@ using Willcraftia.Xna.Framework;
 namespace Willcraftia.Xna.Blocks.Models
 {
     /// <summary>
-    /// グリッドに沿った 6 方向で隣接する要素を管理するための構造体です。
+    /// 隣接チャンクを管理するための構造体です。
     /// </summary>
     /// <remarks>
-    /// この構造体は、隣接要素を方向と共に管理するための構造を持つのみであり、
-    /// 各方向へ適切な要素を設定することは利用側の責務です。
+    /// この構造体は、方向と共に隣接チャンクを管理するための構造を持つのみであり、
+    /// 各方向へ適切な隣接チャンクを設定することは利用側の責務です。
     /// </remarks>
-    /// <typeparam name="T">要素の型。</typeparam>
-    public struct Neighbors<T>
+    public struct ChunkNeighbors
     {
         /// <summary>
-        /// 上方向 (Y 軸正の方向) で隣接する要素。
+        /// 上方向 (Y 軸正の方向) で隣接するチャンク。
         /// </summary>
-        public T Top;
+        public Chunk Top;
 
         /// <summary>
-        /// 下方向 (Y 軸負の方向) で隣接する要素。
+        /// 下方向 (Y 軸負の方向) で隣接するチャンク。
         /// </summary>
-        public T Bottom;
+        public Chunk Bottom;
 
         /// <summary>
-        /// 前方向 (Z 軸正の方向) で隣接する要素。
+        /// 前方向 (Z 軸正の方向) で隣接するチャンク。
         /// </summary>
-        public T Front;
+        public Chunk Front;
 
         /// <summary>
-        /// 後方向 (Z 軸負の方向) で隣接する要素。
+        /// 後方向 (Z 軸負の方向) で隣接するチャンク。
         /// </summary>
-        public T Back;
+        public Chunk Back;
 
         /// <summary>
-        /// 左方向 (X 軸負の方向) で隣接する要素。
+        /// 左方向 (X 軸負の方向) で隣接するチャンク。
         /// </summary>
-        public T Left;
+        public Chunk Left;
 
         /// <summary>
-        /// 右方向 (X 軸正の方向) で隣接する要素。
+        /// 右方向 (X 軸正の方向) で隣接するチャンク。
         /// </summary>
-        public T Right;
+        public Chunk Right;
 
         /// <summary>
-        /// 指定の方向の要素を取得または設定します。
+        /// 指定の方向のチャンクを取得または設定します。
         /// </summary>
         /// <param name="side">方向。</param>
-        /// <returns>要素。</returns>
-        public T this[CubicSide side]
+        /// <returns>チャンク。</returns>
+        public Chunk this[CubicSide side]
         {
             get
             {

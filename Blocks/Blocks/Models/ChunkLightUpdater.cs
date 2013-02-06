@@ -1,0 +1,155 @@
+﻿#region Using
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Willcraftia.Xna.Framework;
+
+#endregion
+
+namespace Willcraftia.Xna.Blocks.Models
+{
+    public sealed class ChunkLightUpdater
+    {
+        // TODO
+        //
+        // 今は非同期に同一チャンクに対して光レベル構築が実行されている。
+        // これを排他制御しなければならない。
+
+        ChunkManager manager;
+
+        LocalWorld localWorld;
+
+        List<VectorI3> lightUpdatedPositions;
+
+        public List<VectorI3> AffectedChunkPositions { get; private set; }
+
+        public ChunkLightUpdater(ChunkManager manager)
+        {
+            if (manager == null) throw new ArgumentNullException("manager");
+
+            this.manager = manager;
+
+            localWorld = new LocalWorld(manager, new VectorI3(3));
+            lightUpdatedPositions = new List<VectorI3>(manager.ChunkSize.Y);
+            AffectedChunkPositions = new List<VectorI3>(3 * 3 * 3);
+        }
+
+        public void UpdateSkylightLevelByBlockRemoved(ref VectorI3 absoluteBlockPosition)
+        {
+            AffectedChunkPositions.Clear();
+
+            VectorI3 chunkPosition;
+            manager.GetChunkPositionByBlockPosition(ref absoluteBlockPosition, out chunkPosition);
+
+            localWorld.FetchByCenter(chunkPosition);
+
+            AffectedChunkPositions.Add(chunkPosition);
+
+            var level = GetMaxNeighborSkylightLevel(ref absoluteBlockPosition);
+
+            var diffuseLevel = (byte) (level - 1);
+            localWorld.SetSkylightLevel(ref absoluteBlockPosition, diffuseLevel);
+
+            if (diffuseLevel == 0) return;
+
+            PushSkylight(ref absoluteBlockPosition, diffuseLevel);
+
+            localWorld.Clear();
+        }
+
+        byte GetMaxNeighborSkylightLevel(ref VectorI3 absoluteBlockPosition)
+        {
+            byte maxLevel = 0;
+            foreach (var side in CubicSide.Items)
+            {
+                var neighborBlockPosition = absoluteBlockPosition + side.Direction;
+
+                var level = localWorld.GetSkylightLevel(ref neighborBlockPosition);
+                if (maxLevel < level && CanPenetrateLight(ref neighborBlockPosition))
+                    maxLevel = level;
+            }
+
+            return maxLevel;
+        }
+
+        void PushSkylight(ref VectorI3 absoluteBlockPosition, byte level)
+        {
+            lightUpdatedPositions.Add(absoluteBlockPosition);
+
+            // 直射日光のシミュレーション。
+            if (level == Chunk.MaxSkylightLevel && 0 < absoluteBlockPosition.Y)
+            {
+                var minY = localWorld.Min.Y * manager.ChunkSize.Y;
+
+                var bottomNeighborPosition = absoluteBlockPosition;
+                for (int y = absoluteBlockPosition.Y - 1; minY <= y; y--)
+                {
+                    bottomNeighborPosition.Y = y;
+
+                    // 最大レベルならば、それ以上は直射日光をシミュレートしなくて良い。
+                    if (localWorld.GetSkylightLevel(ref bottomNeighborPosition) == Chunk.MaxSkylightLevel)
+                        break;
+
+                    // 光を通さない位置に到達したら終了。
+                    if (!CanPenetrateLight(ref bottomNeighborPosition)) break;
+
+                    localWorld.SetSkylightLevel(ref bottomNeighborPosition, Chunk.MaxSkylightLevel);
+
+                    // 更新記録を追加。
+                    lightUpdatedPositions.Add(bottomNeighborPosition);
+
+                    // 影響のあったチャンクを記録。
+                    VectorI3 chunkPosition;
+                    manager.GetChunkPositionByBlockPosition(ref bottomNeighborPosition, out chunkPosition);
+                    if (!AffectedChunkPositions.Contains(chunkPosition))
+                        AffectedChunkPositions.Add(chunkPosition);
+                }
+            }
+
+            for (int i = 0; i < lightUpdatedPositions.Count; i++)
+            {
+                var position = lightUpdatedPositions[i];
+                DiffuseSkylight(ref position);
+            }
+
+            lightUpdatedPositions.Clear();
+        }
+
+        void DiffuseSkylight(ref VectorI3 absoluteBlockPosition)
+        {
+            // 1 以下はこれ以上拡散できない。
+            var level = localWorld.GetSkylightLevel(ref absoluteBlockPosition);
+            if (level <= 1) return;
+
+            if (!CanPenetrateLight(ref absoluteBlockPosition)) return;
+
+            var diffuseLevel = (byte) (level - 1);
+
+            foreach (var side in CubicSide.Items)
+            {
+                var neighborBlockPosition = absoluteBlockPosition + side.Direction;
+
+                // 光レベルの高い位置へは拡散しない。
+                if (diffuseLevel <= localWorld.GetSkylightLevel(ref neighborBlockPosition)) continue;
+
+                if (!CanPenetrateLight(ref neighborBlockPosition)) continue;
+
+                localWorld.SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
+                DiffuseSkylight(ref neighborBlockPosition);
+
+                // 影響のあったチャンクを記録。
+                VectorI3 chunkPosition;
+                manager.GetChunkPositionByBlockPosition(ref neighborBlockPosition, out chunkPosition);
+                if (!AffectedChunkPositions.Contains(chunkPosition))
+                    AffectedChunkPositions.Add(chunkPosition);
+            }
+        }
+
+        bool CanPenetrateLight(ref VectorI3 absoluteBlockPosition)
+        {
+            var block = localWorld.GetBlock(ref absoluteBlockPosition);
+            return ChunkLightBuilder.CanPenetrateLight(block);
+        }
+    }
+}

@@ -11,11 +11,11 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         public readonly VectorI3 Size;
 
+        public VectorI3 Min;
+
         ChunkManager manager;
 
         Chunk[, ,] chunks;
-
-        VectorI3 min;
 
         public Chunk this[int x, int y, int z]
         {
@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void FetchByMin(VectorI3 min)
         {
-            this.min = min;
+            Min = min;
 
             var position = new VectorI3();
 
@@ -67,9 +67,18 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public bool GetChunkIndices(ref VectorI3 chunkPosition, out int x, out int y, out int z)
+        {
+            x = chunkPosition.X - Min.X;
+            y = chunkPosition.Y - Min.Y;
+            z = chunkPosition.Z - Min.Z;
+
+            return 0 <= x || x < Size.X || 0 <= y || y < Size.Y || 0 <= z || z < Size.Z;
+        }
+
         public Chunk GetChunk(ref VectorI3 chunkPosition)
         {
-            var relative = chunkPosition - min;
+            var relative = chunkPosition - Min;
 
             if (relative.X < 0 || Size.X <= relative.X ||
                 relative.Y < 0 || Size.Y <= relative.Y ||
@@ -95,7 +104,24 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunk.GetBlockIndex(ref relativeBlockPosition);
         }
 
-        public byte GetSkyLight(ref VectorI3 blockPosition)
+        public Block GetBlock(ref VectorI3 blockPosition)
+        {
+            VectorI3 chunkPosition;
+            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+
+            var chunk = GetChunk(ref chunkPosition);
+            if (chunk == null) return null;
+
+            VectorI3 relativeBlockPosition;
+            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+
+            var blockIndex = chunk.GetBlockIndex(ref relativeBlockPosition);
+            if (blockIndex == Block.EmptyIndex) return null;
+
+            return chunk.Region.BlockCatalog[blockIndex];
+        }
+
+        public byte GetSkylightLevel(ref VectorI3 blockPosition)
         {
             VectorI3 chunkPosition;
             manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
@@ -107,6 +133,20 @@ namespace Willcraftia.Xna.Blocks.Models
             chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
 
             return chunk.GetSkylightLevel(ref relativeBlockPosition);
+        }
+
+        public void SetSkylightLevel(ref VectorI3 blockPosition, byte value)
+        {
+            VectorI3 chunkPosition;
+            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+
+            var chunk = GetChunk(ref chunkPosition);
+            if (chunk == null) return;
+
+            VectorI3 relativeBlockPosition;
+            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+
+            chunk.SetSkylightLevel(ref relativeBlockPosition, value);
         }
 
         /// <summary>

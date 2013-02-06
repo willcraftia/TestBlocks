@@ -42,9 +42,24 @@ namespace Willcraftia.Xna.Blocks.Edit
                 lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
 
                 chunk.SetBlockIndex(ref relativePosition, BlockIndex);
-                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkMeshUpdatePriorities.High);
 
-                RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
+                if (BlockIndex == Block.EmptyIndex)
+                {
+                    var lightUpdater = chunkManager.BorrowLightUpdater();
+                    
+                    lightUpdater.UpdateSkylightLevelByBlockRemoved(ref BlockPosition);
+
+                    foreach (var chunkPosition in lightUpdater.AffectedChunkPositions)
+                    {
+                        var p = chunkPosition;
+                        chunkManager.RequestUpdateMesh(ref p, ChunkMeshUpdatePriorities.High);
+                    }
+
+                    chunkManager.ReturnLightUpdater(lightUpdater);
+                }
+
+                //var bounds = BoundingBoxI.CreateFromCenterExtents(chunk.Position, VectorI3.One);
+                //chunkManager.RequestChunkTask(ref bounds, ChunkTaskTypes.BuildLocalLights, ChunkTaskPriorities.High);
 
                 return true;
             }
@@ -58,51 +73,14 @@ namespace Willcraftia.Xna.Blocks.Edit
                 chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
 
                 chunk.SetBlockIndex(ref relativePosition, lastBlockIndex);
-                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkMeshUpdatePriorities.High);
 
-                RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
+                var bounds = BoundingBoxI.CreateFromCenterExtents(chunk.Position, VectorI3.One);
+                chunkManager.RequestChunkTask(ref bounds, ChunkTaskTypes.BuildLocalLights, ChunkTaskPriorities.High);
             }
 
             public override void Release()
             {
                 pool.Return(this);
-            }
-
-            void RequestUpdateMeshForNeighbors(ref VectorI3 baseChunkPosition, ref VectorI3 blockPosition)
-            {
-                if (blockPosition.X == 0)
-                {
-                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Left);
-                }
-                else if (blockPosition.X == (chunkManager.ChunkSize.X - 1))
-                {
-                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Right);
-                }
-
-                if (blockPosition.Y == 0)
-                {
-                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Bottom);
-                }
-                else if (blockPosition.Y == (chunkManager.ChunkSize.Y - 1))
-                {
-                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Top);
-                }
-
-                if (blockPosition.Z == 0)
-                {
-                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Back);
-                }
-                else if (blockPosition.Z == (chunkManager.ChunkSize.Z - 1))
-                {
-                    RequestUpdateMeshForNeighbor(ref baseChunkPosition, CubicSide.Front);
-                }
-            }
-
-            void RequestUpdateMeshForNeighbor(ref VectorI3 basePosition, CubicSide side)
-            {
-                var neighborPosition = basePosition + side.Direction;
-                if (chunkManager.ContainsPartition(ref neighborPosition))
-                    chunkManager.RequestUpdateMesh(ref neighborPosition, ChunkMeshUpdatePriorities.High);
             }
         }
 

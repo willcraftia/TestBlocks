@@ -36,6 +36,95 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        #region ChunkTaskCallback
+
+        delegate void ChunkTaskCallback(ChunkTask task);
+
+        #endregion
+
+        #region ChunkTask
+
+        abstract class ChunkTask
+        {
+            public ChunkTaskPriorities Priority { get; private set; }
+
+            public ChunkManager Manager { get; private set; }
+
+            public Chunk Chunk { get; private set; }
+
+            public ChunkTaskCallback Callback { get; private set; }
+
+            public Action Action { get; private set; }
+
+            protected ChunkTask(ChunkManager manager)
+            {
+                if (manager == null) throw new ArgumentNullException("manager");
+
+                Manager = manager;
+                Action = new Action(Execute);
+            }
+
+            public virtual void Initialize(Chunk chunk, ChunkTaskPriorities priority, ChunkTaskCallback callback)
+            {
+                if (chunk == null) throw new ArgumentNullException("chunk");
+
+                Chunk = chunk;
+                Priority = priority;
+                Callback = callback;
+            }
+
+            public virtual void Clear()
+            {
+                Chunk = null;
+                Callback = null;
+            }
+
+            protected virtual void Execute()
+            {
+                if (Callback != null) Callback(this);
+            }
+        }
+
+        #endregion
+
+        #region ChunkTaskBuildLocalLights
+
+        sealed class ChunkTaskBuildLocalLights : ChunkTask
+        {
+            public ChunkTaskBuildLocalLights(ChunkManager manager)
+                : base(manager)
+            {
+            }
+
+            protected override void Execute()
+            {
+                ChunkLightBuilder.BuildLocalLights(Chunk);
+
+                base.Execute();
+            }
+        }
+
+        #endregion
+
+        #region ChunkTaskPropagateLights
+
+        sealed class ChunkTaskPropagateLights : ChunkTask
+        {
+            public ChunkTaskPropagateLights(ChunkManager manager)
+                : base(manager)
+            {
+            }
+
+            protected override void Execute()
+            {
+                ChunkLightBuilder.PropagateLights(Chunk);
+
+                base.Execute();
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// メッシュ サイズ。
         /// </summary>
@@ -102,6 +191,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// データのプール。
         /// </summary>
         ConcurrentPool<ChunkData> dataPool;
+
+        ConcurrentPool<ChunkTaskBuildLocalLights> buildLocalLightsPool;
+
+        ConcurrentPool<ChunkTaskPropagateLights> propagateLightsPool;
+
+        ChunkTaskCallback chunkTaskCallback;
+
+        ConcurrentPool<ChunkLightUpdater> lightUpdaterPool;
 
         /// <summary>
         /// 通常優先度のメッシュ更新要求のキュー。
@@ -272,6 +369,12 @@ namespace Willcraftia.Xna.Blocks.Models
                 SlotCount = 4
             };
 
+            buildLocalLightsPool = new ConcurrentPool<ChunkTaskBuildLocalLights>(() => { return new ChunkTaskBuildLocalLights(this); });
+            propagateLightsPool = new ConcurrentPool<ChunkTaskPropagateLights>(() => { return new ChunkTaskPropagateLights(this); });
+            chunkTaskCallback = OnChunkTaskCompleted;
+
+            lightUpdaterPool = new ConcurrentPool<ChunkLightUpdater>(() => { return new ChunkLightUpdater(this); });
+
             BaseNode = sceneManager.CreateSceneNode("ChunkRoot");
             sceneManager.RootNode.Children.Add(BaseNode);
         }
@@ -347,6 +450,31 @@ namespace Willcraftia.Xna.Blocks.Models
                     highTaskRequestQueue.Enqueue(request);
                     break;
             }
+        }
+
+        public void RequestChunkTask(ref BoundingBoxI bounds, ChunkTaskTypes type, ChunkTaskPriorities priority)
+        {
+            for (int z = bounds.Min.Z; z < (bounds.Min.Z + bounds.Size.Z); z++)
+            {
+                for (int y = bounds.Min.Y; y < (bounds.Min.Y + bounds.Size.Y); y++)
+                {
+                    for (int x = bounds.Min.X; x < (bounds.Min.X + bounds.Size.X); x++)
+                    {
+                        var position = new VectorI3(x, y, z);
+                        RequestChunkTask(ref position, type, priority);
+                    }
+                }
+            }
+        }
+
+        public ChunkLightUpdater BorrowLightUpdater()
+        {
+            return lightUpdaterPool.Borrow();
+        }
+
+        public void ReturnLightUpdater(ChunkLightUpdater lightUpdater)
+        {
+            lightUpdaterPool.Return(lightUpdater);
         }
 
         /// <summary>
@@ -444,14 +572,10 @@ namespace Willcraftia.Xna.Blocks.Models
         protected override void OnActivated(Partition partition)
         {
             var chunk = partition as Chunk;
-            if (0 < chunk.SolidCount)
-            {
-                // 光レベル構築を待たずにメッシュ更新を要求。
-                RequestUpdateMesh(ref chunk.Position, ChunkMeshUpdatePriorities.Normal);
-            }
 
             // 光レベル構築を要求。
-            RequestChunkTask(ref chunk.Position, ChunkTaskTypes.BuildLocalLights, ChunkTaskPriorities.Normal);
+            if (chunk.LightState == ChunkLightState.WaitBuildLocal)
+                RequestChunkTask(ref chunk.Position, ChunkTaskTypes.BuildLocalLights, ChunkTaskPriorities.Normal);
 
             // ノードを追加。
             BaseNode.Children.Add(chunk.Node);
@@ -787,31 +911,66 @@ namespace Willcraftia.Xna.Blocks.Models
 
             while (0 < capacity && highTaskRequestQueue.TryDequeue(out request))
             {
-                var chunk = GetChunk(ref request.Position);
-                if (chunk == null) return;
-
-                // TODO
-                // 非アクティブ化の抑制。
-                var task = chunk.GetTask(request.Type, request.Priority);
-                chunkTaskQueue.Enqueue(task);
+                ProcessChunkTask(ref request);
 
                 capacity--;
             }
             
             while (0 < capacity && normalTaskRequestQueue.TryDequeue(out request))
             {
-                var chunk = GetChunk(ref request.Position);
-                if (chunk == null) return;
-
-                // TODO
-                // 非アクティブ化の抑制。
-                var task = chunk.GetTask(request.Type, request.Priority);
-                chunkTaskQueue.Enqueue(task);
+                ProcessChunkTask(ref request);
 
                 capacity--;
             }
 
             chunkTaskQueue.Update();
+        }
+
+        void ProcessChunkTask(ref ChunkTaskRequest request)
+        {
+            var chunk = GetChunk(ref request.Position);
+            if (chunk == null) return;
+
+            ChunkTask task;
+            switch (request.Type)
+            {
+                case ChunkTaskTypes.BuildLocalLights:
+                    task = buildLocalLightsPool.Borrow();
+                    break;
+                case ChunkTaskTypes.PropagateLights:
+                    task = propagateLightsPool.Borrow();
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            task.Initialize(chunk, request.Priority, chunkTaskCallback);
+
+            // TODO
+            // 非アクティブ化の抑制。
+            chunkTaskQueue.Enqueue(task.Action);
+        }
+
+        void OnChunkTaskCompleted(ChunkTask task)
+        {
+            var chunk = task.Chunk;
+
+            switch (chunk.LightState)
+            {
+                case ChunkLightState.WaitBuildLocal:
+                    RequestChunkTask(ref chunk.Position, ChunkTaskTypes.BuildLocalLights, task.Priority);
+                    break;
+                case ChunkLightState.WaitPropagate:
+                    RequestChunkTask(ref chunk.Position, ChunkTaskTypes.PropagateLights, task.Priority);
+                    break;
+                case ChunkLightState.Complete:
+                    // TODO
+                    if (0 < chunk.SolidCount)
+                        RequestUpdateMesh(ref chunk.Position, ChunkMeshUpdatePriorities.Normal);
+                    break;
+            }
+
+            task.Clear();
         }
     }
 }

@@ -210,7 +210,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (Chunk.LightState == ChunkLightState.Complete)
                 {
-                    var skyLight = localWorld.GetSkyLight(ref absoluteNeighborBlockPosition);
+                    var skyLight = localWorld.GetSkylightLevel(ref absoluteNeighborBlockPosition);
 
                     lightIntensity *= (skyLight / 15f);
                 }

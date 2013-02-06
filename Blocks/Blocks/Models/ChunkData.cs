@@ -140,6 +140,11 @@ namespace Willcraftia.Xna.Blocks.Models
             Array.Clear(blockIndices, 0, blockIndices.Length);
             SolidCount = 0;
 
+            ClearSkylightLevels();
+        }
+
+        public void ClearSkylightLevels()
+        {
             skylightLevels.Clear();
         }
 

@@ -83,10 +83,12 @@
     <Compile Include="Edit\WorldCommandFactory.cs" />
     <Compile Include="Models\ChunkData.cs" />
     <Compile Include="Edit\CommandManager.cs" />
+    <Compile Include="Models\ChunkLightUpdater.cs" />
     <Compile Include="Models\ChunkLightState.cs" />
     <Compile Include="Models\ChunkMeshUpdatePriorities.cs" />
     <Compile Include="Models\ChunkTaskPriorities.cs" />
     <Compile Include="Models\ChunkTaskTypes.cs" />
+    <Compile Include="Models\ChunkLightBuilder.cs" />
     <Compile Include="Models\LocalWorld.cs" />
     <Compile Include="Models\MaxVerticesChunkProcedure.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
@@ -96,7 +98,7 @@
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\GraphicsSettings.cs" />
     <Compile Include="Models\ChunkSettings.cs" />
-    <Compile Include="Models\Neighbors.cs" />
+    <Compile Include="Models\ChunkNeighbors.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\TerrainDensityTest.cs" />
     <Compile Include="Models\TimeColor.cs" />
