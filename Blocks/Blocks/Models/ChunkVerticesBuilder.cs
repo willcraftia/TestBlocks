@@ -208,9 +208,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 // 面隣接ブロックにおける天空光による光量を取得。
 
-                // TODO
                 if (Chunk.LightState == ChunkLightState.Complete)
-                //if (ChunkLightState.WaitPropagate <= Chunk.LightState)
                 {
                     var skyLight = localWorld.GetSkyLight(ref absoluteNeighborBlockPosition);
 
