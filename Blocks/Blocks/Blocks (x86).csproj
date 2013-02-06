@@ -84,6 +84,8 @@
     <Compile Include="Models\ChunkData.cs" />
     <Compile Include="Edit\CommandManager.cs" />
     <Compile Include="Models\ChunkLightState.cs" />
+    <Compile Include="Models\ChunkMeshUpdatePriorities.cs" />
+    <Compile Include="Models\ChunkTaskTypes.cs" />
     <Compile Include="Models\LocalWorld.cs" />
     <Compile Include="Models\MaxVerticesChunkProcedure.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />

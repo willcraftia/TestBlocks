@@ -23,52 +23,28 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public sealed class ChunkManager : PartitionManager
     {
-        #region UpdateMeshPriority
-
-        /// <summary>
-        /// メッシュ更新の優先度を示す列挙型です。
-        /// </summary>
-        public enum UpdateMeshPriority
-        {
-            /// <summary>
-            /// 通常優先度。
-            /// </summary>
-            Normal,
-
-            /// <summary>
-            /// 高優先度。
-            /// </summary>
-            High
-        }
-
-        #endregion
-
-        #region ChunkTaskType
-
-        enum ChunkTaskType
-        {
-            BuildLocalLights,
-            PropagateLights
-        }
-
-        #endregion
-
         #region ChunkTaskRequest
 
         struct ChunkTaskRequest
         {
             public VectorI3 Position;
 
-            public ChunkTaskType Type;
+            public ChunkTaskTypes Type;
         }
 
         #endregion
 
+        /// <summary>
+        /// メッシュ サイズ。
+        /// </summary>
         public static readonly VectorI3 MeshSize = new VectorI3(16);
 
         /// <summary>
         /// チャンク サイズ。
         /// </summary>
+        /// <remarks>
+        /// チャンク サイズは、メッシュ サイズの等倍でなければなりません。
+        /// </remarks>
         public readonly VectorI3 ChunkSize;
 
         /// <summary>
@@ -136,9 +112,9 @@ namespace Willcraftia.Xna.Blocks.Models
         ConcurrentQueue<VectorI3> highUpdateMeshRequests;
 
         /// <summary>
-        /// 頂点ビルダ実行中チャンクのキュー。
+        /// 頂点構築中チャンクのキュー。
         /// </summary>
-        Queue<Chunk> buildVerticesQueue;
+        Queue<Chunk> updateMeshChunkQueue;
 
         /// <summary>
         /// 頂点ビルダのプール。
@@ -275,7 +251,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             normalUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
             highUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
-            buildVerticesQueue = new Queue<Chunk>(verticesBuilderCount);
+            updateMeshChunkQueue = new Queue<Chunk>(verticesBuilderCount);
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
                 MaxCapacity = verticesBuilderCount
@@ -316,6 +292,45 @@ namespace Willcraftia.Xna.Blocks.Models
         public Chunk GetChunk(ref VectorI3 chunkPosition)
         {
             return GetPartition(ref chunkPosition) as Chunk;
+        }
+
+        /// <summary>
+        /// チャンクのメッシュ更新を要求します。
+        /// </summary>
+        /// <remarks>
+        /// 要求はキューで管理され、非同期に順次実行されます。
+        /// </remarks>
+        /// <param name="position">チャンクの位置。</param>
+        /// <param name="priority">優先度。</param>
+        public void RequestUpdateMesh(ref VectorI3 position, ChunkMeshUpdatePriorities priority)
+        {
+            switch (priority)
+            {
+                case ChunkMeshUpdatePriorities.Normal:
+                    normalUpdateMeshRequests.Enqueue(position);
+                    break;
+                case ChunkMeshUpdatePriorities.High:
+                    highUpdateMeshRequests.Enqueue(position);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// チャンクの内部状態構築タスクを要求します。
+        /// </summary>
+        /// <remarks>
+        /// 要求はキューで管理され、非同期に順次実行されます。
+        /// </remarks>
+        /// <param name="position">チャンクの位置。</param>
+        /// <param name="type">タスク種別。</param>
+        public void RequestChunkTask(ref VectorI3 position, ChunkTaskTypes type)
+        {
+            var request = new ChunkTaskRequest
+            {
+                Position = position,
+                Type = type
+            };
+            chunkTaskRequestQueue.Enqueue(request);
         }
 
         /// <summary>
@@ -375,6 +390,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// このクラスの実装では、以下の処理を行います。
         /// 
         /// ・新たなメッシュ更新の開始。
+        /// ・チャンク タスクの実行。
         /// ・メッシュ更新完了の監視。
         /// 
         /// </summary>
@@ -385,7 +401,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // ただし、クローズが開始したら行わない。
             if (!Closing)
             {
-                CheckUpdateMesheRequests(gameTime);
+                ProcessUpdateMeshRequests(gameTime);
 
                 ProcessChunkTaskRequests();
             }
@@ -396,38 +412,9 @@ namespace Willcraftia.Xna.Blocks.Models
             // 更新完了を監視。
             // 更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
-            CheckMeshesUpdated(gameTime);
+            UpdateMeshes(gameTime);
 
             base.UpdateOverride(gameTime);
-        }
-
-        void ProcessChunkTaskRequests()
-        {
-            int capacity = 100;
-            ChunkTaskRequest request;
-            while (0 < capacity && chunkTaskRequestQueue.TryDequeue(out request))
-            {
-                var chunk = GetChunk(ref request.Position);
-                if (chunk == null) return;
-
-                switch (request.Type)
-                {
-                    case ChunkTaskType.BuildLocalLights:
-                        // TODO
-                        // 非アクティブ化の抑制。
-                        chunkTaskQueue.Enqueue(chunk.BuildLocalLightsTask);
-                        break;
-                    case ChunkTaskType.PropagateLights:
-                        // TODO
-                        // 非アクティブ化の抑制。
-                        chunkTaskQueue.Enqueue(chunk.PropagateLightsTask);
-                        break;
-                }
-
-                capacity--;
-            }
-
-            chunkTaskQueue.Update();
         }
 
         /// <summary>
@@ -443,11 +430,12 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = partition as Chunk;
             if (0 < chunk.SolidCount)
             {
-                var bounds = BoundingBoxI.CreateFromCenterExtents(partition.Position, new VectorI3(1));
-                RequestUpdateMesh(ref chunk.Position, UpdateMeshPriority.Normal);
+                // 光レベル構築を待たずにメッシュ更新を要求。
+                RequestUpdateMesh(ref chunk.Position, ChunkMeshUpdatePriorities.Normal);
             }
 
-            RequestBuildLocalLights(ref chunk.Position);
+            // 光レベル構築を要求。
+            RequestChunkTask(ref chunk.Position, ChunkTaskTypes.BuildLocalLights);
 
             // ノードを追加。
             BaseNode.Children.Add(chunk.Node);
@@ -500,44 +488,6 @@ namespace Willcraftia.Xna.Blocks.Models
             dataPool.Return(data);
         }
 
-        /// <summary>
-        /// チャンクのメッシュ更新要求を追加します。
-        /// </summary>
-        /// <param name="position">チャンクの位置。</param>
-        /// <param name="priority">優先度。</param>
-        internal void RequestUpdateMesh(ref VectorI3 position, UpdateMeshPriority priority)
-        {
-            switch (priority)
-            {
-                case UpdateMeshPriority.Normal:
-                    normalUpdateMeshRequests.Enqueue(position);
-                    break;
-                case UpdateMeshPriority.High:
-                    highUpdateMeshRequests.Enqueue(position);
-                    break;
-            }
-        }
-
-        internal void RequestBuildLocalLights(ref VectorI3 position)
-        {
-            RequestChunkTask(ref position, ChunkTaskType.BuildLocalLights);
-        }
-
-        internal void RequestPropagateLights(ref VectorI3 position)
-        {
-            RequestChunkTask(ref position, ChunkTaskType.PropagateLights);
-        }
-
-        void RequestChunkTask(ref VectorI3 position, ChunkTaskType type)
-        {
-            var request = new ChunkTaskRequest
-            {
-                Position = position,
-                Type = type
-            };
-            chunkTaskRequestQueue.Enqueue(request);
-        }
-
         internal SceneNode CreateNode()
         {
             nodeIdSequence++;
@@ -576,13 +526,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void CheckUpdateMesheRequests(GameTime gameTime)
+        void ProcessUpdateMeshRequests(GameTime gameTime)
         {
-            CheckUpdateMesheRequests(gameTime, highUpdateMeshRequests);
-            CheckUpdateMesheRequests(gameTime, normalUpdateMeshRequests);
+            ProcessUpdateMeshRequests(gameTime, highUpdateMeshRequests);
+            ProcessUpdateMeshRequests(gameTime, normalUpdateMeshRequests);
         }
 
-        void CheckUpdateMesheRequests(GameTime gameTime, ConcurrentQueue<VectorI3> requestQueue)
+        void ProcessUpdateMeshRequests(GameTime gameTime, ConcurrentQueue<VectorI3> requestQueue)
         {
             for (int i = 0; i < meshUpdateSearchCapacity; i++)
             {
@@ -598,7 +548,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // チャンクがメッシュ更新中ならば待機キューへ戻す。
-                if (buildVerticesQueue.Contains(chunk))
+                if (updateMeshChunkQueue.Contains(chunk))
                 {
                     requestQueue.Enqueue(position);
                     continue;
@@ -640,7 +590,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 頂点ビルダを登録。
                 verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
 
-                buildVerticesQueue.Enqueue(chunk);
+                updateMeshChunkQueue.Enqueue(chunk);
             }
         }
 
@@ -649,18 +599,18 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 完了しているならば頂点バッファへの反映を試みます。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void CheckMeshesUpdated(GameTime gameTime)
+        void UpdateMeshes(GameTime gameTime)
         {
             // 頂点ビルダの監視。
-            int count = buildVerticesQueue.Count;
+            int count = updateMeshChunkQueue.Count;
             for (int i = 0; i < count; i++)
             {
-                var chunk = buildVerticesQueue.Dequeue();
+                var chunk = updateMeshChunkQueue.Dequeue();
 
                 if (!chunk.VerticesBuilder.Completed)
                 {
                     // 未完ならば更新キューへ戻す。
-                    buildVerticesQueue.Enqueue(chunk);
+                    updateMeshChunkQueue.Enqueue(chunk);
                     continue;
                 }
 
@@ -811,6 +761,36 @@ namespace Willcraftia.Xna.Blocks.Models
             MeshCount++;
 
             return mesh;
+        }
+
+        void ProcessChunkTaskRequests()
+        {
+            // TODO
+            int capacity = 100;
+            ChunkTaskRequest request;
+            while (0 < capacity && chunkTaskRequestQueue.TryDequeue(out request))
+            {
+                var chunk = GetChunk(ref request.Position);
+                if (chunk == null) return;
+
+                switch (request.Type)
+                {
+                    case ChunkTaskTypes.BuildLocalLights:
+                        // TODO
+                        // 非アクティブ化の抑制。
+                        chunkTaskQueue.Enqueue(chunk.BuildLocalLightsTask);
+                        break;
+                    case ChunkTaskTypes.PropagateLights:
+                        // TODO
+                        // 非アクティブ化の抑制。
+                        chunkTaskQueue.Enqueue(chunk.PropagateLightsTask);
+                        break;
+                }
+
+                capacity--;
+            }
+
+            chunkTaskQueue.Update();
         }
     }
 }

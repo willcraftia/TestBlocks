@@ -33,7 +33,9 @@ namespace Willcraftia.Xna.Blocks.Models
             set
             {
                 if (value.X < 1 || value.Y < 1 || value.Z < 1 ||
-                    value.X % 2 != 0 || value.Y % 2 != 0 || value.Z % 2 != 0)
+                    value.X % ChunkManager.MeshSize.X != 0 ||
+                    value.Y % ChunkManager.MeshSize.Y != 0 ||
+                    value.Z % ChunkManager.MeshSize.Z != 0)
                     throw new ArgumentOutOfRangeException("value");
 
                 // 最大配置で ushort の限界を越えるようなサイズは拒否。

@@ -42,7 +42,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                 lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
 
                 chunk.SetBlockIndex(ref relativePosition, BlockIndex);
-                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkManager.UpdateMeshPriority.High);
+                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkMeshUpdatePriorities.High);
 
                 RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
 
@@ -58,7 +58,7 @@ namespace Willcraftia.Xna.Blocks.Edit
                 chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
 
                 chunk.SetBlockIndex(ref relativePosition, lastBlockIndex);
-                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkManager.UpdateMeshPriority.High);
+                chunkManager.RequestUpdateMesh(ref chunk.Position, ChunkMeshUpdatePriorities.High);
 
                 RequestUpdateMeshForNeighbors(ref chunk.Position, ref relativePosition);
             }
@@ -102,7 +102,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             {
                 var neighborPosition = basePosition + side.Direction;
                 if (chunkManager.ContainsPartition(ref neighborPosition))
-                    chunkManager.RequestUpdateMesh(ref neighborPosition, ChunkManager.UpdateMeshPriority.High);
+                    chunkManager.RequestUpdateMesh(ref neighborPosition, ChunkMeshUpdatePriorities.High);
             }
         }
 

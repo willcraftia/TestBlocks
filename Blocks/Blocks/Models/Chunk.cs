@@ -483,7 +483,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (topNeighborChunk == null || topNeighborChunk.LightState < ChunkLightState.WaitPropagate)
             {
                 // 再試行。
-                manager.RequestBuildLocalLights(ref Position);
+                manager.RequestChunkTask(ref Position, ChunkTaskTypes.BuildLocalLights);
                 return;
             }
 
@@ -493,7 +493,7 @@ namespace Willcraftia.Xna.Blocks.Models
             lightState = ChunkLightState.WaitPropagate;
 
             // 隣接チャンクへの伝播を要求。
-            manager.RequestPropagateLights(ref Position);
+            manager.RequestChunkTask(ref Position, ChunkTaskTypes.PropagateLights);
         }
 
         void FallSkylight(Chunk topNeighborChunk)
@@ -599,7 +599,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (neighbor == null)
                 {
                     // 再試行。
-                    manager.RequestPropagateLights(ref Position);
+                    manager.RequestChunkTask(ref Position, ChunkTaskTypes.PropagateLights);
                     return;
                 }
                 neighbors[side] = neighbor;
@@ -635,7 +635,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             lightState = ChunkLightState.Complete;
 
-            manager.RequestUpdateMesh(ref Position, ChunkManager.UpdateMeshPriority.Normal);
+            manager.RequestUpdateMesh(ref Position, ChunkMeshUpdatePriorities.Normal);
         }
 
         void PropagateLights(ref VectorI3 blockPosition, Chunk neighborChunk, ref VectorI3 neighborBlockPosition)
