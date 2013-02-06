@@ -574,6 +574,16 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// 隣接チャンクの光を自チャンクへ伝播させます。
+        /// </summary>
+        /// <remarks>
+        /// ここでは、まず、隣接チャンクから、自チャンクに隣接する位置の光レベルを参照し、
+        /// これに隣接する自チャンクの位置へ光を拡散させます。
+        /// 続いて、ここで更新した光レベルに基づき、自チャンク内部に向かって光を拡散させます。
+        /// 以上により、隣接チャンクを含めた自チャンクの光レベルが完成するため、
+        /// 最後にメッシュ更新を要求します。
+        /// </remarks>
         public void PropagateLights()
         {
             if (SolidCount == 0)
@@ -626,27 +636,21 @@ namespace Willcraftia.Xna.Blocks.Models
             lightState = ChunkLightState.Complete;
 
             manager.RequestUpdateMesh(ref Position, ChunkManager.UpdateMeshPriority.Normal);
-
-            // TODO
-            manager.RequestUpdateMesh(ref neighbors.Front.Position, ChunkManager.UpdateMeshPriority.Normal);
-            manager.RequestUpdateMesh(ref neighbors.Back.Position, ChunkManager.UpdateMeshPriority.Normal);
-            manager.RequestUpdateMesh(ref neighbors.Left.Position, ChunkManager.UpdateMeshPriority.Normal);
-            manager.RequestUpdateMesh(ref neighbors.Right.Position, ChunkManager.UpdateMeshPriority.Normal);
         }
 
         void PropagateLights(ref VectorI3 blockPosition, Chunk neighborChunk, ref VectorI3 neighborBlockPosition)
         {
-            var level = GetSkylightLevel(ref blockPosition);
+            var level = neighborChunk.GetSkylightLevel(ref neighborBlockPosition);
             if (level <= 1) return;
 
             var diffuseLevel = (byte) (level - 1);
-            if (diffuseLevel <= neighborChunk.GetSkylightLevel(ref neighborBlockPosition)) return;
+            if (diffuseLevel <= GetSkylightLevel(ref blockPosition)) return;
 
+            if (!neighborChunk.CanPenetrateLight(ref neighborBlockPosition)) return;
             if (!CanPenetrateLight(ref blockPosition)) return;
-            if (!CanPenetrateLight(ref neighborBlockPosition)) return;
 
-            neighborChunk.SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
-            neighborChunk.DiffuseSkylight(ref neighborBlockPosition);
+            SetSkylightLevel(ref blockPosition, diffuseLevel);
+            DiffuseSkylight(ref blockPosition);
         }
 
         bool CanPenetrateLight(ref VectorI3 blockPosition)
