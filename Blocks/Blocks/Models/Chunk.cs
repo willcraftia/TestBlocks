@@ -61,6 +61,21 @@ namespace Willcraftia.Xna.Blocks.Models
         ChunkMesh[, ,] translucentMeshes;
 
         /// <summary>
+        /// BuildLocalLights デリゲートのキャッシュ。
+        /// </summary>
+        Action buildLocalLightsTask;
+
+        /// <summary>
+        /// PropagateLights デリゲートのキャッシュ。
+        /// </summary>
+        Action propagateLightsTask;
+
+        /// <summary>
+        /// 現在実行中タスクの優先度。
+        /// </summary>
+        ChunkTaskPriorities currentTaskPriority;
+
+        /// <summary>
         /// チャンクのサイズを取得します。
         /// </summary>
         public VectorI3 Size
@@ -76,16 +91,18 @@ namespace Willcraftia.Xna.Blocks.Models
             get { return region; }
         }
 
+        /// <summary>
+        /// チャンクのシーン ノードを取得します。
+        /// </summary>
         public SceneNode Node { get; private set; }
 
+        /// <summary>
+        /// 光レベルの構築状態を取得します。
+        /// </summary>
         public ChunkLightState LightState
         {
             get { return lightState; }
         }
-
-        public Action BuildLocalLightsTask { get; private set; }
-
-        public Action PropagateLightsTask { get; private set; }
 
         /// <summary>
         /// メッシュ更新のための頂点ビルダを取得または設定します。
@@ -119,8 +136,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             Node = manager.CreateNode();
 
-            BuildLocalLightsTask = new Action(BuildLocalLights);
-            PropagateLightsTask = new Action(PropagateLights);
+            buildLocalLightsTask = new Action(BuildLocalLights);
+            propagateLightsTask = new Action(PropagateLights);
         }
 
         /// <summary>
@@ -400,6 +417,21 @@ namespace Willcraftia.Xna.Blocks.Models
                 AttachMesh(mesh);
         }
 
+        public Action GetTask(ChunkTaskTypes type, ChunkTaskPriorities priority)
+        {
+            currentTaskPriority = priority;
+
+            switch (type)
+            {
+                case ChunkTaskTypes.BuildLocalLights:
+                    return buildLocalLightsTask;
+                case ChunkTaskTypes.PropagateLights:
+                    return propagateLightsTask;
+            }
+
+            throw new InvalidOperationException();
+        }
+
         /// <summary>
         /// リージョンが提供するチャンク ストアに永続化されている場合、
         /// チャンク ストアからチャンクをロードします。
@@ -483,7 +515,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (topNeighborChunk == null || topNeighborChunk.LightState < ChunkLightState.WaitPropagate)
             {
                 // 再試行。
-                manager.RequestChunkTask(ref Position, ChunkTaskTypes.BuildLocalLights);
+                manager.RequestChunkTask(ref Position, ChunkTaskTypes.BuildLocalLights, currentTaskPriority);
                 return;
             }
 
@@ -493,7 +525,7 @@ namespace Willcraftia.Xna.Blocks.Models
             lightState = ChunkLightState.WaitPropagate;
 
             // 隣接チャンクへの伝播を要求。
-            manager.RequestChunkTask(ref Position, ChunkTaskTypes.PropagateLights);
+            manager.RequestChunkTask(ref Position, ChunkTaskTypes.PropagateLights, currentTaskPriority);
         }
 
         void FallSkylight(Chunk topNeighborChunk)
@@ -599,7 +631,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (neighbor == null)
                 {
                     // 再試行。
-                    manager.RequestChunkTask(ref Position, ChunkTaskTypes.PropagateLights);
+                    manager.RequestChunkTask(ref Position, ChunkTaskTypes.PropagateLights, currentTaskPriority);
                     return;
                 }
                 neighbors[side] = neighbor;

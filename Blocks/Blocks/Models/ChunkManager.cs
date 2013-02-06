@@ -30,6 +30,8 @@ namespace Willcraftia.Xna.Blocks.Models
             public VectorI3 Position;
 
             public ChunkTaskTypes Type;
+
+            public ChunkTaskPriorities Priority;
         }
 
         #endregion
@@ -104,12 +106,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 通常優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<VectorI3> normalUpdateMeshRequests;
+        ConcurrentQueue<VectorI3> normalUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
 
         /// <summary>
         /// 高優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<VectorI3> highUpdateMeshRequests;
+        ConcurrentQueue<VectorI3> highUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
 
         /// <summary>
         /// 頂点構築中チャンクのキュー。
@@ -132,9 +134,14 @@ namespace Willcraftia.Xna.Blocks.Models
         StringBuilder meshNameBuilder = new StringBuilder(18);
 
         /// <summary>
-        /// チャンク タスク要求のキュー。
+        /// 通常優先度のチャンク タスク要求のキュー。
         /// </summary>
-        ConcurrentQueue<ChunkTaskRequest> chunkTaskRequestQueue = new ConcurrentQueue<ChunkTaskRequest>();
+        ConcurrentQueue<ChunkTaskRequest> normalTaskRequestQueue = new ConcurrentQueue<ChunkTaskRequest>();
+
+        /// <summary>
+        /// 高優先度のチャンク タスク要求のキュー。
+        /// </summary>
+        ConcurrentQueue<ChunkTaskRequest> highTaskRequestQueue = new ConcurrentQueue<ChunkTaskRequest>();
 
         /// <summary>
         /// チャンク タスクのキュー。
@@ -249,8 +256,6 @@ namespace Willcraftia.Xna.Blocks.Models
             dataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyData = new ChunkData(this);
 
-            normalUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
-            highUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
             updateMeshChunkQueue = new Queue<Chunk>(verticesBuilderCount);
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
@@ -323,14 +328,25 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </remarks>
         /// <param name="position">チャンクの位置。</param>
         /// <param name="type">タスク種別。</param>
-        public void RequestChunkTask(ref VectorI3 position, ChunkTaskTypes type)
+        /// <param name="priority">優先度。</param>
+        public void RequestChunkTask(ref VectorI3 position, ChunkTaskTypes type, ChunkTaskPriorities priority)
         {
             var request = new ChunkTaskRequest
             {
                 Position = position,
-                Type = type
+                Type = type,
+                Priority = priority
             };
-            chunkTaskRequestQueue.Enqueue(request);
+
+            switch (priority)
+            {
+                case ChunkTaskPriorities.Normal:
+                    normalTaskRequestQueue.Enqueue(request);
+                    break;
+                case ChunkTaskPriorities.High:
+                    highTaskRequestQueue.Enqueue(request);
+                    break;
+            }
         }
 
         /// <summary>
@@ -435,7 +451,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             // 光レベル構築を要求。
-            RequestChunkTask(ref chunk.Position, ChunkTaskTypes.BuildLocalLights);
+            RequestChunkTask(ref chunk.Position, ChunkTaskTypes.BuildLocalLights, ChunkTaskPriorities.Normal);
 
             // ノードを追加。
             BaseNode.Children.Add(chunk.Node);
@@ -768,24 +784,29 @@ namespace Willcraftia.Xna.Blocks.Models
             // TODO
             int capacity = 100;
             ChunkTaskRequest request;
-            while (0 < capacity && chunkTaskRequestQueue.TryDequeue(out request))
+
+            while (0 < capacity && highTaskRequestQueue.TryDequeue(out request))
             {
                 var chunk = GetChunk(ref request.Position);
                 if (chunk == null) return;
 
-                switch (request.Type)
-                {
-                    case ChunkTaskTypes.BuildLocalLights:
-                        // TODO
-                        // 非アクティブ化の抑制。
-                        chunkTaskQueue.Enqueue(chunk.BuildLocalLightsTask);
-                        break;
-                    case ChunkTaskTypes.PropagateLights:
-                        // TODO
-                        // 非アクティブ化の抑制。
-                        chunkTaskQueue.Enqueue(chunk.PropagateLightsTask);
-                        break;
-                }
+                // TODO
+                // 非アクティブ化の抑制。
+                var task = chunk.GetTask(request.Type, request.Priority);
+                chunkTaskQueue.Enqueue(task);
+
+                capacity--;
+            }
+            
+            while (0 < capacity && normalTaskRequestQueue.TryDequeue(out request))
+            {
+                var chunk = GetChunk(ref request.Position);
+                if (chunk == null) return;
+
+                // TODO
+                // 非アクティブ化の抑制。
+                var task = chunk.GetTask(request.Type, request.Priority);
+                chunkTaskQueue.Enqueue(task);
 
                 capacity--;
             }
