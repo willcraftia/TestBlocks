@@ -48,14 +48,52 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var level = GetMaxNeighborSkylightLevel(ref absoluteBlockPosition);
 
-            var diffuseLevel = (byte) (level - 1);
-            localWorld.SetSkylightLevel(ref absoluteBlockPosition, diffuseLevel);
+            localWorld.SetSkylightLevel(ref absoluteBlockPosition, (byte) (level - 1));
 
-            if (diffuseLevel == 0) return;
+            if (level <= 1) return;
 
-            PushSkylight(ref absoluteBlockPosition, diffuseLevel);
+            PushSkylight(ref absoluteBlockPosition, level);
 
             localWorld.Clear();
+        }
+
+        public void UpdateSkylightLevelByBlockCreated(ref VectorI3 absoluteBlockPosition)
+        {
+            AffectedChunkPositions.Clear();
+
+            VectorI3 chunkPosition;
+            manager.GetChunkPositionByBlockPosition(ref absoluteBlockPosition, out chunkPosition);
+
+            localWorld.FetchByCenter(chunkPosition);
+
+            AffectedChunkPositions.Add(chunkPosition);
+
+            var oldLevel = localWorld.GetSkylightLevel(ref absoluteBlockPosition);
+
+            if (oldLevel == 0)
+            {
+                // 元より光が届いていないため、ブロックの配置による影響はない。
+                localWorld.SetSkylightLevel(ref absoluteBlockPosition, (byte) 0);
+                return;
+            }
+
+            if (oldLevel < Chunk.MaxSkylightLevel)
+            {
+                // 直射日光が届いていないため、部分的な再計算で済む。
+
+                return;
+            }
+
+            if (oldLevel == Chunk.MaxSkylightLevel)
+            {
+                // TODO
+                // チャンク全体の再計算。
+                return;
+            }
+        }
+
+        void RecalculateSkylightFrom(ref VectorI3 absoluteBlockPosition, byte oldLevel)
+        {
         }
 
         byte GetMaxNeighborSkylightLevel(ref VectorI3 absoluteBlockPosition)
@@ -77,11 +115,11 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             lightUpdatedPositions.Add(absoluteBlockPosition);
 
-            // 直射日光のシミュレーション。
-            if (level == Chunk.MaxSkylightLevel && 0 < absoluteBlockPosition.Y)
-            {
-                var minY = localWorld.Min.Y * manager.ChunkSize.Y;
+            var minY = localWorld.Min.Y * manager.ChunkSize.Y;
 
+            // 直射日光のシミュレーション。
+            if (level == Chunk.MaxSkylightLevel && minY < absoluteBlockPosition.Y)
+            {
                 var bottomNeighborPosition = absoluteBlockPosition;
                 for (int y = absoluteBlockPosition.Y - 1; minY <= y; y--)
                 {
