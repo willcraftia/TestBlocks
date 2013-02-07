@@ -127,7 +127,7 @@ namespace Willcraftia.Xna.Blocks.Models
             manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
 
             var chunk = GetChunk(ref chunkPosition);
-            if (chunk == null) return 15;
+            if (chunk == null) return Chunk.MaxSkylightLevel;
 
             VectorI3 relativeBlockPosition;
             chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
