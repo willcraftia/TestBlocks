@@ -96,8 +96,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (oldLevel == Chunk.MaxSkylightLevel)
             {
-                // TODO
-                // 高速化。
+                // 直射日光を遮るため、範囲を広げて再計算。
                 RecalculateSkylightFrom(ref absoluteBlockPosition);
                 return;
             }
@@ -109,6 +108,7 @@ namespace Willcraftia.Xna.Blocks.Models
             min.X -= Chunk.MaxSkylightLevel;
             min.Y -= Chunk.MaxSkylightLevel;
             min.Z -= Chunk.MaxSkylightLevel;
+
             var max = absoluteBlockPosition;
             max.X += Chunk.MaxSkylightLevel;
             max.Y += Chunk.MaxSkylightLevel;
@@ -143,11 +143,11 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            for (int z = min.Z - 1; z < max.Z + 1; z++)
+            for (int z = min.Z; z < max.Z; z++)
             {
-                for (int x = min.X - 1; x < max.X + 1; x++)
+                for (int x = min.X; x < max.X; x++)
                 {
-                    for (int y = min.Y - 1; y < max.Y + 1; y++)
+                    for (int y = max.Y; min.Y < y; y--)
                     {
                         var position = new VectorI3(x, y, z);
                         DiffuseSkylight(ref position);
