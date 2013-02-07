@@ -90,6 +90,7 @@
     <Compile Include="ArrayHelper.cs" />
     <Compile Include="BoundingBoxExtension.cs" />
     <Compile Include="BoundingBoxHelper.cs" />
+    <Compile Include="BoundingDiamondI.cs" />
     <Compile Include="Collections\ConcurrentKeyedPriorityQueue.cs" />
     <Compile Include="Collections\ConcurrentKeyedQueue.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
@@ -243,6 +244,7 @@
     <Compile Include="Noise\SCurve5.cs" />
     <Compile Include="Noise\SquaredMetric.cs" />
     <Compile Include="Noise\SimpleVoronoi.cs" />
+    <Compile Include="RefAction.cs" />
     <Compile Include="Serialization\XmlSerializerAdapter.cs" />
     <Compile Include="StateOutOfRangeException.cs" />
     <Compile Include="Landscape\Partition.cs" />

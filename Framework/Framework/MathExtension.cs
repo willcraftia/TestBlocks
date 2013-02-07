@@ -10,16 +10,31 @@ namespace Willcraftia.Xna.Framework
     public static class MathExtension
     {
         /// <summary>
-        /// 概算により floor を計算します。
-        /// 概算のために Math.Floor より高速ですが、それゆえに Math.Floor とは挙動が異なります。
-        /// 例えば、Math.Floor(-1) == -1 であるに対し、MathExtension.Floor(-1) == -2 となります。
+        /// floor を計算します。
         /// </summary>
+        /// <remarks>
+        /// 概算であるため Math.Floor より高速ですが、それゆえに Math.Floor とは挙動が異なります。
+        /// 例えば、Math.Floor(-1) == -1 であるに対し、MathExtension.Floor(-1) == -2 となります。
+        /// </remarks>
         /// <param name="value"></param>
         /// <returns></returns>
         public static int Floor(float value)
         {
-            // Faster than using (int) Math.Floor(x).
             return 0 <= value ? (int) value : (int) (value - 1);
+        }
+
+        /// <summary>
+        /// 絶対値を計算します。
+        /// </summary>
+        /// <remarks>
+        /// Math.Abs よりわずかに高速ですが、
+        /// int.MaxValue を指定した場合に例外を発生させずに不正な値を返します。
+        /// </remarks>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static int Abs(int value)
+        {
+            return 0 <= value ? value : -value;
         }
 
         public static float Saturate(float value)
