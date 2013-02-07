@@ -11,12 +11,19 @@ namespace Willcraftia.Xna.Framework
     {
         public VectorI3 Center;
 
-        public int Size;
+        /// <summary>
+        /// 中心位置からのダイアモンド領域の広がりの度合い。
+        /// </summary>
+        /// <remarks>
+        /// 0 は中心のみ、1 は中心とその上下前後左右を含むというように、
+        /// 中心からの広がりの度合いを示します。
+        /// </remarks>
+        public int Level;
 
-        public BoundingDiamondI(VectorI3 center, int size)
+        public BoundingDiamondI(VectorI3 center, int level)
         {
             Center = center;
-            Size = size;
+            Level = level;
         }
 
         public bool Contains(ref VectorI3 point)
@@ -25,7 +32,7 @@ namespace Willcraftia.Xna.Framework
             int y = MathExtension.Abs(point.Y);
             int z = MathExtension.Abs(point.Z);
 
-            return (x + y + z) < Size;
+            return (x + y + z) <= Level;
         }
 
         public void ForEach(RefAction<VectorI3> action)
@@ -33,10 +40,11 @@ namespace Willcraftia.Xna.Framework
             ForEach(action, 0);
         }
 
-        public void ForEach(RefAction<VectorI3> action, int startSize)
+        public void ForEach(RefAction<VectorI3> action, int startLevel)
         {
             if (action == null) throw new ArgumentNullException("action");
-            if (startSize < 0 || Size <= startSize) throw new ArgumentOutOfRangeException("startSize");
+            if (startLevel < 0 || Level < startLevel) throw new ArgumentOutOfRangeException("startLevel");
+            if (Level < 0) throw new InvalidOperationException("Invalid value: Level");
 
             var point = new VectorI3();
 
@@ -44,8 +52,10 @@ namespace Willcraftia.Xna.Framework
             int y = 0;
             int z = 0;
 
-            int level = startSize;
-            while (level < Size)
+            int currentLevel = startLevel;
+            x = -currentLevel;
+
+            while (currentLevel <= Level)
             {
                 point.X = Center.X + x;
                 point.Y = Center.Y + y;
@@ -60,29 +70,29 @@ namespace Willcraftia.Xna.Framework
                 else if (y < 0)
                 {
                     y *= -1;
-                    z = -(level - MathExtension.Abs(x) - MathExtension.Abs(y));
+                    z = -(currentLevel - MathExtension.Abs(x) - MathExtension.Abs(y));
                 }
                 else
                 {
                     y = -y + 1;
                     if (0 < y)
                     {
-                        if (++x <= level)
+                        if (++x <= currentLevel)
                         {
-                            y = MathExtension.Abs(x) - level;
+                            y = MathExtension.Abs(x) - currentLevel;
                             z = 0;
                         }
                         else
                         {
-                            level++;
-                            x = -level;
+                            currentLevel++;
+                            x = -currentLevel;
                             y = 0;
                             z = 0;
                         }
                     }
                     else
                     {
-                        z = -(level - MathExtension.Abs(x) - MathExtension.Abs(y));
+                        z = -(currentLevel - MathExtension.Abs(x) - MathExtension.Abs(y));
                     }
                 }
             }
@@ -103,7 +113,7 @@ namespace Willcraftia.Xna.Framework
         // I/F
         public bool Equals(BoundingDiamondI other)
         {
-            return Center == other.Center && Size == other.Size;
+            return Center == other.Center && Level == other.Level;
         }
 
         public override bool Equals(object obj)
@@ -115,7 +125,7 @@ namespace Willcraftia.Xna.Framework
 
         public override int GetHashCode()
         {
-            return Center.GetHashCode() ^ Size.GetHashCode();
+            return Center.GetHashCode() ^ Level.GetHashCode();
         }
 
         #endregion
@@ -124,7 +134,7 @@ namespace Willcraftia.Xna.Framework
 
         public override string ToString()
         {
-            return "Center = " + Center + ", Size = " + Size;
+            return "Center = " + Center + ", Size = " + Level;
         }
 
         #endregion

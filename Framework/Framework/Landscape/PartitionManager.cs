@@ -241,7 +241,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <summary>
             /// Collect メソッドのデリゲート。
             /// </summary>
-            ForEachAction collectAction;
+            RefAction<VectorI3> collectAction;
 
             /// <summary>
             /// 非同期処理中であるか否かを示す値。
@@ -266,7 +266,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             public Activator(PartitionManager manager)
             {
                 this.manager = manager;
-                collectAction = new ForEachAction(Collect);
+                collectAction = new RefAction<VectorI3>(Collect);
 
                 candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
             }

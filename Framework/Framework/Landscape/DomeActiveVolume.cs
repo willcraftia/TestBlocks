@@ -70,7 +70,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public void ForEach(ForEachAction action)
+        public void ForEach(RefAction<VectorI3> action)
         {
             throw new NotImplementedException();
         }

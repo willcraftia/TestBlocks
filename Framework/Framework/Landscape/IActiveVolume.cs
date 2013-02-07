@@ -28,6 +28,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// メソッドに渡されるパーティション位置はオフセット値です。
         /// </summary>
         /// <param name="action">実行するメソッド。</param>
-        void ForEach(ForEachAction action);
+        void ForEach(RefAction<VectorI3> action);
     }
 }

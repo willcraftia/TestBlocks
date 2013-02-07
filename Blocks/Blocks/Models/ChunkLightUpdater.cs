@@ -22,6 +22,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         List<VectorI3> lightUpdatedPositions;
 
+        RefAction<VectorI3> clearSkylightLevelAction;
+
+        RefAction<VectorI3> pushSkylightLevelAction;
+
         public List<VectorI3> AffectedChunkPositions { get; private set; }
 
         public ChunkLightUpdater(ChunkManager manager)
@@ -33,6 +37,8 @@ namespace Willcraftia.Xna.Blocks.Models
             localWorld = new LocalWorld(manager, new VectorI3(3));
             lightUpdatedPositions = new List<VectorI3>(manager.ChunkSize.Y);
             AffectedChunkPositions = new List<VectorI3>(3 * 3 * 3);
+            clearSkylightLevelAction = new RefAction<VectorI3>(ClearSkylightLevel);
+            pushSkylightLevelAction = new RefAction<VectorI3>(PushSkylightLevel);
         }
 
         public void UpdateSkylightLevelByBlockRemoved(ref VectorI3 absoluteBlockPosition)
@@ -80,7 +86,7 @@ namespace Willcraftia.Xna.Blocks.Models
             if (oldLevel < Chunk.MaxSkylightLevel)
             {
                 // 直射日光が届いていないため、部分的な再計算で済む。
-
+                RecalculateSkylightFrom(ref absoluteBlockPosition, oldLevel);
                 return;
             }
 
@@ -94,6 +100,23 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void RecalculateSkylightFrom(ref VectorI3 absoluteBlockPosition, byte oldLevel)
         {
+            var diamond = new BoundingDiamondI(absoluteBlockPosition, oldLevel);
+            diamond.ForEach(clearSkylightLevelAction);
+
+            diamond.Level = oldLevel + 1;
+            diamond.ForEach(pushSkylightLevelAction, oldLevel + 1);
+        }
+
+        void ClearSkylightLevel(ref VectorI3 absoluteBlockPosition)
+        {
+            localWorld.SetSkylightLevel(ref absoluteBlockPosition, (byte) 0);
+        }
+
+        void PushSkylightLevel(ref VectorI3 absoluteBlockPosition)
+        {
+            var level = localWorld.GetSkylightLevel(ref absoluteBlockPosition);
+            if (1 < level)
+                PushSkylight(ref absoluteBlockPosition, level);
         }
 
         byte GetMaxNeighborSkylightLevel(ref VectorI3 absoluteBlockPosition)
