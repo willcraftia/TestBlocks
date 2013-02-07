@@ -24,7 +24,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         RefAction<VectorI3> clearSkylightLevelAction;
 
-        RefAction<VectorI3> pushSkylightLevelAction;
+        RefAction<VectorI3> rediffuseSkylightLevelAction;
 
         public List<VectorI3> AffectedChunkPositions { get; private set; }
 
@@ -38,7 +38,7 @@ namespace Willcraftia.Xna.Blocks.Models
             lightUpdatedPositions = new List<VectorI3>(manager.ChunkSize.Y);
             AffectedChunkPositions = new List<VectorI3>(3 * 3 * 3);
             clearSkylightLevelAction = new RefAction<VectorI3>(ClearSkylightLevel);
-            pushSkylightLevelAction = new RefAction<VectorI3>(PushSkylightLevel);
+            rediffuseSkylightLevelAction = new RefAction<VectorI3>(RediffuseSkylightLevel);
         }
 
         public void UpdateSkylightLevelByBlockRemoved(ref VectorI3 absoluteBlockPosition)
@@ -54,9 +54,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var level = GetMaxNeighborSkylightLevel(ref absoluteBlockPosition);
 
-            localWorld.SetSkylightLevel(ref absoluteBlockPosition, (byte) (level - 1));
+            if (level <= 1)
+            {
+                localWorld.SetSkylightLevel(ref absoluteBlockPosition, (byte) 0);
+                return;
+            }
 
-            if (level <= 1) return;
+            localWorld.SetSkylightLevel(ref absoluteBlockPosition, (byte) (level - 1));
 
             PushSkylight(ref absoluteBlockPosition, level);
 
@@ -86,25 +90,79 @@ namespace Willcraftia.Xna.Blocks.Models
             if (oldLevel < Chunk.MaxSkylightLevel)
             {
                 // 直射日光が届いていないため、部分的な再計算で済む。
-                RecalculateSkylightFrom(ref absoluteBlockPosition, oldLevel);
+                RediffuseSkylightFrom(ref absoluteBlockPosition, oldLevel);
                 return;
             }
 
             if (oldLevel == Chunk.MaxSkylightLevel)
             {
                 // TODO
-                // チャンク全体の再計算。
+                // 高速化。
+                RecalculateSkylightFrom(ref absoluteBlockPosition);
                 return;
             }
         }
 
-        void RecalculateSkylightFrom(ref VectorI3 absoluteBlockPosition, byte oldLevel)
+        void RecalculateSkylightFrom(ref VectorI3 absoluteBlockPosition)
+        {
+            var min = absoluteBlockPosition;
+            min.X -= Chunk.MaxSkylightLevel;
+            min.Y -= Chunk.MaxSkylightLevel;
+            min.Z -= Chunk.MaxSkylightLevel;
+            var max = absoluteBlockPosition;
+            max.X += Chunk.MaxSkylightLevel;
+            max.Y += Chunk.MaxSkylightLevel;
+            max.Z += Chunk.MaxSkylightLevel;
+
+            for (int z = min.Z; z < max.Z; z++)
+            {
+                for (int x = min.X; x < max.X; x++)
+                {
+                    var topPosition = new VectorI3(x, max.Y + 1, z);
+                    var topLevel = localWorld.GetSkylightLevel(ref topPosition);
+                    
+                    int y = max.Y;
+                    var position = new VectorI3(x, 0, z);
+
+                    if (topLevel == Chunk.MaxSkylightLevel && CanPenetrateLight(ref topPosition))
+                    {
+                        for (; min.Y <= y; y--)
+                        {
+                            position.Y = y;
+                            if (!CanPenetrateLight(ref position)) break;
+
+                            localWorld.SetSkylightLevel(ref position, Chunk.MaxSkylightLevel);
+                        }
+                    }
+
+                    for (; min.Y <= y; y--)
+                    {
+                        position.Y = y;
+                        localWorld.SetSkylightLevel(ref position, (byte) 0);
+                    }
+                }
+            }
+
+            for (int z = min.Z - 1; z < max.Z + 1; z++)
+            {
+                for (int x = min.X - 1; x < max.X + 1; x++)
+                {
+                    for (int y = min.Y - 1; y < max.Y + 1; y++)
+                    {
+                        var position = new VectorI3(x, y, z);
+                        DiffuseSkylight(ref position);
+                    }
+                }
+            }
+        }
+
+        void RediffuseSkylightFrom(ref VectorI3 absoluteBlockPosition, byte oldLevel)
         {
             var diamond = new BoundingDiamondI(absoluteBlockPosition, oldLevel);
             diamond.ForEach(clearSkylightLevelAction);
 
             diamond.Level = oldLevel + 1;
-            diamond.ForEach(pushSkylightLevelAction, oldLevel + 1);
+            diamond.ForEach(rediffuseSkylightLevelAction, oldLevel + 1);
         }
 
         void ClearSkylightLevel(ref VectorI3 absoluteBlockPosition)
@@ -112,7 +170,7 @@ namespace Willcraftia.Xna.Blocks.Models
             localWorld.SetSkylightLevel(ref absoluteBlockPosition, (byte) 0);
         }
 
-        void PushSkylightLevel(ref VectorI3 absoluteBlockPosition)
+        void RediffuseSkylightLevel(ref VectorI3 absoluteBlockPosition)
         {
             var level = localWorld.GetSkylightLevel(ref absoluteBlockPosition);
             if (1 < level)
