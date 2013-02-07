@@ -55,6 +55,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             blockIndices = new byte[manager.ChunkSize.X * manager.ChunkSize.Y * manager.ChunkSize.Z];
             skylightLevels = new HalfByteArray3(manager.ChunkSize.X, manager.ChunkSize.Y, manager.ChunkSize.Z);
+            ClearSkylightLevels();
         }
 
         public byte GetBlockIndex(int x, int y, int z)
@@ -145,7 +146,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void ClearSkylightLevels()
         {
-            skylightLevels.Clear();
+            skylightLevels.Fill(Chunk.MaxSkylightLevel);
         }
 
         public void Read(BinaryReader reader)
