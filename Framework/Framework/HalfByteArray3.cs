@@ -136,5 +136,14 @@ namespace Willcraftia.Xna.Framework
         {
             Array.Clear(array, 0, array.Length);
         }
+
+        public void Fill(byte value)
+        {
+            if (0x0F < value) throw new ArgumentOutOfRangeException("value");
+
+            byte composition = (byte) ((value << 4) | value);
+            for (int i = 0; i < array.Length; i++)
+                array[i] = composition;
+        }
     }
 }
