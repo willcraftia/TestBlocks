@@ -33,6 +33,22 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             public override bool Do()
             {
+                SetAndUpdateBlock(BlockIndex);
+                return true;
+            }
+
+            public override void Undo()
+            {
+                SetAndUpdateBlock(lastBlockIndex);
+            }
+
+            public override void Release()
+            {
+                pool.Return(this);
+            }
+
+            void SetAndUpdateBlock(byte blockIndex)
+            {
                 var chunk = chunkManager.GetChunkByBlockPosition(ref BlockPosition);
                 if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
@@ -41,11 +57,11 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
 
-                chunk.SetBlockIndex(ref relativePosition, BlockIndex);
+                chunk.SetBlockIndex(ref relativePosition, blockIndex);
 
                 var lightUpdater = chunkManager.BorrowLightUpdater();
 
-                if (BlockIndex == Block.EmptyIndex)
+                if (blockIndex == Block.EmptyIndex)
                 {
                     lightUpdater.UpdateSkylightLevelByBlockRemoved(ref BlockPosition);
                 }
@@ -54,34 +70,13 @@ namespace Willcraftia.Xna.Blocks.Edit
                     lightUpdater.UpdateSkylightLevelByBlockCreated(ref BlockPosition);
                 }
 
-                foreach (var chunkPosition in lightUpdater.AffectedChunkPositions)
+                for (int i = 0; i < lightUpdater.AffectedChunkPositions.Count; i++)
                 {
-                    var p = chunkPosition;
+                    var p = lightUpdater.AffectedChunkPositions[i];
                     chunkManager.RequestUpdateMesh(ref p, ChunkMeshUpdatePriorities.High);
                 }
 
                 chunkManager.ReturnLightUpdater(lightUpdater);
-
-                return true;
-            }
-
-            public override void Undo()
-            {
-                var chunk = chunkManager.GetChunkByBlockPosition(ref BlockPosition);
-                if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
-
-                VectorI3 relativePosition;
-                chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
-
-                chunk.SetBlockIndex(ref relativePosition, lastBlockIndex);
-
-                var bounds = BoundingBoxI.CreateFromCenterExtents(chunk.Position, VectorI3.One);
-                chunkManager.RequestChunkTask(ref bounds, ChunkTaskTypes.BuildLocalLights, ChunkTaskPriorities.High);
-            }
-
-            public override void Release()
-            {
-                pool.Return(this);
             }
         }
 
