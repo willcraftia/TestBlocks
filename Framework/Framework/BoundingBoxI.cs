@@ -83,11 +83,23 @@ namespace Willcraftia.Xna.Framework
         /// <returns>
         /// true (点が境界ボックスに含まれる場合)、false (それ以外の場合)。
         /// </returns>
-        public bool Contains(VectorI3 point)
+        public bool Contains(ref VectorI3 point)
         {
             bool result;
             Contains(ref point, out result);
             return result;
+        }
+
+        /// <summary>
+        /// 指定の点が境界ボックスに含まれるか否かを検査します。
+        /// </summary>
+        /// <param name="point">点。</param>
+        /// <returns>
+        /// true (点が境界ボックスに含まれる場合)、false (それ以外の場合)。
+        /// </returns>
+        public bool Contains(VectorI3 point)
+        {
+            return Contains(ref point);
         }
     }
 }
