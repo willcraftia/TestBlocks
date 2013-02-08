@@ -143,11 +143,11 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            for (int z = min.Z; z < max.Z; z++)
+            for (int z = min.Z - 1; z < max.Z + 1; z++)
             {
-                for (int x = min.X; x < max.X; x++)
+                for (int x = min.X - 1; x < max.X + 1; x++)
                 {
-                    for (int y = max.Y; min.Y < y; y--)
+                    for (int y = max.Y; min.Y <= y; y--)
                     {
                         var position = new VectorI3(x, y, z);
                         DiffuseSkylight(ref position);
