@@ -11,7 +11,7 @@ using Willcraftia.Xna.Blocks.Models;
 
 namespace Willcraftia.Xna.Blocks.Edit
 {
-    public sealed class StickyBrush
+    public sealed class StickyBrush : Brush
     {
         #region TriangleInfo
 
@@ -39,59 +39,24 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         TriangleInfo[] triangleInfos;
 
-        CommandManager commandManager;
-
-        WorldCommandFactory commandFactory;
-
-        SceneNode node;
-
-        BrushMesh mesh;
-
-        ChunkManager chunkManager;
-
-        VectorI3 position;
-
-        VectorI3 paintPosition;
+        BrushMesh brushMesh;
 
         CubicSide paintFace;
-
-        byte currentBlockIndex;
-
-        public VectorI3 Position
-        {
-            get { return position; }
-        }
-
-        public VectorI3 PaintPosition
-        {
-            get { return paintPosition; }
-        }
 
         public CubicSide PaintFace
         {
             get { return paintFace; }
         }
 
-        public byte BlockIndex { get; set; }
-
-        public bool CanPaint { get; set; }
-
-        public StickyBrush(CommandManager commandManager, WorldCommandFactory commandFactory,
-            SceneNode node, BrushMesh mesh, ChunkManager chunkManager)
+        public StickyBrush(BrushManager manager, SceneNode node)
+            : base(manager, node)
         {
-            if (commandManager == null) throw new ArgumentNullException("commandManager");
-            if (commandFactory == null) throw new ArgumentNullException("commandFactory");
-            if (node == null) throw new ArgumentNullException("node");
-            if (mesh == null) throw new ArgumentNullException("mesh");
-            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
+            var mesh = manager.LoadAsset<Mesh>("title:Resources/Meshes/Cube.json");
 
-            this.commandManager = commandManager;
-            this.commandFactory = commandFactory;
-            this.node = node;
-            this.mesh = mesh;
-            this.chunkManager = chunkManager;
-
-            if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
+            brushMesh = new BrushMesh("BrushMesh", manager.GraphicsDevice, mesh);
+            brushMesh.Color = new Vector3(1, 0, 0);
+            brushMesh.Alpha = 0.5f;
+            Node.Objects.Add(brushMesh);
 
             triangleInfos = new TriangleInfo[2 * 6];
 
@@ -136,15 +101,12 @@ namespace Willcraftia.Xna.Blocks.Edit
         // ブロック生成消滅の位置を決定する以外にも、
         // ブラシ描画のための描画位置の決定に必須。
 
-        public void Update(View view, Projection projection)
+        public override void Update(ICamera camera)
         {
             CanPaint = false;
 
-            var eyePositionWorld = view.Position;
-            var eyeDirection = view.Direction;
-
-            if (eyeDirection.IsZero()) throw new ArgumentException("eyeDirection must be not a zero vector.", "eyeDirection");
-
+            var eyePositionWorld = camera.View.Position;
+            var eyeDirection = camera.View.Direction;
             eyeDirection.Normalize();
 
             var ray = new Ray(eyePositionWorld, eyeDirection);
@@ -164,18 +126,12 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 if (prevTestPosition == testPosition) continue;
 
-                var chunk = chunkManager.GetChunkByBlockPosition(ref testPosition);
-                if (chunk == null) continue;
-
-                VectorI3 relativePosition;
-                chunk.GetRelativeBlockPosition(ref testPosition, out relativePosition);
-
-                var blockIndex = chunk.GetBlockIndex(ref relativePosition);
-                if (blockIndex != Block.EmptyIndex)
+                var blockIndex = Manager.GetBlockIndex(ref testPosition);
+                if (blockIndex != null && blockIndex != Block.EmptyIndex)
                 {
                     if (ResolvePaintPosition(ref ray, ref testPosition))
                     {
-                        position = testPosition;
+                        Position = testPosition;
                         CanPaint = true;
                         break;
                     }
@@ -184,12 +140,15 @@ namespace Willcraftia.Xna.Blocks.Edit
                 prevTestPosition = testPosition;
             }
 
-            mesh.Visible = CanPaint;
+            // 粘着ブラシの消去位置はブラシの位置。
+            ErasePosition = Position;
 
+            // ペイント不能の場合は自動的にメッシュ非表示となるため、
+            // メッシュの更新は不要。
             if (!CanPaint) return;
 
             UpdateMesh();
-            node.Update(true);
+            Node.Update(true);
         }
 
         bool ResolvePaintPosition(ref Ray ray, ref VectorI3 brushPosition)
@@ -211,16 +170,10 @@ namespace Willcraftia.Xna.Blocks.Edit
                 if (Intersects(ref ray, triangleInfos[i], ref world))
                 {
                     var testPosition = brushPosition + triangleInfos[i].Side.Direction;
-                    var chunk = chunkManager.GetChunkByBlockPosition(ref testPosition);
-                    if (chunk == null) continue;
-
-                    VectorI3 relativePosition;
-                    chunk.GetRelativeBlockPosition(ref testPosition, out relativePosition);
-                    var blockIndex = chunk.GetBlockIndex(ref relativePosition);
+                    var blockIndex = Manager.GetBlockIndex(ref testPosition);
                     if (blockIndex == Block.EmptyIndex)
                     {
-                        paintPosition = testPosition;
-                        currentBlockIndex = blockIndex;
+                        PaintPosition = testPosition;
                         paintFace = triangleInfos[i].Side;
                         return true;
                     }
@@ -228,21 +181,6 @@ namespace Willcraftia.Xna.Blocks.Edit
             }
 
             return false;
-        }
-
-        public void Paint()
-        {
-            if (!CanPaint) return;
-
-            // 既存のブロックと同じブロックを配置しようとしているならば抑制。
-            if (currentBlockIndex == BlockIndex) return;
-
-            var command = commandFactory.CreateSetBlockCommand();
-
-            command.BlockPosition = paintPosition;
-            command.BlockIndex = BlockIndex;
-
-            commandManager.RequestCommand(command);
         }
 
         bool IsBackFace(CubicSide side, ref Vector3 eyeDirection)
@@ -269,19 +207,19 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             var meshPositionWorld = new Vector3
             {
-                X = position.X + 0.5f,
-                Y = position.Y + 0.5f,
-                Z = position.Z + 0.5f
+                X = Position.X + 0.5f,
+                Y = Position.Y + 0.5f,
+                Z = Position.Z + 0.5f
             };
 
-            mesh.PositionWorld = meshPositionWorld;
-            mesh.BoxWorld.Min = meshPositionWorld - new Vector3(0.5f);
-            mesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
+            brushMesh.PositionWorld = meshPositionWorld;
+            brushMesh.BoxWorld.Min = meshPositionWorld - new Vector3(0.5f);
+            brushMesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
 
-            BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
+            BoundingSphere.CreateFromBoundingBox(ref brushMesh.BoxWorld, out brushMesh.SphereWorld);
 
-            mesh.VisibleAllFaces = false;
-            mesh.VisibleFace = paintFace;
+            brushMesh.VisibleAllFaces = false;
+            brushMesh.VisibleFace = paintFace;
         }
     }
 }

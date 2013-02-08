@@ -10,104 +10,65 @@ using Willcraftia.Xna.Blocks.Models;
 
 namespace Willcraftia.Xna.Blocks.Edit
 {
-    public sealed class FreeBrush
+    public sealed class FreeBrush : Brush
     {
-        CommandManager commandManager;
+        BrushMesh brushMesh;
 
-        WorldCommandFactory commandFactory;
-
-        SceneNode node;
-
-        BrushMesh mesh;
-
-        ChunkManager chunkManager;
-
-        VectorI3 position;
-
-        byte currentBlockIndex;
-
-        public VectorI3 Position
+        public FreeBrush(BrushManager manager, SceneNode node)
+            : base(manager, node)
         {
-            get { return position; }
-        }
+            var mesh = manager.LoadAsset<Mesh>("title:Resources/Meshes/Cube.json");
 
-        public byte BlockIndex { get; set; }
-
-        public FreeBrush(CommandManager commandManager, WorldCommandFactory commandFactory,
-            SceneNode node, BrushMesh mesh, ChunkManager chunkManager)
-        {
-            if (commandManager == null) throw new ArgumentNullException("commandManager");
-            if (commandFactory == null) throw new ArgumentNullException("commandFactory");
-            if (node == null) throw new ArgumentNullException("node");
-            if (mesh == null) throw new ArgumentNullException("mesh");
-            if (chunkManager == null) throw new ArgumentNullException("chunkManager");
-
-            this.commandManager = commandManager;
-            this.commandFactory = commandFactory;
-            this.node = node;
-            this.mesh = mesh;
-            this.chunkManager = chunkManager;
-
-            if (!node.Objects.Contains(mesh)) node.Objects.Add(mesh);
+            brushMesh = new BrushMesh("BrushMesh", manager.GraphicsDevice, mesh);
+            brushMesh.Color = new Vector3(1, 0, 0);
+            brushMesh.Alpha = 0.5f;
+            Node.Objects.Add(brushMesh);
         }
 
         // まずはカメラを更新。
         // ブロック生成消滅の位置を決定する以外にも、
         // ブラシ描画のための描画位置の決定に必須。
 
-        public void Update(View view, Projection projection)
+        public override void Update(ICamera camera)
         {
-            var eyePositionWorld = view.Position;
-            var eyeDirection = view.Direction;
-
-            if (eyeDirection.IsZero()) throw new ArgumentException("eyeDirection must be not a zero vector.", "eyeDirection");
-
+            var eyePositionWorld = camera.View.Position;
+            var eyeDirection = camera.View.Direction;
             eyeDirection.Normalize();
 
             const int offset = 4;
             var basePositionWorld = eyePositionWorld + eyeDirection * offset;
 
-            position = new VectorI3
+            Position = new VectorI3
             {
                 X = (int) Math.Floor(basePositionWorld.X),
                 Y = (int) Math.Floor(basePositionWorld.Y),
                 Z = (int) Math.Floor(basePositionWorld.Z)
             };
-            currentBlockIndex = Block.EmptyIndex;
+
+            // 自由ブラシは、その位置がペイント位置であり消去位置。
+            PaintPosition = Position;
+            ErasePosition = Position;
 
             UpdateMesh();
-            node.Update(true);
-        }
-
-        public void Paint()
-        {
-            // 既存のブロックと同じブロックを配置しようとしているならば抑制。
-            if (currentBlockIndex == BlockIndex) return;
-
-            var command = commandFactory.CreateSetBlockCommand();
-
-            command.BlockPosition = position;
-            command.BlockIndex = BlockIndex;
-
-            commandManager.RequestCommand(command);
+            Node.Update(true);
         }
 
         void UpdateMesh()
         {
             var meshPositionWorld = new Vector3
             {
-                X = position.X + 0.5f,
-                Y = position.Y + 0.5f,
-                Z = position.Z + 0.5f
+                X = Position.X + 0.5f,
+                Y = Position.Y + 0.5f,
+                Z = Position.Z + 0.5f
             };
 
-            mesh.PositionWorld = meshPositionWorld;
-            mesh.BoxWorld.Min = meshPositionWorld - new Vector3(0.5f);
-            mesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
+            brushMesh.PositionWorld = meshPositionWorld;
+            brushMesh.BoxWorld.Min = meshPositionWorld - new Vector3(0.5f);
+            brushMesh.BoxWorld.Max = meshPositionWorld + new Vector3(0.5f);
 
-            BoundingSphere.CreateFromBoundingBox(ref mesh.BoxWorld, out mesh.SphereWorld);
+            BoundingSphere.CreateFromBoundingBox(ref brushMesh.BoxWorld, out brushMesh.SphereWorld);
 
-            mesh.VisibleAllFaces = true;
+            brushMesh.VisibleAllFaces = true;
         }
     }
 }

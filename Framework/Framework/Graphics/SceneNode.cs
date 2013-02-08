@@ -255,6 +255,24 @@ namespace Willcraftia.Xna.Framework.Graphics
             Objects = new ObjectCollection(this);
         }
 
+        public void SetVisible(bool visible)
+        {
+            SetVisible(visible, true);
+        }
+
+        public void SetVisible(bool visible, bool cascade)
+        {
+            foreach (var obj in Objects)
+            {
+                obj.Visible = visible;
+            }
+
+            foreach (var child in Children)
+            {
+                child.SetVisible(visible, cascade);
+            }
+        }
+
         public void Update(bool updateChildren)
         {
             if (updateChildren)

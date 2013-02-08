@@ -47,6 +47,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         Region region;
 
+        BrushManager brushManager;
+
         ResourceManager editorResourceManager = new ResourceManager();
 
         AssetManager editorAssetManager;
@@ -55,13 +57,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         WorldCommandFactory worldCommandFactory;
 
-        StickyBrush stickyBrush;
-
         VectorI3 lastPaintPosition;
 
         byte lastPaintBlockIndex;
-
-        Eraser eraser;
 
         #region Trace
 
@@ -228,30 +226,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             region = worldManager.Load("dummy");
 
             //----------------------------------------------------------------
-            // エディット
+            // ブラシ マネージャ
 
-            editorAssetManager = new AssetManager(Services);
-            editorAssetManager.RegisterLoader(typeof(Mesh), new MeshLoader());
-
-            var cubeMeshResource = editorResourceManager.Load("title:Resources/Meshes/Cube.json");
-            var cubeMesh = editorAssetManager.Load<Mesh>(cubeMeshResource);
-
-            worldCommandFactory = new WorldCommandFactory(worldManager);
-
-            var brushNode = worldManager.SceneManager.CreateSceneNode("Brush");
-            worldManager.SceneManager.RootNode.Children.Add(brushNode);
-
-            var brushMesh = new BrushMesh("BrushMesh", GraphicsDevice, cubeMesh);
-            brushMesh.Color = new Vector3(1, 0, 0);
-            brushMesh.Alpha = 0.5f;
-            brushNode.Objects.Add(brushMesh);
-
-            worldManager.SceneManager.UpdateOctreeSceneNode(brushNode);
-
-            stickyBrush = new StickyBrush(commandManager, worldCommandFactory, brushNode, brushMesh, worldManager.ChunkManager);
-            stickyBrush.BlockIndex = 1;
-
-            eraser = new Eraser(commandManager, worldCommandFactory, worldManager.ChunkManager);
+            brushManager = new BrushManager(Services, GraphicsDevice, worldManager, commandManager);
 
             //----------------------------------------------------------------
             // その他
@@ -328,10 +305,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             worldManager.Update(gameTime);
 
             //----------------------------------------------------------------
-            // エディット
+            // ブラシ マネージャ
 
-            var camera = worldManager.SceneManager.ActiveCamera;
-            stickyBrush.Update(camera.View, camera.Projection);
+            brushManager.Update();
 
             // 左ボタンでブロック消去。
             // ブロック消去は消去対象の判定との兼ね合いから、
@@ -339,8 +315,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (mouseState.LeftButton == ButtonState.Released && lastMouseState.LeftButton == ButtonState.Pressed &&
                 mouseState.RightButton == ButtonState.Released)
             {
-                eraser.Position = stickyBrush.Position;
-                eraser.Erase();
+                brushManager.Erase();
             }
 
             // TODO
@@ -353,12 +328,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (mouseState.RightButton == ButtonState.Released && lastMouseState.RightButton == ButtonState.Pressed &&
                 mouseState.LeftButton == ButtonState.Released)
             {
-                if (stickyBrush.PaintPosition != lastPaintPosition || stickyBrush.BlockIndex != lastPaintBlockIndex)
+                if (brushManager.ActiveBrush.PaintPosition != lastPaintPosition ||
+                    brushManager.SelectedBlockIndex != lastPaintBlockIndex)
                 {
-                    stickyBrush.Paint();
+                    brushManager.Paint();
 
-                    lastPaintPosition = stickyBrush.PaintPosition;
-                    lastPaintBlockIndex = stickyBrush.BlockIndex;
+                    lastPaintPosition = brushManager.ActiveBrush.PaintPosition;
+                    lastPaintBlockIndex = brushManager.SelectedBlockIndex;
                 }
             }
             if (mouseState.RightButton == ButtonState.Released)
@@ -522,10 +498,14 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(camera.View.Direction.Z).Append(")").AppendLine();
 
             sb.Append("Brush: (");
-            sb.Append(stickyBrush.PaintFace).Append(": ");
-            sb.AppendNumber(stickyBrush.Position.X).Append(", ");
-            sb.AppendNumber(stickyBrush.Position.Y).Append(", ");
-            sb.AppendNumber(stickyBrush.Position.Z).Append(")").AppendLine();
+            if (brushManager.ActiveBrush is StickyBrush)
+            {
+                var stickyBrush = brushManager.ActiveBrush as StickyBrush;
+                sb.Append(stickyBrush.PaintFace).Append(": ");
+            }
+            sb.AppendNumber(brushManager.ActiveBrush.Position.X).Append(", ");
+            sb.AppendNumber(brushManager.ActiveBrush.Position.Y).Append(", ");
+            sb.AppendNumber(brushManager.ActiveBrush.Position.Z).Append(")").AppendLine();
 
             sb.Append("Near/Far: ").AppendNumber(camera.Projection.NearPlaneDistance).Append("/");
             sb.AppendNumber(camera.Projection.FarPlaneDistance);
