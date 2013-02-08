@@ -25,7 +25,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             byte lastBlockIndex;
 
-            public SetBlockCommand(ConcurrentPool<SetBlockCommand> pool, ChunkManager chunkManager)
+            internal SetBlockCommand(ConcurrentPool<SetBlockCommand> pool, ChunkManager chunkManager)
             {
                 this.pool = pool;
                 this.chunkManager = chunkManager;
