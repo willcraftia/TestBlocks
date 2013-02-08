@@ -143,6 +143,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
+            var diffuseBounds = new BoundingBoxI();
+            diffuseBounds.Min.X = min.X;
+            diffuseBounds.Min.Y = min.Y;
+            diffuseBounds.Min.Z = min.Z;
+            diffuseBounds.Size.X = max.X - diffuseBounds.Min.X;
+            diffuseBounds.Size.Y = max.Y - diffuseBounds.Min.Y;
+            diffuseBounds.Size.Z = max.Z - diffuseBounds.Min.Z;
+
             for (int z = min.Z - 1; z < max.Z + 1; z++)
             {
                 for (int x = min.X - 1; x < max.X + 1; x++)
@@ -150,7 +158,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     for (int y = max.Y; min.Y <= y; y--)
                     {
                         var position = new VectorI3(x, y, z);
-                        DiffuseSkylight(ref position);
+                        DiffuseSkylight(ref position, ref diffuseBounds);
                     }
                 }
             }
@@ -256,6 +264,37 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 localWorld.SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
                 DiffuseSkylight(ref neighborBlockPosition);
+
+                // 影響のあったチャンクを記録。
+                VectorI3 chunkPosition;
+                manager.GetChunkPositionByBlockPosition(ref neighborBlockPosition, out chunkPosition);
+                if (!AffectedChunkPositions.Contains(chunkPosition))
+                    AffectedChunkPositions.Add(chunkPosition);
+            }
+        }
+
+        void DiffuseSkylight(ref VectorI3 absoluteBlockPosition, ref BoundingBoxI bounds)
+        {
+            var level = localWorld.GetSkylightLevel(ref absoluteBlockPosition);
+            if (level <= 1) return;
+
+            if (!CanPenetrateLight(ref absoluteBlockPosition)) return;
+
+            var diffuseLevel = (byte) (level - 1);
+
+            foreach (var side in CubicSide.Items)
+            {
+                var neighborBlockPosition = absoluteBlockPosition + side.Direction;
+
+                // 範囲外の位置については拡散をシミュレートしない。
+                if (!bounds.Contains(ref neighborBlockPosition)) continue;
+
+                if (diffuseLevel <= localWorld.GetSkylightLevel(ref neighborBlockPosition)) continue;
+
+                if (!CanPenetrateLight(ref neighborBlockPosition)) continue;
+
+                localWorld.SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
+                DiffuseSkylight(ref neighborBlockPosition, ref bounds);
 
                 // 影響のあったチャンクを記録。
                 VectorI3 chunkPosition;
