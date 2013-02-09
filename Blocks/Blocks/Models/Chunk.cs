@@ -47,8 +47,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </remarks>
         ChunkData data;
 
-        bool dataChanged;
-
         volatile ChunkLightState lightState;
 
         /// <summary>
@@ -178,7 +176,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 manager.ReturnData(data);
                 data = null;
             }
-            dataChanged = false;
 
             region = null;
 
@@ -261,10 +258,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Block GetBlock(ref VectorI3 position)
         {
-            var blockIndex = GetBlockIndex(ref position);
-            if (blockIndex == Block.EmptyIndex) return null;
-
-            return region.BlockCatalog[blockIndex];
+            return GetBlock(position.X, position.Y, position.Z);
         }
 
         public byte GetBlockIndex(int x, int y, int z)
@@ -276,12 +270,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte GetBlockIndex(ref VectorI3 position)
         {
-            if (data == null) return Block.EmptyIndex;
-
-            return data.GetBlockIndex(ref position);
+            return GetBlockIndex(position.X, position.Y, position.Z);
         }
 
-        public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
+        public void SetBlockIndex(int x, int y, int z, byte blockIndex)
         {
             if (data == null)
             {
@@ -292,13 +284,12 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 非空ブロックを設定しようとする場合は、
                 // チャンク マネージャからデータを借りる必要があります。
                 data = manager.BorrowData();
-                dataChanged = true;
             }
 
             // 同じインデックスならば更新しない。
-            if (data.GetBlockIndex(ref position) == blockIndex) return;
+            if (data.GetBlockIndex(x, y, z) == blockIndex) return;
 
-            data.SetBlockIndex(ref position, blockIndex);
+            data.SetBlockIndex(x, y, z, blockIndex);
 
             if (data.SolidCount == 0)
             {
@@ -306,11 +297,12 @@ namespace Willcraftia.Xna.Blocks.Models
                 // データをチャンク マネージャへ返します。
                 manager.ReturnData(data);
                 data = null;
-                dataChanged = true;
             }
+        }
 
-            // 光レベルの再構築が必要。
-            //lightState = ChunkLightState.WaitBuildLocal;
+        public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
+        {
+            SetBlockIndex(position.X, position.Y, position.Z, blockIndex);
         }
 
         public byte GetSkylightLevel(int x, int y, int z)
@@ -322,9 +314,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte GetSkylightLevel(ref VectorI3 position)
         {
-            if (data == null) return MaxSkylightLevel;
-
-            return data.GetSkylightLevel(ref position);
+            return GetSkylightLevel(position.X, position.Y, position.Z);
         }
 
         public void SetSkylightLevel(int x, int y, int z, byte value)
@@ -337,10 +327,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void SetSkylightLevel(ref VectorI3 position, byte value)
         {
-            // 完全空チャンクの場合、光量データは不要。
-            if (data == null) return;
-
-            data.SetSkylightLevel(ref position, value);
+            SetSkylightLevel(position.X, position.Y, position.Z, value);
         }
 
         public void FillSkylightLevels(byte level)
@@ -460,15 +447,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
                 else
                 {
-                    // 空ブロック以外を含むならば自身へバインド。
                     data = d;
                 }
             }
             else
             {
                 // 永続化されていないならば自動生成。
-                foreach (var procedure in region.ChunkProcesures)
-                    procedure.Generate(this);
+                for (int i = 0; i < region.ChunkProcesures.Count; i++)
+                    region.ChunkProcesures[i].Generate(this);
             }
 
             // 空チャンクは光レベル構築が不要 (全位置の光レベルが最大)。
@@ -487,13 +473,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (data != null)
             {
-                // 変更があるならば永続化。
-                if (dataChanged || data.Dirty) Region.ChunkStore.AddChunk(Position, data);
+                Region.ChunkStore.AddChunk(Position, data);
             }
             else
             {
-                // 変更があるならば空データで永続化。
-                if (dataChanged) Region.ChunkStore.AddChunk(Position, manager.EmptyData);
+                // 空データで永続化。
+                Region.ChunkStore.AddChunk(Position, manager.EmptyData);
             }
 
             base.PassivateOverride();

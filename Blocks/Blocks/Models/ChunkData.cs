@@ -20,6 +20,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         byte[] blockIndices;
 
+        /// <summary>
+        /// 天空光レベルの配列。
+        /// </summary>
         HalfByteArray3 skylightLevels;
 
         /// <summary>
@@ -34,14 +37,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 非空ブロックの総数を取得します。
         /// </summary>
         public int SolidCount { get; private set; }
-
-        /// <summary>
-        /// ブロックのインデックス配列に変更があったか否かを示す値を取得または設定します。
-        /// </summary>
-        /// <value>
-        /// true (ブロックのインデックス配列に変更があった場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Dirty { get; private set; }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -60,11 +55,18 @@ namespace Willcraftia.Xna.Blocks.Models
             ClearSkylightLevels();
         }
 
+        /// <summary>
+        /// ブロックのインデックスを取得します。
+        /// </summary>
+        /// <param name="x">ブロックの X 位置。</param>
+        /// <param name="y">ブロックの Y 位置。</param>
+        /// <param name="z">ブロックの Z 位置。</param>
+        /// <returns>ブロックのインデックス。</returns>
         public byte GetBlockIndex(int x, int y, int z)
         {
-            if (x < 0 || manager.ChunkSize.X < x ||
-                y < 0 || manager.ChunkSize.Y < y ||
-                z < 0 || manager.ChunkSize.Z < z)
+            if ((uint) manager.ChunkSize.X < (uint) x ||
+                (uint) manager.ChunkSize.Y < (uint) y ||
+                (uint) manager.ChunkSize.Z < (uint) z)
                 throw new ArgumentOutOfRangeException("position");
 
             var index = GetArrayIndex(x, y, z);
@@ -72,38 +74,23 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// ブロックのインデックスを取得します。
-        /// </summary>
-        /// <param name="position">ブロックの位置。</param>
-        /// <returns>ブロックのインデックス。</returns>
-        public byte GetBlockIndex(ref VectorI3 position)
-        {
-            if (position.X < 0 || manager.ChunkSize.X < position.X ||
-                position.Y < 0 || manager.ChunkSize.Y < position.Y ||
-                position.Z < 0 || manager.ChunkSize.Z < position.Z)
-                throw new ArgumentOutOfRangeException("position");
-
-            var index = GetArrayIndex(ref position);
-            return blockIndices[index];
-        }
-
-        /// <summary>
         /// ブロックのインデックスを設定します。
         /// </summary>
-        /// <param name="position">ブロックの位置。</param>
+        /// <param name="x">ブロックの X 位置。</param>
+        /// <param name="y">ブロックの Y 位置。</param>
+        /// <param name="z">ブロックの Z 位置。</param>
         /// <param name="blockIndex">ブロックのインデックス。</param>
-        public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
+        public void SetBlockIndex(int x, int y, int z, byte blockIndex)
         {
-            if (position.X < 0 || manager.ChunkSize.X < position.X ||
-                position.Y < 0 || manager.ChunkSize.Y < position.Y ||
-                position.Z < 0 || manager.ChunkSize.Z < position.Z)
+            if ((uint) manager.ChunkSize.X < (uint) x ||
+                (uint) manager.ChunkSize.Y < (uint) y ||
+                (uint) manager.ChunkSize.Z < (uint) z)
                 throw new ArgumentOutOfRangeException("position");
 
-            var index = GetArrayIndex(ref position);
+            var index = GetArrayIndex(x, y, z);
             if (blockIndices[index] == blockIndex) return;
 
             blockIndices[index] = blockIndex;
-            Dirty = true;
 
             if (blockIndex != Block.EmptyIndex)
             {
@@ -115,31 +102,42 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        /// <summary>
+        /// 天空光レベルを取得します。
+        /// </summary>
+        /// <param name="x">ブロックの X 位置。</param>
+        /// <param name="y">ブロックの Y 位置。</param>
+        /// <param name="z">ブロックの Z 位置。</param>
+        /// <returns>天空光レベル。</returns>
         public byte GetSkylightLevel(int x, int y, int z)
         {
             return skylightLevels[x, y, z];
         }
 
-        public byte GetSkylightLevel(ref VectorI3 position)
-        {
-            return skylightLevels[position.X, position.Y, position.Z];
-        }
-
+        /// <summary>
+        /// 天空光レベルを設定します。
+        /// </summary>
+        /// <param name="x">ブロックの X 位置。</param>
+        /// <param name="y">ブロックの Y 位置。</param>
+        /// <param name="z">ブロックの Z 位置。</param>
+        /// <param name="value">天空光レベル。</param>
         public void SetSkylightLevel(int x, int y, int z, byte value)
         {
             skylightLevels[x, y, z] = value;
         }
 
-        public void SetSkylightLevel(ref VectorI3 position, byte value)
-        {
-            skylightLevels[position.X, position.Y, position.Z] = value;
-        }
-
+        /// <summary>
+        /// 全ての位置に指定の天空光レベルを設定します。
+        /// </summary>
+        /// <param name="value">天空光レベル。</param>
         public void FillSkylightLevels(byte level)
         {
             skylightLevels.Fill(level);
         }
 
+        /// <summary>
+        /// 全ての位置の天空光レベルを 0 に設定します。
+        /// </summary>
         public void ClearSkylightLevels()
         {
             FillSkylightLevels(Chunk.MaxSkylightLevel);
@@ -183,19 +181,16 @@ namespace Willcraftia.Xna.Blocks.Models
                 writer.Write(blockIndices[i]);
         }
 
-        int GetArrayIndex(int x, int y, int z)
-        {
-            return x + y * manager.ChunkSize.X + z * manager.ChunkSize.X * manager.ChunkSize.Y;
-        }
-
         /// <summary>
         /// 指定のブロック位置を示すブロック配列のインデックスを取得します。
         /// </summary>
-        /// <param name="position">ブロック位置。</param>
+        /// <param name="x">ブロックの X 位置。</param>
+        /// <param name="y">ブロックの Y 位置。</param>
+        /// <param name="z">ブロックの Z 位置。</param>
         /// <returns>ブロック配列のインデックス。</returns>
-        int GetArrayIndex(ref VectorI3 position)
+        int GetArrayIndex(int x, int y, int z)
         {
-            return position.X + position.Y * manager.ChunkSize.X + position.Z * manager.ChunkSize.X * manager.ChunkSize.Y;
+            return x + y * manager.ChunkSize.X + z * manager.ChunkSize.X * manager.ChunkSize.Y;
         }
     }
 }
