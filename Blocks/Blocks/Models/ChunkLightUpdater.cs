@@ -104,15 +104,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void RecalculateSkylightFrom(ref VectorI3 absoluteBlockPosition)
         {
+            var maxDistance = Chunk.MaxSkylightLevel - 1;
+
             var min = absoluteBlockPosition;
-            min.X -= Chunk.MaxSkylightLevel;
-            min.Y -= Chunk.MaxSkylightLevel;
-            min.Z -= Chunk.MaxSkylightLevel;
+            min.X -= maxDistance;
+            min.Y -= maxDistance;
+            min.Z -= maxDistance;
 
             var max = absoluteBlockPosition;
-            max.X += Chunk.MaxSkylightLevel;
-            max.Y += Chunk.MaxSkylightLevel;
-            max.Z += Chunk.MaxSkylightLevel;
+            max.X += maxDistance;
+            max.Y += maxDistance;
+            max.Z += maxDistance;
 
             for (int z = min.Z; z < max.Z; z++)
             {
