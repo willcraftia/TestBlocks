@@ -12,11 +12,15 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         protected PooledCommand() { }
 
-        public override void Release()
+        public sealed override void Release()
         {
+            ReleaseOverride();
+
             Pool.Return(this);
 
             base.Release();
         }
+
+        protected virtual void ReleaseOverride() { }
     }
 }

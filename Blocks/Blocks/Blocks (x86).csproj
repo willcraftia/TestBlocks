@@ -76,9 +76,12 @@
     <Compile Include="Content\SceneSettingsLoader.cs" />
     <Compile Include="Content\SkySphereLoader.cs" />
     <Compile Include="Edit\Brush.cs" />
+    <Compile Include="Edit\BrushCommand.cs" />
+    <Compile Include="Edit\BrushCommandFactory.cs" />
     <Compile Include="Edit\BrushManager.cs" />
     <Compile Include="Edit\CommandPool.cs" />
     <Compile Include="Edit\FreeBrush.cs" />
+    <Compile Include="Edit\PickBlockCommand.cs" />
     <Compile Include="Edit\PooledCommand.cs" />
     <Compile Include="Edit\SetBlockCommand.cs" />
     <Compile Include="Edit\StickyBrush.cs" />

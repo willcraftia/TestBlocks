@@ -16,11 +16,11 @@ namespace Willcraftia.Xna.Blocks.Edit
 {
     public sealed class BrushManager
     {
-        WorldManager worldManager;
-
         CommandManager commandManager;
 
         WorldCommandFactory worldCommandFactory;
+
+        BrushCommandFactory brushCommandFactory;
 
         ResourceManager resourceManager;
 
@@ -29,6 +29,8 @@ namespace Willcraftia.Xna.Blocks.Edit
         Brush activeBrush;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
+
+        public WorldManager WorldManager { get; private set; }
 
         public byte SelectedBlockIndex { get; set; }
 
@@ -65,10 +67,11 @@ namespace Willcraftia.Xna.Blocks.Edit
             if (commandManager == null) throw new ArgumentNullException("commandManager");
 
             GraphicsDevice = graphicsDevice;
-            this.worldManager = worldManager;
+            this.WorldManager = worldManager;
             this.commandManager = commandManager;
 
             worldCommandFactory = new WorldCommandFactory(worldManager);
+            brushCommandFactory = new BrushCommandFactory(this);
             
             resourceManager = new ResourceManager();
             
@@ -108,7 +111,7 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             if (ActiveBrush != null)
             {
-                ActiveBrush.Update(worldManager.SceneManager.ActiveCamera);
+                ActiveBrush.Update(WorldManager.SceneManager.ActiveCamera);
 
                 // ペイント可能: ブラシ表示
                 // ペイント不能: ブラシ非表示
@@ -120,7 +123,7 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
 
-            var command = worldCommandFactory.Create<SetBlockCommand>();
+            var command = worldCommandFactory.CreateSetBlockCommand();
 
             command.BlockPosition = ActiveBrush.PaintPosition;
             command.BlockIndex = SelectedBlockIndex;
@@ -132,11 +135,19 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
 
-            var command = worldCommandFactory.Create<SetBlockCommand>();
+            var command = worldCommandFactory.CreateSetBlockCommand();
 
             command.BlockPosition = ActiveBrush.ErasePosition;
             command.BlockIndex = Block.EmptyIndex;
 
+            commandManager.RequestCommand(command);
+        }
+
+        public void Pick()
+        {
+            if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
+
+            var command = brushCommandFactory.CreatePickBlockCommand();
             commandManager.RequestCommand(command);
         }
 
@@ -148,7 +159,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         internal byte? GetBlockIndex(ref VectorI3 absoluteBlockPosition)
         {
-            var chunk = worldManager.ChunkManager.GetChunkByBlockPosition(ref absoluteBlockPosition);
+            var chunk = WorldManager.ChunkManager.GetChunkByBlockPosition(ref absoluteBlockPosition);
             if (chunk == null) return null;
 
             VectorI3 relativePosition;

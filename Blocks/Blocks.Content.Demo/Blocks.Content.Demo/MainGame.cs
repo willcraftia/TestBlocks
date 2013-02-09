@@ -339,6 +339,15 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 lastPaintBlockIndex = Block.EmptyIndex;
             }
 
+            // マウス中ボタン押下でブラシのある位置のブロックを選択 (スポイト)。
+            // TODO
+            // ホイール クリックが反応してくれない。手の打ちようがない。
+            if ((mouseState.MiddleButton == ButtonState.Released && lastMouseState.MiddleButton == ButtonState.Pressed) ||
+                keyboardState.IsKeyUp(Keys.O) && lastKeyboardState.IsKeyDown(Keys.O))
+            {
+                brushManager.Pick();
+            }
+
             // Undo。
             if (keyboardState.IsKeyDown(Keys.LeftControl) &&
                 keyboardState.IsKeyUp(Keys.Z) && lastKeyboardState.IsKeyDown(Keys.Z))

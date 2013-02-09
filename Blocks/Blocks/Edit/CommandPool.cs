@@ -12,26 +12,26 @@ namespace Willcraftia.Xna.Blocks.Edit
     {
         Dictionary<Type, ConcurrentPool<PooledCommand>> poolDictionary = new Dictionary<Type, ConcurrentPool<PooledCommand>>();
 
-        public void Register<T>(Func<T> createFunction) where T : PooledCommand
+        public void Register(Type type, Func<PooledCommand> createFunction)
         {
-            poolDictionary[typeof(T)] = new ConcurrentPool<PooledCommand>(createFunction);
+            poolDictionary[type] = new ConcurrentPool<PooledCommand>(createFunction);
         }
 
-        public void Deregister<T>() where T : PooledCommand
+        public void Deregister(Type type)
         {
-            poolDictionary.Remove(typeof(T));
+            poolDictionary.Remove(type);
         }
 
-        public T Borrow<T>() where T : PooledCommand
+        public PooledCommand Borrow(Type type)
         {
-            var command = poolDictionary[typeof(T)].Borrow() as T;
+            var command = poolDictionary[type].Borrow();
             command.Pool = this;
             return command;
         }
 
-        public void Return<T>(T command) where T : PooledCommand
+        public void Return(PooledCommand command)
         {
-            poolDictionary[typeof(T)].Return(command);
+            poolDictionary[command.GetType()].Return(command);
         }
     }
 }

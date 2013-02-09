@@ -21,12 +21,17 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             this.worldManager = worldManager;
 
-            pool.Register(() => { return new SetBlockCommand(); });
+            pool.Register(typeof(SetBlockCommand), () => { return new SetBlockCommand(); });
         }
 
-        public T Create<T>() where T : WorldCommand
+        public SetBlockCommand CreateSetBlockCommand()
         {
-            var command = pool.Borrow<T>();
+            return Create(typeof(SetBlockCommand)) as SetBlockCommand;
+        }
+
+        WorldCommand Create(Type type)
+        {
+            var command = pool.Borrow(type) as WorldCommand;
             command.WorldManager = worldManager;
             return command;
         }
