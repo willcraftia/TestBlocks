@@ -18,7 +18,8 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             if (chunk == null) throw new ArgumentNullException("chunk");
 
-            chunk.ClearSkylightLevels();
+            // 光レベル 0 で満たしてから処理を始める。
+            chunk.FillSkylightLevels((byte) 0);
 
             if (chunk.SolidCount == 0)
             {

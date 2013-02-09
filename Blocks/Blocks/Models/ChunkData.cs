@@ -55,6 +55,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             blockIndices = new byte[manager.ChunkSize.X * manager.ChunkSize.Y * manager.ChunkSize.Z];
             skylightLevels = new HalfByteArray3(manager.ChunkSize.X, manager.ChunkSize.Y, manager.ChunkSize.Z);
+            
+            // 初期状態は空チャンクであるため、最大光レベルで充満させる。
             ClearSkylightLevels();
         }
 
@@ -133,6 +135,16 @@ namespace Willcraftia.Xna.Blocks.Models
             skylightLevels[position.X, position.Y, position.Z] = value;
         }
 
+        public void FillSkylightLevels(byte level)
+        {
+            skylightLevels.Fill(level);
+        }
+
+        public void ClearSkylightLevels()
+        {
+            FillSkylightLevels(Chunk.MaxSkylightLevel);
+        }
+
         /// <summary>
         /// 初期化します。
         /// </summary>
@@ -142,11 +154,6 @@ namespace Willcraftia.Xna.Blocks.Models
             SolidCount = 0;
 
             ClearSkylightLevels();
-        }
-
-        public void ClearSkylightLevels()
-        {
-            skylightLevels.Fill(Chunk.MaxSkylightLevel);
         }
 
         public void Read(BinaryReader reader)

@@ -343,6 +343,18 @@ namespace Willcraftia.Xna.Blocks.Models
             data.SetSkylightLevel(ref position, value);
         }
 
+        public void FillSkylightLevels(byte level)
+        {
+            // 空チャンクの場合は消去不能。
+            if (data != null) data.FillSkylightLevels(level);
+        }
+
+        public void ClearSkylightLevels()
+        {
+            // 空チャンクの場合は消去不能。
+            if (data != null) data.ClearSkylightLevels();
+        }
+
         public int GetRelativeBlockPositionX(int absoluteBlockPositionX)
         {
             return absoluteBlockPositionX - (Position.X * manager.ChunkSize.X);
@@ -500,11 +512,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // マネージャへ削除要求。
             manager.DisposeMesh(mesh);
-        }
-
-        public void ClearSkylightLevels()
-        {
-            if (data != null) data.ClearSkylightLevels();
         }
     }
 }
