@@ -96,7 +96,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             BrushNodeBase.Children.Add(freeBrushNode);
             worldManager.SceneManager.UpdateOctreeSceneNode(freeBrushNode);
 
-            FreeBrush = new Edit.FreeBrush(this, freeBrushNode);
+            FreeBrush = new FreeBrush(this, freeBrushNode);
 
             //----------------------------------------------------------------
             // デフォルトのアクティブ ブラシを設定
