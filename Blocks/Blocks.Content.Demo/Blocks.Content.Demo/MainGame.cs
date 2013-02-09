@@ -51,11 +51,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         ResourceManager editorResourceManager = new ResourceManager();
 
-        AssetManager editorAssetManager;
-
         CommandManager commandManager = new CommandManager();
-
-        WorldCommandFactory worldCommandFactory;
 
         VectorI3 lastPaintPosition;
 
