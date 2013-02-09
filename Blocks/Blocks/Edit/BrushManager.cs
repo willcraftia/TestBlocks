@@ -120,7 +120,7 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
 
-            var command = worldCommandFactory.CreateSetBlockCommand();
+            var command = worldCommandFactory.Create<SetBlockCommand>();
 
             command.BlockPosition = ActiveBrush.PaintPosition;
             command.BlockIndex = SelectedBlockIndex;
@@ -132,7 +132,7 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
 
-            var command = worldCommandFactory.CreateSetBlockCommand();
+            var command = worldCommandFactory.Create<SetBlockCommand>();
 
             command.BlockPosition = ActiveBrush.ErasePosition;
             command.BlockIndex = Block.EmptyIndex;
