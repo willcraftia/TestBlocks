@@ -377,6 +377,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             {
                 var opaque = context.OpaqueObjects[i];
 
+                if (!(opaque is ShadowCaster)) continue;
+
                 // 専用カメラの視錐台に含まれるもののみを描画。
                 if (IsVisibleObject(opaque))
                     opaque.Draw(normalDepthMapEffect);
