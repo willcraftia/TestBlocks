@@ -19,11 +19,17 @@ namespace Willcraftia.Xna.Blocks.Edit
             this.brushManager = brushManager;
 
             pool.Register(typeof(PickBlockCommand), () => { return new PickBlockCommand(); });
+            pool.Register(typeof(SetBrushCommand), () => { return new SetBrushCommand(); });
         }
 
         public PickBlockCommand CreatePickBlockCommand()
         {
             return Create(typeof(PickBlockCommand)) as PickBlockCommand;
+        }
+
+        public SetBrushCommand CreateSetBrushCommand()
+        {
+            return Create(typeof(SetBrushCommand)) as SetBrushCommand;
         }
 
         BrushCommand Create(Type type)

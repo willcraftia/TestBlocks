@@ -104,7 +104,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             //----------------------------------------------------------------
             // デフォルトのアクティブ ブラシを設定
 
-            ActiveBrush = StickyBrush;
+            ActiveBrush = FreeBrush;
         }
 
         public void Update()
@@ -148,6 +148,17 @@ namespace Willcraftia.Xna.Blocks.Edit
             if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
 
             var command = brushCommandFactory.CreatePickBlockCommand();
+            commandManager.RequestCommand(command);
+        }
+
+        public void SetBrush(Brush brush)
+        {
+            if (brush == null) throw new ArgumentNullException("brush");
+
+            if (activeBrush == brush) return;
+
+            var command = brushCommandFactory.CreateSetBrushCommand();
+            command.Brush = brush;
             commandManager.RequestCommand(command);
         }
 

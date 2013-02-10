@@ -33,6 +33,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         GraphicsDeviceManager graphics;
 
+        KeyboardState currentKeyboardState;
+
         KeyboardState lastKeyboardState;
 
         MouseState lastMouseState;
@@ -264,7 +266,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //----------------------------------------------------------------
             // マウスとキーボード状態の取得
 
-            var keyboardState = Keyboard.GetState();
+            currentKeyboardState = Keyboard.GetState();
             var mouseState = Mouse.GetState();
 
             //----------------------------------------------------------------
@@ -272,7 +274,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             // TODO
             if (!worldManager.ChunkManager.Closing && !worldManager.ChunkManager.Closed &&
-                keyboardState.IsKeyDown(Keys.Escape))
+                currentKeyboardState.IsKeyDown(Keys.Escape))
             {
                 worldManager.ChunkManager.Close();
 
@@ -287,9 +289,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             viewInput.Update(gameTime, worldManager.SceneManager.ActiveCamera.View);
 
-            if (keyboardState.IsKeyDown(Keys.PageUp))
+            if (currentKeyboardState.IsKeyDown(Keys.PageUp))
                 viewInput.MoveVelocity += 10;
-            if (keyboardState.IsKeyDown(Keys.PageDown))
+            if (currentKeyboardState.IsKeyDown(Keys.PageDown))
             {
                 viewInput.MoveVelocity -= 10;
                 if (viewInput.MoveVelocity < 10) viewInput.MoveVelocity = 10;
@@ -339,24 +341,33 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 lastPaintBlockIndex = Block.EmptyIndex;
             }
 
+            // Undo。
+            if (currentKeyboardState.IsKeyDown(Keys.LeftControl) && IsKeyPressed(Keys.Z))
+                commandManager.RequestUndo();
+
+            // Redo。
+            if (currentKeyboardState.IsKeyDown(Keys.LeftControl) && IsKeyPressed(Keys.Y))
+                commandManager.RequestRedo();
+
             // マウス中ボタン押下でブラシのある位置のブロックを選択 (スポイト)。
             // TODO
-            // ホイール クリックが反応してくれない。手の打ちようがない。
+            // ホイール クリックが反応してくれない。
+            // 手の打ちようがないのでキー [O] で対応。
             if ((mouseState.MiddleButton == ButtonState.Released && lastMouseState.MiddleButton == ButtonState.Pressed) ||
-                keyboardState.IsKeyUp(Keys.O) && lastKeyboardState.IsKeyDown(Keys.O))
+                IsKeyPressed(Keys.O))
             {
                 brushManager.Pick();
             }
 
-            // Undo。
-            if (keyboardState.IsKeyDown(Keys.LeftControl) &&
-                keyboardState.IsKeyUp(Keys.Z) && lastKeyboardState.IsKeyDown(Keys.Z))
-                commandManager.RequestUndo();
+            if (IsKeyPressed(Keys.D1))
+            {
+                brushManager.SetBrush(brushManager.FreeBrush);
+            }
 
-            // Redo。
-            if (keyboardState.IsKeyDown(Keys.LeftControl) &&
-                keyboardState.IsKeyUp(Keys.Y) && lastKeyboardState.IsKeyDown(Keys.Y))
-                commandManager.RequestRedo();
+            if (IsKeyPressed(Keys.D2))
+            {
+                brushManager.SetBrush(brushManager.StickyBrush);
+            }
 
             // コマンド実行。
             commandManager.Update();
@@ -365,25 +376,25 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // その他
 
             // F1
-            if (keyboardState.IsKeyUp(Keys.F1) && lastKeyboardState.IsKeyDown(Keys.F1))
+            if (IsKeyPressed(Keys.F1))
                 helpVisible = !helpVisible;
             // F2
-            if (keyboardState.IsKeyUp(Keys.F2) && lastKeyboardState.IsKeyDown(Keys.F2))
+            if (IsKeyPressed(Keys.F2))
                 SceneManager.DebugBoxVisible = !SceneManager.DebugBoxVisible;
             // F3
-            if (keyboardState.IsKeyUp(Keys.F3) && lastKeyboardState.IsKeyDown(Keys.F3))
+            if (IsKeyPressed(Keys.F3))
                 RegionManager.Wireframe = !RegionManager.Wireframe;
             // F4
-            if (keyboardState.IsKeyUp(Keys.F4) && lastKeyboardState.IsKeyDown(Keys.F4))
+            if (IsKeyPressed(Keys.F4))
                 worldManager.SceneSettings.FogEnabled = !worldManager.SceneSettings.FogEnabled;
             // F5
-            if (keyboardState.IsKeyUp(Keys.F5) && lastKeyboardState.IsKeyDown(Keys.F5))
+            if (IsKeyPressed(Keys.F5))
                 textureDisplay.Visible = !textureDisplay.Visible;
 
             //----------------------------------------------------------------
             // マウスとキーボード状態の記録
 
-            lastKeyboardState = keyboardState;
+            lastKeyboardState = currentKeyboardState;
             lastMouseState = mouseState;
 
             base.Update(gameTime);
@@ -422,6 +433,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 FileTraceListenerManager.Clear();
 
             base.Dispose(disposing);
+        }
+
+        bool IsKeyPressed(Keys key)
+        {
+            return currentKeyboardState.IsKeyUp(key) && lastKeyboardState.IsKeyDown(key);
         }
 
         float ByteToMegabyte(long byteSize)
