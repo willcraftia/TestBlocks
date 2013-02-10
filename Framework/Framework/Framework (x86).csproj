@@ -109,7 +109,6 @@
     <Compile Include="Component\XnaTypePropertyHandler.cs" />
     <Compile Include="Component\XnaTypePropertyStringfier.cs" />
     <Compile Include="Content\AssetHolder.cs" />
-    <Compile Include="Content\AssetHolderCollection.cs" />
     <Compile Include="Content\AssetManager.cs" />
     <Compile Include="Content\DownloadDefinition.cs" />
     <Compile Include="Content\DownloadInfo.cs" />

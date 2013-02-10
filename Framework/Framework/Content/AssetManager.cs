@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Content;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.IO;
 
@@ -12,6 +13,18 @@ namespace Willcraftia.Xna.Framework.Content
 {
     public sealed class AssetManager : IDisposable
     {
+        #region AssetHolderCollection
+
+        sealed class AssetHolderCollection : KeyedList<IResource, AssetHolder>
+        {
+            protected override IResource GetKeyForItem(AssetHolder item)
+            {
+                return item.Resource;
+            }
+        }
+
+        #endregion
+
         static readonly Logger logger = new Logger(typeof(AssetManager).Name);
 
         NoCacheContentManager contentManager;
@@ -76,7 +89,7 @@ namespace Willcraftia.Xna.Framework.Content
             if (resource == null) throw new ArgumentNullException("resource");
 
             AssetHolder holder;
-            if (!holders.TryGetItem(resource, out holder)) holder = LoadNew(resource, type);
+            if (!holders.TryGet(resource, out holder)) holder = LoadNew(resource, type);
 
             return holder.Asset;
         }
@@ -121,7 +134,7 @@ namespace Willcraftia.Xna.Framework.Content
             logger.Info("Unload: {0}", resource);
 
             AssetHolder holder;
-            if (holders.TryGetItem(resource, out holder))
+            if (holders.TryGet(resource, out holder))
             {
                 DisposeIfNeeded(holder);
                 holders.Remove(resource);
@@ -169,16 +182,18 @@ namespace Willcraftia.Xna.Framework.Content
 
             // Protect.
             AssetHolder testHolder;
-            if (holders.TryGetItem(resource, out testHolder) && !asset.Equals(testHolder.Asset))
+            if (holders.TryGet(resource, out testHolder) && !asset.Equals(testHolder.Asset))
                 throw new InvalidOperationException("Resource '{0}' is bound to the other asset: " + resource);
 
             // Unbind if needed.
             AssetHolder oldHolder = null;
-            foreach (var assetHolder in holders)
+            for (int i = 0; i < holders.Count; i++)
             {
-                if (assetHolder.Asset.Equals(asset) && assetHolder.Resource != resource)
+                var h = holders[i];
+
+                if (h.Asset.Equals(asset) && h.Resource != resource)
                 {
-                    oldHolder = assetHolder;
+                    oldHolder = h;
                     break;
                 }
             }
