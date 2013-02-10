@@ -177,8 +177,9 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             lock (regions)
             {
-                foreach (var region in regions)
+                for (int i = 0; i < regions.Count; i++)
                 {
+                    var region = regions[i];
                     if (region.Box.Contains(chunkPosition))
                     {
                         return region;
@@ -249,8 +250,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void PrepareChunkEffects()
         {
-            foreach (var region in regions)
+            for (int i = 0; i < regions.Count; i++)
             {
+                var region = regions[i];
                 sceneManager.UpdateEffect(region.ChunkEffect);
 
                 region.ChunkEffect.WireframeEnabled = Wireframe;
@@ -259,8 +261,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         internal void OnShadowMapUpdated(object sender, EventArgs e)
         {
-            foreach (var region in regions)
+            for (int i = 0; i < regions.Count; i++)
             {
+                var region = regions[i];
                 sceneManager.UpdateEffectShadowMap(region.ChunkEffect);
             }
         }

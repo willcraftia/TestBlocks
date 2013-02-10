@@ -30,8 +30,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var b = new StringBuilder(rootDirectory);
             b.Append('/');
-            foreach (var c in regionResource.AbsoluteUri)
+            for (int i = 0; i < regionResource.AbsoluteUri.Length; i++)
             {
+                var c = regionResource.AbsoluteUri[i];
                 switch (c)
                 {
                     case ':':

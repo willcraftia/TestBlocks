@@ -100,9 +100,9 @@ namespace Willcraftia.Xna.Blocks.Models
             var effectMatrices = effect as IEffectMatrices;
             if (effectMatrices != null) effectMatrices.World = World;
 
-            foreach (var pass in effect.CurrentTechnique.Passes)
+            for (int i = 0; i < effect.CurrentTechnique.Passes.Count; i++)
             {
-                pass.Apply();
+                effect.CurrentTechnique.Passes[i].Apply();
 
                 DrawCore();
             }

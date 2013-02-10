@@ -53,8 +53,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void DrawMaps()
         {
-            foreach (var tile in this)
-                DrawMaps(tile.Index);
+            for (int i = 0; i < Count; i++)
+                DrawMaps(this[i].Index);
         }
 
         public void DrawMaps(byte index)

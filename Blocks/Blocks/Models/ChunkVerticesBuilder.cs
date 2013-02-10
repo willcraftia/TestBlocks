@@ -74,8 +74,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool Initialize(Chunk chunk)
         {
-            foreach (var side in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
+                var side = CubicSide.Items[i];
+
                 var neighborPosition = chunk.Position + side.Direction;
                 if (!manager.ContainsPartition(ref neighborPosition))
                 {
@@ -172,8 +174,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // MeshPart が必ずしも平面であるとは限らないが、
             // ここでは平面を仮定して隣接状態を考える。
-            foreach (var side in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
+                var side = CubicSide.Items[i];
+
                 var meshPart = block.Mesh.MeshParts[side];
 
                 // 対象面が存在しない場合はスキップ。
@@ -247,8 +251,10 @@ namespace Willcraftia.Xna.Blocks.Models
             var mySide = side.Reverse();
 
             // 面隣接ブロックに対して面隣接ブロックが存在する場合、遮蔽と判定。
-            foreach (var s in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
+                var s = CubicSide.Items[i];
+
                 // 自身に対する方向はスキップ。
                 if (mySide == s) continue;
 
