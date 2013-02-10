@@ -20,9 +20,9 @@ namespace Willcraftia.Xna.Framework.IO
         {
             if (uri == null) throw new ArgumentNullException("uri");
 
-            foreach (var loader in loaders)
+            for (int i = 0; i < loaders.Count; i++)
             {
-                var resource = loader.LoadResource(uri);
+                var resource = loaders[i].LoadResource(uri);
                 if (resource != null) return resource;
             }
 
