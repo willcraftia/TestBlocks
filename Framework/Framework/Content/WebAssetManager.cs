@@ -191,8 +191,10 @@ namespace Willcraftia.Xna.Framework.Content
             var b = new StringBuilder();
             b.Append(StorageResource.StorageScheme);
             b.Append(":Downloads/");
-            foreach (var c in uri)
+            for (int i = 0; i < uri.Length; i++)
             {
+                var c = uri[i];
+
                 switch (c)
                 {
                     case ':':
