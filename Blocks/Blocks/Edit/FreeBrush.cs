@@ -23,6 +23,9 @@ namespace Willcraftia.Xna.Blocks.Edit
             brushMesh.Color = new Vector3(1, 0, 0);
             brushMesh.Alpha = 0.5f;
             Node.Objects.Add(brushMesh);
+
+            // 常にペイント可能。
+            CanPaint = true;
         }
 
         // まずはカメラを更新。
