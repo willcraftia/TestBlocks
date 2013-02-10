@@ -286,9 +286,9 @@ namespace Willcraftia.Xna.Framework.Graphics
                 graphicsDevice.SetVertexBuffer(vertexBuffer);
                 graphicsDevice.Indices = indexBuffer;
 
-                foreach (var pass in particleEffect.CurrentTechnique.Passes)
+                for (int i = 0; i < particleEffect.CurrentTechnique.Passes.Count; i++)
                 {
-                    pass.Apply();
+                    particleEffect.CurrentTechnique.Passes[i].Apply();
 
                     if (firstActiveParticle < firstFreeParticle)
                     {
