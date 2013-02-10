@@ -95,8 +95,9 @@ namespace Willcraftia.Xna.Framework.Component
             var property = componentInfo.GetProperty(propertyName);
             var propertyValue = propertyDefinition.Value;
 
-            foreach (var handler in PropertyHandlers)
+            for (int i = 0; i < PropertyHandlers.Count; i++)
             {
+                var handler = PropertyHandlers[i];
                 if (handler.SetPropertyValue(component, property, propertyValue))
                     return;
             }
