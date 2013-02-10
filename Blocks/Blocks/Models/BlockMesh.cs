@@ -23,17 +23,17 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             var mesh = new BlockMesh();
 
-            foreach (var side in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
-                var prototype = block.MeshPrototype.MeshParts[side];
+                var prototype = block.MeshPrototype.MeshParts[i];
                 if (prototype == null) continue;
 
                 var texCoordOffset = Vector2.Zero;
 
-                var tile = block.Tiles[side];
+                var tile = block.Tiles[i];
                 if (tile != null) tile.GetTexCoordOffset(out texCoordOffset);
 
-                mesh.MeshParts[side] = Create(prototype, ref texCoordOffset);
+                mesh.MeshParts[i] = Create(prototype, ref texCoordOffset);
             }
 
             return mesh;

@@ -64,8 +64,10 @@ namespace Willcraftia.Xna.Blocks.Edit
             var transform = Matrix.CreateTranslation(new Vector3(0.5f));
 
             int i = 0;
-            foreach (var side in CubicSide.Items)
+            for (int j = 0; j < CubicSide.Count; j++)
             {
+                var side = CubicSide.Items[j];
+
                 var normal = side.Direction.ToVector3();
 
                 var side1 = new Vector3(normal.Y, normal.Z, normal.X);

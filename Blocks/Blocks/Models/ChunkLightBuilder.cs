@@ -61,8 +61,10 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             var neighbors = new ChunkNeighbors();
-            foreach (var side in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
+                var side = CubicSide.Items[i];
+
                 var neighbor = GetPropagatableNeighborChunk(chunk, side);
                 if (neighbor == null)
                 {
@@ -196,8 +198,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (!CanPenetrateLight(chunk, ref blockPosition)) return;
 
-            foreach (var side in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
+                var side = CubicSide.Items[i];
+
                 var neighborBlockPosition = blockPosition + side.Direction;
 
                 // チャンク外はスキップ。
