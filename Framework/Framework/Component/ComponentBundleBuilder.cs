@@ -138,8 +138,10 @@ namespace Willcraftia.Xna.Framework.Component
 
                     string stringValue = null;
 
-                    foreach (var stringfier in PropertyStringfiers)
+                    for (int k = 0; k < PropertyStringfiers.Count; k++)
                     {
+                        var stringfier = PropertyStringfiers[k];
+
                         if (stringfier.ConvertToString(component, property, propertyValue, out stringValue))
                             break;
                     }
@@ -174,8 +176,10 @@ namespace Willcraftia.Xna.Framework.Component
                 var propertyValue = property.GetValue(component, null);
 
                 bool handled = false;
-                foreach (var stringfier in PropertyStringfiers)
+                for (int k = 0; k < PropertyStringfiers.Count; k++)
                 {
+                    var stringfier = PropertyStringfiers[k];
+
                     if (stringfier.CanConvertToString(component, property, propertyValue))
                     {
                         handled = true;
