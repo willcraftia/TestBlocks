@@ -40,8 +40,9 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 #if WINDOWS
             if (fileTraceListeners == null) return;
 
-            foreach (var listener in fileTraceListeners)
+            for (int i = 0; i < fileTraceListeners.Count; i++)
             {
+                var listener = fileTraceListeners[i];
                 listener.Flush();
                 listener.Close();
                 Trace.Listeners.Remove(listener);
