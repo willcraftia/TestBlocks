@@ -98,6 +98,57 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
+        #region CameraCollection
+
+        public sealed class CameraCollection : KeyedList<string, ICamera>
+        {
+            internal CameraCollection(int capacity) : base(capacity) { }
+
+            protected override string GetKeyForItem(ICamera item)
+            {
+                return item.Name;
+            }
+        }
+
+        #endregion
+
+        #region DirectionalLightCollection
+
+        public sealed class DirectionalLightCollection : KeyedList<string, DirectionalLight>
+        {
+            internal DirectionalLightCollection(int capacity) : base(capacity) { }
+
+            protected override string GetKeyForItem(DirectionalLight item)
+            {
+                return item.Name;
+            }
+        }
+
+        #endregion
+
+        #region ParticleSystemCollection
+
+        public sealed class ParticleSystemCollection : KeyedList<string, ParticleSystem>
+        {
+            internal ParticleSystemCollection(int capacity) : base(capacity) { }
+
+            protected override string GetKeyForItem(ParticleSystem item)
+            {
+                return item.Name;
+            }
+        }
+
+        #endregion
+
+        #region PostProcessorCollection
+
+        public sealed class PostProcessorCollection : ListBase<PostProcessor>
+        {
+            internal PostProcessorCollection(int capacity) : base(capacity) { }
+        }
+
+        #endregion
+
         public const int InitialCameraCapacity = 10;
 
         public const int InitialDirectionalLightCapacity = 10;
@@ -523,8 +574,10 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             if (octree.Nodes.Count == 0) return;
 
-            foreach (var node in octree.Nodes)
+            for (int i = 0; i < octree.Nodes.Count; i++)
             {
+                var node = octree.Nodes[i];
+
                 if (node.Objects.Count == 0) continue;
 
                 foreach (var obj in node.Objects)
@@ -564,8 +617,8 @@ namespace Willcraftia.Xna.Framework.Graphics
             //----------------------------------------------------------------
             // 投影オブジェクトを収集
 
-            foreach (var shadowCaster in shadowCasters)
-                ShadowMap.TryAddShadowCaster(shadowCaster);
+            for (int i = 0; i < shadowCasters.Count; i++)
+                ShadowMap.TryAddShadowCaster(shadowCasters[i]);
 
             //----------------------------------------------------------------
             // シャドウ マップを描画
@@ -669,8 +722,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(RenderTarget);
 
-            foreach (var particleSystem in ParticleSystems)
+            for (int i = 0; i < ParticleSystems.Count; i++)
             {
+                var particleSystem = ParticleSystems[i];
                 if (particleSystem.Enabled)
                     particleSystem.Draw(gameTime, activeCamera);
             }
@@ -684,8 +738,9 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Monitor.Begin(MonitorPostProcess);
 
-            foreach (var postProcessor in PostProcessors)
+            for (int i = 0; i < PostProcessors.Count; i++)
             {
+                var postProcessor = PostProcessors[i];
                 if (postProcessor.Enabled)
                 {
                     postProcessor.Process(postProcessorContext);

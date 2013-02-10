@@ -138,11 +138,9 @@
     <Compile Include="Graphics\SsaoMapBlur.cs" />
     <Compile Include="Graphics\Bloom.cs" />
     <Compile Include="Graphics\BlurSettings.cs" />
-    <Compile Include="Graphics\CameraCollection.cs" />
     <Compile Include="Graphics\ColorOverlap.cs" />
     <Compile Include="Graphics\DepthMapEffect.cs" />
     <Compile Include="Graphics\DirectionalLight.cs" />
-    <Compile Include="Graphics\DirectionalLightCollection.cs" />
     <Compile Include="Graphics\Dof.cs" />
     <Compile Include="Graphics\Edge.cs" />
     <Compile Include="Graphics\FullscreenQuad.cs" />
@@ -153,9 +151,7 @@
     <Compile Include="Graphics\NormalDepthMapEffect.cs" />
     <Compile Include="Graphics\ParticleSettings.cs" />
     <Compile Include="Graphics\ParticleSystem.cs" />
-    <Compile Include="Graphics\ParticleSystemCollection.cs" />
     <Compile Include="Graphics\PostProcessor.cs" />
-    <Compile Include="Graphics\PostProcessorCollection.cs" />
     <Compile Include="Graphics\SceneObject.cs" />
     <Compile Include="Graphics\ShadowCaster.cs" />
     <Compile Include="Graphics\GaussianBlur.cs" />
