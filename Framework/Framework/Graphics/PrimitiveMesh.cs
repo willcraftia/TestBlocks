@@ -46,9 +46,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             graphicsDevice.SetVertexBuffer(VertexBuffer);
             graphicsDevice.Indices = IndexBuffer;
 
-            foreach (var effectPass in effect.CurrentTechnique.Passes)
+            for (int i = 0; i < effect.CurrentTechnique.Passes.Count; i++)
             {
-                effectPass.Apply();
+                effect.CurrentTechnique.Passes[i].Apply();
                 graphicsDevice.DrawIndexedPrimitives(PrimitiveType, 0, 0, NumVertices, 0, PrimitiveCount);
             }
         }
