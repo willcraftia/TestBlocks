@@ -57,9 +57,9 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             Translucent = true;
 
-            foreach (var side in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
-                var meshPart = mesh.MeshParts[side];
+                var meshPart = mesh.MeshParts[i];
                 if (meshPart == null) continue;
 
                 var vertexCount = meshPart.Vertices.Length;
@@ -67,11 +67,11 @@ namespace Willcraftia.Xna.Blocks.Edit
 
                 if (vertexCount == 0 || indexCount == 0) continue;
 
-                vertexBuffers[side] = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalTexture), vertexCount, BufferUsage.WriteOnly);
-                vertexBuffers[side].SetData(meshPart.Vertices);
+                vertexBuffers[i] = new VertexBuffer(graphicsDevice, typeof(VertexPositionNormalTexture), vertexCount, BufferUsage.WriteOnly);
+                vertexBuffers[i].SetData(meshPart.Vertices);
 
-                indexBuffers[side] = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.WriteOnly);
-                indexBuffers[side].SetData(meshPart.Indices);
+                indexBuffers[i] = new IndexBuffer(graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.WriteOnly);
+                indexBuffers[i].SetData(meshPart.Indices);
             }
 
             fillTexture = Texture2DHelper.CreateFillTexture(graphicsDevice);
@@ -95,12 +95,12 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             effect.CurrentTechnique.Passes[0].Apply();
 
-            foreach (var side in CubicSide.Items)
+            for (int i = 0; i < CubicSide.Count; i++)
             {
-                if (!VisibleAllFaces && VisibleFace != side) continue;
+                if (!VisibleAllFaces && VisibleFace != CubicSide.Items[i]) continue;
 
-                var vertexBuffer = vertexBuffers[side];
-                var indexBuffer = indexBuffers[side];
+                var vertexBuffer = vertexBuffers[i];
+                var indexBuffer = indexBuffers[i];
 
                 if (vertexBuffer == null || indexBuffer == null) continue;
 
@@ -136,10 +136,10 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             if (disposing)
             {
-                foreach (var side in CubicSide.Items)
+                for (int i = 0; i < CubicSide.Count; i++)
                 {
-                    if (vertexBuffers[side] != null) vertexBuffers[side].Dispose();
-                    if (indexBuffers[side] != null) indexBuffers[side].Dispose();
+                    if (vertexBuffers[i] != null) vertexBuffers[i].Dispose();
+                    if (indexBuffers[i] != null) indexBuffers[i].Dispose();
                 }
                 fillTexture.Dispose();
                 effect.Dispose();
