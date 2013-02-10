@@ -332,8 +332,10 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             float maxEndTime = 0;
 
             // 表示対象となるバーの数に応じて、表示サイズと位置を決定。
-            foreach (var bar in previousFrameLog.Bars)
+            for (int i = 0; i < previousFrameLog.Bars.Count; i++)
             {
+                var bar = previousFrameLog.Bars[i];
+
                 // バーが可視で、マーカを持つならば表示対象。
                 if (BarVisible && bar.MarkerLogCount != 0)
                 {
@@ -389,21 +391,23 @@ namespace Willcraftia.Xna.Framework.Diagnostics
                 // 各バーを描画。
                 var barRectangle = new Rectangle();
                 barRectangle.Height = BarHeight;
-                foreach (var bar in previousFrameLog.Bars)
+                for (int i = 0; i < previousFrameLog.Bars.Count; i++)
                 {
+                    var bar = previousFrameLog.Bars[i];
+
                     // MarkerLog がないバーはスキップ。
                     if (bar.MarkerLogCount == 0) continue;
 
                     barRectangle.Y = y + BarPadding;
 
-                    for (int i = 0; i < bar.MarkerLogCount; i++)
+                    for (int j = 0; j < bar.MarkerLogCount; j++)
                     {
-                        int barStartX = (int) (offsetX + bar.MarkerLogs[i].BeginTime * pixelPerMillisecond);
-                        int barEndX = (int) (offsetX + bar.MarkerLogs[i].EndTime * pixelPerMillisecond);
+                        int barStartX = (int) (offsetX + bar.MarkerLogs[j].BeginTime * pixelPerMillisecond);
+                        int barEndX = (int) (offsetX + bar.MarkerLogs[j].EndTime * pixelPerMillisecond);
                         barRectangle.X = barStartX;
                         barRectangle.Width = Math.Max(barEndX - barStartX, 1);
 
-                        spriteBatch.Draw(fillTexture, barRectangle, bar.MarkerLogs[i].Color);
+                        spriteBatch.Draw(fillTexture, barRectangle, bar.MarkerLogs[j].Color);
                     }
 
                     y += BarHeight + BarPadding;
