@@ -20,15 +20,15 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         [Conditional("DEBUG"), Conditional("TRACE")]
         public static void Begin(string name)
         {
-            foreach (var listener in Listeners)
-                listener.Begin(name);
+            for (int i = 0; i < Listeners.Count; i++)
+                Listeners[i].Begin(name);
         }
 
         [Conditional("DEBUG"), Conditional("TRACE")]
         public static void End(string name)
         {
-            foreach (var listener in Listeners)
-                listener.End(name);
+            for (int i = 0; i < Listeners.Count; i++)
+                Listeners[i].End(name);
         }
     }
 }
