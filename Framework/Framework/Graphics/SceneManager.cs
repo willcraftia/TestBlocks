@@ -594,11 +594,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = colorWriteDisable;
 
-            foreach (var opaque in opaqueObjects)
-                opaque.UpdateOcclusion();
+            for (int i = 0; i < opaqueObjects.Count; i++)
+                opaqueObjects[i].UpdateOcclusion();
 
-            foreach (var translucent in translucentObjects)
-                translucent.UpdateOcclusion();
+            for (int i = 0; i < translucentObjects.Count; i++)
+                translucentObjects[i].UpdateOcclusion();
 
             Monitor.End(MonitorOcclusionQuery);
 
@@ -614,8 +614,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = BlendState.Opaque;
 
-            foreach (var opaque in opaqueObjects)
+            for (int i = 0; i < opaqueObjects.Count; i++)
             {
+                var opaque = opaqueObjects[i];
+
                 if (opaque.Occluded)
                 {
                     OccludedSceneObjectCount++;
@@ -630,8 +632,10 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-            foreach (var translucent in translucentObjects)
+            for (int i = 0; i < translucentObjects.Count; i++)
             {
+                var translucent = translucentObjects[i];
+
                 if (translucent.Occluded)
                 {
                     OccludedSceneObjectCount++;
@@ -718,11 +722,11 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
             GraphicsDevice.SetRenderTarget(RenderTarget);
 
-            foreach (var opaque in opaqueObjects)
-                DebugDrawBoundingBox(opaque);
+            for (int i = 0; i < opaqueObjects.Count; i++)
+                DebugDrawBoundingBox(opaqueObjects[i]);
 
-            foreach (var translucent in translucentObjects)
-                DebugDrawBoundingBox(translucent);
+            for (int i = 0; i < translucentObjects.Count; i++)
+                DebugDrawBoundingBox(translucentObjects[i]);
 
             GraphicsDevice.SetRenderTarget(null);
         }
