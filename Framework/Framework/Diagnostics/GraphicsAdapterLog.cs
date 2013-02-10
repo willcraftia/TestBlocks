@@ -15,8 +15,9 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         [Conditional("TRACE")]
         public static void Info()
         {
-            foreach (var graphicsAdapter in GraphicsAdapter.Adapters)
-                Info(graphicsAdapter);
+            for (int i = 0; i < GraphicsAdapter.Adapters.Count; i++)
+                Info(GraphicsAdapter.Adapters[i]);
+                
         }
 
         [Conditional("TRACE")]
