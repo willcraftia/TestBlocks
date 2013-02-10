@@ -409,11 +409,17 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.SetRenderTarget(shadowSceneMap);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-            foreach (var opaque in context.OpaqueObjects)
+            for (int i = 0; i < context.OpaqueObjects.Count; i++)
+            {
+                var opaque = context.OpaqueObjects[i];
                 opaque.Draw(shadowSceneEffect);
+            }
 
-            foreach (var translucent in context.TranslucentObjects)
+            for (int i = 0; i < context.TranslucentObjects.Count; i++)
+            {
+                var translucent = context.TranslucentObjects[i];
                 translucent.Draw(shadowSceneEffect);
+            }
 
             GraphicsDevice.SetRenderTarget(null);
 

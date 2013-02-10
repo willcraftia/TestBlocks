@@ -373,8 +373,10 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
             // 不透明オブジェクトのみ対象。
-            foreach (var opaque in context.OpaqueObjects)
+            for (int i = 0; i < context.OpaqueObjects.Count; i++)
             {
+                var opaque = context.OpaqueObjects[i];
+
                 // 専用カメラの視錐台に含まれるもののみを描画。
                 if (IsVisibleObject(opaque))
                     opaque.Draw(normalDepthMapEffect);

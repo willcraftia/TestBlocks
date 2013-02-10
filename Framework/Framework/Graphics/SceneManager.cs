@@ -61,13 +61,13 @@ namespace Willcraftia.Xna.Framework.Graphics
             }
 
             // I/F
-            public IEnumerable<SceneObject> OpaqueObjects
+            public List<SceneObject> OpaqueObjects
             {
                 get { return sceneManager.opaqueObjects; }
             }
 
             // I/F
-            public IEnumerable<SceneObject> TranslucentObjects
+            public List<SceneObject> TranslucentObjects
             {
                 get { return sceneManager.translucentObjects; }
             }

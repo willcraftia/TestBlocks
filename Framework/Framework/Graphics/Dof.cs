@@ -257,15 +257,19 @@ namespace Willcraftia.Xna.Framework.Graphics
             GraphicsDevice.SetRenderTarget(depthMap);
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
 
-            foreach (var opaque in context.OpaqueObjects)
+            for (int i = 0; i < context.OpaqueObjects.Count; i++)
             {
+                var opaque = context.OpaqueObjects[i];
+
                 // 専用カメラの視錐台に含まれるもののみを描画。
                 if (IsVisibleObject(opaque))
                     opaque.Draw(depthMapEffect);
             }
 
-            foreach (var translucent in context.TranslucentObjects)
+            for (int i = 0; i < context.TranslucentObjects.Count; i++)
             {
+                var translucent = context.TranslucentObjects[i];
+
                 // 専用カメラの視錐台に含まれるもののみを描画。
                 if (IsVisibleObject(translucent))
                     translucent.Draw(depthMapEffect);
