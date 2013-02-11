@@ -20,16 +20,16 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public override bool Do()
         {
-            SetAndUpdateBlock(BlockIndex);
+            SetBlock(BlockIndex);
             return true;
         }
 
         public override void Undo()
         {
-            SetAndUpdateBlock(lastBlockIndex);
+            SetBlock(lastBlockIndex);
         }
 
-        void SetAndUpdateBlock(byte blockIndex)
+        void SetBlock(byte blockIndex)
         {
             var chunkManager = WorldManager.ChunkManager;
 
@@ -40,6 +40,9 @@ namespace Willcraftia.Xna.Blocks.Edit
             chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
 
             lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
+
+            // 既存ブロックと同じならば処理せず、Undo 履歴にも残さない。
+            if (blockIndex == lastBlockIndex) return;
 
             chunk.SetBlockIndex(ref relativePosition, blockIndex);
 
