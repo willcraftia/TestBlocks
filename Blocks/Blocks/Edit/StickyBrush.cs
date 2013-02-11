@@ -41,11 +41,13 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         BrushMesh brushMesh;
 
-        CubicSide paintFace;
+        CubicSide paintSide;
 
-        public CubicSide PaintFace
+        CubicSide lockedSide;
+
+        public CubicSide PaintSide
         {
-            get { return paintFace; }
+            get { return paintSide; }
         }
 
         public StickyBrush(BrushManager manager, SceneNode node)
@@ -99,6 +101,13 @@ namespace Willcraftia.Xna.Blocks.Edit
             }
         }
 
+        public override void StartPaint()
+        {
+            lockedSide = null;
+
+            base.StartPaint();
+        }
+
         // まずはカメラを更新。
         // ブロック生成消滅の位置を決定する以外にも、
         // ブラシ描画のための描画位置の決定に必須。
@@ -114,8 +123,9 @@ namespace Willcraftia.Xna.Blocks.Edit
             var ray = new Ray(eyePositionWorld, eyeDirection);
 
             // グリッドに沿っていない視点方向を考慮しての float によるオフセット。
+            // 約 sqrt(2) / 2 で位置を増加させつつ判定。
             var prevTestPosition = new VectorI3();
-            for (float offset = 0.5f; offset < 10; offset += 0.2f)
+            for (float offset = 0.7f; offset < 10; offset += 0.7f)
             {
                 var basePositionWorld = eyePositionWorld + eyeDirection * offset;
 
@@ -145,6 +155,12 @@ namespace Willcraftia.Xna.Blocks.Edit
             // 粘着ブラシの消去位置はブラシの位置。
             ErasePosition = Position;
 
+            // ペイント開始かつ面未固定ならば、選択された面で固定。
+            if (PaintStarted && lockedSide == null)
+            {
+                lockedSide = paintSide;
+            }
+
             // ペイント不能の場合は自動的にメッシュ非表示となるため、
             // メッシュの更新は不要。
             if (!CanPaint) return;
@@ -165,18 +181,24 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             for (int i = 0; i < triangleInfos.Length; i++)
             {
+                var side = triangleInfos[i].Side;
+
+                // 面固定済みならば、それ以外の面を除外。
+                if (PaintStarted && lockedSide != null && side != lockedSide)
+                    continue;
+
                 // 背面は判定から除外。
-                if (IsBackFace(triangleInfos[i].Side, ref rayDirection)) continue;
+                if (IsBackFace(side, ref rayDirection)) continue;
 
                 // 面と視線が交差するか否か。
                 if (Intersects(ref ray, triangleInfos[i], ref world))
                 {
-                    var testPosition = brushPosition + triangleInfos[i].Side.Direction;
+                    var testPosition = brushPosition + side.Direction;
                     var blockIndex = Manager.GetBlockIndex(ref testPosition);
                     if (blockIndex == Block.EmptyIndex)
                     {
                         PaintPosition = testPosition;
-                        paintFace = triangleInfos[i].Side;
+                        paintSide = side;
                         return true;
                     }
                 }
@@ -221,7 +243,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             BoundingSphere.CreateFromBoundingBox(ref brushMesh.BoxWorld, out brushMesh.SphereWorld);
 
             brushMesh.VisibleAllFaces = false;
-            brushMesh.VisibleFace = paintFace;
+            brushMesh.VisibleFace = paintSide;
         }
     }
 }

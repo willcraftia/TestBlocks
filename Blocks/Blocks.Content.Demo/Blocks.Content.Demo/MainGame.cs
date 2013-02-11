@@ -305,6 +305,20 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             //----------------------------------------------------------------
             // ブラシ マネージャ
 
+            // 右ボタン押下でペイント モードの開始。
+            if (mouseState.RightButton == ButtonState.Pressed && lastMouseState.RightButton == ButtonState.Released)
+            {
+                brushManager.StartPaintMode();
+            }
+
+            // 右ボタン解放でペイント モードの終了。
+            if (mouseState.RightButton == ButtonState.Released && lastMouseState.RightButton == ButtonState.Pressed)
+            {
+                brushManager.EndPaintMode();
+            }
+
+            // ブラシ マネージャを更新。
+            // 内部でブラシの位置が決定される。
             brushManager.Update();
 
             // 左ボタンでブロック消去。
@@ -316,30 +330,12 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
                 brushManager.Erase();
             }
 
-            // TODO
-            //
-            // 連続配置と非連続配置の切替が分からない。
-            //
-            // 任意配置ブラシの場合、連続配置可としたい。
-            // 粘着配置ブラシの場合、連続配置不可としたい。
-            //
-            if (mouseState.RightButton == ButtonState.Released && lastMouseState.RightButton == ButtonState.Pressed &&
-                mouseState.LeftButton == ButtonState.Released)
+            // 右ボタン押下でペイント。
+            if (mouseState.RightButton == ButtonState.Pressed && mouseState.LeftButton == ButtonState.Released)
             {
-                if (brushManager.ActiveBrush.PaintPosition != lastPaintPosition ||
-                    brushManager.SelectedBlockIndex != lastPaintBlockIndex)
-                {
-                    brushManager.Paint();
+                brushManager.Paint();
+            }
 
-                    lastPaintPosition = brushManager.ActiveBrush.PaintPosition;
-                    lastPaintBlockIndex = brushManager.SelectedBlockIndex;
-                }
-            }
-            if (mouseState.RightButton == ButtonState.Released)
-            {
-                lastPaintPosition = new VectorI3(int.MaxValue);
-                lastPaintBlockIndex = Block.EmptyIndex;
-            }
 
             // Undo。
             if (currentKeyboardState.IsKeyDown(Keys.LeftControl) && IsKeyPressed(Keys.Z))
@@ -522,7 +518,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (brushManager.ActiveBrush is StickyBrush)
             {
                 var stickyBrush = brushManager.ActiveBrush as StickyBrush;
-                sb.Append(stickyBrush.PaintFace).Append(": ");
+                sb.Append(stickyBrush.PaintSide).Append(": ");
             }
             sb.AppendNumber(brushManager.ActiveBrush.Position.X).Append(", ");
             sb.AppendNumber(brushManager.ActiveBrush.Position.Y).Append(", ");

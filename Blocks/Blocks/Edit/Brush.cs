@@ -32,6 +32,8 @@ namespace Willcraftia.Xna.Blocks.Edit
             }
         }
 
+        public bool PaintStarted { get; private set; }
+
         public bool CanPaint { get; protected set; }
 
         protected BrushManager Manager { get; private set; }
@@ -45,11 +47,27 @@ namespace Willcraftia.Xna.Blocks.Edit
             Node = node;
         }
 
+        public virtual void StartPaint()
+        {
+            PaintStarted = true;
+        }
+
+        public virtual void EndPaint()
+        {
+            PaintStarted = false;
+        }
+
         public abstract void Update(ICamera camera);
 
         protected virtual void OnActiveChanged()
         {
             Node.SetVisible(active);
+
+            if (!active)
+            {
+                // 非アクティブになった場合はペイント開始状態をリセット。
+                PaintStarted = false;
+            }
         }
     }
 }

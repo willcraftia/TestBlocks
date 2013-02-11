@@ -16,6 +16,11 @@ namespace Willcraftia.Xna.Blocks.Edit
 {
     public sealed class BrushManager
     {
+        /// <summary>
+        /// 繰り返しブロック配置における遅延フレーム数。
+        /// </summary>
+        const int paintRepeatDelay = 30;
+
         CommandManager commandManager;
 
         WorldCommandFactory worldCommandFactory;
@@ -27,6 +32,10 @@ namespace Willcraftia.Xna.Blocks.Edit
         AssetManager assetManager;
 
         Brush activeBrush;
+
+        bool paintModeStarted;
+
+        int paintRepeatCount;
 
         public GraphicsDevice GraphicsDevice { get; private set; }
 
@@ -107,25 +116,50 @@ namespace Willcraftia.Xna.Blocks.Edit
             ActiveBrush = FreeBrush;
         }
 
+        public void StartPaintMode()
+        {
+            if (paintModeStarted) return;
+
+            paintModeStarted = true;
+            paintRepeatCount = 0;
+
+            // ブラシのペイント モードを開始。
+            activeBrush.StartPaint();
+        }
+
+        public void EndPaintMode()
+        {
+            if (!paintModeStarted) return;
+
+            paintModeStarted = false;
+
+            activeBrush.EndPaint();
+        }
+
         public void Update()
         {
-            if (ActiveBrush != null)
-            {
-                ActiveBrush.Update(WorldManager.SceneManager.ActiveCamera);
+            if (activeBrush == null) return;
 
-                // ペイント可能: ブラシ表示
-                // ペイント不能: ブラシ非表示
-                ActiveBrush.Node.SetVisible(ActiveBrush.CanPaint);
-            }
+            activeBrush.Update(WorldManager.SceneManager.ActiveCamera);
+
+            // ペイント可能: ブラシ表示
+            // ペイント不能: ブラシ非表示
+            activeBrush.Node.SetVisible(activeBrush.CanPaint);
         }
 
         public void Paint()
         {
-            if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
+            if (activeBrush == null || !activeBrush.CanPaint) return;
+
+            // 繰り返しペイントのフレーム遅延数未満ならばスキップ。
+            if (paintRepeatCount++ < paintRepeatDelay) return;
+
+            // 繰り返しフレーム数をリセット。
+            paintRepeatCount = 0;
 
             var command = worldCommandFactory.CreateSetBlockCommand();
 
-            command.BlockPosition = ActiveBrush.PaintPosition;
+            command.BlockPosition = activeBrush.PaintPosition;
             command.BlockIndex = SelectedBlockIndex;
 
             commandManager.RequestCommand(command);
@@ -133,11 +167,11 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public void Erase()
         {
-            if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
+            if (activeBrush == null || !activeBrush.CanPaint) return;
 
             var command = worldCommandFactory.CreateSetBlockCommand();
 
-            command.BlockPosition = ActiveBrush.ErasePosition;
+            command.BlockPosition = activeBrush.ErasePosition;
             command.BlockIndex = Block.EmptyIndex;
 
             commandManager.RequestCommand(command);
@@ -145,7 +179,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public void Pick()
         {
-            if (ActiveBrush == null || !ActiveBrush.CanPaint) return;
+            if (activeBrush == null || !activeBrush.CanPaint) return;
 
             var command = brushCommandFactory.CreatePickBlockCommand();
             commandManager.RequestCommand(command);
