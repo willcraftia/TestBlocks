@@ -1456,8 +1456,7 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ChunkProcedures = new string[]
                     {
                         "../ChunkProcedures/NoiseTerrain.json"
-                    },
-                    ChunkStore = ChunkStoreTypes.None
+                    }
                 };
                 SerializeAndDeserialize<RegionDefinition>("Regions/Default", definition);
             }

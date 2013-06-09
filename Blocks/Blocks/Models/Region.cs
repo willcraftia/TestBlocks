@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
@@ -16,8 +17,36 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class Region : IAsset, IDisposable
     {
+        IResource resource;
+
         // I/F
-        public IResource Resource { get; set; }
+        public IResource Resource
+        {
+            get { return resource; }
+            set
+            {
+                resource = value;
+
+                // 移植では以下のロジックをローダで実装する。
+                var b = new StringBuilder();
+                for (int i = 0; i < resource.AbsoluteUri.Length; i++)
+                {
+                    var c = resource.AbsoluteUri[i];
+                    switch (c)
+                    {
+                        case ':':
+                        case '/':
+                        case '!':
+                            b.Append('_');
+                            break;
+                        default:
+                            b.Append(c);
+                            break;
+                    }
+                }
+                ChunkStoreKey = b.ToString();
+            }
+        }
 
         public AssetManager AssetManager { get; private set; }
 
@@ -43,7 +72,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public List<IChunkProcedure> ChunkProcesures { get; set; }
 
-        public IChunkStore ChunkStore { get; set; }
+        public string ChunkStoreKey { get; private set; }
 
         public void Initialize(AssetManager assetManager, Effect chunkEffect)
         {

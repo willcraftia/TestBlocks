@@ -16,42 +16,12 @@ namespace Willcraftia.Xna.Blocks.Models
     {
         static readonly Logger logger = new Logger(typeof(StorageChunkStore).Name);
 
-        IResource regionUri;
-
         string rootDirectory = "Chunks";
 
-        string regionDirectory;
-
-        public StorageChunkStore(IResource regionResource)
-        {
-            if (regionResource == null) throw new ArgumentNullException("regionResource");
-
-            this.regionUri = regionResource;
-
-            var b = new StringBuilder(rootDirectory);
-            b.Append('/');
-            for (int i = 0; i < regionResource.AbsoluteUri.Length; i++)
-            {
-                var c = regionResource.AbsoluteUri[i];
-                switch (c)
-                {
-                    case ':':
-                    case '/':
-                    case '!':
-                        b.Append('_');
-                        break;
-                    default:
-                        b.Append(c);
-                        break;
-                }
-            }
-            regionDirectory = b.ToString();
-        }
-
-        public bool GetChunk(VectorI3 position, ChunkData data)
+        public bool GetChunk(string regionKey, VectorI3 position, ChunkData data)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-            var filePath = ResolveFilePath(position);
+            var filePath = ResolveFilePath(regionKey, position);
 
             bool result;
             if (!storageContainer.FileExists(filePath))
@@ -72,17 +42,19 @@ namespace Willcraftia.Xna.Blocks.Models
             return result;
         }
 
-        public void AddChunk(VectorI3 position, ChunkData data)
+        public void AddChunk(string regionKey, VectorI3 position, ChunkData data)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
             if (!storageContainer.DirectoryExists(rootDirectory))
                 storageContainer.CreateDirectory(rootDirectory);
 
-            if (!storageContainer.DirectoryExists(regionDirectory))
-                storageContainer.CreateDirectory(regionDirectory);
+            var regionPath = ResolveRegionPath(regionKey);
 
-            var filePath = ResolveFilePath(position);
+            if (!storageContainer.DirectoryExists(regionPath))
+                storageContainer.CreateDirectory(regionPath);
+
+            var filePath = ResolveFilePath(regionKey, position);
             using (var stream = storageContainer.CreateFile(filePath))
             using (var writer = new BinaryWriter(stream))
             {
@@ -90,23 +62,25 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void DeleteChunk(VectorI3 position)
+        public void DeleteChunk(string regionKey, VectorI3 position)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-            var filePath = ResolveFilePath(position);
+            var filePath = ResolveFilePath(regionKey, position);
 
             storageContainer.DeleteFile(filePath);
         }
 
-        public void ClearChunks()
+        public void ClearChunks(string regionKey)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-            var filePaths = storageContainer.GetFileNames(regionDirectory + "/*.bin");
+            var filePaths = GetChunkFilePaths(regionKey);
 
             foreach (var filePath in filePaths)
                 storageContainer.DeleteFile(filePath);
 
-            storageContainer.DeleteDirectory(regionDirectory);
+            var regionPath = ResolveRegionPath(regionKey);
+
+            storageContainer.DeleteDirectory(regionPath);
         }
 
         public void GetChunkBundle(Stream chunkBundleStream)
@@ -162,15 +136,20 @@ namespace Willcraftia.Xna.Blocks.Models
             //}
         }
 
-        string[] GetChunkFilePaths()
+        string[] GetChunkFilePaths(string regionKey)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
-            return storageContainer.GetFileNames(regionDirectory + "/*.bin");
+            return storageContainer.GetFileNames(rootDirectory + "/" + regionKey + "/*.bin");
         }
 
-        string ResolveFilePath(VectorI3 position)
+        string ResolveRegionPath(string regionKey)
         {
-            return regionDirectory + "/" + position.X + "_" + position.Y + "_" + position.Z + ".bin";
+            return rootDirectory + "/" + regionKey + "/";
+        }
+
+        string ResolveFilePath(string regionKey, VectorI3 position)
+        {
+            return rootDirectory + "/" + regionKey + "/" + position.X + "_" + position.Y + "_" + position.Z + ".bin";
         }
     }
 }

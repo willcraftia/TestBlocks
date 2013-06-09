@@ -304,6 +304,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public int MaxIndexCount { get; private set; }
 
+        public IChunkStore ChunkStore { get; private set; }
+
         /// <summary>
         /// 空データを取得します。
         /// </summary>
@@ -316,7 +318,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="graphicsDevice">グラフィックス デバイス。</param>
         /// <param name="regionManager">リージョン マネージャ。</param>
         /// <param name="sceneManager">シーン マネージャ。</param>
-        public ChunkManager(ChunkSettings settings, GraphicsDevice graphicsDevice, RegionManager regionManager, SceneManager sceneManager)
+        public ChunkManager(
+            ChunkSettings settings,
+            GraphicsDevice graphicsDevice,
+            RegionManager regionManager,
+            SceneManager sceneManager,
+            IChunkStore chunkStore)
             : base(settings.PartitionManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -326,6 +333,7 @@ namespace Willcraftia.Xna.Blocks.Models
             this.graphicsDevice = graphicsDevice;
             this.regionManager = regionManager;
             SceneManager = sceneManager;
+            ChunkStore = chunkStore ?? NullChunkStore.Instance;
 
             meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
             verticesBuilderCount = settings.VerticesBuilderCount;

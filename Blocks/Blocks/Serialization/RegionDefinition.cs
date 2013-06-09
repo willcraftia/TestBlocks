@@ -45,7 +45,5 @@ namespace Willcraftia.Xna.Blocks.Serialization
         // URI
         [XmlArrayItem("Procedure")]
         public string[] ChunkProcedures;
-
-        public ChunkStoreTypes ChunkStore;
     }
 }

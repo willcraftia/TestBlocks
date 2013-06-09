@@ -10,13 +10,13 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public interface IChunkStore
     {
-        bool GetChunk(VectorI3 position, ChunkData data);
+        bool GetChunk(string regionKey, VectorI3 position, ChunkData data);
 
-        void AddChunk(VectorI3 position, ChunkData data);
+        void AddChunk(string regionKey, VectorI3 position, ChunkData data);
 
-        void DeleteChunk(VectorI3 position);
+        void DeleteChunk(string regionKey, VectorI3 position);
 
-        void ClearChunks();
+        void ClearChunks(string regionKey);
 
         //
         // ChunkBundle の反映は、エディタとゲームで共通。

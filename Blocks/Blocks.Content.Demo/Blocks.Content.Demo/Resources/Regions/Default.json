@@ -18,6 +18,5 @@
   "ChunkBundle": null,
   "ChunkProcedures": [
     "../ChunkProcedures/NoiseTerrain.json"
-  ],
-  "ChunkStore": 1
+  ]
 }

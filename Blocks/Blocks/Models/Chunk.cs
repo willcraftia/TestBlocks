@@ -438,7 +438,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var d = manager.BorrowData();
 
-            if (region.ChunkStore.GetChunk(Position, d))
+            if (manager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, d))
             {
                 if (d.SolidCount == 0)
                 {
@@ -473,12 +473,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (data != null)
             {
-                Region.ChunkStore.AddChunk(Position, data);
+                manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, data);
             }
             else
             {
                 // 空データで永続化。
-                Region.ChunkStore.AddChunk(Position, manager.EmptyData);
+                manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, manager.EmptyData);
             }
 
             base.PassivateOverride();
