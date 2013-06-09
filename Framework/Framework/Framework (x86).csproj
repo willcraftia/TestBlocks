@@ -241,7 +241,6 @@
     <Compile Include="Noise\SimpleVoronoi.cs" />
     <Compile Include="RefAction.cs" />
     <Compile Include="Serialization\XmlSerializerAdapter.cs" />
-    <Compile Include="StateOutOfRangeException.cs" />
     <Compile Include="Landscape\Partition.cs" />
     <Compile Include="Landscape\PartitionManager.cs" />
     <Compile Include="MathExtension.cs" />
