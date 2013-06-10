@@ -551,9 +551,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティションのアクティブ化と非アクティブ化を行います。
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
         /// <param name="eyePositionWorld">ワールド空間における視点の位置。</param>
-        public void Update(GameTime gameTime, Matrix view, Matrix projection)
+        public void Update(Matrix view, Matrix projection)
         {
             if (Closed) return;
 
@@ -570,28 +569,28 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             if (!Closing)
             {
-                CheckPassivations(gameTime);
-                CheckActivations(gameTime);
+                CheckPassivations();
+                CheckActivations();
 
-                Passivate(gameTime);
-                Activate(gameTime);
+                Passivate();
+                Activate();
 
                 // サブクラスにおける追加の更新処理。
-                UpdateOverride(gameTime);
+                UpdateOverride();
             }
             else
             {
-                CheckPassivations(gameTime);
-                CheckActivations(gameTime);
+                CheckPassivations();
+                CheckActivations();
 
                 // クローズが開始したら新規アクティブ化を停止。
                 // 非アクティブ化のみを実行。
 
-                Passivate(gameTime);
+                Passivate();
 
                 // サブクラスにおける追加の更新処理。
                 // クローズ中に行うべきこともある。
-                UpdateOverride(gameTime);
+                UpdateOverride();
 
                 // 全ての非アクティブ化が完了していればクローズ完了。
                 if (activations.Count == 0 && passivations.Count == 0 && partitions.Count == 0 &&
@@ -689,8 +688,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション更新処理で呼び出されます。
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        protected virtual void UpdateOverride(GameTime gameTime) { }
+        protected virtual void UpdateOverride() { }
 
         protected virtual void OnActivated(Partition partition) { }
 
@@ -701,8 +699,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// 非アクティブ化の完了を検査します。
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void CheckPassivations(GameTime gameTime)
+        void CheckPassivations()
         {
             while (!finishedPassivationTasks.IsEmpty)
             {
@@ -734,8 +731,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// アクティブ化の完了を検査します。
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void CheckActivations(GameTime gameTime)
+        void CheckActivations()
         {
             while (!finishedActivationTasks.IsEmpty)
             {
@@ -814,8 +810,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// なお、同時に非アクティブ化可能なパーティションの数には上限があり、
         /// 上限に到達した場合には、このフレームでの非アクティブ化は保留されます。
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void Passivate(GameTime gameTime)
+        void Passivate()
         {
             // メモ
             //
@@ -872,7 +867,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 上限に到達した場合には、このフレームでのアクティブ化は保留されます。
         /// </summary>
         /// <param name="gameTime">ゲーム時間。</param>
-        void Activate(GameTime gameTime)
+        void Activate()
         {
             if (!activator.Active)
             {

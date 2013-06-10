@@ -527,14 +527,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// ・メッシュ更新完了の監視。
         /// 
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        protected override void UpdateOverride(GameTime gameTime)
+        protected override void UpdateOverride()
         {
             // 更新が必要なチャンクを探索して更新要求を追加。
             // ただし、クローズが開始したら行わない。
             if (!Closing)
             {
-                ProcessUpdateMeshRequests(gameTime);
+                ProcessUpdateMeshRequests();
 
                 ProcessChunkTaskRequests();
             }
@@ -542,9 +541,9 @@ namespace Willcraftia.Xna.Blocks.Models
             // 更新完了を監視。
             // 更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
-            UpdateMeshes(gameTime);
+            UpdateMeshes();
 
-            base.UpdateOverride(gameTime);
+            base.UpdateOverride();
         }
 
         /// <summary>
@@ -651,14 +650,13 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void ProcessUpdateMeshRequests(GameTime gameTime)
+        void ProcessUpdateMeshRequests()
         {
-            ProcessUpdateMeshRequests(gameTime, highUpdateMeshRequests);
-            ProcessUpdateMeshRequests(gameTime, normalUpdateMeshRequests);
+            ProcessUpdateMeshRequests(highUpdateMeshRequests);
+            ProcessUpdateMeshRequests(normalUpdateMeshRequests);
         }
 
-        void ProcessUpdateMeshRequests(GameTime gameTime, ConcurrentQueue<VectorI3> requestQueue)
+        void ProcessUpdateMeshRequests(ConcurrentQueue<VectorI3> requestQueue)
         {
             for (int i = 0; i < meshUpdateSearchCapacity; i++)
             {
@@ -730,8 +728,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンク メッシュ更新の完了を監視し、
         /// 完了しているならば頂点バッファへの反映を試みます。
         /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void UpdateMeshes(GameTime gameTime)
+        void UpdateMeshes()
         {
             // 頂点ビルダの監視。
             while (!finishedUpdateMeshTasks.IsEmpty)
