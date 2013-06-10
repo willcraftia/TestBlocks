@@ -80,12 +80,12 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 for (int x = 0; x < size.X; x++)
                 {
-                    var frontBlockPosition = new VectorI3(x, y, size.Z - 1);
-                    var frontNeighborBlockPosition = new VectorI3(x, y, 0);
+                    var frontBlockPosition = new IntVector3(x, y, size.Z - 1);
+                    var frontNeighborBlockPosition = new IntVector3(x, y, 0);
                     PropagateLights(chunk, ref frontBlockPosition, neighbors.Front, ref frontNeighborBlockPosition);
 
-                    var backBlockPosition = new VectorI3(x, y, 0);
-                    var backNeighborBlockPosition = new VectorI3(x, y, size.Z - 1);
+                    var backBlockPosition = new IntVector3(x, y, 0);
+                    var backNeighborBlockPosition = new IntVector3(x, y, size.Z - 1);
                     PropagateLights(chunk, ref backBlockPosition, neighbors.Back, ref backNeighborBlockPosition);
                 }
             }
@@ -94,12 +94,12 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 for (int y = 0; y < size.Y; y++)
                 {
-                    var leftBlockPosition = new VectorI3(0, y, z);
-                    var leftBlockNeighborPosition = new VectorI3(size.X - 1, y, z);
+                    var leftBlockPosition = new IntVector3(0, y, z);
+                    var leftBlockNeighborPosition = new IntVector3(size.X - 1, y, z);
                     PropagateLights(chunk, ref leftBlockPosition, neighbors.Left, ref leftBlockNeighborPosition);
 
-                    var rightBlockPosition = new VectorI3(size.X - 1, y, z);
-                    var rightBlockNeighborPosition = new VectorI3(0, y, z);
+                    var rightBlockPosition = new IntVector3(size.X - 1, y, z);
+                    var rightBlockNeighborPosition = new IntVector3(0, y, z);
                     PropagateLights(chunk, ref rightBlockPosition, neighbors.Right, ref rightBlockNeighborPosition);
                 }
             }
@@ -107,7 +107,7 @@ namespace Willcraftia.Xna.Blocks.Models
             chunk.LightState = ChunkLightState.Complete;
         }
 
-        static bool CanPenetrateLight(Chunk chunk, ref VectorI3 blockPosition)
+        static bool CanPenetrateLight(Chunk chunk, ref IntVector3 blockPosition)
         {
             var block = chunk.GetBlock(ref blockPosition);
             return CanPenetrateLight(block);
@@ -159,14 +159,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     for (int y = size.Y - 1; 0 <= y; y--)
                     {
-                        var blockPosition = new VectorI3(x, y, z);
+                        var blockPosition = new IntVector3(x, y, z);
                         DiffuseSkylight(chunk, ref blockPosition);
                     }
                 }
             }
         }
 
-        static void PropagateLights(Chunk chunk, ref VectorI3 blockPosition, Chunk neighborChunk, ref VectorI3 neighborBlockPosition)
+        static void PropagateLights(Chunk chunk, ref IntVector3 blockPosition, Chunk neighborChunk, ref IntVector3 neighborBlockPosition)
         {
             var level = neighborChunk.GetSkylightLevel(ref neighborBlockPosition);
             if (level <= 1) return;
@@ -190,7 +190,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return neighbor;
         }
 
-        static void DiffuseSkylight(Chunk chunk, ref VectorI3 blockPosition)
+        static void DiffuseSkylight(Chunk chunk, ref IntVector3 blockPosition)
         {
             // 1 以下はこれ以上拡散できない。
             var level = chunk.GetSkylightLevel(ref blockPosition);

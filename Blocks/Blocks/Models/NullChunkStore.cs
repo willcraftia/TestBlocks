@@ -14,11 +14,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         NullChunkStore() { }
 
-        public bool GetChunk(string regionKey, VectorI3 position, ChunkData data) { return false; }
+        public bool GetChunk(string regionKey, IntVector3 position, ChunkData data) { return false; }
 
-        public void AddChunk(string regionKey, VectorI3 position, ChunkData data) { }
+        public void AddChunk(string regionKey, IntVector3 position, ChunkData data) { }
 
-        public void DeleteChunk(string regionKey, VectorI3 position) { }
+        public void DeleteChunk(string regionKey, IntVector3 position) { }
 
         public void ClearChunks(string regionKey) { }
 

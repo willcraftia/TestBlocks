@@ -18,6 +18,6 @@ namespace Willcraftia.Xna.Blocks.Models
         // block unit
         public const int SizeZ = 256;
 
-        public VectorI3 Position;
+        public IntVector3 Position;
     }
 }

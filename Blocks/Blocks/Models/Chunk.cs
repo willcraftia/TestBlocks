@@ -64,7 +64,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンクのサイズを取得します。
         /// </summary>
-        public VectorI3 Size
+        public IntVector3 Size
         {
             get { return manager.ChunkSize; }
         }
@@ -130,7 +130,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         /// <param name="position">チャンクの位置。</param>
         /// <param name="region">リージョン。</param>
-        public void Initialize(VectorI3 position, Region region)
+        public void Initialize(IntVector3 position, Region region)
         {
             Position = position;
             this.region = region;
@@ -144,7 +144,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public void Release()
         {
-            Position = VectorI3.Zero;
+            Position = IntVector3.Zero;
 
             for (int z = 0; z < manager.MeshSegments.Z; z++)
             {
@@ -191,7 +191,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         /// <param name="chunkSize">チャンク サイズ。</param>
         /// <returns>最大頂点数。</returns>
-        public static int CalculateMaxVertexCount(VectorI3 chunkSize)
+        public static int CalculateMaxVertexCount(IntVector3 chunkSize)
         {
             // ブロックが交互に配置されるチャンクで頂点数が最大であると考える。
             //
@@ -244,7 +244,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 0 <= z && z < manager.ChunkSize.Z;
         }
 
-        public bool Contains(ref VectorI3 position)
+        public bool Contains(ref IntVector3 position)
         {
             return Contains(position.X, position.Y, position.Z);
         }
@@ -257,7 +257,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return region.BlockCatalog[blockIndex];
         }
 
-        public Block GetBlock(ref VectorI3 position)
+        public Block GetBlock(ref IntVector3 position)
         {
             return GetBlock(position.X, position.Y, position.Z);
         }
@@ -269,7 +269,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return data.GetBlockIndex(x, y, z);
         }
 
-        public byte GetBlockIndex(ref VectorI3 position)
+        public byte GetBlockIndex(ref IntVector3 position)
         {
             return GetBlockIndex(position.X, position.Y, position.Z);
         }
@@ -301,7 +301,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void SetBlockIndex(ref VectorI3 position, byte blockIndex)
+        public void SetBlockIndex(ref IntVector3 position, byte blockIndex)
         {
             SetBlockIndex(position.X, position.Y, position.Z, blockIndex);
         }
@@ -313,7 +313,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return data.GetSkylightLevel(x, y, z);
         }
 
-        public byte GetSkylightLevel(ref VectorI3 position)
+        public byte GetSkylightLevel(ref IntVector3 position)
         {
             return GetSkylightLevel(position.X, position.Y, position.Z);
         }
@@ -326,7 +326,7 @@ namespace Willcraftia.Xna.Blocks.Models
             data.SetSkylightLevel(x, y, z, value);
         }
 
-        public void SetSkylightLevel(ref VectorI3 position, byte value)
+        public void SetSkylightLevel(ref IntVector3 position, byte value)
         {
             SetSkylightLevel(position.X, position.Y, position.Z, value);
         }
@@ -358,9 +358,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return absoluteBlockPositionZ - (Position.Z * manager.ChunkSize.Z);
         }
 
-        public void GetRelativeBlockPosition(ref VectorI3 absoluteBlockPosition, out VectorI3 result)
+        public void GetRelativeBlockPosition(ref IntVector3 absoluteBlockPosition, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = GetRelativeBlockPositionX(absoluteBlockPosition.X),
                 Y = GetRelativeBlockPositionY(absoluteBlockPosition.Y),
@@ -383,9 +383,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return Position.Z * manager.ChunkSize.Z + relativeBlockPositionZ;
         }
 
-        public void GetAbsoluteBlockPosition(ref VectorI3 relativeBlockPosition, out VectorI3 result)
+        public void GetAbsoluteBlockPosition(ref IntVector3 relativeBlockPosition, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = GetAbsoluteBlockPositionX(relativeBlockPosition.X),
                 Y = GetAbsoluteBlockPositionY(relativeBlockPosition.Y),

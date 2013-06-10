@@ -7,9 +7,9 @@ using System.Collections.Generic;
 
 namespace Willcraftia.Xna.Framework
 {
-    public struct BoundingDiamondI : IEquatable<BoundingDiamondI>
+    public struct IntBoundingDiamond : IEquatable<IntBoundingDiamond>
     {
-        public VectorI3 Center;
+        public IntVector3 Center;
 
         /// <summary>
         /// 中心位置からのダイアモンド領域の広がりの度合い。
@@ -20,13 +20,13 @@ namespace Willcraftia.Xna.Framework
         /// </remarks>
         public int Level;
 
-        public BoundingDiamondI(VectorI3 center, int level)
+        public IntBoundingDiamond(IntVector3 center, int level)
         {
             Center = center;
             Level = level;
         }
 
-        public bool Contains(ref VectorI3 point)
+        public bool Contains(ref IntVector3 point)
         {
             int x = MathExtension.Abs(point.X);
             int y = MathExtension.Abs(point.Y);
@@ -35,18 +35,18 @@ namespace Willcraftia.Xna.Framework
             return (x + y + z) <= Level;
         }
 
-        public void ForEach(RefAction<VectorI3> action)
+        public void ForEach(RefAction<IntVector3> action)
         {
             ForEach(action, 0);
         }
 
-        public void ForEach(RefAction<VectorI3> action, int startLevel)
+        public void ForEach(RefAction<IntVector3> action, int startLevel)
         {
             if (action == null) throw new ArgumentNullException("action");
             if (startLevel < 0 || Level < startLevel) throw new ArgumentOutOfRangeException("startLevel");
             if (Level < 0) throw new InvalidOperationException("Invalid value: Level");
 
-            var point = new VectorI3();
+            var point = new IntVector3();
 
             int x = 0;
             int y = 0;
@@ -100,18 +100,18 @@ namespace Willcraftia.Xna.Framework
 
         #region Equatable
 
-        public static bool operator ==(BoundingDiamondI value1, BoundingDiamondI value2)
+        public static bool operator ==(IntBoundingDiamond value1, IntBoundingDiamond value2)
         {
             return value1.Equals(value2);
         }
 
-        public static bool operator !=(BoundingDiamondI value1, BoundingDiamondI value2)
+        public static bool operator !=(IntBoundingDiamond value1, IntBoundingDiamond value2)
         {
             return !value1.Equals(value2);
         }
 
         // I/F
-        public bool Equals(BoundingDiamondI other)
+        public bool Equals(IntBoundingDiamond other)
         {
             return Center == other.Center && Level == other.Level;
         }
@@ -120,7 +120,7 @@ namespace Willcraftia.Xna.Framework
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((BoundingDiamondI) obj);
+            return Equals((IntBoundingDiamond) obj);
         }
 
         public override int GetHashCode()

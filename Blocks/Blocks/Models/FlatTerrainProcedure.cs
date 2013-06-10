@@ -57,7 +57,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return biome.GetBiomeElement(absoluteX, absoluteZ);
         }
 
-        void Generate(Chunk chunk, ref VectorI3 chunkSize, ref VectorI3 chunkPosition, int x, int y, int z, BiomeElement biomeElement)
+        void Generate(Chunk chunk, ref IntVector3 chunkSize, ref IntVector3 chunkPosition, int x, int y, int z, BiomeElement biomeElement)
         {
             var h = chunkPosition.Y * chunkSize.Y + y;
 
@@ -108,7 +108,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            var position = new VectorI3(x, y, z);
+            var position = new IntVector3(x, y, z);
             chunk.SetBlockIndex(ref position, index);
         }
 

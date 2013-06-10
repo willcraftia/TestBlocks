@@ -28,7 +28,7 @@ namespace Willcraftia.Xna.Framework.Collections
             /// <summary>
             /// 八分木空間における原点位置。
             /// </summary>
-            public readonly VectorI3 Origin;
+            public readonly IntVector3 Origin;
 
             /// <summary>
             /// 八分木空間におけるサイズ。
@@ -40,7 +40,7 @@ namespace Willcraftia.Xna.Framework.Collections
             /// </summary>
             /// <param name="origin">八分木空間における原点位置。</param>
             /// <param name="size">八分木空間におけるサイズ。</param>
-            protected Node(VectorI3 origin, int size)
+            protected Node(IntVector3 origin, int size)
             {
                 Origin = origin;
                 Size = size;
@@ -68,7 +68,7 @@ namespace Willcraftia.Xna.Framework.Collections
             /// </summary>
             /// <param name="origin">八分木空間における原点位置。</param>
             /// <param name="size">八分木空間におけるサイズ。</param>
-            internal Branch(VectorI3 origin, int size)
+            internal Branch(IntVector3 origin, int size)
                 : base(origin, size)
             {
                 Children = new Node[2, 2, 2];
@@ -81,7 +81,7 @@ namespace Willcraftia.Xna.Framework.Collections
                     {
                         for (int x = 0; x < 2; x++)
                         {
-                            var childOrigin = Origin + new VectorI3(x, y, z) * childSize;
+                            var childOrigin = Origin + new IntVector3(x, y, z) * childSize;
 
                             if (childSize == 1)
                             {
@@ -101,7 +101,7 @@ namespace Willcraftia.Xna.Framework.Collections
             /// </summary>
             /// <param name="point">八分木空間における子ノードの位置。</param>
             /// <returns>子ノード。</returns>
-            internal Node GetChild(VectorI3 point)
+            internal Node GetChild(IntVector3 point)
             {
                 var relative = point - Origin;
                 var halfSize = Size / 2;
@@ -129,7 +129,7 @@ namespace Willcraftia.Xna.Framework.Collections
             /// </summary>
             /// <param name="origin">八分木空間における原点位置。</param>
             /// <param name="size">八分木空間におけるサイズ。</param>
-            internal Leaf(VectorI3 origin, int size)
+            internal Leaf(IntVector3 origin, int size)
                 : base(origin, size)
             {
             }
@@ -155,7 +155,7 @@ namespace Willcraftia.Xna.Framework.Collections
         /// 要素。
         /// 取得時は、要素が設定されていない場合は型 T のデフォルト。
         /// </returns>
-        public T this[VectorI3 point]
+        public T this[IntVector3 point]
         {
             get
             {
@@ -178,7 +178,7 @@ namespace Willcraftia.Xna.Framework.Collections
 
             this.dimension = dimension;
 
-            root = new Branch(VectorI3.Zero, dimension);
+            root = new Branch(IntVector3.Zero, dimension);
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace Willcraftia.Xna.Framework.Collections
         /// このメソッドは、指定の位置へ型 T のデフォルトを設定します。
         /// </summary>
         /// <param name="point">八分木空間における位置。</param>
-        public void RemoveItem(VectorI3 point)
+        public void RemoveItem(IntVector3 point)
         {
             GetLeaf(ref point).Item = default(T);
         }
@@ -234,7 +234,7 @@ namespace Willcraftia.Xna.Framework.Collections
         /// </summary>
         /// <param name="point">八分木空間における位置。</param>
         /// <returns>リーフ ノード。</returns>
-        Leaf GetLeaf(ref VectorI3 point)
+        Leaf GetLeaf(ref IntVector3 point)
         {
             if (point.X < 0 || dimension <= point.X) throw new ArgumentOutOfRangeException("point");
             if (point.Y < 0 || dimension <= point.Y) throw new ArgumentOutOfRangeException("point");

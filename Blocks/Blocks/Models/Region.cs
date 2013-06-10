@@ -60,7 +60,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public BoundingBoxI Box;
+        public IntBoundingBox Box;
 
         public TileCatalog TileCatalog { get; set; }
 

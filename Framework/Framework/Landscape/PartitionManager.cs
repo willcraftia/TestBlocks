@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Vector3 partitionSize;
 
-            VectorI3 clusterSize = new VectorI3(8);
+            IntVector3 clusterSize = new IntVector3(8);
 
             int activationCapacity = 3;
 
@@ -49,7 +49,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            public VectorI3 ClusterSize
+            public IntVector3 ClusterSize
             {
                 get { return clusterSize; }
                 set
@@ -128,7 +128,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 /// <summary>
                 /// パーティション空間におけるパーティションの位置。
                 /// </summary>
-                public VectorI3 Position;
+                public IntVector3 Position;
 
                 /// <summary>
                 /// ワールド空間におけるパーティションの原点位置。
@@ -223,7 +223,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <summary>
             /// 視点位置。
             /// </summary>
-            VectorI3 eyePosition;
+            IntVector3 eyePosition;
 
             /// <summary>
             /// アクティブ領域。
@@ -243,7 +243,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <summary>
             /// Collect メソッドのデリゲート。
             /// </summary>
-            RefAction<VectorI3> collectAction;
+            RefAction<IntVector3> collectAction;
 
             /// <summary>
             /// 非同期処理中であるか否かを示す値。
@@ -268,7 +268,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             public Activator(PartitionManager manager)
             {
                 this.manager = manager;
-                collectAction = new RefAction<VectorI3>(Collect);
+                collectAction = new RefAction<IntVector3>(Collect);
 
                 candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
             }
@@ -281,7 +281,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <param name="eyePosition">視点位置。</param>
             /// <param name="volume">アクティブ領域。</param>
             /// <param name="priorDistance">アクティブ化優先距離。</param>
-            public void Start(Matrix view, Matrix projection, VectorI3 eyePosition, IActiveVolume volume, float priorDistance)
+            public void Start(Matrix view, Matrix projection, IntVector3 eyePosition, IActiveVolume volume, float priorDistance)
             {
                 if (active) return;
 
@@ -317,7 +317,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// 候補となる場合には候補キューへ入れます。
             /// </summary>
             /// <param name="offset"></param>
-            void Collect(ref VectorI3 offset)
+            void Collect(ref IntVector3 offset)
             {
                 var position = eyePosition + offset;
 
@@ -408,11 +408,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         Activator activator;
 
-        ConcurrentDictionary<VectorI3, Partition> activations;
+        ConcurrentDictionary<IntVector3, Partition> activations;
 
         ConcurrentQueue<Partition> finishedActivationTasks = new ConcurrentQueue<Partition>();
 
-        ConcurrentDictionary<VectorI3, Partition> passivations;
+        ConcurrentDictionary<IntVector3, Partition> passivations;
 
         ConcurrentQueue<Partition> finishedPassivationTasks = new ConcurrentQueue<Partition>();
 
@@ -446,7 +446,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション空間における視点の位置。
         /// </summary>
-        VectorI3 eyePosition;
+        IntVector3 eyePosition;
 
         /// <summary>
         /// ビュー行列。
@@ -527,8 +527,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             activator = new Activator(this);
 
-            activations = new ConcurrentDictionary<VectorI3, Partition>(activationCapacity, activationCapacity);
-            passivations = new ConcurrentDictionary<VectorI3, Partition>(passivationCapacity, passivationCapacity);
+            activations = new ConcurrentDictionary<IntVector3, Partition>(activationCapacity, activationCapacity);
+            passivations = new ConcurrentDictionary<IntVector3, Partition>(passivationCapacity, passivationCapacity);
 
             // null の場合はデフォルト実装を与える。
             minActiveVolume = settings.MinActiveVolume ?? new DefaultActiveVolume(4);
@@ -627,7 +627,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool ContainsPartition(ref VectorI3 position)
+        public bool ContainsPartition(ref IntVector3 position)
         {
             return clusterManager.ContainsPartition(ref position);
         }
@@ -639,7 +639,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
         /// </returns>
-        public Partition GetPartition(ref VectorI3 position)
+        public Partition GetPartition(ref IntVector3 position)
         {
             return clusterManager.GetPartition(ref position);
         }
@@ -662,7 +662,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、アクティブ化を抑制する場合には null。
         /// </returns>
-        protected abstract Partition Create(ref VectorI3 position);
+        protected abstract Partition Create(ref IntVector3 position);
 
         /// <summary>
         /// 非アクティブ化でパーティションを解放する際に呼び出されます。
@@ -680,7 +680,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (指定の位置でパーティションをアクティブ化できる場合)、false (それ以外の場合)。
         /// </returns>
-        protected virtual bool CanActivate(ref VectorI3 position)
+        protected virtual bool CanActivate(ref IntVector3 position)
         {
             return true;
         }
@@ -935,7 +935,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 partitions.Dequeue().Dispose();
         }
 
-        void DisposeConcurrentKeyedQueue(ConcurrentKeyedQueue<VectorI3, Partition> partitions)
+        void DisposeConcurrentKeyedQueue(ConcurrentKeyedQueue<IntVector3, Partition> partitions)
         {
             while (0 < partitions.Count)
             {

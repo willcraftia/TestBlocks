@@ -202,12 +202,12 @@ namespace Willcraftia.Xna.Blocks.Edit
             return assetManager.Load<T>(resource);
         }
 
-        internal byte? GetBlockIndex(ref VectorI3 absoluteBlockPosition)
+        internal byte? GetBlockIndex(ref IntVector3 absoluteBlockPosition)
         {
             var chunk = WorldManager.ChunkManager.GetChunkByBlockPosition(ref absoluteBlockPosition);
             if (chunk == null) return null;
 
-            VectorI3 relativePosition;
+            IntVector3 relativePosition;
             chunk.GetRelativeBlockPosition(ref absoluteBlockPosition, out relativePosition);
 
             return chunk.GetBlockIndex(ref relativePosition);

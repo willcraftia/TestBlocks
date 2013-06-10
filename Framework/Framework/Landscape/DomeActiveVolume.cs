@@ -56,7 +56,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public bool Contains(ref VectorI3 eyePosition, ref VectorI3 point)
+        public bool Contains(ref IntVector3 eyePosition, ref IntVector3 point)
         {
             if (point.Y < minY + eyePosition.Y)
             {
@@ -64,13 +64,13 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
 
             int distanceSquared;
-            VectorI3.DistanceSquared(ref eyePosition, ref point, out distanceSquared);
+            IntVector3.DistanceSquared(ref eyePosition, ref point, out distanceSquared);
 
             return distanceSquared <= radiusSquared;
         }
 
         // I/F
-        public void ForEach(RefAction<VectorI3> action)
+        public void ForEach(RefAction<IntVector3> action)
         {
             throw new NotImplementedException();
         }

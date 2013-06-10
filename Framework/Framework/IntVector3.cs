@@ -7,46 +7,46 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Framework
 {
-    public struct VectorI3 : IEquatable<VectorI3>
+    public struct IntVector3 : IEquatable<IntVector3>
     {
-        public static VectorI3 Zero
+        public static IntVector3 Zero
         {
-            get { return new VectorI3(); }
+            get { return new IntVector3(); }
         }
 
-        public static VectorI3 One
+        public static IntVector3 One
         {
-            get { return new VectorI3(1); }
+            get { return new IntVector3(1); }
         }
 
-        public static VectorI3 Top
+        public static IntVector3 Top
         {
-            get { return new VectorI3(0, 1, 0); }
+            get { return new IntVector3(0, 1, 0); }
         }
 
-        public static VectorI3 Bottom
+        public static IntVector3 Bottom
         {
-            get { return new VectorI3(0, -1, 0); }
+            get { return new IntVector3(0, -1, 0); }
         }
 
-        public static VectorI3 Front
+        public static IntVector3 Front
         {
-            get { return new VectorI3(0, 0, 1); }
+            get { return new IntVector3(0, 0, 1); }
         }
 
-        public static VectorI3 Back
+        public static IntVector3 Back
         {
-            get { return new VectorI3(0, 0, -1); }
+            get { return new IntVector3(0, 0, -1); }
         }
 
-        public static VectorI3 Left
+        public static IntVector3 Left
         {
-            get { return new VectorI3(-1, 0, 0); }
+            get { return new IntVector3(-1, 0, 0); }
         }
 
-        public static VectorI3 Right
+        public static IntVector3 Right
         {
-            get { return new VectorI3(1, 0, 0); }
+            get { return new IntVector3(1, 0, 0); }
         }
 
         public int X;
@@ -55,30 +55,30 @@ namespace Willcraftia.Xna.Framework
 
         public int Z;
 
-        public VectorI3(int value)
+        public IntVector3(int value)
         {
             X = value;
             Y = value;
             Z = value;
         }
 
-        public VectorI3(int x, int y, int z)
+        public IntVector3(int x, int y, int z)
         {
             X = x;
             Y = y;
             Z = z;
         }
 
-        public static VectorI3 Negate(VectorI3 value)
+        public static IntVector3 Negate(IntVector3 value)
         {
-            VectorI3 result;
+            IntVector3 result;
             Negate(ref value, out result);
             return result;
         }
 
-        public static void Negate(ref VectorI3 value, out VectorI3 result)
+        public static void Negate(ref IntVector3 value, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = -value.X,
                 Y = -value.Y,
@@ -86,16 +86,16 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
-        public static VectorI3 Add(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 Add(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Add(ref value1, ref value2, out result);
             return result;
         }
 
-        public static void Add(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        public static void Add(ref IntVector3 value1, ref IntVector3 value2, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = value1.X + value2.X,
                 Y = value1.Y + value2.Y,
@@ -103,16 +103,16 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
-        public static VectorI3 Subtract(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 Subtract(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Subtract(ref value1, ref value2, out result);
             return result;
         }
 
-        public static void Subtract(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        public static void Subtract(ref IntVector3 value1, ref IntVector3 value2, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = value1.X - value2.X,
                 Y = value1.Y - value2.Y,
@@ -120,16 +120,16 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
-        public static VectorI3 Multiply(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 Multiply(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Multiply(ref value1, ref value1, out result);
             return result;
         }
 
-        public static void Multiply(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        public static void Multiply(ref IntVector3 value1, ref IntVector3 value2, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = value1.X * value2.X,
                 Y = value1.Y * value2.Y,
@@ -137,16 +137,16 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
-        public static VectorI3 Multiply(VectorI3 value, int scaleFactor)
+        public static IntVector3 Multiply(IntVector3 value, int scaleFactor)
         {
-            VectorI3 result;
+            IntVector3 result;
             Multiply(ref value, scaleFactor, out result);
             return result;
         }
 
-        public static void Multiply(ref VectorI3 value, int scaleFactor, out VectorI3 result)
+        public static void Multiply(ref IntVector3 value, int scaleFactor, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = value.X * scaleFactor,
                 Y = value.Y * scaleFactor,
@@ -154,16 +154,16 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
-        public static VectorI3 Divide(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 Divide(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Divide(ref value1, ref value2, out result);
             return result;
         }
 
-        public static void Divide(ref VectorI3 value1, ref VectorI3 value2, out VectorI3 result)
+        public static void Divide(ref IntVector3 value1, ref IntVector3 value2, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = value1.X / value2.X,
                 Y = value1.Y / value2.Y,
@@ -171,16 +171,16 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
-        public static VectorI3 Divide(VectorI3 value, int divider)
+        public static IntVector3 Divide(IntVector3 value, int divider)
         {
-            VectorI3 result;
+            IntVector3 result;
             Divide(ref value, divider, out result);
             return result;
         }
 
-        public static void Divide(ref VectorI3 value, int divider, out VectorI3 result)
+        public static void Divide(ref IntVector3 value, int divider, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = value.X / divider,
                 Y = value.Y / divider,
@@ -188,14 +188,14 @@ namespace Willcraftia.Xna.Framework
             };
         }
 
-        public static void Distance(ref VectorI3 v1, ref VectorI3 v2, out float result)
+        public static void Distance(ref IntVector3 v1, ref IntVector3 v2, out float result)
         {
             int distanceSquared;
             DistanceSquared(ref v1, ref v2, out distanceSquared);
             result = (float) Math.Sqrt(distanceSquared);
         }
 
-        public static void DistanceSquared(ref VectorI3 v1, ref VectorI3 v2, out int result)
+        public static void DistanceSquared(ref IntVector3 v1, ref IntVector3 v2, out int result)
         {
             var x = v2.X - v1.X;
             var y = v2.Y - v1.Y;
@@ -220,58 +220,58 @@ namespace Willcraftia.Xna.Framework
 
         #region Operators
 
-        public static VectorI3 operator +(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 operator +(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Add(ref value1, ref value2, out result);
             return result;
         }
 
-        public static VectorI3 operator -(VectorI3 value)
+        public static IntVector3 operator -(IntVector3 value)
         {
-            VectorI3 result;
+            IntVector3 result;
             Negate(ref value, out result);
             return result;
         }
 
-        public static VectorI3 operator -(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 operator -(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Subtract(ref value1, ref value2, out result);
             return result;
         }
 
-        public static VectorI3 operator *(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 operator *(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Multiply(ref value1, ref value2, out result);
             return result;
         }
 
-        public static VectorI3 operator *(int scaleFactor, VectorI3 value)
+        public static IntVector3 operator *(int scaleFactor, IntVector3 value)
         {
-            VectorI3 result;
+            IntVector3 result;
             Multiply(ref value, scaleFactor, out result);
             return result;
         }
 
-        public static VectorI3 operator *(VectorI3 value, int scaleFactor)
+        public static IntVector3 operator *(IntVector3 value, int scaleFactor)
         {
-            VectorI3 result;
+            IntVector3 result;
             Multiply(ref value, scaleFactor, out result);
             return result;
         }
 
-        public static VectorI3 operator /(VectorI3 value1, VectorI3 value2)
+        public static IntVector3 operator /(IntVector3 value1, IntVector3 value2)
         {
-            VectorI3 result;
+            IntVector3 result;
             Divide(ref value1, ref value2, out result);
             return result;
         }
 
-        public static VectorI3 operator /(VectorI3 value, int divider)
+        public static IntVector3 operator /(IntVector3 value, int divider)
         {
-            VectorI3 result;
+            IntVector3 result;
             Divide(ref value, divider, out result);
             return result;
         }
@@ -280,18 +280,18 @@ namespace Willcraftia.Xna.Framework
 
         #region Equatable
 
-        public static bool operator ==(VectorI3 value1, VectorI3 value2)
+        public static bool operator ==(IntVector3 value1, IntVector3 value2)
         {
             return value1.Equals(value2);
         }
 
-        public static bool operator !=(VectorI3 value1, VectorI3 value2)
+        public static bool operator !=(IntVector3 value1, IntVector3 value2)
         {
             return !value1.Equals(value2);
         }
 
         // I/F
-        public bool Equals(VectorI3 other)
+        public bool Equals(IntVector3 other)
         {
             return X == other.X && Y == other.Y && Z == other.Z;
         }
@@ -300,7 +300,7 @@ namespace Willcraftia.Xna.Framework
         {
             if (obj == null || GetType() != obj.GetType()) return false;
 
-            return Equals((VectorI3) obj);
+            return Equals((IntVector3) obj);
         }
 
         public override int GetHashCode()

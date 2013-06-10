@@ -15,7 +15,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public readonly int MaxDepth;
 
-        Dictionary<VectorI3, Octree> rootsByPositionGrid = new Dictionary<VectorI3, Octree>();
+        Dictionary<IntVector3, Octree> rootsByPositionGrid = new Dictionary<IntVector3, Octree>();
 
         Pool<Octree> octreePool;
 
@@ -32,7 +32,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             Vector3 center;
             node.BoxWorld.GetCenter(out center);
 
-            var rootPositionGrid = new VectorI3
+            var rootPositionGrid = new IntVector3
             {
                 X = (int) Math.Floor(center.X / RegionSize.X),
                 Y = (int) Math.Floor(center.Y / RegionSize.Y),

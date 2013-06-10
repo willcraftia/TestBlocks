@@ -41,7 +41,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.manager = manager;
 
-            localWorld = new LocalWorld(manager, new VectorI3(3));
+            localWorld = new LocalWorld(manager, new IntVector3(3));
             ExecuteAction = new Action(Execute);
 
             var segmentCount = manager.MeshSegments.X * manager.MeshSegments.Y * manager.MeshSegments.Z;
@@ -54,7 +54,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     for (int x = 0; x < manager.MeshSegments.X; x++)
                     {
-                        var segmentPosition = new VectorI3(x, y, z);
+                        var segmentPosition = new IntVector3(x, y, z);
                         opaques[x, y, z] = new ChunkVertices();
                         translucences[x, y, z] = new ChunkVertices();
                     }
@@ -156,7 +156,7 @@ namespace Willcraftia.Xna.Blocks.Models
         void BuildBlock(int segmentX, int segmentY, int segmentZ, int x, int y, int z)
         {
             // チャンク内相対ブロック位置。
-            var relativeBlockPosition = new VectorI3
+            var relativeBlockPosition = new IntVector3
             {
                 X = segmentX * ChunkManager.MeshSize.X + x,
                 Y = segmentY * ChunkManager.MeshSize.Y + y,
@@ -164,7 +164,7 @@ namespace Willcraftia.Xna.Blocks.Models
             };
 
             // ワールド内絶対ブロック位置。
-            VectorI3 absoluteBlockPosition;
+            IntVector3 absoluteBlockPosition;
             Chunk.GetAbsoluteBlockPosition(ref relativeBlockPosition, out absoluteBlockPosition);
 
             var blockIndex = Chunk.GetBlockIndex(ref relativeBlockPosition);
@@ -243,7 +243,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        float CalculateAmbientOcclusion(ref VectorI3 absoluteNeighborBlockPosition, CubicSide side)
+        float CalculateAmbientOcclusion(ref IntVector3 absoluteNeighborBlockPosition, CubicSide side)
         {
             const float occlusionPerFace = 1 / 5f;
 

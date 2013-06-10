@@ -41,7 +41,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             const int offset = 4;
             var basePositionWorld = eyePositionWorld + eyeDirection * offset;
 
-            Position = new VectorI3
+            Position = new IntVector3
             {
                 X = (int) Math.Floor(basePositionWorld.X),
                 Y = (int) Math.Floor(basePositionWorld.Y),

@@ -124,12 +124,12 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             // グリッドに沿っていない視点方向を考慮しての float によるオフセット。
             // 約 sqrt(2) / 2 で位置を増加させつつ判定。
-            var prevTestPosition = new VectorI3();
+            var prevTestPosition = new IntVector3();
             for (float offset = 0.7f; offset < 10; offset += 0.7f)
             {
                 var basePositionWorld = eyePositionWorld + eyeDirection * offset;
 
-                var testPosition = new VectorI3
+                var testPosition = new IntVector3
                 {
                     X = (int) Math.Floor(basePositionWorld.X),
                     Y = (int) Math.Floor(basePositionWorld.Y),
@@ -169,7 +169,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             Node.Update(true);
         }
 
-        bool ResolvePaintPosition(ref Ray ray, ref VectorI3 brushPosition)
+        bool ResolvePaintPosition(ref Ray ray, ref IntVector3 brushPosition)
         {
             var brushPositionWorld = brushPosition.ToVector3();
 

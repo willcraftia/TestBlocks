@@ -19,7 +19,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// パーティション空間におけるパーティションの位置。
         /// </summary>
-        public VectorI3 Position;
+        public IntVector3 Position;
 
         /// <summary>
         /// アクティブ化が完了しているか否かを示す値。

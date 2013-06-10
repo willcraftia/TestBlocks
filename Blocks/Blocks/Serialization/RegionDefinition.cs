@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
         //----------------------------
         // Bounds (the unit is chunk)
 
-        public BoundingBoxI Box;
+        public IntBoundingBox Box;
 
         //----------------------------
         // Catalog

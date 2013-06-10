@@ -50,7 +50,7 @@ namespace Willcraftia.Xna.Blocks.Models
                                 blockIndex = Region.BlockCatalog.DirtIndex;
                         }
 
-                        var position = new VectorI3(x, y, z);
+                        var position = new IntVector3(x, y, z);
                         chunk.SetBlockIndex(ref position, blockIndex);
                     }
                 }

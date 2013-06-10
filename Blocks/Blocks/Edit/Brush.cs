@@ -10,11 +10,11 @@ namespace Willcraftia.Xna.Blocks.Edit
 {
     public abstract class Brush
     {
-        public VectorI3 Position;
+        public IntVector3 Position;
 
-        public VectorI3 PaintPosition;
+        public IntVector3 PaintPosition;
 
-        public VectorI3 ErasePosition;
+        public IntVector3 ErasePosition;
 
         bool active;
 

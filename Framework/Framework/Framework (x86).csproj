@@ -90,7 +90,7 @@
     <Compile Include="ArrayHelper.cs" />
     <Compile Include="BoundingBoxExtension.cs" />
     <Compile Include="BoundingBoxHelper.cs" />
-    <Compile Include="BoundingDiamondI.cs" />
+    <Compile Include="IntBoundingDiamond.cs" />
     <Compile Include="Collections\ConcurrentKeyedPriorityQueue.cs" />
     <Compile Include="Collections\ConcurrentKeyedQueue.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
@@ -118,7 +118,7 @@
     <Compile Include="Content\IAssetManagerAware.cs" />
     <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
-    <Compile Include="BoundingBoxI.cs" />
+    <Compile Include="IntBoundingBox.cs" />
     <Compile Include="CubicSide.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TextureDisplay.cs" />
@@ -287,7 +287,7 @@
     <Compile Include="IO\ResourceManager.cs" />
     <Compile Include="Triangle.cs" />
     <Compile Include="Vector3Extension.cs" />
-    <Compile Include="VectorI3.cs" />
+    <Compile Include="IntVector3.cs" />
     <Compile Include="View.cs" />
   </ItemGroup>
   <ItemGroup>

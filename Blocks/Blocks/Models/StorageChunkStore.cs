@@ -18,7 +18,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         string rootDirectory = "Chunks";
 
-        public bool GetChunk(string regionKey, VectorI3 position, ChunkData data)
+        public bool GetChunk(string regionKey, IntVector3 position, ChunkData data)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePath = ResolveFilePath(regionKey, position);
@@ -42,7 +42,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return result;
         }
 
-        public void AddChunk(string regionKey, VectorI3 position, ChunkData data)
+        public void AddChunk(string regionKey, IntVector3 position, ChunkData data)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
 
@@ -62,7 +62,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void DeleteChunk(string regionKey, VectorI3 position)
+        public void DeleteChunk(string regionKey, IntVector3 position)
         {
             var storageContainer = StorageManager.RequiredCurrentStorageContainer;
             var filePath = ResolveFilePath(regionKey, position);
@@ -147,7 +147,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return rootDirectory + "/" + regionKey + "/";
         }
 
-        string ResolveFilePath(string regionKey, VectorI3 position)
+        string ResolveFilePath(string regionKey, IntVector3 position)
         {
             return rootDirectory + "/" + regionKey + "/" + position.X + "_" + position.Y + "_" + position.Z + ".bin";
         }

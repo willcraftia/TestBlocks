@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         CommandManager commandManager = new CommandManager();
 
-        VectorI3 lastPaintPosition;
+        IntVector3 lastPaintPosition;
 
         byte lastPaintBlockIndex;
 

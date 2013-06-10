@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
 {
     public struct ChunkSettingsDefinition
     {
-        public VectorI3 ChunkSize;
+        public IntVector3 ChunkSize;
 
         public int MeshUpdateSearchCapacity;
 
@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
 
         public int ChunkPoolMaxCapacity;
 
-        public VectorI3 ClusterSize;
+        public IntVector3 ClusterSize;
 
         public int ActivationCapacity;
 

@@ -10,7 +10,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 {
     public sealed class SetBlockCommand : WorldCommand
     {
-        public VectorI3 BlockPosition;
+        public IntVector3 BlockPosition;
 
         public byte BlockIndex;
 
@@ -36,7 +36,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             var chunk = chunkManager.GetChunkByBlockPosition(ref BlockPosition);
             if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
-            VectorI3 relativePosition;
+            IntVector3 relativePosition;
             chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
 
             lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);

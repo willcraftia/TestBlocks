@@ -28,7 +28,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         struct ChunkTaskRequest
         {
-            public VectorI3 Position;
+            public IntVector3 Position;
 
             public ChunkTaskTypes Type;
 
@@ -129,7 +129,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// メッシュ サイズ。
         /// </summary>
-        public static readonly VectorI3 MeshSize = new VectorI3(16);
+        public static readonly IntVector3 MeshSize = new IntVector3(16);
 
         /// <summary>
         /// チャンク サイズ。
@@ -137,7 +137,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <remarks>
         /// チャンク サイズは、メッシュ サイズの等倍でなければなりません。
         /// </remarks>
-        public readonly VectorI3 ChunkSize;
+        public readonly IntVector3 ChunkSize;
 
         /// <summary>
         /// セグメント サイズ。
@@ -146,12 +146,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 指定されたセグメント サイズに従い、
         /// チャンクのメッシュは複数のメッシュへ分割されます。
         /// </remarks>
-        public readonly VectorI3 MeshSegments;
+        public readonly IntVector3 MeshSegments;
 
         /// <summary>
         /// 半チャンク サイズ。
         /// </summary>
-        public readonly VectorI3 HalfChunkSize;
+        public readonly IntVector3 HalfChunkSize;
 
         /// <summary>
         /// チャンク メッシュのオフセット。
@@ -204,14 +204,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 通常優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<VectorI3> normalUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
+        ConcurrentQueue<IntVector3> normalUpdateMeshRequests = new ConcurrentQueue<IntVector3>();
 
         /// <summary>
         /// 高優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<VectorI3> highUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
+        ConcurrentQueue<IntVector3> highUpdateMeshRequests = new ConcurrentQueue<IntVector3>();
 
-        ConcurrentDictionary<VectorI3, Chunk> updatingChunks;
+        ConcurrentDictionary<IntVector3, Chunk> updatingChunks;
 
         ConcurrentQueue<Chunk> finishedUpdateMeshTasks = new ConcurrentQueue<Chunk>();
 
@@ -328,7 +328,7 @@ namespace Willcraftia.Xna.Blocks.Models
             meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
             verticesBuilderCount = settings.VerticesBuilderCount;
 
-            MeshSegments = new VectorI3
+            MeshSegments = new IntVector3
             {
                 X = ChunkSize.X / MeshSize.X,
                 Y = ChunkSize.Y / MeshSize.Y,
@@ -351,7 +351,7 @@ namespace Willcraftia.Xna.Blocks.Models
             dataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyData = new ChunkData(this);
 
-            updatingChunks = new ConcurrentDictionary<VectorI3, Chunk>(verticesBuilderCount, verticesBuilderCount);
+            updatingChunks = new ConcurrentDictionary<IntVector3, Chunk>(verticesBuilderCount, verticesBuilderCount);
 
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
@@ -368,9 +368,9 @@ namespace Willcraftia.Xna.Blocks.Models
             sceneManager.RootNode.Children.Add(BaseNode);
         }
 
-        public void GetChunkPositionByBlockPosition(ref VectorI3 blockPosition, out VectorI3 result)
+        public void GetChunkPositionByBlockPosition(ref IntVector3 blockPosition, out IntVector3 result)
         {
-            result = new VectorI3
+            result = new IntVector3
             {
                 X = (int) Math.Floor(blockPosition.X / (double) ChunkSize.X),
                 Y = (int) Math.Floor(blockPosition.Y / (double) ChunkSize.Y),
@@ -378,15 +378,15 @@ namespace Willcraftia.Xna.Blocks.Models
             };
         }
 
-        public Chunk GetChunkByBlockPosition(ref VectorI3 blockPosition)
+        public Chunk GetChunkByBlockPosition(ref IntVector3 blockPosition)
         {
-            VectorI3 chunkPosition;
+            IntVector3 chunkPosition;
             GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
 
             return GetChunk(ref chunkPosition);
         }
 
-        public Chunk GetChunk(ref VectorI3 chunkPosition)
+        public Chunk GetChunk(ref IntVector3 chunkPosition)
         {
             return GetPartition(ref chunkPosition) as Chunk;
         }
@@ -399,7 +399,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </remarks>
         /// <param name="position">チャンクの位置。</param>
         /// <param name="priority">優先度。</param>
-        public void RequestUpdateMesh(ref VectorI3 position, ChunkMeshUpdatePriorities priority)
+        public void RequestUpdateMesh(ref IntVector3 position, ChunkMeshUpdatePriorities priority)
         {
             switch (priority)
             {
@@ -421,7 +421,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="position">チャンクの位置。</param>
         /// <param name="type">タスク種別。</param>
         /// <param name="priority">優先度。</param>
-        public void RequestChunkTask(ref VectorI3 position, ChunkTaskTypes type, ChunkTaskPriorities priority)
+        public void RequestChunkTask(ref IntVector3 position, ChunkTaskTypes type, ChunkTaskPriorities priority)
         {
             var request = new ChunkTaskRequest
             {
@@ -441,7 +441,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void RequestChunkTask(ref BoundingBoxI bounds, ChunkTaskTypes type, ChunkTaskPriorities priority)
+        public void RequestChunkTask(ref IntBoundingBox bounds, ChunkTaskTypes type, ChunkTaskPriorities priority)
         {
             for (int z = bounds.Min.Z; z < (bounds.Min.Z + bounds.Size.Z); z++)
             {
@@ -449,7 +449,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     for (int x = bounds.Min.X; x < (bounds.Min.X + bounds.Size.X); x++)
                     {
-                        var position = new VectorI3(x, y, z);
+                        var position = new IntVector3(x, y, z);
                         RequestChunkTask(ref position, type, priority);
                     }
                 }
@@ -472,7 +472,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// ・指定の位置を含むリージョンがある場合、アクティブ化可能であると判定。
         /// 
         /// </summary>
-        protected override bool CanActivate(ref VectorI3 position)
+        protected override bool CanActivate(ref IntVector3 position)
         {
             if (regionManager.GetRegionByChunkPosition(ref position) == null) return false;
 
@@ -485,7 +485,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// ・プールからチャンクを取得して返却。ただし、プールが枯渇している場合は null。
         /// 
         /// </summary>
-        protected override Partition Create(ref VectorI3 position)
+        protected override Partition Create(ref IntVector3 position)
         {
             // プールから取得。
             var chunk = chunkPool.Borrow();
@@ -656,11 +656,11 @@ namespace Willcraftia.Xna.Blocks.Models
             ProcessUpdateMeshRequests(normalUpdateMeshRequests);
         }
 
-        void ProcessUpdateMeshRequests(ConcurrentQueue<VectorI3> requestQueue)
+        void ProcessUpdateMeshRequests(ConcurrentQueue<IntVector3> requestQueue)
         {
             for (int i = 0; i < meshUpdateSearchCapacity; i++)
             {
-                VectorI3 position;
+                IntVector3 position;
                 if (!requestQueue.TryDequeue(out position)) break;
 
                 // アクティブ チャンクを取得。

@@ -12,7 +12,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkSettings : IAsset
     {
-        VectorI3 chunkSize;
+        IntVector3 chunkSize;
 
         int partitionPoolMaxCapacity = 0;
 
@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Blocks.Models
         // I/F
         public IResource Resource { get; set; }
 
-        public VectorI3 ChunkSize
+        public IntVector3 ChunkSize
         {
             get { return chunkSize; }
             set

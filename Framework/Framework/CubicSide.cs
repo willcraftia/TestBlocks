@@ -36,17 +36,17 @@ namespace Willcraftia.Xna.Framework
 
         public const int RightIndex = 5;
 
-        public static readonly CubicSide Top = new CubicSide(TopIndex, "Top", VectorI3.Top);
+        public static readonly CubicSide Top = new CubicSide(TopIndex, "Top", IntVector3.Top);
 
-        public static readonly CubicSide Bottom = new CubicSide(BottomIndex, "Bottom", VectorI3.Bottom);
+        public static readonly CubicSide Bottom = new CubicSide(BottomIndex, "Bottom", IntVector3.Bottom);
 
-        public static readonly CubicSide Front = new CubicSide(FrontIndex, "Front", VectorI3.Front);
+        public static readonly CubicSide Front = new CubicSide(FrontIndex, "Front", IntVector3.Front);
 
-        public static readonly CubicSide Back = new CubicSide(BackIndex, "Back", VectorI3.Back);
+        public static readonly CubicSide Back = new CubicSide(BackIndex, "Back", IntVector3.Back);
 
-        public static readonly CubicSide Left = new CubicSide(LeftIndex, "Left", VectorI3.Left);
+        public static readonly CubicSide Left = new CubicSide(LeftIndex, "Left", IntVector3.Left);
 
-        public static readonly CubicSide Right = new CubicSide(RightIndex, "Right", VectorI3.Right);
+        public static readonly CubicSide Right = new CubicSide(RightIndex, "Right", IntVector3.Right);
 
         public static ReadOnlyCollection<CubicSide> Items { get; private set; }
 
@@ -54,7 +54,7 @@ namespace Willcraftia.Xna.Framework
 
         public string Name { get; private set; }
 
-        public VectorI3 Direction { get; private set; }
+        public IntVector3 Direction { get; private set; }
 
         static CubicSide()
         {
@@ -68,7 +68,7 @@ namespace Willcraftia.Xna.Framework
             Items = list.AsReadOnly();
         }
 
-        CubicSide(int index, string name, VectorI3 direction)
+        CubicSide(int index, string name, IntVector3 direction)
         {
             Index = index;
             Name = name;

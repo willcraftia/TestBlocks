@@ -1445,10 +1445,10 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var definition = new RegionDefinition
                 {
                     Name = "Default",
-                    Box = new BoundingBoxI
+                    Box = new IntBoundingBox
                     {
-                        Min = new VectorI3(-128, 0, -128),
-                        Size = new VectorI3(256, 16, 256)
+                        Min = new IntVector3(-128, 0, -128),
+                        Size = new IntVector3(256, 16, 256)
                     },
                     TileCatalog = "../TileCatalogs/Default.json",
                     BlockCatalog = "../BlockCatalogs/Default.json",
@@ -1563,13 +1563,13 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
             {
                 var definition = new ChunkSettingsDefinition
                 {
-                    ChunkSize = new VectorI3(16),
+                    ChunkSize = new IntVector3(16),
                     MeshUpdateSearchCapacity = 100,
                     VerticesBuilderCount = 10,
                     MinActiveRange = 16,
                     MaxActiveRange = 17,
                     ChunkPoolMaxCapacity = 0,
-                    ClusterSize = new VectorI3(8),
+                    ClusterSize = new IntVector3(8),
                     ActivationCapacity = 10,
                     PassivationCapacity = 10,
                     PassivationSearchCapacity = 200,
