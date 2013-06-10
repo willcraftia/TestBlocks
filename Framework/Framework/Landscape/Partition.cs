@@ -65,11 +65,17 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </value>
         public bool SuppressPassivation { get; set; }
 
+        public PartitionManager PartitionManager { get; private set; }
+
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        protected Partition()
+        protected Partition(PartitionManager partitionManager)
         {
+            if (partitionManager == null) throw new ArgumentNullException("partitionManager");
+
+            PartitionManager = partitionManager;
+
             ActivateAction = new Action(Activate);
             PassivateAction = new Action(Passivate);
         }
@@ -110,6 +116,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             ActivationCompleted = true;
             
             asyncCallEvent.Set();
+
+            PartitionManager.OnActivationTaskFinished(this);
         }
 
         /// <summary>
@@ -127,6 +135,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             PassivationCompleted = true;
 
             asyncCallEvent.Set();
+
+            PartitionManager.OnPassivationTaskFinished(this);
         }
 
         /// <summary>

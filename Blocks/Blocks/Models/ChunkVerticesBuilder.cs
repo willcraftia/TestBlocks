@@ -134,6 +134,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
             localWorld.Clear();
 
+            manager.OnUpdateMeshFinished(Chunk);
+
             completed = true;
         }
 

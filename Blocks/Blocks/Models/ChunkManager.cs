@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
@@ -210,20 +211,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         ConcurrentQueue<VectorI3> highUpdateMeshRequests = new ConcurrentQueue<VectorI3>();
 
-        /// <summary>
-        /// 頂点構築中チャンクのキュー。
-        /// </summary>
-        Queue<Chunk> updateMeshChunkQueue;
+        ConcurrentDictionary<VectorI3, Chunk> updatingChunks;
+
+        ConcurrentQueue<Chunk> finishedUpdateMeshTasks = new ConcurrentQueue<Chunk>();
 
         /// <summary>
         /// 頂点ビルダのプール。
         /// </summary>
         Pool<ChunkVerticesBuilder> verticesBuilderPool;
-
-        /// <summary>
-        /// 頂点ビルダの処理を非同期に実行するためのタスク キュー。
-        /// </summary>
-        TaskQueue verticesBuilderTaskQueue;
 
         /// <summary>
         /// メッシュ名の構築で利用する文字列ビルダ。
@@ -239,11 +234,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 高優先度のチャンク タスク要求のキュー。
         /// </summary>
         ConcurrentQueue<ChunkTaskRequest> highTaskRequestQueue = new ConcurrentQueue<ChunkTaskRequest>();
-
-        /// <summary>
-        /// チャンク タスクのキュー。
-        /// </summary>
-        TaskQueue chunkTaskQueue;
 
         /// <summary>
         /// シーン マネージャ。
@@ -361,20 +351,11 @@ namespace Willcraftia.Xna.Blocks.Models
             dataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyData = new ChunkData(this);
 
-            updateMeshChunkQueue = new Queue<Chunk>(verticesBuilderCount);
+            updatingChunks = new ConcurrentDictionary<VectorI3, Chunk>(verticesBuilderCount, verticesBuilderCount);
+
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
                 MaxCapacity = verticesBuilderCount
-            };
-            verticesBuilderTaskQueue = new TaskQueue
-            {
-                SlotCount = verticesBuilderCount
-            };
-
-            chunkTaskQueue = new TaskQueue
-            {
-                // TODO
-                SlotCount = 4
             };
 
             buildLocalLightsPool = new ConcurrentPool<ChunkTaskBuildLocalLights>(() => { return new ChunkTaskBuildLocalLights(this); });
@@ -558,9 +539,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 ProcessChunkTaskRequests();
             }
 
-            // ビルダのタスク キューを更新。
-            verticesBuilderTaskQueue.Update();
-
             // 更新完了を監視。
             // 更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
@@ -696,7 +674,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // チャンクがメッシュ更新中ならば待機キューへ戻す。
-                if (updateMeshChunkQueue.Contains(chunk))
+                if (updatingChunks.ContainsKey(chunk.Position))
                 {
                     requestQueue.Enqueue(position);
                     continue;
@@ -735,11 +713,17 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                // 頂点ビルダを登録。
-                verticesBuilderTaskQueue.Enqueue(verticesBuilder.ExecuteAction);
+                // メッシュ更新中としてマーク。
+                updatingChunks[chunk.Position] = chunk;
 
-                updateMeshChunkQueue.Enqueue(chunk);
+                // タスク実行。
+                Task.Factory.StartNew(verticesBuilder.ExecuteAction);
             }
+        }
+
+        internal void OnUpdateMeshFinished(Chunk chunk)
+        {
+            finishedUpdateMeshTasks.Enqueue(chunk);
         }
 
         /// <summary>
@@ -750,17 +734,15 @@ namespace Willcraftia.Xna.Blocks.Models
         void UpdateMeshes(GameTime gameTime)
         {
             // 頂点ビルダの監視。
-            int count = updateMeshChunkQueue.Count;
-            for (int i = 0; i < count; i++)
+            while (!finishedUpdateMeshTasks.IsEmpty)
             {
-                var chunk = updateMeshChunkQueue.Dequeue();
+                Chunk chunk;
+                if (!finishedUpdateMeshTasks.TryDequeue(out chunk))
+                    break;
 
-                if (!chunk.VerticesBuilder.Completed)
-                {
-                    // 未完ならば更新キューへ戻す。
-                    updateMeshChunkQueue.Enqueue(chunk);
-                    continue;
-                }
+                // 更新中マークを解除。
+                Chunk removedChunk;
+                updatingChunks.TryRemove(chunk.Position, out removedChunk);
 
                 // クローズ中は頂点バッファ反映をスキップ。
                 if (!Closing) UpdateMesh(chunk);
@@ -914,7 +896,7 @@ namespace Willcraftia.Xna.Blocks.Models
         void ProcessChunkTaskRequests()
         {
             // TODO
-            int capacity = 100;
+            int capacity = 4;
             ChunkTaskRequest request;
 
             while (0 < capacity && highTaskRequestQueue.TryDequeue(out request))
@@ -930,8 +912,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 capacity--;
             }
-
-            chunkTaskQueue.Update();
         }
 
         void ProcessChunkTask(ref ChunkTaskRequest request)
@@ -939,24 +919,24 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = GetChunk(ref request.Position);
             if (chunk == null) return;
 
-            ChunkTask task;
+            ChunkTask chunkTask;
             switch (request.Type)
             {
                 case ChunkTaskTypes.BuildLocalLights:
-                    task = buildLocalLightsPool.Borrow();
+                    chunkTask = buildLocalLightsPool.Borrow();
                     break;
                 case ChunkTaskTypes.PropagateLights:
-                    task = propagateLightsPool.Borrow();
+                    chunkTask = propagateLightsPool.Borrow();
                     break;
                 default:
                     throw new InvalidOperationException();
             }
 
-            task.Initialize(chunk, request.Priority, chunkTaskCallback);
+            chunkTask.Initialize(chunk, request.Priority, chunkTaskCallback);
 
             // TODO
             // 非アクティブ化の抑制。
-            chunkTaskQueue.Enqueue(task.Action);
+            Task.Factory.StartNew(chunkTask.Action);
         }
 
         void OnChunkTaskCompleted(ChunkTask task)
