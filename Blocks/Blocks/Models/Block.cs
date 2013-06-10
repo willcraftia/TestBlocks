@@ -30,7 +30,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Mesh MeshPrototype { get; set; }
 
-        public CubicCollection<Tile> Tiles { get; private set; }
+        public SideCollection<Tile> Tiles { get; private set; }
 
         // 1 つでも半透明タイルを参照したら、ブロック自体を半透明とする。
         // エディタでは、これをユーザへ強制する。
@@ -57,7 +57,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Block()
         {
-            Tiles = new CubicCollection<Tile>();
+            Tiles = new SideCollection<Tile>();
         }
 
         public void BuildMesh()

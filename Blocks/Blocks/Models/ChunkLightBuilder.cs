@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 return;
             }
 
-            var topNeighborChunk = chunk.GetNeighborChunk(CubicSide.Top);
+            var topNeighborChunk = chunk.GetNeighborChunk(Side.Top);
             if (topNeighborChunk == null || topNeighborChunk.LightState < ChunkLightState.WaitPropagate)
             {
                 // 再試行。
@@ -61,9 +61,9 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             var neighbors = new ChunkNeighbors();
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
-                var side = CubicSide.Items[i];
+                var side = Side.Items[i];
 
                 var neighbor = GetPropagatableNeighborChunk(chunk, side);
                 if (neighbor == null)
@@ -181,7 +181,7 @@ namespace Willcraftia.Xna.Blocks.Models
             DiffuseSkylight(chunk, ref blockPosition);
         }
 
-        static Chunk GetPropagatableNeighborChunk(Chunk chunk, CubicSide side)
+        static Chunk GetPropagatableNeighborChunk(Chunk chunk, Side side)
         {
             var neighbor = chunk.GetNeighborChunk(side);
             if (neighbor == null || neighbor.LightState < ChunkLightState.WaitPropagate)
@@ -198,9 +198,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             if (!CanPenetrateLight(chunk, ref blockPosition)) return;
 
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
-                var side = CubicSide.Items[i];
+                var side = Side.Items[i];
 
                 var neighborBlockPosition = blockPosition + side.Direction;
 

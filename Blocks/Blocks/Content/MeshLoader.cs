@@ -24,12 +24,12 @@ namespace Willcraftia.Xna.Blocks.Content
             {
                 Name = definition.Name
             };
-            mesh.MeshParts[CubicSide.Top] = ToMeshPart(definition.Top);
-            mesh.MeshParts[CubicSide.Bottom] = ToMeshPart(definition.Bottom);
-            mesh.MeshParts[CubicSide.Front] = ToMeshPart(definition.Front);
-            mesh.MeshParts[CubicSide.Back] = ToMeshPart(definition.Back);
-            mesh.MeshParts[CubicSide.Left] = ToMeshPart(definition.Left);
-            mesh.MeshParts[CubicSide.Right] = ToMeshPart(definition.Right);
+            mesh.MeshParts[Side.Top] = ToMeshPart(definition.Top);
+            mesh.MeshParts[Side.Bottom] = ToMeshPart(definition.Bottom);
+            mesh.MeshParts[Side.Front] = ToMeshPart(definition.Front);
+            mesh.MeshParts[Side.Back] = ToMeshPart(definition.Back);
+            mesh.MeshParts[Side.Left] = ToMeshPart(definition.Left);
+            mesh.MeshParts[Side.Right] = ToMeshPart(definition.Right);
 
             return mesh;
         }
@@ -42,12 +42,12 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new MeshDefinition
             {
                 Name = mesh.Name,
-                Top = ToMeshPartDefinition(mesh.MeshParts[CubicSide.Top]),
-                Bottom = ToMeshPartDefinition(mesh.MeshParts[CubicSide.Bottom]),
-                Front = ToMeshPartDefinition(mesh.MeshParts[CubicSide.Front]),
-                Back = ToMeshPartDefinition(mesh.MeshParts[CubicSide.Back]),
-                Left = ToMeshPartDefinition(mesh.MeshParts[CubicSide.Left]),
-                Right = ToMeshPartDefinition(mesh.MeshParts[CubicSide.Right])
+                Top = ToMeshPartDefinition(mesh.MeshParts[Side.Top]),
+                Bottom = ToMeshPartDefinition(mesh.MeshParts[Side.Bottom]),
+                Front = ToMeshPartDefinition(mesh.MeshParts[Side.Front]),
+                Back = ToMeshPartDefinition(mesh.MeshParts[Side.Back]),
+                Left = ToMeshPartDefinition(mesh.MeshParts[Side.Left]),
+                Right = ToMeshPartDefinition(mesh.MeshParts[Side.Right])
             };
 
             serializer.Serialize(resource, definition);

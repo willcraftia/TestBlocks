@@ -764,9 +764,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="partition">非アクティブ化されたパーティション。</param>
         void NortifyNeighborPassivated(Partition partition)
         {
-            for (int i = 0; i < CubicSide.Items.Count; i++)
+            for (int i = 0; i < Side.Items.Count; i++)
             {
-                var side = CubicSide.Items[i];
+                var side = Side.Items[i];
 
                 var nearbyPosition = partition.Position + side.Direction;
 
@@ -784,9 +784,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="partition">アクティブ化されたパーティション。</param>
         void NotifyNeighborActivated(Partition partition)
         {
-            for (int i = 0; i < CubicSide.Items.Count; i++)
+            for (int i = 0; i < Side.Items.Count; i++)
             {
-                var side = CubicSide.Items[i];
+                var side = Side.Items[i];
 
                 var nearbyPosition = partition.Position + side.Direction;
 

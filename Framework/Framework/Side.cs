@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 
 namespace Willcraftia.Xna.Framework
 {
-    public sealed class CubicSide
+    public sealed class Side
     {
         [Flags]
         public enum Flags
@@ -36,19 +36,19 @@ namespace Willcraftia.Xna.Framework
 
         public const int RightIndex = 5;
 
-        public static readonly CubicSide Top = new CubicSide(TopIndex, "Top", IntVector3.Top);
+        public static readonly Side Top = new Side(TopIndex, "Top", IntVector3.Top);
 
-        public static readonly CubicSide Bottom = new CubicSide(BottomIndex, "Bottom", IntVector3.Bottom);
+        public static readonly Side Bottom = new Side(BottomIndex, "Bottom", IntVector3.Bottom);
 
-        public static readonly CubicSide Front = new CubicSide(FrontIndex, "Front", IntVector3.Front);
+        public static readonly Side Front = new Side(FrontIndex, "Front", IntVector3.Front);
 
-        public static readonly CubicSide Back = new CubicSide(BackIndex, "Back", IntVector3.Back);
+        public static readonly Side Back = new Side(BackIndex, "Back", IntVector3.Back);
 
-        public static readonly CubicSide Left = new CubicSide(LeftIndex, "Left", IntVector3.Left);
+        public static readonly Side Left = new Side(LeftIndex, "Left", IntVector3.Left);
 
-        public static readonly CubicSide Right = new CubicSide(RightIndex, "Right", IntVector3.Right);
+        public static readonly Side Right = new Side(RightIndex, "Right", IntVector3.Right);
 
-        public static ReadOnlyCollection<CubicSide> Items { get; private set; }
+        public static ReadOnlyCollection<Side> Items { get; private set; }
 
         public int Index { get; private set; }
 
@@ -56,9 +56,9 @@ namespace Willcraftia.Xna.Framework
 
         public IntVector3 Direction { get; private set; }
 
-        static CubicSide()
+        static Side()
         {
-            var list = new List<CubicSide>(Count);
+            var list = new List<Side>(Count);
             list.Add(Top);
             list.Add(Bottom);
             list.Add(Front);
@@ -68,38 +68,38 @@ namespace Willcraftia.Xna.Framework
             Items = list.AsReadOnly();
         }
 
-        CubicSide(int index, string name, IntVector3 direction)
+        Side(int index, string name, IntVector3 direction)
         {
             Index = index;
             Name = name;
             Direction = direction;
         }
 
-        public static CubicSide ToCubicSide(int index)
+        public static Side ToCubicSide(int index)
         {
             switch (index)
             {
-                case TopIndex: return CubicSide.Top;
-                case BottomIndex: return CubicSide.Bottom;
-                case FrontIndex: return CubicSide.Front;
-                case BackIndex: return CubicSide.Back;
-                case LeftIndex: return CubicSide.Left;
-                case RightIndex: return CubicSide.Right;
+                case TopIndex: return Side.Top;
+                case BottomIndex: return Side.Bottom;
+                case FrontIndex: return Side.Front;
+                case BackIndex: return Side.Back;
+                case LeftIndex: return Side.Left;
+                case RightIndex: return Side.Right;
             }
 
             throw new ArgumentOutOfRangeException("index");
         }
 
-        public CubicSide Reverse()
+        public Side Reverse()
         {
             switch (Index)
             {
-                case TopIndex: return CubicSide.Bottom;
-                case BottomIndex: return CubicSide.Top;
-                case FrontIndex: return CubicSide.Back;
-                case BackIndex: return CubicSide.Front;
-                case LeftIndex: return CubicSide.Right;
-                case RightIndex: return CubicSide.Left;
+                case TopIndex: return Side.Bottom;
+                case BottomIndex: return Side.Top;
+                case FrontIndex: return Side.Back;
+                case BackIndex: return Side.Front;
+                case LeftIndex: return Side.Right;
+                case RightIndex: return Side.Left;
             }
 
             throw new InvalidOperationException();

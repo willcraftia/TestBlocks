@@ -231,7 +231,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return (vertexCount / 4) * 6;
         }
 
-        public Chunk GetNeighborChunk(CubicSide side)
+        public Chunk GetNeighborChunk(Side side)
         {
             var neighborPosition = Position + side.Direction;
             return manager.GetChunk(ref neighborPosition);

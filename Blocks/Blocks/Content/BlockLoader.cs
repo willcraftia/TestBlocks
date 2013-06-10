@@ -45,12 +45,12 @@ namespace Willcraftia.Xna.Blocks.Content
                 Restitution = definition.Restitution
             };
 
-            block.Tiles[CubicSide.Top] = Load<Tile>(resource, definition.TopTile);
-            block.Tiles[CubicSide.Bottom] = Load<Tile>(resource, definition.BottomTile);
-            block.Tiles[CubicSide.Front] = Load<Tile>(resource, definition.FrontTile);
-            block.Tiles[CubicSide.Back] = Load<Tile>(resource, definition.BackTile);
-            block.Tiles[CubicSide.Left] = Load<Tile>(resource, definition.LeftTile);
-            block.Tiles[CubicSide.Right] = Load<Tile>(resource, definition.RightTile);
+            block.Tiles[Side.Top] = Load<Tile>(resource, definition.TopTile);
+            block.Tiles[Side.Bottom] = Load<Tile>(resource, definition.BottomTile);
+            block.Tiles[Side.Front] = Load<Tile>(resource, definition.FrontTile);
+            block.Tiles[Side.Back] = Load<Tile>(resource, definition.BackTile);
+            block.Tiles[Side.Left] = Load<Tile>(resource, definition.LeftTile);
+            block.Tiles[Side.Right] = Load<Tile>(resource, definition.RightTile);
             block.BuildMesh();
 
             // 1 つでも半透明タイルを含んでいたら半透明ブロックとする。
@@ -77,12 +77,12 @@ namespace Willcraftia.Xna.Blocks.Content
             {
                 Name = block.Name,
                 Mesh = ToUri(resource, block.MeshPrototype),
-                TopTile = ToUri(resource, block.Tiles[CubicSide.Top]),
-                BottomTile = ToUri(resource, block.Tiles[CubicSide.Bottom]),
-                FrontTile = ToUri(resource, block.Tiles[CubicSide.Front]),
-                BackTile = ToUri(resource, block.Tiles[CubicSide.Back]),
-                LeftTile = ToUri(resource, block.Tiles[CubicSide.Left]),
-                RightTile = ToUri(resource, block.Tiles[CubicSide.Right]),
+                TopTile = ToUri(resource, block.Tiles[Side.Top]),
+                BottomTile = ToUri(resource, block.Tiles[Side.Bottom]),
+                FrontTile = ToUri(resource, block.Tiles[Side.Front]),
+                BackTile = ToUri(resource, block.Tiles[Side.Back]),
+                LeftTile = ToUri(resource, block.Tiles[Side.Left]),
+                RightTile = ToUri(resource, block.Tiles[Side.Right]),
                 Fluid = block.Fluid,
                 ShadowCasting = block.ShadowCasting,
                 Shape = block.Shape,

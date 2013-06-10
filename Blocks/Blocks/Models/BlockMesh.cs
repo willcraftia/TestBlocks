@@ -12,18 +12,18 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class BlockMesh
     {
-        public CubicCollection<MeshPart> MeshParts { get; private set; }
+        public SideCollection<MeshPart> MeshParts { get; private set; }
 
         BlockMesh()
         {
-            MeshParts = new CubicCollection<MeshPart>();
+            MeshParts = new SideCollection<MeshPart>();
         }
 
         public static BlockMesh Create(Block block)
         {
             var mesh = new BlockMesh();
 
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
                 var prototype = block.MeshPrototype.MeshParts[i];
                 if (prototype == null) continue;

@@ -95,7 +95,7 @@
     <Compile Include="Collections\ConcurrentKeyedQueue.cs" />
     <Compile Include="Collections\ConcurrentPool.cs" />
     <Compile Include="Collections\ConcurrentPriorityQueue.cs" />
-    <Compile Include="Collections\CubicCollection.cs" />
+    <Compile Include="Collections\SideCollection.cs" />
     <Compile Include="Collections\KeyedPriorityQueue.cs" />
     <Compile Include="Collections\KeyedQueue.cs" />
     <Compile Include="Collections\SimpleOctree.cs" />
@@ -119,7 +119,7 @@
     <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="IntBoundingBox.cs" />
-    <Compile Include="CubicSide.cs" />
+    <Compile Include="Side.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TextureDisplay.cs" />
     <Compile Include="Diagnostics\IMonitorListener.cs" />

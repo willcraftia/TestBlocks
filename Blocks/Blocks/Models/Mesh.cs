@@ -17,11 +17,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public string Name { get; set; }
 
-        public CubicCollection<MeshPart> MeshParts { get; private set; }
+        public SideCollection<MeshPart> MeshParts { get; private set; }
 
         public Mesh()
         {
-            MeshParts = new CubicCollection<MeshPart>();
+            MeshParts = new SideCollection<MeshPart>();
         }
 
         #region ToString

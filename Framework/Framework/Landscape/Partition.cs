@@ -144,14 +144,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         /// <param name="neighbor">アクティブになった隣接パーティション。</param>
         /// <param name="side">隣接パーティションの方向。</param>
-        protected internal virtual void OnNeighborActivated(Partition neighbor, CubicSide side) { }
+        protected internal virtual void OnNeighborActivated(Partition neighbor, Side side) { }
 
         /// <summary>
         /// 隣接パーティションが非アクティブになった時に呼び出されます。
         /// </summary>
         /// <param name="neighbor">非アクティブになった隣接パーティション。</param>
         /// <param name="side">隣接パーティションの方向。</param>
-        protected internal virtual void OnNeighborPassivated(Partition neighbor, CubicSide side) { }
+        protected internal virtual void OnNeighborPassivated(Partition neighbor, Side side) { }
 
         /// <summary>
         /// アクティブ化の開始直前で呼び出されます。

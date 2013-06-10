@@ -19,9 +19,9 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             public Triangle Triangle;
 
-            public CubicSide Side { get; private set; }
+            public Side Side { get; private set; }
 
-            public TriangleInfo(CubicSide side)
+            public TriangleInfo(Side side)
             {
                 Side = side;
             }
@@ -41,11 +41,11 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         BrushMesh brushMesh;
 
-        CubicSide paintSide;
+        Side paintSide;
 
-        CubicSide lockedSide;
+        Side lockedSide;
 
-        public CubicSide PaintSide
+        public Side PaintSide
         {
             get { return paintSide; }
         }
@@ -66,9 +66,9 @@ namespace Willcraftia.Xna.Blocks.Edit
             var transform = Matrix.CreateTranslation(new Vector3(0.5f));
 
             int i = 0;
-            for (int j = 0; j < CubicSide.Count; j++)
+            for (int j = 0; j < Side.Count; j++)
             {
-                var side = CubicSide.Items[j];
+                var side = Side.Items[j];
 
                 var normal = side.Direction.ToVector3();
 
@@ -207,7 +207,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             return false;
         }
 
-        bool IsBackFace(CubicSide side, ref Vector3 eyeDirection)
+        bool IsBackFace(Side side, ref Vector3 eyeDirection)
         {
             var normal = side.Direction.ToVector3();
 

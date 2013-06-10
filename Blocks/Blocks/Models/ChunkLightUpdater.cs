@@ -190,9 +190,9 @@ namespace Willcraftia.Xna.Blocks.Models
         byte GetMaxNeighborSkylightLevel(ref IntVector3 absoluteBlockPosition)
         {
             byte maxLevel = 0;
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
-                var side = CubicSide.Items[i];
+                var side = Side.Items[i];
 
                 var neighborBlockPosition = absoluteBlockPosition + side.Direction;
 
@@ -257,9 +257,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var diffuseLevel = (byte) (level - 1);
 
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
-                var side = CubicSide.Items[i];
+                var side = Side.Items[i];
 
                 var neighborBlockPosition = absoluteBlockPosition + side.Direction;
 
@@ -288,9 +288,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var diffuseLevel = (byte) (level - 1);
 
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
-                var side = CubicSide.Items[i];
+                var side = Side.Items[i];
 
                 var neighborBlockPosition = absoluteBlockPosition + side.Direction;
 

@@ -51,26 +51,26 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         /// <param name="side">方向。</param>
         /// <returns>チャンク。</returns>
-        public Chunk this[CubicSide side]
+        public Chunk this[Side side]
         {
             get
             {
-                if (side == CubicSide.Top) return Top;
-                if (side == CubicSide.Bottom) return Bottom;
-                if (side == CubicSide.Front) return Front;
-                if (side == CubicSide.Back) return Back;
-                if (side == CubicSide.Left) return Left;
-                if (side == CubicSide.Right) return Right;
+                if (side == Side.Top) return Top;
+                if (side == Side.Bottom) return Bottom;
+                if (side == Side.Front) return Front;
+                if (side == Side.Back) return Back;
+                if (side == Side.Left) return Left;
+                if (side == Side.Right) return Right;
                 throw new InvalidOperationException();
             }
             set
             {
-                if (side == CubicSide.Top) { Top = value; return; }
-                if (side == CubicSide.Bottom) { Bottom = value; return; }
-                if (side == CubicSide.Front) { Front = value; return; }
-                if (side == CubicSide.Back) { Back = value; return; }
-                if (side == CubicSide.Left) { Left = value; return; }
-                if (side == CubicSide.Right) { Right = value; return; }
+                if (side == Side.Top) { Top = value; return; }
+                if (side == Side.Bottom) { Bottom = value; return; }
+                if (side == Side.Front) { Front = value; return; }
+                if (side == Side.Back) { Back = value; return; }
+                if (side == Side.Left) { Left = value; return; }
+                if (side == Side.Right) { Right = value; return; }
             }
         }
     }

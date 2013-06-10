@@ -7,13 +7,13 @@ using System.Collections.Generic;
 
 namespace Willcraftia.Xna.Framework.Collections
 {
-    public sealed class CubicCollection<T> : IList<T>
+    public sealed class SideCollection<T> : IList<T>
     {
         #region Enumerator
 
         public struct Enumerator : IEnumerator<T>, System.Collections.IEnumerator
         {
-            CubicCollection<T> owner;
+            SideCollection<T> owner;
 
             int index;
 
@@ -37,7 +37,7 @@ namespace Willcraftia.Xna.Framework.Collections
                 }
             }
 
-            internal Enumerator(CubicCollection<T> owner)
+            internal Enumerator(SideCollection<T> owner)
             {
                 this.owner = owner;
                 index = 0;
@@ -81,7 +81,7 @@ namespace Willcraftia.Xna.Framework.Collections
 
         #endregion
 
-        T[] items = new T[CubicSide.Count];
+        T[] items = new T[Side.Count];
 
         int version;
 
@@ -108,7 +108,7 @@ namespace Willcraftia.Xna.Framework.Collections
             get { return false; }
         }
 
-        public T this[CubicSide side]
+        public T this[Side side]
         {
             get { return this[side.Index]; }
             set { this[side.Index] = value; }

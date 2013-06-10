@@ -20,9 +20,9 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         BasicEffect effect;
 
-        CubicCollection<VertexBuffer> vertexBuffers = new CubicCollection<VertexBuffer>();
+        SideCollection<VertexBuffer> vertexBuffers = new SideCollection<VertexBuffer>();
 
-        CubicCollection<IndexBuffer> indexBuffers = new CubicCollection<IndexBuffer>();
+        SideCollection<IndexBuffer> indexBuffers = new SideCollection<IndexBuffer>();
 
         Texture2D fillTexture;
 
@@ -42,7 +42,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         public bool VisibleAllFaces { get; set; }
 
-        public CubicSide VisibleFace { get; set; }
+        public Side VisibleFace { get; set; }
 
         public BrushMesh(string name, GraphicsDevice graphicsDevice, Mesh mesh)
             : base(name)
@@ -57,7 +57,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             Translucent = true;
 
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
                 var meshPart = mesh.MeshParts[i];
                 if (meshPart == null) continue;
@@ -95,9 +95,9 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             effect.CurrentTechnique.Passes[0].Apply();
 
-            for (int i = 0; i < CubicSide.Count; i++)
+            for (int i = 0; i < Side.Count; i++)
             {
-                if (!VisibleAllFaces && VisibleFace != CubicSide.Items[i]) continue;
+                if (!VisibleAllFaces && VisibleFace != Side.Items[i]) continue;
 
                 var vertexBuffer = vertexBuffers[i];
                 var indexBuffer = indexBuffers[i];
@@ -136,7 +136,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             if (disposing)
             {
-                for (int i = 0; i < CubicSide.Count; i++)
+                for (int i = 0; i < Side.Count; i++)
                 {
                     if (vertexBuffers[i] != null) vertexBuffers[i].Dispose();
                     if (indexBuffers[i] != null) indexBuffers[i].Dispose();
