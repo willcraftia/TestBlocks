@@ -256,7 +256,7 @@ namespace Willcraftia.Xna.Blocks.Models
             defaultCamera.View.Position = new Vector3(0, 16 * 16, 0);
             //camera.View.Position = new Vector3(0, 16 * 3, 0);
             //camera.View.Position = new Vector3(0, 16 * 2, 0);
-            defaultCamera.Projection.Fov = MathHelper.PiOver2;
+            //defaultCamera.Projection.Fov = MathHelper.ToRadians(90);
             defaultCamera.Projection.AspectRatio = GraphicsDevice.Viewport.AspectRatio;
 
             // 最大アクティブ範囲を超えない位置へ FarPlaneDistance を設定。
