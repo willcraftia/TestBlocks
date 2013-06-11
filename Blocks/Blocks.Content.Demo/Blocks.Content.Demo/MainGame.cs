@@ -158,18 +158,24 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             monitorListener.CreateMarker(MonitorUpdate, 0, Color.White);
 
             monitorListener.CreateMarker(PartitionManager.MonitorUpdate, 1, Color.Cyan);
-            monitorListener.CreateMarker(ChunkManager.MonitorUpdate, 1, Color.Orange);
-            monitorListener.CreateMarker(RegionManager.MonitorUpdate, 1, Color.Green);
+            monitorListener.CreateMarker(PartitionManager.MonitorCheckPassivations, 2, Color.Orange);
+            monitorListener.CreateMarker(PartitionManager.MonitorCheckActivations, 2, Color.Green);
+            monitorListener.CreateMarker(PartitionManager.MonitorPassivate, 2, Color.Red);
+            monitorListener.CreateMarker(PartitionManager.MonitorActivate, 2, Color.Yellow);
+            monitorListener.CreateMarker(ChunkManager.MonitorProcessUpdateMeshRequests, 3, Color.Orange);
+            monitorListener.CreateMarker(ChunkManager.MonitorProcessChunkTaskRequests, 3, Color.Green);
+            monitorListener.CreateMarker(ChunkManager.MonitorUpdateMeshes, 3, Color.Red);
+            //monitorListener.CreateMarker(RegionManager.MonitorUpdate, 1, Color.Orange);
             
-            monitorListener.CreateMarker(MonitorDraw, 2, Color.White);
+            monitorListener.CreateMarker(MonitorDraw, 4, Color.White);
 
-            monitorListener.CreateMarker(SceneManager.MonitorDraw, 3, Color.Cyan);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, 4, Color.Cyan);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, 4, Color.Orange);
-            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, 4, Color.Green);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, 4, Color.Red);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, 4, Color.Yellow);
-            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, 4, Color.Magenta);
+            monitorListener.CreateMarker(SceneManager.MonitorDraw, 5, Color.Cyan);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, 6, Color.Cyan);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, 6, Color.Orange);
+            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, 6, Color.Green);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, 6, Color.Red);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, 6, Color.Yellow);
+            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, 6, Color.Magenta);
 
             #endregion
 

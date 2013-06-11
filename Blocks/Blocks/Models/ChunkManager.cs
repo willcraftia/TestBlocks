@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
+using Willcraftia.Xna.Framework.Diagnostics;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Landscape;
 using Willcraftia.Xna.Framework.Threading;
@@ -125,6 +126,12 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         #endregion
+
+        public const string MonitorProcessUpdateMeshRequests = "ChunkManager.ProcessUpdateMeshRequests";
+
+        public const string MonitorProcessChunkTaskRequests = "ChunkManager.ProcessChunkTaskRequests";
+
+        public const string MonitorUpdateMeshes = "ChunkManager.UpdateMeshes";
 
         /// <summary>
         /// メッシュ サイズ。
@@ -652,8 +659,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         void ProcessUpdateMeshRequests()
         {
+            Monitor.Begin(MonitorProcessUpdateMeshRequests);
+
             ProcessUpdateMeshRequests(highUpdateMeshRequests);
             ProcessUpdateMeshRequests(normalUpdateMeshRequests);
+
+            Monitor.End(MonitorProcessUpdateMeshRequests);
         }
 
         void ProcessUpdateMeshRequests(ConcurrentQueue<IntVector3> requestQueue)
@@ -730,6 +741,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         void UpdateMeshes()
         {
+            Monitor.Begin(MonitorUpdateMeshes);
+
             // 頂点ビルダの監視。
             while (!finishedUpdateMeshTasks.IsEmpty)
             {
@@ -753,6 +766,8 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 非アクティブ化の抑制を解除。
                 chunk.SuppressPassivation = false;
             }
+
+            Monitor.End(MonitorUpdateMeshes);
         }
 
         /// <summary>
@@ -761,6 +776,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="chunk">チャンク。</param>
         void UpdateMesh(Chunk chunk)
         {
+            // TODO
+            // ここが負荷の原因。
+
             for (int z = 0; z < MeshSegments.Z; z++)
             {
                 for (int y = 0; y < MeshSegments.Y; y++)
@@ -892,6 +910,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void ProcessChunkTaskRequests()
         {
+            Monitor.Begin(MonitorProcessChunkTaskRequests);
+
             // TODO
             int capacity = 4;
             ChunkTaskRequest request;
@@ -909,6 +929,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 capacity--;
             }
+
+            Monitor.End(MonitorProcessChunkTaskRequests);
         }
 
         void ProcessChunkTask(ref ChunkTaskRequest request)

@@ -383,6 +383,14 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const string MonitorUpdate = "PartitionManager.Update";
 
+        public const string MonitorCheckPassivations = "PartitionManager.CheckPassivations";
+
+        public const string MonitorCheckActivations = "PartitionManager.CheckActivations";
+
+        public const string MonitorPassivate = "PartitionManager.Passivate";
+
+        public const string MonitorActivate = "PartitionManager.Activate";
+
         /// <summary>
         /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
@@ -701,6 +709,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void CheckPassivations()
         {
+            Monitor.Begin(MonitorCheckPassivations);
+
             while (!finishedPassivationTasks.IsEmpty)
             {
                 Partition partition;
@@ -726,6 +736,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 解放。
                 Release(partition);
             }
+
+            Monitor.End(MonitorCheckPassivations);
         }
 
         /// <summary>
@@ -733,6 +745,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void CheckActivations()
         {
+            Monitor.Begin(MonitorCheckActivations);
+
             while (!finishedActivationTasks.IsEmpty)
             {
                 Partition partition;
@@ -756,6 +770,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // サブクラスへも通知。
                 OnActivated(partition);
             }
+
+            Monitor.End(MonitorCheckActivations);
         }
 
         /// <summary>
@@ -812,6 +828,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void Passivate()
         {
+            Monitor.Begin(MonitorPassivate);
+
             // メモ
             //
             // 非アクティブ化はパーティションのロックを伴う。
@@ -858,6 +876,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // タスク実行。
                 Task.Factory.StartNew(partition.PassivateAction);
             }
+
+            Monitor.End(MonitorPassivate);
         }
 
         /// <summary>
@@ -869,11 +889,15 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <param name="gameTime">ゲーム時間。</param>
         void Activate()
         {
+            Monitor.Begin(MonitorActivate);
+
             if (!activator.Active)
             {
                 // 非同期処理中ではないならば、アクティベータの実行を開始。
                 activator.Start(view, projection, eyePosition, minActiveVolume, priorActiveDistance);
             }
+
+            Monitor.End(MonitorActivate);
         }
 
         /// <summary>
