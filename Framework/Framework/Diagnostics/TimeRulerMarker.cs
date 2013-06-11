@@ -38,6 +38,22 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         /// </summary>
         public Color Color { get; set; }
 
+        public float MinTime { get; private set; }
+
+        public float MaxTime { get; private set; }
+
+        public float AverageTime { get; private set; }
+
+        public float SnapMinTime { get; private set; }
+
+        public float SnapMaxTime { get; private set; }
+
+        public float SnapAverageTime { get; private set; }
+
+        public int SnapSamples { get; private set; }
+
+        public bool SnapInitialized { get; private set; }
+
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
@@ -65,6 +81,36 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         public void End()
         {
             timeRuler.End(this);
+        }
+
+        [Conditional("DEBUG"), Conditional("TRACE")]
+        public void RecordFrame(float beginTime, float endTime)
+        {
+            float duration = endTime - beginTime;
+
+            if (!SnapInitialized)
+            {
+                MinTime = duration;
+                MaxTime = duration;
+                AverageTime = duration;
+
+                SnapInitialized = true;
+            }
+            else
+            {
+                MinTime = Math.Min(MinTime, duration);
+                MaxTime = Math.Max(MaxTime, duration);
+                AverageTime += duration;
+                AverageTime *= 0.5f;
+
+                if (timeRuler.LogSnapDuration <= ++SnapSamples)
+                {
+                    SnapMinTime = MinTime;
+                    SnapMaxTime = MaxTime;
+                    SnapAverageTime = AverageTime;
+                    SnapSamples = 0;
+                }
+            }
         }
     }
 }

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Graphics;
@@ -174,6 +175,12 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         /// </summary>
         SpriteBatch spriteBatch;
 
+        string fontAssetName;
+
+        SpriteFont spriteFont;
+
+        StringBuilder logString = new StringBuilder(512);
+
         /// <summary>
         /// バーを表示するかどうかを示す値を取得または設定します。
         /// </summary>
@@ -186,6 +193,8 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         /// バーの垂直方向の余白を取得または設定します。
         /// </summary>
         public int BarPadding { get; set; }
+
+        public bool LogVisible { get; set; }
 
         /// <summary>
         /// 対象とする FPS を取得または設定します。
@@ -229,10 +238,16 @@ namespace Willcraftia.Xna.Framework.Diagnostics
         public int BarHeight { get; set; }
 
         /// <summary>
+        /// ログのスナップ ショット取得期間 (フレーム単位)。
+        /// </summary>
+        public int LogSnapDuration { get; set; }
+
+        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="game">Game。</param>
-        public TimeRuler(Game game)
+        /// <param name="fontAssetName">フォント アセット名。</param>
+        public TimeRuler(Game game, string fontAssetName = null)
             : base(game)
         {
             BackgroundColor = Color.Black * 0.5f;
@@ -241,10 +256,13 @@ namespace Willcraftia.Xna.Framework.Diagnostics
             BarHeight = 4;
             BarVisible = true;
             BarPadding = 1;
+            LogVisible = true;
             Fps = 60;
             MaxSampleFrames = 4;
             AutoAdjustDelay = 30;
             TargetSampleFrames = 1;
+            LogSnapDuration = 120;
+            this.fontAssetName = fontAssetName ?? "Fonts/Debug";
         }
 
         public TimeRulerMarker CreateMarker()
@@ -297,12 +315,11 @@ namespace Willcraftia.Xna.Framework.Diagnostics
                     currentBar.MarkerLogCount = 0;
                     currentBar.MarkerLogIndexStackCount = 0;
 
-                    // End が呼ばれないままの MarkerLog を終了させ、新フレームで継続。
                     for (int stackIndex = 0; stackIndex < previousBar.MarkerLogIndexStackCount; stackIndex++)
                     {
                         int markerIndex = previousBar.MarkerLogIndexStack[stackIndex];
 
-                        // 終了時間を設定。
+                        // End が呼ばれないままの MarkerLog を終了させるため、終了時間を設定。
                         previousBar.MarkerLogs[markerIndex].EndTime = endFrameTime;
 
                         // 新フレームへ継続。
@@ -314,6 +331,15 @@ namespace Willcraftia.Xna.Framework.Diagnostics
                         currentBar.MarkerLogs[stackIndex].EndTime = float.NaN;
                         currentBar.MarkerLogs[stackIndex].Color = previousBar.MarkerLogs[markerIndex].Color;
                         currentBar.MarkerLogCount++;
+                    }
+
+                    // 計測の記録。
+                    for (int markerIndex = 0; markerIndex < previousBar.MarkerLogCount; markerIndex++)
+                    {
+                        var markerId = previousBar.MarkerLogs[markerIndex].Id;
+                        var marker = markers[markerId];
+
+                        marker.RecordFrame(previousBar.MarkerLogs[markerIndex].BeginTime, previousBar.MarkerLogs[markerIndex].EndTime);
                     }
                 }
 
@@ -430,6 +456,70 @@ namespace Willcraftia.Xna.Framework.Diagnostics
                 }
             }
 
+            if (LogVisible)
+            {
+                int y = startY - spriteFont.LineSpacing;
+                logString.Length = 0;
+                for (int barIndex = 0; barIndex < previousFrameLog.Bars.Count; barIndex++)
+                {
+                    var bar = previousFrameLog.Bars[barIndex];
+
+                    for (int markerIndex = 0; markerIndex < bar.MarkerLogCount; markerIndex++)
+                    {
+                        var markerId = bar.MarkerLogs[markerIndex].Id;
+                        var marker = markers[markerId];
+
+                        if (marker.SnapInitialized)
+                        {
+                            if (0 < logString.Length)
+                                logString.Append('\n');
+
+                            logString.Append(" [");
+                            logString.AppendNumber(barIndex);
+                            logString.Append("][");
+                            logString.Append(markers[marker.Id].Name);
+                            logString.Append("][");
+                            logString.AppendNumber(marker.SnapAverageTime);
+                            logString.Append("ms] ");
+
+                            y -= spriteFont.LineSpacing;
+                        }
+                    }
+                }
+
+                var size = spriteFont.MeasureString(logString);
+
+                // 背景領域を描画。
+                var backgroundRect = new Rectangle(offsetX, y, (int) size.X + 12, (int) size.Y);
+                spriteBatch.Draw(fillTexture, backgroundRect, new Color(0, 0, 0, 128));
+
+                // ログ文字列を描画。
+                spriteBatch.DrawString(spriteFont, logString, new Vector2(offsetX + 12, y), Color.White);
+
+                // ログ カラー ボックスを描画。
+                y += (int) ((float) spriteFont.LineSpacing * 0.3f);
+                backgroundRect = new Rectangle((int) offsetX + 4, y, 10, 10);
+                Rectangle foregroundRect = new Rectangle((int) offsetX + 5, y + 1, 8, 8);
+
+                for (int barIndex = 0; barIndex < previousFrameLog.Bars.Count; barIndex++)
+                {
+                    var bar = previousFrameLog.Bars[barIndex];
+
+                    for (int markerIndex = 0; markerIndex < bar.MarkerLogCount; markerIndex++)
+                    {
+                        var markerId = bar.MarkerLogs[markerIndex].Id;
+                        var marker = markers[markerId];
+
+                        backgroundRect.Y = y;
+                        foregroundRect.Y = y + 1;
+                        spriteBatch.Draw(fillTexture, backgroundRect, Color.White);
+                        spriteBatch.Draw(fillTexture, foregroundRect, marker.Color);
+
+                        y += spriteFont.LineSpacing;
+                    }
+                }
+            }
+
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -461,6 +551,7 @@ namespace Willcraftia.Xna.Framework.Diagnostics
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
             fillTexture = Texture2DHelper.CreateFillTexture(GraphicsDevice);
+            spriteFont = Game.Content.Load<SpriteFont>(fontAssetName);
 
             base.LoadContent();
         }
