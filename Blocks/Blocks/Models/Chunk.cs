@@ -113,7 +113,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         /// <param name="manager">チャンク マネージャ。</param>
         public Chunk(ChunkManager manager)
-            : base(manager)
         {
             if (manager == null) throw new ArgumentNullException("manager");
 

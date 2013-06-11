@@ -355,7 +355,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                     var candidate = candidates.Dequeue();
 
                     // 非同期アクティブ化を実行。
-                    manager.ActivatePartitionAsync(candidate.Position);
+                    manager.RequestActivatePartitionAsync(candidate.Position);
                 }
 
                 // 実行キューへ追加しなかった全てを取消。
@@ -379,6 +379,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
         protected readonly Vector3 PartitionSize;
+
+        readonly Action<object> activatePartitionAsyncAction;
+
+        readonly Action<object> passivatePartitionAsyncAction;
 
         /// <summary>
         /// クラスタ マネージャ。
@@ -528,16 +532,9 @@ namespace Willcraftia.Xna.Framework.Landscape
             priorActiveDistance = settings.PriorActiveDistance;
 
             passivationSearchCapacity = settings.PassivationSearchCapacity;
-        }
 
-        internal void OnActivationTaskFinished(Partition partition)
-        {
-            finishedActivationTasks.Enqueue(partition);
-        }
-
-        internal void OnPassivationTaskFinished(Partition partition)
-        {
-            finishedPassivationTasks.Enqueue(partition);
+            activatePartitionAsyncAction = new Action<object>(ActivatePartitionAsync);
+            passivatePartitionAsyncAction = new Action<object>(PassivatePartitionAsync);
         }
 
         /// <summary>
@@ -858,10 +855,25 @@ namespace Willcraftia.Xna.Framework.Landscape
                 OnPassivating(partition);
 
                 // タスク実行。
-                Task.Factory.StartNew(partition.PassivateAsyncAction);
+                Task.Factory.StartNew(passivatePartitionAsyncAction, partition);
             }
 
             Monitor.End(MonitorPassivate);
+        }
+
+        /// <summary>
+        /// 非アクティブ化タスク処理です。
+        /// </summary>
+        /// <param name="state">タスク状態としての非アクティブ化対象パーティション。</param>
+        void PassivatePartitionAsync(object state)
+        {
+            var partition = state as Partition;
+
+            // パーティションの非アクティブ化を実行。
+            partition.PassivateAsync();
+
+            // タスク終了を記録。
+            finishedPassivationTasks.Enqueue(partition);
         }
 
         /// <summary>
@@ -892,7 +904,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </param>
         protected virtual void DisposeOverride(bool disposing) { }
 
-        internal bool ActivatePartitionAsync(IntVector3 position)
+        /// <summary>
+        /// 指定位置のパーティションをアクティブ化するように要求します。
+        /// </summary>
+        /// <param name="position">パーティション位置。</param>
+        /// <returns>
+        /// true (アクティブ化要求を許可した場合)、false (それ以外の場合)。
+        /// </returns>
+        internal bool RequestActivatePartitionAsync(IntVector3 position)
         {
             // 同時実行許容量を越えるならば終了。
             if (activationCapacity <= activations.Count)
@@ -912,9 +931,24 @@ namespace Willcraftia.Xna.Framework.Landscape
             partition.OnActivating();
 
             // タスク実行。
-            Task.Factory.StartNew(partition.ActivateAsyncAction);
+            Task.Factory.StartNew(activatePartitionAsyncAction, partition);
 
             return true;
+        }
+
+        /// <summary>
+        /// アクティブ化タスク処理です。
+        /// </summary>
+        /// <param name="state">タスク状態としてのアクティブ化対象パーティション。</param>
+        void ActivatePartitionAsync(object state)
+        {
+            var partition = state as Partition;
+
+            // パーティションへアクティブ化を要求。
+            partition.ActivateAsync();
+            
+            // タスク完了を記録。
+            finishedActivationTasks.Enqueue(partition);
         }
 
         #region IDisposable

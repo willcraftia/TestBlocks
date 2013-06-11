@@ -38,18 +38,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected internal volatile bool PassivationCompleted;
 
         /// <summary>
-        /// Activate() メソッドのデリゲートです。
-        /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
-        /// </summary>
-        internal readonly Action ActivateAsyncAction;
-
-        /// <summary>
-        /// Passivate() メソッドのデリゲートです。
-        /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
-        /// </summary>
-        internal readonly Action PassivateAsyncAction;
-
-        /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
         /// </summary>
@@ -65,20 +53,10 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </value>
         public bool SuppressPassivation { get; set; }
 
-        public PartitionManager PartitionManager { get; private set; }
-
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        protected Partition(PartitionManager partitionManager)
-        {
-            if (partitionManager == null) throw new ArgumentNullException("partitionManager");
-
-            PartitionManager = partitionManager;
-
-            ActivateAsyncAction = new Action(ActivateAsync);
-            PassivateAsyncAction = new Action(PassivateAsync);
-        }
+        protected Partition() { }
 
         /// <summary>
         /// パーティションに対するロックの取得を試行します。
@@ -116,8 +94,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             ActivationCompleted = true;
             
             asyncCallEvent.Set();
-
-            PartitionManager.OnActivationTaskFinished(this);
         }
 
         /// <summary>
@@ -135,8 +111,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             PassivationCompleted = true;
 
             asyncCallEvent.Set();
-
-            PartitionManager.OnPassivationTaskFinished(this);
         }
 
         /// <summary>
