@@ -218,7 +218,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         ConcurrentQueue<IntVector3> highUpdateMeshRequests = new ConcurrentQueue<IntVector3>();
 
-        ConcurrentDictionary<IntVector3, Chunk> updatingChunks;
+        Dictionary<IntVector3, Chunk> updatingChunks;
 
         ConcurrentQueue<Chunk> finishedUpdateMeshTasks = new ConcurrentQueue<Chunk>();
 
@@ -358,7 +358,7 @@ namespace Willcraftia.Xna.Blocks.Models
             dataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyData = new ChunkData(this);
 
-            updatingChunks = new ConcurrentDictionary<IntVector3, Chunk>(verticesBuilderCount, verticesBuilderCount);
+            updatingChunks = new Dictionary<IntVector3, Chunk>(verticesBuilderCount);
 
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
@@ -760,8 +760,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     break;
 
                 // 更新中マークを解除。
-                Chunk removedChunk;
-                updatingChunks.TryRemove(chunk.Position, out removedChunk);
+                updatingChunks.Remove(chunk.Position);
 
                 // クローズ中は頂点バッファ反映をスキップ。
                 if (!Closing) UpdateMesh(chunk);
