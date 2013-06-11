@@ -103,6 +103,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             graphics.PreferredBackBufferHeight = 720;
             //graphics.PreferMultiSampling = true;
 
+            Content.RootDirectory = "Content";
+
             //----------------------------------------------------------------
             // ÉçÉMÉìÉO
 
@@ -155,27 +157,37 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             monitorListener = new TimeRulerMonitorListener(timeRuler);
             DiagnosticsMonitor.Listeners.Add(monitorListener);
 
-            monitorListener.CreateMarker(MonitorUpdate, 0, Color.White);
+            int barIndex = 0;
 
-            monitorListener.CreateMarker(PartitionManager.MonitorUpdate, 1, Color.Cyan);
-            monitorListener.CreateMarker(PartitionManager.MonitorCheckPassivations, 2, Color.Orange);
-            monitorListener.CreateMarker(PartitionManager.MonitorCheckActivations, 2, Color.Green);
-            monitorListener.CreateMarker(PartitionManager.MonitorPassivate, 2, Color.Red);
-            monitorListener.CreateMarker(PartitionManager.MonitorActivate, 2, Color.Yellow);
-            monitorListener.CreateMarker(ChunkManager.MonitorProcessUpdateMeshRequests, 3, Color.Orange);
-            monitorListener.CreateMarker(ChunkManager.MonitorProcessChunkTaskRequests, 3, Color.Green);
-            monitorListener.CreateMarker(ChunkManager.MonitorUpdateMeshes, 3, Color.Red);
-            //monitorListener.CreateMarker(RegionManager.MonitorUpdate, 1, Color.Orange);
-            
-            monitorListener.CreateMarker(MonitorDraw, 4, Color.White);
+            monitorListener.CreateMarker(MonitorUpdate, barIndex, Color.White);
 
-            monitorListener.CreateMarker(SceneManager.MonitorDraw, 5, Color.Cyan);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, 6, Color.Cyan);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, 6, Color.Orange);
-            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, 6, Color.Green);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, 6, Color.Red);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, 6, Color.Yellow);
-            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, 6, Color.Magenta);
+            barIndex++;
+            monitorListener.CreateMarker(PartitionManager.MonitorUpdate, barIndex, Color.Cyan);
+            barIndex++;
+            monitorListener.CreateMarker(PartitionManager.MonitorCheckPassivations, barIndex, Color.Orange);
+            monitorListener.CreateMarker(PartitionManager.MonitorCheckActivations, barIndex, Color.Green);
+            monitorListener.CreateMarker(PartitionManager.MonitorPassivate, barIndex, Color.Red);
+            monitorListener.CreateMarker(PartitionManager.MonitorActivate, barIndex, Color.Yellow);
+            barIndex++;
+            monitorListener.CreateMarker(ChunkManager.MonitorProcessUpdateMeshRequests, barIndex, Color.Green);
+            monitorListener.CreateMarker(ChunkManager.MonitorProcessChunkTaskRequests, barIndex, Color.Yellow);
+            monitorListener.CreateMarker(ChunkManager.MonitorUpdateMeshes, barIndex, Color.Magenta);
+
+            barIndex++;
+            monitorListener.CreateMarker(RegionManager.MonitorUpdate, barIndex, Color.White);
+
+            barIndex++;
+            monitorListener.CreateMarker(MonitorDraw, barIndex, Color.White);
+
+            barIndex++;
+            monitorListener.CreateMarker(SceneManager.MonitorDraw, barIndex, Color.Cyan);
+            barIndex++;
+            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, barIndex, Color.Cyan);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, barIndex, Color.Orange);
+            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, barIndex, Color.Green);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, barIndex, Color.Red);
+            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, barIndex, Color.Yellow);
+            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, barIndex, Color.Magenta);
 
             #endregion
 
@@ -236,8 +248,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             //----------------------------------------------------------------
             // ÇªÇÃëº
-
-            Content.RootDirectory = "Content";
 
             spriteBatch = new SpriteBatch(GraphicsDevice);
             font = Content.Load<SpriteFont>("Fonts/Debug");
