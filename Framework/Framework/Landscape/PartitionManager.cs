@@ -169,7 +169,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                     View.GetPosition(ref view, out eyePositionWorld);
                 }
 
-                // I/F
                 public int Compare(Candidate candidate1, Candidate candidate2)
                 {
                     float distance1;
@@ -352,26 +351,11 @@ namespace Willcraftia.Xna.Framework.Landscape
             {
                 while (0 < candidates.Count)
                 {
-                    // 同時実行許容量を越えるならば終了。
-                    if (manager.activationCapacity <= manager.activations.Count) break;
-
                     // 候補を取得。
                     var candidate = candidates.Dequeue();
 
-                    // インスタンス生成。
-                    var partition = manager.Create(ref candidate.Position);
-
-                    // 生成が拒否されたら終了。
-                    if (partition == null) break;
-
-                    // アクティブ化中としてマーク。
-                    manager.activations[partition.Position] = partition;
-
-                    // アクティブ化の開始を通知。
-                    partition.OnActivating();
-
-                    // タスク実行。
-                    Task.Factory.StartNew(partition.ActivateAction);
+                    // 非同期アクティブ化を実行。
+                    manager.ActivatePartitionAsync(candidate.Position);
                 }
 
                 // 実行キューへ追加しなかった全てを取消。
@@ -874,7 +858,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 OnPassivating(partition);
 
                 // タスク実行。
-                Task.Factory.StartNew(partition.PassivateAction);
+                Task.Factory.StartNew(partition.PassivateAsyncAction);
             }
 
             Monitor.End(MonitorPassivate);
@@ -907,6 +891,31 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// true (明示的な破棄である場合)、false (それ以外の場合)。
         /// </param>
         protected virtual void DisposeOverride(bool disposing) { }
+
+        internal bool ActivatePartitionAsync(IntVector3 position)
+        {
+            // 同時実行許容量を越えるならば終了。
+            if (activationCapacity <= activations.Count)
+                return false;
+
+            // インスタンス生成。
+            var partition = Create(ref position);
+
+            // 生成が拒否されたら終了。
+            if (partition == null)
+                return false;
+
+            // アクティブ化中としてマーク。
+            activations[partition.Position] = partition;
+
+            // アクティブ化の開始を通知。
+            partition.OnActivating();
+
+            // タスク実行。
+            Task.Factory.StartNew(partition.ActivateAsyncAction);
+
+            return true;
+        }
 
         #region IDisposable
 

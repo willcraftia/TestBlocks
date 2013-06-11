@@ -41,13 +41,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// Activate() メソッドのデリゲートです。
         /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
         /// </summary>
-        internal readonly Action ActivateAction;
+        internal readonly Action ActivateAsyncAction;
 
         /// <summary>
         /// Passivate() メソッドのデリゲートです。
         /// 非同期処理の要求毎にデリゲート インスタンスが生成されることを回避するために用います。
         /// </summary>
-        internal readonly Action PassivateAction;
+        internal readonly Action PassivateAsyncAction;
 
         /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
@@ -76,8 +76,8 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             PartitionManager = partitionManager;
 
-            ActivateAction = new Action(Activate);
-            PassivateAction = new Action(Passivate);
+            ActivateAsyncAction = new Action(ActivateAsync);
+            PassivateAsyncAction = new Action(PassivateAsync);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションのアクティブ化を試行します。
         /// このメソッドは非同期に呼び出されます。
         /// </summary>
-        internal void Activate()
+        internal void ActivateAsync()
         {
             Debug.Assert(!ActivationCompleted);
 
@@ -124,7 +124,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションの非アクティブ化を試行します。
         /// このメソッドは非同期に呼び出されます。
         /// </summary>
-        internal void Passivate()
+        internal void PassivateAsync()
         {
             Debug.Assert(ActivationCompleted);
             Debug.Assert(!PassivationCompleted);
