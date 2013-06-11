@@ -748,17 +748,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // TODO
             // 試しに更新数を制限してみたが、どうやらこれは問題ではない模様。
+            // 更新間隔を置くと多少はマシになるが、それでも瞬間的な負荷は発生する。
             // 原因は、複数スレッドによるロックの奪い合いか、
             // 巨大な頂点バッファの連続作成か？
-            const int maxCount = 1;
-            int count = 0;
 
             // 頂点ビルダの監視。
             while (!finishedUpdateMeshTasks.IsEmpty)
             {
-                if (maxCount <= count)
-                    break;
-
                 Chunk chunk;
                 if (!finishedUpdateMeshTasks.TryDequeue(out chunk))
                     break;
@@ -778,8 +774,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 // 非アクティブ化の抑制を解除。
                 chunk.SuppressPassivation = false;
-
-                count++;
             }
 
             Monitor.End(MonitorUpdateMeshes);
@@ -922,6 +916,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void ProcessChunkTaskRequests()
         {
+            // TODO
+            // どうやら、ここも瞬間的に重くなるように見える。
+
             Monitor.Begin(MonitorProcessChunkTaskRequests);
 
             // TODO
