@@ -24,6 +24,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         bool occlusionQueryActive;
 
+        // 単体でのメッシュ構築以外に、
+        // 隣接メッシュとの結合によるメッシュ更新も発生しうるため、
+        // バッファは動的設定としておくべきである。
+
         DynamicVertexBuffer vertexBuffer;
 
         DynamicIndexBuffer indexBuffer;
