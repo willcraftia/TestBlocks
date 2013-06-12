@@ -72,10 +72,11 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             "[F2] Chunk bounding box\r\n" +
             "[F3] Wireframe\r\n" +
             "[F4] Fog\r\n" +
-            "[F5] InterMap\r\n" +
-            "[w][s][a][d][q][z] Movement\r\n" +
+            "[F5] Inter maps\r\n" +
+            "[F6] Time Ruler\r\n" +
+            "[w/s/a/d/q/z] Movement\r\n" +
             "[Mouse] Camera orientation\r\n" +
-            "[PageUp][PageDown] Move velocity";
+            "[PageUp/Down] Velocity";
 
         Vector2 helpMessageFontSize;
 
@@ -146,8 +147,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
             timeRuler = new TimeRuler(this);
             timeRuler.BackgroundColor = Color.Black;
-            //timeRuler.Enabled = false;
-            //timeRuler.Visible = false;
+            timeRuler.Visible = false;
             Components.Add(timeRuler);
 
             #endregion
@@ -402,6 +402,9 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // F5
             if (IsKeyPressed(Keys.F5))
                 textureDisplay.Visible = !textureDisplay.Visible;
+            // F6
+            if (IsKeyPressed(Keys.F6))
+                timeRuler.Visible = !timeRuler.Visible;
 
             //----------------------------------------------------------------
             // マウスとキーボード状態の記録
@@ -566,7 +569,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             // draw the rectangle.
             spriteBatch.Draw(fillTexture, layout.ArrangedBounds, Color.Black * 0.5f);
 
-            // calculate the text area for help messages.
+            // calculate the text area for information.
             layout.ContainerBounds = layout.ArrangedBounds;
             layout.Width = informationWidth;
             layout.Height = (int) informationTextFontSize.Y;
