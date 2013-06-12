@@ -75,8 +75,10 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             "[F5] Inter maps\r\n" +
             "[F6] Time Ruler\r\n" +
             "[w/s/a/d/q/z] Movement\r\n" +
+            "[PageUp/Down] Velocity\n" +
             "[Mouse] Camera orientation\r\n" +
-            "[PageUp/Down] Velocity";
+            "[Mouse L/R] Destroy/Create Block\n" +
+            "[O] Spoil Block";
 
         Vector2 helpMessageFontSize;
 
