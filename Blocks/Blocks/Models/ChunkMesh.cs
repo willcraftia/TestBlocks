@@ -129,7 +129,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (vertexBuffer == null)
                     vertexBuffer = new DynamicVertexBuffer(
-                        graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.None);
+                        graphicsDevice, typeof(VertexPositionNormalColorTexture), vertexCount, BufferUsage.WriteOnly);
                 
                 vertexBuffer.SetData(vertices, 0, vertexCount, SetDataOptions.Discard);
             }
@@ -161,7 +161,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (indexBuffer == null)
                     indexBuffer = new DynamicIndexBuffer(
-                        graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.None);
+                        graphicsDevice, IndexElementSize.SixteenBits, indexCount, BufferUsage.WriteOnly);
 
                 indexBuffer.SetData(indices, 0, indexCount, SetDataOptions.Discard);
             }
