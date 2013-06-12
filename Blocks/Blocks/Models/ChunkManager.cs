@@ -133,6 +133,8 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const string MonitorUpdateMeshes = "ChunkManager.UpdateMeshes";
 
+        public const int MinFrameCountPerUpdateMeshBuffer = 1;
+
         /// <summary>
         /// メッシュ サイズ。
         /// </summary>
@@ -222,6 +224,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ConcurrentQueue<Chunk> finishedUpdateMeshTasks = new ConcurrentQueue<Chunk>();
 
+        int frameCountPerUpdateMeshBuffer = MinFrameCountPerUpdateMeshBuffer;
+
+        int frameCountBeforeLastUpdateMeshBuffer;
+
         /// <summary>
         /// 頂点ビルダのプール。
         /// </summary>
@@ -302,6 +308,17 @@ namespace Willcraftia.Xna.Blocks.Models
         public int MaxIndexCount { get; private set; }
 
         public IChunkStore ChunkStore { get; private set; }
+
+        public int FrameCountPerUpdateMeshBuffer
+        {
+            get { return frameCountPerUpdateMeshBuffer; }
+            set
+            {
+                if (value < MinFrameCountPerUpdateMeshBuffer) throw new ArgumentOutOfRangeException("value");
+
+                frameCountPerUpdateMeshBuffer = value;
+            }
+        }
 
         /// <summary>
         /// 空データを取得します。
@@ -555,7 +572,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 更新完了を監視。
             // 更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
-            UpdateMeshes();
+            UpdateMesheBuffer();
 
             base.UpdateOverride();
         }
@@ -746,7 +763,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンク メッシュ更新の完了を監視し、
         /// 完了しているならば頂点バッファへの反映を試みます。
         /// </summary>
-        void UpdateMeshes()
+        void UpdateMesheBuffer()
         {
             Monitor.Begin(MonitorUpdateMeshes);
 
@@ -759,27 +776,30 @@ namespace Willcraftia.Xna.Blocks.Models
             // 原因は、複数スレッドによるロックの奪い合いか、
             // 巨大な頂点バッファの連続作成か？
 
-            // 頂点ビルダの監視。
-            while (!finishedUpdateMeshTasks.IsEmpty)
+            frameCountBeforeLastUpdateMeshBuffer++;
+
+            if (frameCountPerUpdateMeshBuffer <= frameCountBeforeLastUpdateMeshBuffer)
             {
+                frameCountBeforeLastUpdateMeshBuffer = 0;
+
                 Chunk chunk;
-                if (!finishedUpdateMeshTasks.TryDequeue(out chunk))
-                    break;
+                if (finishedUpdateMeshTasks.TryDequeue(out chunk))
+                {
+                    // 更新中マークを解除。
+                    updatingChunks.Remove(chunk.Position);
 
-                // 更新中マークを解除。
-                updatingChunks.Remove(chunk.Position);
+                    // クローズ中は頂点バッファ反映をスキップ。
+                    if (!Closing) UpdateMeshBuffer(chunk);
 
-                // クローズ中は頂点バッファ反映をスキップ。
-                if (!Closing) UpdateMesh(chunk);
+                    // 頂点ビルダを解放。
+                    ReleaseVerticesBuilder(chunk.VerticesBuilder);
 
-                // 頂点ビルダを解放。
-                ReleaseVerticesBuilder(chunk.VerticesBuilder);
+                    // 更新開始で取得したロックを解放。
+                    chunk.ExitLock();
 
-                // 更新開始で取得したロックを解放。
-                chunk.ExitLock();
-
-                // 非アクティブ化の抑制を解除。
-                chunk.SuppressPassivation = false;
+                    // 非アクティブ化の抑制を解除。
+                    chunk.SuppressPassivation = false;
+                }
             }
 
             Monitor.End(MonitorUpdateMeshes);
@@ -789,7 +809,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンクに関連付けられた頂点ビルダの結果で頂点バッファを更新します。
         /// </summary>
         /// <param name="chunk">チャンク。</param>
-        void UpdateMesh(Chunk chunk)
+        void UpdateMeshBuffer(Chunk chunk)
         {
             for (int z = 0; z < MeshSegments.Z; z++)
             {
@@ -797,7 +817,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     for (int x = 0; x < MeshSegments.X; x++)
                     {
-                        UpdateMesh(chunk, x, y, z);
+                        UpdateMeshSegmentBuffer(chunk, x, y, z);
                     }
                 }
             }
@@ -806,7 +826,7 @@ namespace Willcraftia.Xna.Blocks.Models
             chunk.Node.Update(false);
         }
 
-        void UpdateMesh(Chunk chunk, int segmentX, int segmentY, int segmentZ)
+        void UpdateMeshSegmentBuffer(Chunk chunk, int segmentX, int segmentY, int segmentZ)
         {
             var builder = chunk.VerticesBuilder;
 

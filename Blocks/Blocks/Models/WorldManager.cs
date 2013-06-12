@@ -330,6 +330,15 @@ namespace Willcraftia.Xna.Blocks.Models
             //----------------------------------------------------------------
             // チャンク マネージャ
 
+            if (gameTime.IsRunningSlowly)
+            {
+                ChunkManager.FrameCountPerUpdateMeshBuffer = 3;
+            }
+            else
+            {
+                ChunkManager.FrameCountPerUpdateMeshBuffer = ChunkManager.MinFrameCountPerUpdateMeshBuffer;
+            }
+
             ChunkManager.Update(SceneManager.ActiveCamera.View.Matrix, SceneManager.ActiveCamera.Projection.Matrix);
 
             //----------------------------------------------------------------
