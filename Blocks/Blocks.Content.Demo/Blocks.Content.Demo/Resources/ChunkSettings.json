@@ -14,7 +14,7 @@
     "Y": 8,
     "Z": 8
   },
-  "ActivationCapacity": 4,
+  "ActivationCapacity": 5,
   "PassivationCapacity": 10,
   "PassivationSearchCapacity": 200,
   "PriorActiveDistance": 96.0,
