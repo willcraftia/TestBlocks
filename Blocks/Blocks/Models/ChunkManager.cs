@@ -730,17 +730,10 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                // メッシュ更新が終わるまで非アクティブ化を抑制。
-                // パーティション マネージャは非アクティブ化前にロック取得を試みるが、
-                // チャンク マネージャはそのサブクラスでロックを取得しているため、
-                // ロックだけでは非アクティブ化を抑制できない事に注意。
-                chunk.SuppressPassivation = true;
-
-                // チャンクのロックを試行。
-                // 頂点ビルダの更新が完了するまでロックを維持。
-                if (!chunk.EnterLock())
+                // チャンクが更新できる状態であるか否か。
+                if (!chunk.BeginUpdate())
                 {
-                    // ロックを取得できない場合は待機キューへ戻す。
+                    // チャンクを更新できる状態にないならば待機キューへ戻す。
                     requestQueue.Enqueue(position);
                     verticesBuilderPool.Return(verticesBuilder);
                     continue;
@@ -794,11 +787,8 @@ namespace Willcraftia.Xna.Blocks.Models
                     // 頂点ビルダを解放。
                     ReleaseVerticesBuilder(chunk.VerticesBuilder);
 
-                    // 更新開始で取得したロックを解放。
-                    chunk.ExitLock();
-
-                    // 非アクティブ化の抑制を解除。
-                    chunk.SuppressPassivation = false;
+                    // チャンク更新完了。
+                    chunk.EndUpdate();
                 }
             }
 

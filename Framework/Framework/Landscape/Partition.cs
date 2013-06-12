@@ -38,20 +38,48 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected internal volatile bool PassivationCompleted;
 
         /// <summary>
+        /// 非アクティブ化開始状態であるか否かを示す値。
+        /// </summary>
+        /// <value>
+        /// true (非アクティブ化開始状態である場合)、false (それ以外の場合)。
+        /// </value>
+        volatile bool passivating;
+
+        /// <summary>
+        /// 更新開始状態であるか否かを示す値。
+        /// </summary>
+        /// <value>
+        /// true (更新開始状態である場合)、false (それ以外の場合)。
+        /// </value>
+        volatile bool updating;
+
+        /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
         /// </summary>
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
 
         /// <summary>
-        /// 非アクティブ化を抑制するか否かを示す値を取得または設定します。
-        /// このプロパティを true にしている間は、
-        /// 非アクティブ化対象となってもパーティション マネージャは非アクティブ化しません。
+        /// 非アクティブ化開始状態であるか否かを示す値を取得します。
         /// </summary>
         /// <value>
-        /// true (非アクティブ化を抑制する場合)、false (それ以外の場合)。
+        /// true (非アクティブ化開始状態である場合)、false (それ以外の場合)。
         /// </value>
-        public bool SuppressPassivation { get; set; }
+        public bool Passivating
+        {
+            get { return passivating; }
+        }
+
+        /// <summary>
+        /// 更新開始状態であるか否かを示す値を取得します。
+        /// </summary>
+        /// <value>
+        /// true (更新開始状態である場合)、false (それ以外の場合)。
+        /// </value>
+        public bool Updating
+        {
+            get { return updating; }
+        }
 
         /// <summary>
         /// インスタンスを生成します。
@@ -59,25 +87,57 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected Partition() { }
 
         /// <summary>
-        /// パーティションに対するロックの取得を試行します。
-        /// 他のスレッドがロック中の場合は、ロックの取得に失敗します。
-        /// ロックの取得に成功した場合は、
-        /// 必ず ExitLock メソッドでロックを解放しなければなりません。
+        /// 非アクティブ化開始状態にします。
+        /// 更新開始状態の場合、非アクティブ化を開始できません。
         /// </summary>
         /// <returns>
-        /// true (ロックを取得できた場合)、false (それ以外の場合)。
+        /// true (非アクティブ化を開始できない場合)、false (それ以外の場合)。
         /// </returns>
-        public bool EnterLock()
+        public virtual bool BeginPassivation()
         {
-            return Monitor.TryEnter(this);
+            if (updating)
+                return false;
+
+            passivating = true;
+            return true;
         }
 
         /// <summary>
-        /// EnterLock メソッドで取得した更新ロックを開放します。
+        /// 非アクティブ化開始状態を解除します。
         /// </summary>
-        public void ExitLock()
+        public virtual void EndPassivation()
         {
-            Monitor.Exit(this);
+            if (!passivating)
+                throw new InvalidOperationException("BeginPassivation() must be called before EndPassivation().");
+
+            passivating = false;
+        }
+
+        /// <summary>
+        /// 更新開始状態にします。
+        /// 非アクティブ化開始状態の場合、更新を開始できません。
+        /// </summary>
+        /// <returns>
+        /// true (更新を開始できない場合)、false (それ以外の場合)。
+        /// </returns>
+        public virtual bool BeginUpdate()
+        {
+            if (passivating)
+                return false;
+
+            updating = true;
+            return true;
+        }
+
+        /// <summary>
+        /// 更新開始状態を解除します。
+        /// </summary>
+        public virtual void EndUpdate()
+        {
+            if (!updating)
+                throw new InvalidOperationException("BeginUpdate() must be called before EndUpdate().");
+
+            updating = false;
         }
 
         /// <summary>
@@ -87,6 +147,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void ActivateAsync()
         {
             Debug.Assert(!ActivationCompleted);
+            Debug.Assert(!Passivating);
 
             asyncCallEvent.Reset();
 
@@ -104,6 +165,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Debug.Assert(ActivationCompleted);
             Debug.Assert(!PassivationCompleted);
+            Debug.Assert(Passivating);
 
             asyncCallEvent.Reset();
 

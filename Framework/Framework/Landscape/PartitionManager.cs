@@ -702,9 +702,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (!passivations.TryRemove(partition.Position, out removedPartition))
                     continue;
 
-                // 非アクティブ化の開始で取得したロックを解放。
-                partition.ExitLock();
-
                 // 完了を通知。
                 partition.OnPassivated();
 
@@ -713,6 +710,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // サブクラスへも通知。
                 OnPassivated(partition);
+
+                // 非アクティブ化の完了。
+                partition.EndPassivation();
 
                 // 解放。
                 Release(partition);
@@ -835,12 +835,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                     }
                 }
 
-                // 非アクティブ化が抑制されている場合は断念。
-                if (partition.SuppressPassivation) continue;
-
-                // ロックの取得を試行。
-                // ロックを取得できない場合は断念。
-                if (!partition.EnterLock()) continue;
+                // 非アクティブ化を開始できる状態ではないならば断念。
+                if (!partition.BeginPassivation())
+                    continue;
 
                 // 非アクティブ化中としてマーク。
                 passivations[partition.Position] = partition;
