@@ -113,7 +113,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             //----------------------------------------------------------------
             // デフォルトのアクティブ ブラシを設定
 
-            ActiveBrush = FreeBrush;
+            ActiveBrush = StickyBrush;
         }
 
         public void StartPaintMode()
