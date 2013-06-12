@@ -152,10 +152,10 @@ namespace Willcraftia.Xna.Blocks.Edit
             if (activeBrush == null || !activeBrush.CanPaint) return;
 
             // 繰り返しペイントのフレーム遅延数未満ならばスキップ。
-            if (paintRepeatCount++ < paintRepeatDelay) return;
+            if (0 < paintRepeatCount--) return;
 
             // 繰り返しフレーム数をリセット。
-            paintRepeatCount = 0;
+            paintRepeatCount = paintRepeatDelay;
 
             var command = worldCommandFactory.CreateSetBlockCommand();
 
