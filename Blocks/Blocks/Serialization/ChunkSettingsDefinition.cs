@@ -2,6 +2,7 @@
 
 using System;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Blocks.Models;
 
 #endregion
 
@@ -30,5 +31,7 @@ namespace Willcraftia.Xna.Blocks.Serialization
         public int PassivationSearchCapacity;
 
         public float PriorActiveDistance;
+
+        public ChunkStoreType ChunkStoreType;
     }
 }

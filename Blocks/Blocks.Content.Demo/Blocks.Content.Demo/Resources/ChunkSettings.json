@@ -17,5 +17,6 @@
   "ActivationCapacity": 4,
   "PassivationCapacity": 10,
   "PassivationSearchCapacity": 200,
-  "PriorActiveDistance": 96.0
+  "PriorActiveDistance": 96.0,
+  "ChunkStoreType": 0
 }

@@ -28,6 +28,7 @@ namespace Willcraftia.Xna.Blocks.Content
                 VerticesBuilderCount = definition.VerticesBuilderCount,
                 MinActiveVolume = definition.MinActiveRange,
                 MaxActiveVolume = definition.MaxActiveRange,
+                ChunkStoreType = definition.ChunkStoreType
             };
 
             settings.PartitionManager.ClusterSize = definition.ClusterSize;
@@ -59,7 +60,8 @@ namespace Willcraftia.Xna.Blocks.Content
                 ActivationCapacity = settings.PartitionManager.ActivationCapacity,
                 PassivationCapacity = settings.PartitionManager.PassivationCapacity,
                 PassivationSearchCapacity = settings.PartitionManager.PassivationSearchCapacity,
-                PriorActiveDistance = settings.PartitionManager.PriorActiveDistance
+                PriorActiveDistance = settings.PartitionManager.PriorActiveDistance,
+                ChunkStoreType = settings.ChunkStoreType
             };
 
             serializer.Serialize(resource, definition);

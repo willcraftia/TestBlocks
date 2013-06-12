@@ -247,7 +247,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var chunkSettings = LoadAsset<ChunkSettings>("title:Resources/ChunkSettings.json");
 
-            ChunkManager = new ChunkManager(chunkSettings, GraphicsDevice, RegionManager, SceneManager, new StorageChunkStore());
+            ChunkManager = new ChunkManager(chunkSettings, GraphicsDevice, RegionManager, SceneManager);
 
             //----------------------------------------------------------------
             // デフォルト カメラ

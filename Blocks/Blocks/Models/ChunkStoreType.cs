@@ -4,9 +4,9 @@ using System;
 
 #endregion
 
-namespace Willcraftia.Xna.Blocks.Serialization
+namespace Willcraftia.Xna.Blocks.Models
 {
-    public enum ChunkStoreTypes
+    public enum ChunkStoreType
     {
         Storage,
         None

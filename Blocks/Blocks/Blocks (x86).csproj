@@ -117,7 +117,7 @@
     <Compile Include="Models\WorldManager.cs" />
     <Compile Include="Serialization\BloomSettingsDefinition.cs" />
     <Compile Include="Serialization\BlurSettingsDefinition.cs" />
-    <Compile Include="Serialization\ChunkStoreTypes.cs" />
+    <Compile Include="Models\ChunkStoreType.cs" />
     <Compile Include="Models\DefaultBiome.cs" />
     <Compile Include="Models\CatalogedBiomeManager.cs" />
     <Compile Include="Models\IChunkProcedure.cs" />

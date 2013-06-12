@@ -319,8 +319,7 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkSettings settings,
             GraphicsDevice graphicsDevice,
             RegionManager regionManager,
-            SceneManager sceneManager,
-            IChunkStore chunkStore)
+            SceneManager sceneManager)
             : base(settings.PartitionManager)
         {
             if (graphicsDevice == null) throw new ArgumentNullException("graphicsDevice");
@@ -330,10 +329,18 @@ namespace Willcraftia.Xna.Blocks.Models
             this.graphicsDevice = graphicsDevice;
             this.regionManager = regionManager;
             SceneManager = sceneManager;
-            ChunkStore = chunkStore ?? NullChunkStore.Instance;
-
             meshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity;
             verticesBuilderCount = settings.VerticesBuilderCount;
+
+            switch (settings.ChunkStoreType)
+            {
+                case ChunkStoreType.Storage:
+                    ChunkStore = StorageChunkStore.Instance;
+                    break;
+                default:
+                    ChunkStore = NullChunkStore.Instance;
+                    break;
+            }
 
             MeshSegments = new IntVector3
             {

@@ -14,9 +14,13 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class StorageChunkStore : IChunkStore
     {
+        public static readonly StorageChunkStore Instance = new StorageChunkStore();
+
         static readonly Logger logger = new Logger(typeof(StorageChunkStore).Name);
 
         string rootDirectory = "Chunks";
+
+        StorageChunkStore() { }
 
         public bool GetChunk(string regionKey, IntVector3 position, ChunkData data)
         {

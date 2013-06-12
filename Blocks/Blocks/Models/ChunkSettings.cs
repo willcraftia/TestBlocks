@@ -103,6 +103,8 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
+        public ChunkStoreType ChunkStoreType { get; set; }
+
         public PartitionManager.Settings PartitionManager { get; private set; }
 
         public ChunkSettings()

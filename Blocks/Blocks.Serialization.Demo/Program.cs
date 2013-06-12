@@ -1573,7 +1573,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                     ActivationCapacity = 10,
                     PassivationCapacity = 10,
                     PassivationSearchCapacity = 200,
-                    PriorActiveDistance = 6 * 16
+                    PriorActiveDistance = 6 * 16,
+                    ChunkStoreType = ChunkStoreType.Storage
                 };
                 SerializeAndDeserialize<ChunkSettingsDefinition>("ChunkSettings", definition);
             }
