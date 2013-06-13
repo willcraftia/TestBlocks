@@ -23,7 +23,6 @@ namespace Willcraftia.Xna.Blocks.Content
             var settings = new ChunkSettings
             {
                 ChunkSize = definition.ChunkSize,
-                ChunkPoolMaxCapacity = definition.ChunkPoolMaxCapacity,
                 MeshUpdateSearchCapacity = definition.MeshUpdateSearchCapacity,
                 VerticesBuilderCount = definition.VerticesBuilderCount,
                 MinActiveVolume = definition.MinActiveRange,
@@ -51,7 +50,6 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new ChunkSettingsDefinition
             {
                 ChunkSize = settings.ChunkSize,
-                ChunkPoolMaxCapacity = settings.ChunkPoolMaxCapacity,
                 MeshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity,
                 VerticesBuilderCount = settings.VerticesBuilderCount,
                 MinActiveRange = settings.MinActiveVolume,

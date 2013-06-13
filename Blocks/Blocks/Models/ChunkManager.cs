@@ -192,16 +192,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         int nodeIdSequence;
 
-        /// <summary>
-        /// チャンクのプール。
-        /// </summary>
-        ConcurrentPool<Chunk> chunkPool;
-
-        /// <summary>
-        /// データのプール。
-        /// </summary>
-        ConcurrentPool<ChunkData> dataPool;
-
         ConcurrentPool<ChunkTaskBuildLocalLights> buildLocalLightsPool;
 
         ConcurrentPool<ChunkTaskPropagateLights> propagateLightsPool;
@@ -377,9 +367,6 @@ namespace Willcraftia.Xna.Blocks.Models
             halfMeshSize.Z /= 2;
             MeshOffset = halfMeshSize.ToVector3();
 
-            chunkPool = new ConcurrentPool<Chunk>(() => { return new Chunk(this); });
-            chunkPool.MaxCapacity = settings.ChunkPoolMaxCapacity;
-            dataPool = new ConcurrentPool<ChunkData>(() => { return new ChunkData(this); });
             EmptyData = new ChunkData(this);
 
             updatingChunks = new Dictionary<IntVector3, Chunk>(verticesBuilderCount);
@@ -511,43 +498,25 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// このクラスの実装では、以下の処理を行います。
-        /// 
-        /// ・プールからチャンクを取得して返却。ただし、プールが枯渇している場合は null。
-        /// 
+        /// 指定の位置にあるチャンクのインスタンスを生成します。
         /// </summary>
         protected override Partition Create(ref IntVector3 position)
         {
-            // プールから取得。
-            var chunk = chunkPool.Borrow();
-            if (chunk == null) return null;
-
             // 対象リージョンの取得。
             var region = regionManager.GetRegionByChunkPosition(ref position);
-            if (region == null) throw new InvalidOperationException("Region not found: ChunkPosition = " + position);
+            if (region == null)
+                throw new InvalidOperationException(string.Format("No region exists for a chunk '{0}'.", position));
 
-            // 初期化。
-            chunk.Initialize(position, region);
-
-            return chunk;
+            return new Chunk(this, region, position);
         }
 
         /// <summary>
-        /// このクラスの実装では、以下の処理を行います。
-        /// 
-        /// ・チャンクの解放処理の呼び出し。
-        /// ・プールへチャンクを返却。
-        /// 
+        /// チャンクのグラフィックス リソースを解放します。
         /// </summary>
         protected override void Release(Partition partition)
         {
             var chunk = partition as Chunk;
-
-            // 解放。
-            chunk.Release();
-
-            // プールへ戻す。
-            chunkPool.Return(chunk);
+            chunk.ReleaseGraphicsResources();
         }
 
         /// <summary>
@@ -614,34 +583,6 @@ namespace Willcraftia.Xna.Blocks.Models
             BaseNode.Children.Remove(chunk.Node);
 
             base.OnPassivating(partition);
-        }
-
-        /// <summary>
-        /// このクラスの実装では、以下の処理を行います。
-        /// 
-        /// ・プールにある全てのチャンクの削除。
-        /// 
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected override void DisposeOverride(bool disposing)
-        {
-            // TODO
-            // プール内チャンクの破棄。
-
-            chunkPool.Clear();
-
-            base.DisposeOverride(disposing);
-        }
-
-        internal ChunkData BorrowData()
-        {
-            return dataPool.Borrow();
-        }
-
-        internal void ReturnData(ChunkData data)
-        {
-            data.Clear();
-            dataPool.Return(data);
         }
 
         internal SceneNode CreateNode()

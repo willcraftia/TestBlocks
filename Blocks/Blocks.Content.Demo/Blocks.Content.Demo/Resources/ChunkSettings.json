@@ -8,7 +8,6 @@
   "VerticesBuilderCount": 5,
   "MinActiveRange": 8,
   "MaxActiveRange": 9,
-  "ChunkPoolMaxCapacity": 0,
   "ClusterSize": {
     "X": 8,
     "Y": 8,

@@ -112,11 +112,15 @@ namespace Willcraftia.Xna.Blocks.Models
         /// インスタンスを生成します。
         /// </summary>
         /// <param name="manager">チャンク マネージャ。</param>
-        public Chunk(ChunkManager manager)
+        /// <param name="position">チャンクの位置。</param>
+        /// <param name="region">リージョン。</param>
+        public Chunk(ChunkManager manager, Region region, IntVector3 position)
         {
             if (manager == null) throw new ArgumentNullException("manager");
 
             this.manager = manager;
+            this.region = region;
+            Position = position;
 
             opaqueMeshes = new ChunkMesh[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
             translucentMeshes = new ChunkMesh[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
@@ -125,26 +129,10 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 初期化します。
+        /// グラフィックス リソースを開放します。
         /// </summary>
-        /// <param name="position">チャンクの位置。</param>
-        /// <param name="region">リージョン。</param>
-        public void Initialize(IntVector3 position, Region region)
+        public void ReleaseGraphicsResources()
         {
-            Position = position;
-            this.region = region;
-
-            ActivationCompleted = false;
-            PassivationCompleted = false;
-        }
-
-        /// <summary>
-        /// 開放します。
-        /// </summary>
-        public void Release()
-        {
-            Position = IntVector3.Zero;
-
             for (int z = 0; z < manager.MeshSegments.Z; z++)
             {
                 for (int y = 0; y < manager.MeshSegments.Y; y++)
@@ -170,19 +158,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 manager.ReleaseVerticesBuilder(VerticesBuilder);
                 VerticesBuilder = null;
             }
-
-            if (data != null)
-            {
-                manager.ReturnData(data);
-                data = null;
-            }
-
-            region = null;
-
-            lightState = ChunkLightState.WaitBuildLocal;
-
-            ActivationCompleted = false;
-            PassivationCompleted = false;
         }
 
         /// <summary>
@@ -281,23 +256,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 // データに変更がないため、即座に処理を終えます。
                 if (blockIndex == Block.EmptyIndex) return;
 
-                // 非空ブロックを設定しようとする場合は、
-                // チャンク マネージャからデータを借りる必要があります。
-                data = manager.BorrowData();
+                // 非空ブロックを設定しようとする場合はデータを新規生成。
+                data = new ChunkData(manager);
             }
 
             // 同じインデックスならば更新しない。
             if (data.GetBlockIndex(x, y, z) == blockIndex) return;
 
             data.SetBlockIndex(x, y, z, blockIndex);
-
-            if (data.SolidCount == 0)
-            {
-                // 全てが空ブロックになったならば、
-                // データをチャンク マネージャへ返します。
-                manager.ReturnData(data);
-                data = null;
-            }
         }
 
         public void SetBlockIndex(ref IntVector3 position, byte blockIndex)
@@ -436,14 +402,17 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(region != null);
 
-            var d = manager.BorrowData();
+            var d = new ChunkData(manager);
+
+            // TODO
+            // バイナリ データの先頭にブロック数を記録し、
+            // 先にこれを読み込んで判定できるようにする。
 
             if (manager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, d))
             {
                 if (d.SolidCount == 0)
                 {
-                    // 全てが空ブロックならば返却。
-                    manager.ReturnData(d);
+                    // 全てが空ブロックならば GC 回収。
                 }
                 else
                 {

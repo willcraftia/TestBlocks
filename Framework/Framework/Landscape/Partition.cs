@@ -27,7 +27,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <value>
         /// true (非同期な非アクティブ化処理が終了している場合)、false (それ以外の場合)。
         /// </value>
-        protected internal volatile bool ActivationCompleted;
+        volatile bool activationCompleted;
 
         /// <summary>
         /// 非アクティブ化が完了しているか否かを示す値。
@@ -35,7 +35,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <value>
         /// true (非同期なアクティブ化処理が終了している場合)、false (それ以外の場合)。
         /// </value>
-        protected internal volatile bool PassivationCompleted;
+        volatile bool passivationCompleted;
 
         /// <summary>
         /// 非アクティブ化開始状態であるか否かを示す値。
@@ -146,13 +146,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void ActivateAsync()
         {
-            Debug.Assert(!ActivationCompleted);
+            Debug.Assert(!activationCompleted);
             Debug.Assert(!Passivating);
 
             asyncCallEvent.Reset();
 
             ActivateOverride();
-            ActivationCompleted = true;
+            activationCompleted = true;
             
             asyncCallEvent.Set();
         }
@@ -163,14 +163,14 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         internal void PassivateAsync()
         {
-            Debug.Assert(ActivationCompleted);
-            Debug.Assert(!PassivationCompleted);
+            Debug.Assert(activationCompleted);
+            Debug.Assert(!passivationCompleted);
             Debug.Assert(Passivating);
 
             asyncCallEvent.Reset();
 
             PassivateOverride();
-            PassivationCompleted = true;
+            passivationCompleted = true;
 
             asyncCallEvent.Set();
         }
