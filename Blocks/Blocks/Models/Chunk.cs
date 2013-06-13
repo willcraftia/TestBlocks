@@ -22,6 +22,11 @@ namespace Willcraftia.Xna.Blocks.Models
         public const byte MaxSkylightLevel = 15;
 
         /// <summary>
+        /// ブロック インデックスに関するロック オブジェクト。
+        /// </summary>
+        object blockIndexLock = new object();
+
+        /// <summary>
         /// チャンク マネージャ。
         /// </summary>
         ChunkManager manager;
@@ -234,9 +239,12 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public byte GetBlockIndex(int x, int y, int z)
         {
-            if (data == null) return Block.EmptyIndex;
+            lock (blockIndexLock)
+            {
+                if (data == null) return Block.EmptyIndex;
 
-            return data.GetBlockIndex(x, y, z);
+                return data.GetBlockIndex(x, y, z);
+            }
         }
 
         public byte GetBlockIndex(IntVector3 position)
@@ -246,27 +254,30 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void SetBlockIndex(int x, int y, int z, byte blockIndex)
         {
-            if (data == null)
+            lock (blockIndexLock)
             {
-                // データが null で空ブロックを設定しようとする場合は、
-                // データに変更がないため、即座に処理を終えます。
-                if (blockIndex == Block.EmptyIndex) return;
+                if (data == null)
+                {
+                    // データが null で空ブロックを設定しようとする場合は、
+                    // データに変更がないため、即座に処理を終えます。
+                    if (blockIndex == Block.EmptyIndex) return;
 
-                // 非空ブロックを設定しようとする場合はデータを新規生成。
-                data = new ChunkData(manager);
-            }
+                    // 非空ブロックを設定しようとする場合はデータを新規生成。
+                    data = new ChunkData(manager);
+                }
 
-            // 同じインデックスならば更新しない。
-            if (data.GetBlockIndex(x, y, z) == blockIndex) return;
+                // 同じインデックスならば更新しない。
+                if (data.GetBlockIndex(x, y, z) == blockIndex) return;
 
-            data.SetBlockIndex(x, y, z, blockIndex);
+                data.SetBlockIndex(x, y, z, blockIndex);
 
-            if (data.SolidCount == 0)
-            {
-                // 空になったならば GC へ。
-                // なお、頻繁に非空と空の状態を繰り返すことが稀であることを前提とし、
-                // これによる GC 負荷は少ないと判断する。
-                data = null;
+                if (data.SolidCount == 0)
+                {
+                    // 空になったならば GC へ。
+                    // なお、頻繁に非空と空の状態を繰り返すことが稀であることを前提とし、
+                    // これによる GC 負荷は少ないと判断する。
+                    data = null;
+                }
             }
         }
 
@@ -404,17 +415,17 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(region != null);
 
-            var d = new ChunkData(manager);
+            var newData = new ChunkData(manager);
 
-            if (manager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, d))
+            if (manager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, newData))
             {
-                if (d.SolidCount == 0)
+                if (newData.SolidCount == 0)
                 {
                     // 全てが空ブロックならば GC 回収。
                 }
                 else
                 {
-                    data = d;
+                    data = newData;
                 }
             }
             else
@@ -438,14 +449,17 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             Debug.Assert(region != null);
 
-            if (data != null)
+            lock (blockIndexLock)
             {
-                manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, data);
-            }
-            else
-            {
-                // 空データで永続化。
-                manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, manager.EmptyData);
+                if (data != null)
+                {
+                    manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, data);
+                }
+                else
+                {
+                    // 空データで永続化。
+                    manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, manager.EmptyData);
+                }
             }
 
             base.PassivateOverride();
