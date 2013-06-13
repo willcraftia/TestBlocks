@@ -204,7 +204,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public Chunk GetNeighborChunk(Side side)
         {
             var neighborPosition = Position + side.Direction;
-            return manager.GetChunk(ref neighborPosition);
+            return manager.GetChunk(neighborPosition);
         }
 
         public bool Contains(int x, int y, int z)

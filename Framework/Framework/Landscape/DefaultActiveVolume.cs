@@ -46,7 +46,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public bool Contains(ref IntVector3 eyePosition, ref IntVector3 point)
+        public bool Contains(IntVector3 eyePosition, IntVector3 point)
         {
             int distanceSquared;
             IntVector3.DistanceSquared(ref eyePosition, ref point, out distanceSquared);

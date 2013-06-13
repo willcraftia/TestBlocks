@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             var chunkManager = BrushManager.WorldManager.ChunkManager;
 
-            var chunk = chunkManager.GetChunkByBlockPosition(ref brush.Position);
+            var chunk = chunkManager.GetChunkByBlockPosition(brush.Position);
             if (chunk == null) return false;
 
             var relativeBlockPosition = chunk.GetRelativeBlockPosition(brush.Position);

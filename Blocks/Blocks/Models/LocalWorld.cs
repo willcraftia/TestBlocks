@@ -61,39 +61,15 @@ namespace Willcraftia.Xna.Blocks.Models
                         position.Y = min.Y + y;
                         position.Z = min.Z + z;
 
-                        chunks[x, y, z] = manager.GetChunk(ref position);
+                        chunks[x, y, z] = manager.GetChunk(position);
                     }
                 }
             }
         }
 
-        public bool GetChunkIndices(ref IntVector3 chunkPosition, out int x, out int y, out int z)
+        public byte? GetBlockIndex(IntVector3 blockPosition)
         {
-            x = chunkPosition.X - Min.X;
-            y = chunkPosition.Y - Min.Y;
-            z = chunkPosition.Z - Min.Z;
-
-            return 0 <= x || x < Size.X || 0 <= y || y < Size.Y || 0 <= z || z < Size.Z;
-        }
-
-        public Chunk GetChunk(ref IntVector3 chunkPosition)
-        {
-            var relative = chunkPosition - Min;
-
-            if (relative.X < 0 || Size.X <= relative.X ||
-                relative.Y < 0 || Size.Y <= relative.Y ||
-                relative.Z < 0 || Size.Z <= relative.Z)
-            {
-                return null;
-            }
-
-            return chunks[relative.X, relative.Y, relative.Z];
-        }
-
-        public byte? GetBlockIndex(ref IntVector3 blockPosition)
-        {
-            IntVector3 chunkPosition;
-            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+            var chunkPosition = manager.GetChunkPositionByBlockPosition(blockPosition);
 
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return null;
@@ -103,10 +79,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunk.GetBlockIndex(relativeBlockPosition);
         }
 
-        public Block GetBlock(ref IntVector3 blockPosition)
+        public Block GetBlock(IntVector3 blockPosition)
         {
-            IntVector3 chunkPosition;
-            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+            var chunkPosition = manager.GetChunkPositionByBlockPosition(blockPosition);
 
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return null;
@@ -119,10 +94,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunk.Region.BlockCatalog[blockIndex];
         }
 
-        public byte GetSkylightLevel(ref IntVector3 blockPosition)
+        public byte GetSkylightLevel(IntVector3 blockPosition)
         {
-            IntVector3 chunkPosition;
-            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+            var chunkPosition = manager.GetChunkPositionByBlockPosition(blockPosition);
 
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return Chunk.MaxSkylightLevel;
@@ -132,10 +106,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return chunk.GetSkylightLevel(relativeBlockPosition);
         }
 
-        public void SetSkylightLevel(ref IntVector3 blockPosition, byte value)
+        public void SetSkylightLevel(IntVector3 blockPosition, byte value)
         {
-            IntVector3 chunkPosition;
-            manager.GetChunkPositionByBlockPosition(ref blockPosition, out chunkPosition);
+            var chunkPosition = manager.GetChunkPositionByBlockPosition(blockPosition);
 
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return;
@@ -151,6 +124,20 @@ namespace Willcraftia.Xna.Blocks.Models
         public void Clear()
         {
             Array.Clear(chunks, 0, chunks.Length);
+        }
+
+        Chunk GetChunk(ref IntVector3 chunkPosition)
+        {
+            var relative = chunkPosition - Min;
+
+            if (relative.X < 0 || Size.X <= relative.X ||
+                relative.Y < 0 || Size.Y <= relative.Y ||
+                relative.Z < 0 || Size.Z <= relative.Z)
+            {
+                return null;
+            }
+
+            return chunks[relative.X, relative.Y, relative.Z];
         }
     }
 }

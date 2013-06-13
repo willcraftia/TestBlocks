@@ -94,9 +94,9 @@
     <Compile Include="Edit\CommandManager.cs" />
     <Compile Include="Models\ChunkLightUpdater.cs" />
     <Compile Include="Models\ChunkLightState.cs" />
-    <Compile Include="Models\ChunkMeshUpdatePriorities.cs" />
-    <Compile Include="Models\ChunkTaskPriorities.cs" />
-    <Compile Include="Models\ChunkTaskTypes.cs" />
+    <Compile Include="Models\ChunkMeshUpdatePriority.cs" />
+    <Compile Include="Models\ChunkTaskPriority.cs" />
+    <Compile Include="Models\ChunkTaskType.cs" />
     <Compile Include="Models\ChunkLightBuilder.cs" />
     <Compile Include="Models\LocalWorld.cs" />
     <Compile Include="Models\MaxVerticesChunkProcedure.cs" />

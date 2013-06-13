@@ -33,7 +33,7 @@ namespace Willcraftia.Xna.Blocks.Edit
         {
             var chunkManager = WorldManager.ChunkManager;
 
-            var chunk = chunkManager.GetChunkByBlockPosition(ref BlockPosition);
+            var chunk = chunkManager.GetChunkByBlockPosition(BlockPosition);
             if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
             var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             for (int i = 0; i < lightUpdater.AffectedChunkPositions.Count; i++)
             {
                 var p = lightUpdater.AffectedChunkPositions[i];
-                chunkManager.RequestUpdateMesh(ref p, ChunkMeshUpdatePriorities.High);
+                chunkManager.RequestUpdateMesh(p, ChunkMeshUpdatePriority.High);
             }
 
             chunkManager.ReturnLightUpdater(lightUpdater);

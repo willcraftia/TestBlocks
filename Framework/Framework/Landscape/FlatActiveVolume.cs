@@ -40,7 +40,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public bool Contains(ref IntVector3 eyePosition, ref IntVector3 point)
+        public bool Contains(IntVector3 eyePosition, IntVector3 point)
         {
             eyePosition.Y = 0;
             point.Y = 0;

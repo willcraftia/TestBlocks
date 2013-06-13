@@ -9,7 +9,7 @@ namespace Willcraftia.Xna.Blocks.Models
     /// <summary>
     /// チャンクの内部状態を構築するためのタスクの種類を定義します。
     /// </summary>
-    public enum ChunkTaskTypes
+    public enum ChunkTaskType
     {
         /// <summary>
         /// チャンク ローカルで光レベルを構築。

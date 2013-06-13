@@ -321,13 +321,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                 var position = eyePosition + offset;
 
                 // 既にアクティブならばスキップ。
-                if (manager.ContainsPartition(ref position)) return;
+                if (manager.ContainsPartition(position)) return;
 
                 // 既に実行中ならばスキップ。
                 if (manager.activations.ContainsKey(position)) return;
 
                 // アクティブ化可能であるかどうか。
-                if (!manager.CanActivate(ref position)) return;
+                if (!manager.CanActivate(position)) return;
 
                 var candidate = new Candidate();
                 candidate.Position = position;
@@ -616,9 +616,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool ContainsPartition(ref IntVector3 position)
+        public bool ContainsPartition(IntVector3 position)
         {
-            return clusterManager.ContainsPartition(ref position);
+            return clusterManager.ContainsPartition(position);
         }
 
         /// <summary>
@@ -628,9 +628,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
         /// </returns>
-        public Partition GetPartition(ref IntVector3 position)
+        public Partition GetPartition(IntVector3 position)
         {
-            return clusterManager.GetPartition(ref position);
+            return clusterManager.GetPartition(position);
         }
 
         /// <summary>
@@ -651,7 +651,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、アクティブ化を抑制する場合には null。
         /// </returns>
-        protected abstract Partition Create(ref IntVector3 position);
+        protected abstract Partition Create(IntVector3 position);
 
         /// <summary>
         /// 非アクティブ化でパーティションを解放する際に呼び出されます。
@@ -669,7 +669,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (指定の位置でパーティションをアクティブ化できる場合)、false (それ以外の場合)。
         /// </returns>
-        protected virtual bool CanActivate(ref IntVector3 position)
+        protected virtual bool CanActivate(IntVector3 position)
         {
             return true;
         }
@@ -767,7 +767,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = clusterManager.GetPartition(ref nearbyPosition);
+                var neighbor = clusterManager.GetPartition(nearbyPosition);
                 if (neighbor == null) continue;
 
                 var reverseSide = side.Reverse();
@@ -787,7 +787,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 var nearbyPosition = partition.Position + side.Direction;
 
-                var neighbor = clusterManager.GetPartition(ref nearbyPosition);
+                var neighbor = clusterManager.GetPartition(nearbyPosition);
                 if (neighbor == null) continue;
 
                 // 自身へアクティブな隣接パーティションを通知。
@@ -827,7 +827,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (maxActiveVolume.Contains(ref eyePosition, ref partition.Position))
+                    if (maxActiveVolume.Contains(eyePosition, partition.Position))
                     {
                         // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.Enqueue(partition);
@@ -843,7 +843,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 passivations[partition.Position] = partition;
 
                 // アクティブではない状態にする。
-                clusterManager.RemovePartition(ref partition.Position);
+                clusterManager.RemovePartition(partition.Position);
 
                 // 開始を通知。
                 partition.OnPassivating();
@@ -915,7 +915,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 return false;
 
             // インスタンス生成。
-            var partition = Create(ref position);
+            var partition = Create(position);
 
             // 生成が拒否されたら終了。
             if (partition == null)

@@ -21,7 +21,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションの位置が領域に含まれる場合)、false (それ以外の場合)。
         /// </returns>
-        bool Contains(ref IntVector3 eyePosition, ref IntVector3 point);
+        bool Contains(IntVector3 eyePosition, IntVector3 point);
 
         /// <summary>
         /// 領域に含まれるパーティション位置に対して指定のメソッドを実行します。

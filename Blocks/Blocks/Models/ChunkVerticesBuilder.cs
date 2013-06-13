@@ -79,7 +79,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var side = Side.Items[i];
 
                 var neighborPosition = chunk.Position + side.Direction;
-                if (!manager.ContainsPartition(ref neighborPosition))
+                if (!manager.ContainsPartition(neighborPosition))
                 {
                     return false;
                 }
@@ -188,7 +188,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var absoluteNeighborBlockPosition = absoluteBlockPosition + side.Direction;
 
                 // 面隣接ブロックを探索。
-                var neighborBlockIndex = localWorld.GetBlockIndex(ref absoluteNeighborBlockPosition);
+                var neighborBlockIndex = localWorld.GetBlockIndex(absoluteNeighborBlockPosition);
 
                 // 未定の場合は面なしとする。
                 // 正確な描画には面なしとすべきではないが、
@@ -215,7 +215,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 if (Chunk.LightState == ChunkLightState.Complete)
                 {
-                    var skyLight = localWorld.GetSkylightLevel(ref absoluteNeighborBlockPosition);
+                    var skyLight = localWorld.GetSkylightLevel(absoluteNeighborBlockPosition);
 
                     lightIntensity *= (skyLight / 15f);
                 }
@@ -263,7 +263,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 var occluderPosition = absoluteNeighborBlockPosition + s.Direction;
 
                 // 遮蔽対象のブロックのインデックスを取得。
-                var occluderBlockIndex = localWorld.GetBlockIndex(ref occluderPosition);
+                var occluderBlockIndex = localWorld.GetBlockIndex(occluderPosition);
 
                 // 未定と空の場合は非遮蔽。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;

@@ -173,7 +173,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return region;
         }
 
-        public Region GetRegionByChunkPosition(ref IntVector3 chunkPosition)
+        public Region GetRegionByChunkPosition(IntVector3 chunkPosition)
         {
             lock (regions)
             {

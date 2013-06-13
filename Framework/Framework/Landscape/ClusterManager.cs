@@ -242,7 +242,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (パーティションが存在する場合)、false (それ以外の場合)。
         /// </returns>
-        public bool ContainsPartition(ref IntVector3 position)
+        public bool ContainsPartition(IntVector3 position)
         {
             var cluster = GetCluster(ref position);
             if (cluster == null) return false;
@@ -257,7 +257,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// パーティション、あるいは、指定の位置にパーティションが存在しない場合は null。
         /// </returns>
-        public Partition GetPartition(ref IntVector3 position)
+        public Partition GetPartition(IntVector3 position)
         {
             var cluster = GetCluster(ref position);
             if (cluster == null) return null;
@@ -295,7 +295,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// クラスタを削除してプールへ戻します。
         /// </summary>
         /// <param name="position">パーティションの位置。</param>
-        public bool RemovePartition(ref IntVector3 position)
+        public bool RemovePartition(IntVector3 position)
         {
             var cluster = GetCluster(ref position);
             if (cluster == null) return false;

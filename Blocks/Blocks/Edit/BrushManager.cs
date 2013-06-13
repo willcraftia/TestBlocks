@@ -204,7 +204,7 @@ namespace Willcraftia.Xna.Blocks.Edit
 
         internal byte? GetBlockIndex(ref IntVector3 absoluteBlockPosition)
         {
-            var chunk = WorldManager.ChunkManager.GetChunkByBlockPosition(ref absoluteBlockPosition);
+            var chunk = WorldManager.ChunkManager.GetChunkByBlockPosition(absoluteBlockPosition);
             if (chunk == null) return null;
 
             var relativePosition = chunk.GetRelativeBlockPosition(absoluteBlockPosition);

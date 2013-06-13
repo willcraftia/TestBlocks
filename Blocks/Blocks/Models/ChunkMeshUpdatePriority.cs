@@ -7,9 +7,9 @@ using System;
 namespace Willcraftia.Xna.Blocks.Models
 {
     /// <summary>
-    /// チャンク タスクの優先度を定義する列挙型です。
+    /// メッシュ更新の優先度を示す列挙型です。
     /// </summary>
-    public enum ChunkTaskPriorities
+    public enum ChunkMeshUpdatePriority
     {
         /// <summary>
         /// 通常優先度。
