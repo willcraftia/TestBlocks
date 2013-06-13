@@ -35,15 +35,11 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンク データ。
         /// </summary>
         /// <remarks>
-        /// 初めて空ブロック以外が設定される際には、
-        /// チャンク マネージャでプーリングされているデータを借り、
-        /// このフィールドへ設定します。
-        /// 一方、全てが空ブロックになる際には、
-        /// このフィールドに設定されていたデータをチャンク マネージャへ返却し、
-        /// このフィールドには null を設定します。
-        /// 
-        /// この仕組により、空 (そら) を表すチャンクではメモリが節約され、
-        /// また、null の場合にメッシュ更新を要求しないことで、無駄なメッシュ更新を回避できます。
+        /// 初めて空ブロック以外が設定される際にインスタンスが生成されます。
+        /// また、非空状態から空状態となった場合、フィールドを null に設定し、
+        /// チャンク データは GC 対象となります。
+        /// この仕組は、状況によっては大部分を占め得る、
+        /// 空 (そら) を表すチャンクに対する大幅なメモリ節減を目的としています。
         /// </remarks>
         ChunkData data;
 
@@ -264,6 +260,14 @@ namespace Willcraftia.Xna.Blocks.Models
             if (data.GetBlockIndex(x, y, z) == blockIndex) return;
 
             data.SetBlockIndex(x, y, z, blockIndex);
+
+            if (data.SolidCount == 0)
+            {
+                // 空になったならば GC へ。
+                // なお、頻繁に非空と空の状態を繰り返すことが稀であることを前提とし、
+                // これによる GC 負荷は少ないと判断する。
+                data = null;
+            }
         }
 
         public void SetBlockIndex(ref IntVector3 position, byte blockIndex)
@@ -298,13 +302,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void FillSkylightLevels(byte level)
         {
-            // 空チャンクの場合は消去不能。
             if (data != null) data.FillSkylightLevels(level);
         }
 
         public void ClearSkylightLevels()
         {
-            // 空チャンクの場合は消去不能。
             if (data != null) data.ClearSkylightLevels();
         }
 
@@ -403,10 +405,6 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(region != null);
 
             var d = new ChunkData(manager);
-
-            // TODO
-            // バイナリ データの先頭にブロック数を記録し、
-            // 先にこれを読み込んで判定できるようにする。
 
             if (manager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, d))
             {
