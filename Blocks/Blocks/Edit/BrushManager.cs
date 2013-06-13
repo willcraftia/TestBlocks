@@ -207,10 +207,9 @@ namespace Willcraftia.Xna.Blocks.Edit
             var chunk = WorldManager.ChunkManager.GetChunkByBlockPosition(ref absoluteBlockPosition);
             if (chunk == null) return null;
 
-            IntVector3 relativePosition;
-            chunk.GetRelativeBlockPosition(ref absoluteBlockPosition, out relativePosition);
+            var relativePosition = chunk.GetRelativeBlockPosition(absoluteBlockPosition);
 
-            return chunk.GetBlockIndex(ref relativePosition);
+            return chunk.GetBlockIndex(relativePosition);
         }
     }
 }

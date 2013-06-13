@@ -164,10 +164,9 @@ namespace Willcraftia.Xna.Blocks.Models
             };
 
             // ワールド内絶対ブロック位置。
-            IntVector3 absoluteBlockPosition;
-            Chunk.GetAbsoluteBlockPosition(ref relativeBlockPosition, out absoluteBlockPosition);
+            var absoluteBlockPosition = Chunk.GetAbsoluteBlockPosition(relativeBlockPosition);
 
-            var blockIndex = Chunk.GetBlockIndex(ref relativeBlockPosition);
+            var blockIndex = Chunk.GetBlockIndex(relativeBlockPosition);
 
             // 空ならば頂点は存在しない。
             if (Block.EmptyIndex == blockIndex) return;

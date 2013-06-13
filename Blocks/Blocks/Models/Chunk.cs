@@ -214,7 +214,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 0 <= z && z < manager.ChunkSize.Z;
         }
 
-        public bool Contains(ref IntVector3 position)
+        public bool Contains(IntVector3 position)
         {
             return Contains(position.X, position.Y, position.Z);
         }
@@ -227,7 +227,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return region.BlockCatalog[blockIndex];
         }
 
-        public Block GetBlock(ref IntVector3 position)
+        public Block GetBlock(IntVector3 position)
         {
             return GetBlock(position.X, position.Y, position.Z);
         }
@@ -239,7 +239,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return data.GetBlockIndex(x, y, z);
         }
 
-        public byte GetBlockIndex(ref IntVector3 position)
+        public byte GetBlockIndex(IntVector3 position)
         {
             return GetBlockIndex(position.X, position.Y, position.Z);
         }
@@ -270,7 +270,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public void SetBlockIndex(ref IntVector3 position, byte blockIndex)
+        public void SetBlockIndex(IntVector3 position, byte blockIndex)
         {
             SetBlockIndex(position.X, position.Y, position.Z, blockIndex);
         }
@@ -282,7 +282,7 @@ namespace Willcraftia.Xna.Blocks.Models
             return data.GetSkylightLevel(x, y, z);
         }
 
-        public byte GetSkylightLevel(ref IntVector3 position)
+        public byte GetSkylightLevel(IntVector3 position)
         {
             return GetSkylightLevel(position.X, position.Y, position.Z);
         }
@@ -295,7 +295,7 @@ namespace Willcraftia.Xna.Blocks.Models
             data.SetSkylightLevel(x, y, z, value);
         }
 
-        public void SetSkylightLevel(ref IntVector3 position, byte value)
+        public void SetSkylightLevel(IntVector3 position, byte value)
         {
             SetSkylightLevel(position.X, position.Y, position.Z, value);
         }
@@ -325,9 +325,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return absoluteBlockPositionZ - (Position.Z * manager.ChunkSize.Z);
         }
 
-        public void GetRelativeBlockPosition(ref IntVector3 absoluteBlockPosition, out IntVector3 result)
+        public IntVector3 GetRelativeBlockPosition(IntVector3 absoluteBlockPosition)
         {
-            result = new IntVector3
+            return new IntVector3
             {
                 X = GetRelativeBlockPositionX(absoluteBlockPosition.X),
                 Y = GetRelativeBlockPositionY(absoluteBlockPosition.Y),
@@ -350,9 +350,9 @@ namespace Willcraftia.Xna.Blocks.Models
             return Position.Z * manager.ChunkSize.Z + relativeBlockPositionZ;
         }
 
-        public void GetAbsoluteBlockPosition(ref IntVector3 relativeBlockPosition, out IntVector3 result)
+        public IntVector3 GetAbsoluteBlockPosition(IntVector3 relativeBlockPosition)
         {
-            result = new IntVector3
+            return new IntVector3
             {
                 X = GetAbsoluteBlockPositionX(relativeBlockPosition.X),
                 Y = GetAbsoluteBlockPositionY(relativeBlockPosition.Y),

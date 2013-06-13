@@ -24,10 +24,9 @@ namespace Willcraftia.Xna.Blocks.Edit
             var chunk = chunkManager.GetChunkByBlockPosition(ref brush.Position);
             if (chunk == null) return false;
 
-            IntVector3 relativeBlockPosition;
-            chunk.GetRelativeBlockPosition(ref brush.Position, out relativeBlockPosition);
+            var relativeBlockPosition = chunk.GetRelativeBlockPosition(brush.Position);
 
-            var blockIndex = chunk.GetBlockIndex(ref relativeBlockPosition);
+            var blockIndex = chunk.GetBlockIndex(relativeBlockPosition);
             if (blockIndex == Block.EmptyIndex) return false;
 
             lastSelectedBlockIndex = BrushManager.SelectedBlockIndex;

@@ -36,15 +36,14 @@ namespace Willcraftia.Xna.Blocks.Edit
             var chunk = chunkManager.GetChunkByBlockPosition(ref BlockPosition);
             if (chunk == null) throw new InvalidOperationException("Chunk not found: BlockPosition=" + BlockPosition);
 
-            IntVector3 relativePosition;
-            chunk.GetRelativeBlockPosition(ref BlockPosition, out relativePosition);
+            var relativePosition = chunk.GetRelativeBlockPosition(BlockPosition);
 
-            lastBlockIndex = chunk.GetBlockIndex(ref relativePosition);
+            lastBlockIndex = chunk.GetBlockIndex(relativePosition);
 
             // 既存ブロックと同じならば処理せず、Undo 履歴にも残さない。
             if (blockIndex == lastBlockIndex) return;
 
-            chunk.SetBlockIndex(ref relativePosition, blockIndex);
+            chunk.SetBlockIndex(relativePosition, blockIndex);
 
             var lightUpdater = chunkManager.BorrowLightUpdater();
 

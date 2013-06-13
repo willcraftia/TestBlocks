@@ -98,10 +98,9 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return null;
 
-            IntVector3 relativeBlockPosition;
-            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+            var relativeBlockPosition = chunk.GetRelativeBlockPosition(blockPosition);
 
-            return chunk.GetBlockIndex(ref relativeBlockPosition);
+            return chunk.GetBlockIndex(relativeBlockPosition);
         }
 
         public Block GetBlock(ref IntVector3 blockPosition)
@@ -112,10 +111,9 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return null;
 
-            IntVector3 relativeBlockPosition;
-            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+            var relativeBlockPosition = chunk.GetRelativeBlockPosition(blockPosition);
 
-            var blockIndex = chunk.GetBlockIndex(ref relativeBlockPosition);
+            var blockIndex = chunk.GetBlockIndex(relativeBlockPosition);
             if (blockIndex == Block.EmptyIndex) return null;
 
             return chunk.Region.BlockCatalog[blockIndex];
@@ -129,10 +127,9 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return Chunk.MaxSkylightLevel;
 
-            IntVector3 relativeBlockPosition;
-            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+            var relativeBlockPosition = chunk.GetRelativeBlockPosition(blockPosition);
 
-            return chunk.GetSkylightLevel(ref relativeBlockPosition);
+            return chunk.GetSkylightLevel(relativeBlockPosition);
         }
 
         public void SetSkylightLevel(ref IntVector3 blockPosition, byte value)
@@ -143,10 +140,9 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = GetChunk(ref chunkPosition);
             if (chunk == null) return;
 
-            IntVector3 relativeBlockPosition;
-            chunk.GetRelativeBlockPosition(ref blockPosition, out relativeBlockPosition);
+            var relativeBlockPosition = chunk.GetRelativeBlockPosition(blockPosition);
 
-            chunk.SetSkylightLevel(ref relativeBlockPosition, value);
+            chunk.SetSkylightLevel(relativeBlockPosition, value);
         }
 
         /// <summary>

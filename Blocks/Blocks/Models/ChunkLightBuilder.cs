@@ -109,7 +109,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static bool CanPenetrateLight(Chunk chunk, ref IntVector3 blockPosition)
         {
-            var block = chunk.GetBlock(ref blockPosition);
+            var block = chunk.GetBlock(blockPosition);
             return CanPenetrateLight(block);
         }
 
@@ -168,16 +168,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
         static void PropagateLights(Chunk chunk, ref IntVector3 blockPosition, Chunk neighborChunk, ref IntVector3 neighborBlockPosition)
         {
-            var level = neighborChunk.GetSkylightLevel(ref neighborBlockPosition);
+            var level = neighborChunk.GetSkylightLevel(neighborBlockPosition);
             if (level <= 1) return;
 
             var diffuseLevel = (byte) (level - 1);
-            if (diffuseLevel <= chunk.GetSkylightLevel(ref blockPosition)) return;
+            if (diffuseLevel <= chunk.GetSkylightLevel(blockPosition)) return;
 
             if (!CanPenetrateLight(neighborChunk, ref neighborBlockPosition)) return;
             if (!CanPenetrateLight(chunk, ref blockPosition)) return;
 
-            chunk.SetSkylightLevel(ref blockPosition, diffuseLevel);
+            chunk.SetSkylightLevel(blockPosition, diffuseLevel);
             DiffuseSkylight(chunk, ref blockPosition);
         }
 
@@ -193,7 +193,7 @@ namespace Willcraftia.Xna.Blocks.Models
         static void DiffuseSkylight(Chunk chunk, ref IntVector3 blockPosition)
         {
             // 1 以下はこれ以上拡散できない。
-            var level = chunk.GetSkylightLevel(ref blockPosition);
+            var level = chunk.GetSkylightLevel(blockPosition);
             if (level <= 1) return;
 
             if (!CanPenetrateLight(chunk, ref blockPosition)) return;
@@ -205,15 +205,15 @@ namespace Willcraftia.Xna.Blocks.Models
                 var neighborBlockPosition = blockPosition + side.Direction;
 
                 // チャンク外はスキップ。
-                if (!chunk.Contains(ref neighborBlockPosition)) continue;
+                if (!chunk.Contains(neighborBlockPosition)) continue;
 
                 // 光レベルの高い位置へは拡散しない。
                 var diffuseLevel = (byte) (level - 1);
-                if (diffuseLevel <= chunk.GetSkylightLevel(ref neighborBlockPosition)) continue;
+                if (diffuseLevel <= chunk.GetSkylightLevel(neighborBlockPosition)) continue;
 
                 if (!CanPenetrateLight(chunk, ref neighborBlockPosition)) continue;
 
-                chunk.SetSkylightLevel(ref neighborBlockPosition, diffuseLevel);
+                chunk.SetSkylightLevel(neighborBlockPosition, diffuseLevel);
                 DiffuseSkylight(chunk, ref neighborBlockPosition);
             }
         }

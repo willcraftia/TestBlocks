@@ -108,8 +108,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            var position = new IntVector3(x, y, z);
-            chunk.SetBlockIndex(ref position, index);
+            chunk.SetBlockIndex(x, y, z, index);
         }
 
         #region ToString
