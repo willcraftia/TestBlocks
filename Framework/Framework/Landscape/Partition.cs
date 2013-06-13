@@ -38,107 +38,25 @@ namespace Willcraftia.Xna.Framework.Landscape
         volatile bool passivationCompleted;
 
         /// <summary>
-        /// 非アクティブ化開始状態であるか否かを示す値。
-        /// </summary>
-        /// <value>
-        /// true (非アクティブ化開始状態である場合)、false (それ以外の場合)。
-        /// </value>
-        volatile bool passivating;
-
-        /// <summary>
-        /// 更新開始状態であるか否かを示す値。
-        /// </summary>
-        /// <value>
-        /// true (更新開始状態である場合)、false (それ以外の場合)。
-        /// </value>
-        volatile bool updating;
-
-        /// <summary>
         /// 非同期な Activate() あるいは Passivate() の呼び出しが終わるまで、
         /// Dispose() の実行を待機するためのシグナルを管理します。
         /// </summary>
         ManualResetEvent asyncCallEvent = new ManualResetEvent(true);
 
         /// <summary>
-        /// 非アクティブ化開始状態であるか否かを示す値を取得します。
+        /// パーティションがアクティブであるか否かを示す値を取得します。
+        /// パーティションのアクティブ化が完了してから非アクティブ化が開始するまでの間、
+        /// このプロパティは true を返します。
         /// </summary>
         /// <value>
-        /// true (非アクティブ化開始状態である場合)、false (それ以外の場合)。
+        /// true (パーティションがアクティブである場合)、false (それ以外の場合)。
         /// </value>
-        public bool Passivating
-        {
-            get { return passivating; }
-        }
-
-        /// <summary>
-        /// 更新開始状態であるか否かを示す値を取得します。
-        /// </summary>
-        /// <value>
-        /// true (更新開始状態である場合)、false (それ以外の場合)。
-        /// </value>
-        public bool Updating
-        {
-            get { return updating; }
-        }
+        public bool Active { get; private set; }
 
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         protected Partition() { }
-
-        /// <summary>
-        /// 非アクティブ化開始状態にします。
-        /// 更新開始状態の場合、非アクティブ化を開始できません。
-        /// </summary>
-        /// <returns>
-        /// true (非アクティブ化を開始できない場合)、false (それ以外の場合)。
-        /// </returns>
-        public virtual bool BeginPassivation()
-        {
-            if (updating)
-                return false;
-
-            passivating = true;
-            return true;
-        }
-
-        /// <summary>
-        /// 非アクティブ化開始状態を解除します。
-        /// </summary>
-        public virtual void EndPassivation()
-        {
-            if (!passivating)
-                throw new InvalidOperationException("BeginPassivation() must be called before EndPassivation().");
-
-            passivating = false;
-        }
-
-        /// <summary>
-        /// 更新開始状態にします。
-        /// 非アクティブ化開始状態の場合、更新を開始できません。
-        /// </summary>
-        /// <returns>
-        /// true (更新を開始できない場合)、false (それ以外の場合)。
-        /// </returns>
-        public virtual bool BeginUpdate()
-        {
-            if (passivating)
-                return false;
-
-            updating = true;
-            return true;
-        }
-
-        /// <summary>
-        /// 更新開始状態を解除します。
-        /// </summary>
-        public virtual void EndUpdate()
-        {
-            if (!updating)
-                throw new InvalidOperationException("BeginUpdate() must be called before EndUpdate().");
-
-            updating = false;
-        }
 
         /// <summary>
         /// パーティションのアクティブ化を試行します。
@@ -147,7 +65,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal void ActivateAsync()
         {
             Debug.Assert(!activationCompleted);
-            Debug.Assert(!Passivating);
 
             asyncCallEvent.Reset();
 
@@ -165,7 +82,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Debug.Assert(activationCompleted);
             Debug.Assert(!passivationCompleted);
-            Debug.Assert(Passivating);
 
             asyncCallEvent.Reset();
 
@@ -197,12 +113,18 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// アクティブ化の完了直後で呼び出されます。
         /// </summary>
-        protected internal virtual void OnActivated() { }
+        protected internal virtual void OnActivated()
+        {
+            Active = true;
+        }
 
         /// <summary>
         /// 非アクティブ化の開始直前で呼び出されます。
         /// </summary>
-        protected internal virtual void OnPassivating() { }
+        protected internal virtual void OnPassivating()
+        {
+            Active = false;
+        }
 
         /// <summary>
         /// 非アクティブ化の完了直後で呼び出されます。

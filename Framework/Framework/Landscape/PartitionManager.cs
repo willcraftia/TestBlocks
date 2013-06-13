@@ -711,9 +711,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // サブクラスへも通知。
                 OnPassivated(partition);
 
-                // 非アクティブ化の完了。
-                partition.EndPassivation();
-
                 // 解放。
                 Release(partition);
             }
@@ -835,10 +832,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                     }
                 }
 
-                // 非アクティブ化を開始できる状態ではないならば断念。
-                if (!partition.BeginPassivation())
-                    continue;
-
                 // 非アクティブ化中としてマーク。
                 passivations[partition.Position] = partition;
 
@@ -846,6 +839,11 @@ namespace Willcraftia.Xna.Framework.Landscape
                 clusterManager.RemovePartition(partition.Position);
 
                 // 開始を通知。
+                //
+                // 注意！
+                // このメソッドのスレッドと同じであることを前提に、
+                // パーティションのアクティブ状態を監視するクラスもあるため、
+                // 処理を変更する場合には注意すること。
                 partition.OnPassivating();
 
                 // サブクラスへも通知。

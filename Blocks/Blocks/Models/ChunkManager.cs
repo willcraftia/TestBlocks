@@ -670,15 +670,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                // チャンクが更新できる状態であるか否か。
-                if (!chunk.BeginUpdate())
-                {
-                    // チャンクを更新できる状態にないならば待機キューへ戻す。
-                    requestQueue.Enqueue(position);
-                    verticesBuilderPool.Return(verticesBuilder);
-                    continue;
-                }
-
                 // メッシュ更新中としてマーク。
                 updatingChunks[chunk.Position] = chunk;
 
@@ -722,13 +713,19 @@ namespace Willcraftia.Xna.Blocks.Models
                     updatingChunks.Remove(chunk.Position);
 
                     // クローズ中は頂点バッファ反映をスキップ。
-                    if (!Closing) UpdateMeshBuffer(chunk);
+                    if (!Closing)
+                    {
+                        // チャンクがアクティブならばバッファ更新を試行。
+                        // チャンク (パーティション) の非アクティブ化の開始は、
+                        // このメソッドと同じスレッドで処理されるため、
+                        // このタイミングで Active が true ならば、
+                        // チャンクはアクティブである。
+                        if (chunk.Active)
+                            UpdateMeshBuffer(chunk);
+                    }
 
                     // 頂点ビルダを解放。
                     ReleaseVerticesBuilder(chunk.VerticesBuilder);
-
-                    // チャンク更新完了。
-                    chunk.EndUpdate();
                 }
             }
 
