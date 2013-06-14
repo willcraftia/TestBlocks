@@ -371,35 +371,34 @@ namespace Willcraftia.Xna.Blocks.Models
             };
         }
 
-        public ChunkMesh GetOpaqueMesh(int segmentX, int segmentY, int segmentZ)
+        public ChunkMesh GetMesh(int segmentX, int segmentY, int segmentZ, bool translucence)
         {
-            return opaqueMeshes[segmentX, segmentY, segmentZ];
+            if (translucence)
+            {
+                return translucentMeshes[segmentX, segmentY, segmentZ];
+            }
+            else
+            {
+                return opaqueMeshes[segmentX, segmentY, segmentZ];
+            }
         }
 
-        public ChunkMesh GetTranslucentMesh(int segmentX, int segmentY, int segmentZ)
+        public void SetMesh(int segmentX, int segmentY, int segmentZ, bool translucence, ChunkMesh mesh)
         {
-            return translucentMeshes[segmentX, segmentY, segmentZ];
-        }
+            ChunkMesh oldMesh;
+            if (translucence)
+            {
+                oldMesh = translucentMeshes[segmentX, segmentY, segmentZ];
+                translucentMeshes[segmentX, segmentY, segmentZ] = mesh;
+            }
+            else
+            {
+                oldMesh = opaqueMeshes[segmentX, segmentY, segmentZ];
+                opaqueMeshes[segmentX, segmentY, segmentZ] = mesh;
+            }
 
-        public void SetOpaqueMesh(int segmentX, int segmentY, int segmentZ, ChunkMesh mesh)
-        {
-            var oldMesh = opaqueMeshes[segmentX, segmentY, segmentZ];
             if (oldMesh != null)
                 DetachMesh(oldMesh);
-
-            opaqueMeshes[segmentX, segmentY, segmentZ] = mesh;
-
-            if (mesh != null)
-                AttachMesh(mesh);
-        }
-
-        public void SetTranslucentMesh(int segmentX, int segmentY, int segmentZ, ChunkMesh mesh)
-        {
-            var oldMesh = translucentMeshes[segmentX, segmentY, segmentZ];
-            if (oldMesh != null)
-                DetachMesh(oldMesh);
-
-            translucentMeshes[segmentX, segmentY, segmentZ] = mesh;
 
             if (mesh != null)
                 AttachMesh(mesh);

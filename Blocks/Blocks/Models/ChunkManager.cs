@@ -127,13 +127,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
         #endregion
 
+        struct ChunkMeshBufferRequest
+        {
+            public Chunk Chunk;
+
+            public IntVector3 Segment;
+
+            public bool Translucece;
+        }
+
         public const string MonitorProcessUpdateMeshRequests = "ChunkManager.ProcessUpdateMeshRequests";
 
         public const string MonitorProcessChunkTaskRequests = "ChunkManager.ProcessChunkTaskRequests";
 
         public const string MonitorUpdateMeshes = "ChunkManager.UpdateMeshes";
-
-        public const int MinFrameCountPerUpdateMeshBuffer = 1;
 
         /// <summary>
         /// メッシュ サイズ。
@@ -212,12 +219,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         Dictionary<IntVector3, Chunk> updatingChunks;
 
-        ConcurrentQueue<Chunk> finishedUpdateMeshTasks = new ConcurrentQueue<Chunk>();
-
-        int frameCountPerUpdateMeshBuffer = MinFrameCountPerUpdateMeshBuffer;
-
-        int frameCountBeforeLastUpdateMeshBuffer;
-
         /// <summary>
         /// 頂点ビルダのプール。
         /// </summary>
@@ -237,6 +238,10 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 高優先度のチャンク タスク要求のキュー。
         /// </summary>
         ConcurrentQueue<ChunkTaskRequest> highTaskRequestQueue = new ConcurrentQueue<ChunkTaskRequest>();
+
+        ConcurrentQueue<ChunkMeshBufferRequest> chunkMeshBufferRequests = new ConcurrentQueue<ChunkMeshBufferRequest>();
+
+        int updateMeshBufferPerFrame = 2;
 
         /// <summary>
         /// シーン マネージャ。
@@ -298,17 +303,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public int MaxIndexCount { get; private set; }
 
         public IChunkStore ChunkStore { get; private set; }
-
-        public int FrameCountPerUpdateMeshBuffer
-        {
-            get { return frameCountPerUpdateMeshBuffer; }
-            set
-            {
-                if (value < MinFrameCountPerUpdateMeshBuffer) throw new ArgumentOutOfRangeException("value");
-
-                frameCountPerUpdateMeshBuffer = value;
-            }
-        }
 
         /// <summary>
         /// 空データを取得します。
@@ -646,6 +640,10 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
+                // TODO
+                // 同一チャンクでもメッシュ更新は独立しているため、
+                // 更新中であっても更新処理を実行しても良いのでは？
+
                 // チャンクがメッシュ更新中ならば待機キューへ戻す。
                 if (updatingChunks.ContainsKey(chunk.Position))
                 {
@@ -680,7 +678,32 @@ namespace Willcraftia.Xna.Blocks.Models
 
         internal void OnUpdateMeshFinished(Chunk chunk)
         {
-            finishedUpdateMeshTasks.Enqueue(chunk);
+            for (int z = 0; z < MeshSegments.Z; z++)
+            {
+                for (int y = 0; y < MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < MeshSegments.X; x++)
+                    {
+                        var opaqueRequest = new ChunkMeshBufferRequest
+                        {
+                            Chunk = chunk,
+                            Segment = new IntVector3(x, y, z),
+                            Translucece = false
+                        };
+                        chunkMeshBufferRequests.Enqueue(opaqueRequest);
+
+                        var translucentRequest = new ChunkMeshBufferRequest
+                        {
+                            Chunk = chunk,
+                            Segment = new IntVector3(x, y, z),
+                            Translucece = true
+                        };
+                        chunkMeshBufferRequests.Enqueue(translucentRequest);
+                    }
+                }
+            }
+
+            updatingChunks.Remove(chunk.Position);
         }
 
         /// <summary>
@@ -700,60 +723,49 @@ namespace Willcraftia.Xna.Blocks.Models
             // 原因は、複数スレッドによるロックの奪い合いか、
             // 巨大な頂点バッファの連続作成か？
 
-            frameCountBeforeLastUpdateMeshBuffer++;
+            int updateCount = 0;
 
-            if (frameCountPerUpdateMeshBuffer <= frameCountBeforeLastUpdateMeshBuffer)
+            ChunkMeshBufferRequest request;
+            while (chunkMeshBufferRequests.TryDequeue(out request))
             {
-                frameCountBeforeLastUpdateMeshBuffer = 0;
+                var chunk = request.Chunk;
 
-                Chunk chunk;
-                if (finishedUpdateMeshTasks.TryDequeue(out chunk))
+                // チャンクの非アクティブ化は、このメソッドと同じスレッドで処理される。
+                // このため、Active プロパティが示す値は、このメソッドで保証される。
+                if (!chunk.Active)
+                    continue;
+
+                var segment = request.Segment;
+                var translucence = request.Translucece;
+
+                // クローズ中は頂点バッファ反映をスキップ。
+                if (!Closing)
                 {
-                    // 更新中マークを解除。
-                    updatingChunks.Remove(chunk.Position);
-
-                    // クローズ中は頂点バッファ反映をスキップ。
-                    if (!Closing)
+                    if (UpdateMeshSegmentBuffer(chunk, segment.X, segment.Y, segment.Z, translucence))
                     {
-                        // チャンクがアクティブならばバッファ更新を試行。
-                        // チャンク (パーティション) の非アクティブ化の開始は、
-                        // このメソッドと同じスレッドで処理されるため、
-                        // このタイミングで Active が true ならば、
-                        // チャンクはアクティブである。
-                        if (chunk.Active)
-                            UpdateMeshBuffer(chunk);
-                    }
+                        // バッファに変更があったならばチャンクのノードを更新。
+                        chunk.Node.Update(false);
 
-                    // 頂点ビルダを解放。
-                    ReleaseVerticesBuilder(chunk.VerticesBuilder);
+                        updateCount++;
+                    }
                 }
+
+                // バッファを反映済みとしてマーク。
+                var vertices = chunk.VerticesBuilder.GetVertices(segment.X, segment.Y, segment.Z, translucence);
+                vertices.Consumed = true;
+
+                // 全てのバッファへ反映したならば頂点ビルダを解放。
+                if (chunk.VerticesBuilder.ConsumedAll())
+                    ReleaseVerticesBuilder(chunk.VerticesBuilder);
+
+                if (updateMeshBufferPerFrame <= updateCount)
+                    break;
             }
 
             Monitor.End(MonitorUpdateMeshes);
         }
 
-        /// <summary>
-        /// チャンクに関連付けられた頂点ビルダの結果で頂点バッファを更新します。
-        /// </summary>
-        /// <param name="chunk">チャンク。</param>
-        void UpdateMeshBuffer(Chunk chunk)
-        {
-            for (int z = 0; z < MeshSegments.Z; z++)
-            {
-                for (int y = 0; y < MeshSegments.Y; y++)
-                {
-                    for (int x = 0; x < MeshSegments.X; x++)
-                    {
-                        UpdateMeshSegmentBuffer(chunk, x, y, z);
-                    }
-                }
-            }
-
-            // チャンクのノードを更新。
-            chunk.Node.Update(false);
-        }
-
-        void UpdateMeshSegmentBuffer(Chunk chunk, int segmentX, int segmentY, int segmentZ)
+        bool UpdateMeshSegmentBuffer(Chunk chunk, int segmentX, int segmentY, int segmentZ, bool translucence)
         {
             var builder = chunk.VerticesBuilder;
 
@@ -773,24 +785,29 @@ namespace Willcraftia.Xna.Blocks.Models
             // メッシュに設定するエフェクト。
             var effect = chunk.Region.ChunkEffect;
 
-            var opaque = builder.GetOpaque(segmentX, segmentY, segmentZ);
-            var translucence = builder.GetTranslucence(segmentX, segmentY, segmentZ);
+            var vertices = builder.GetVertices(segmentX, segmentY, segmentZ, translucence);
 
-            //----------------------------------------------------------------
-            // 不透明メッシュ
-
-            if (opaque.VertexCount == 0 || opaque.IndexCount == 0)
+            bool updated;
+            if (vertices.VertexCount == 0 || vertices.IndexCount == 0)
             {
-                if (chunk.GetOpaqueMesh(segmentX, segmentY, segmentZ) != null)
-                    chunk.SetOpaqueMesh(segmentX, segmentY, segmentZ, null);
+                if (chunk.GetMesh(segmentX, segmentY, segmentZ, translucence) != null)
+                {
+                    chunk.SetMesh(segmentX, segmentY, segmentZ, translucence, null);
+                    updated = true;
+                }
+                else
+                {
+                    // 更新不要。
+                    updated = false;
+                }
             }
             else
             {
-                var mesh = chunk.GetOpaqueMesh(segmentX, segmentY, segmentZ);
+                var mesh = chunk.GetMesh(segmentX, segmentY, segmentZ, translucence);
                 if (mesh == null)
                 {
                     mesh = CreateMesh(effect, false, segmentX, segmentY, segmentZ);
-                    chunk.SetOpaqueMesh(segmentX, segmentY, segmentZ, mesh);
+                    chunk.SetMesh(segmentX, segmentY, segmentZ, translucence, mesh);
                 }
                 else
                 {
@@ -800,45 +817,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 mesh.PositionWorld = position;
                 mesh.World = world;
-                opaque.Populate(mesh);
+                vertices.Populate(mesh);
 
                 TotalVertexCount += mesh.VertexCount;
                 TotalIndexCount += mesh.IndexCount;
                 MaxVertexCount = Math.Max(MaxVertexCount, mesh.VertexCount);
                 MaxIndexCount = Math.Max(MaxIndexCount, mesh.IndexCount);
+
+                updated = true;
             }
 
-            //----------------------------------------------------------------
-            // 半透明メッシュ
-
-            if (translucence.VertexCount == 0 || translucence.IndexCount == 0)
-            {
-                if (chunk.GetTranslucentMesh(segmentX, segmentY, segmentZ) != null)
-                    chunk.SetTranslucentMesh(segmentX, segmentY, segmentZ, null);
-            }
-            else
-            {
-                var mesh = chunk.GetTranslucentMesh(segmentX, segmentY, segmentZ);
-                if (mesh == null)
-                {
-                    mesh = CreateMesh(effect, true, segmentX, segmentY, segmentZ);
-                    chunk.SetTranslucentMesh(segmentX, segmentY, segmentZ, mesh);
-                }
-                else
-                {
-                    TotalVertexCount -= mesh.VertexCount;
-                    TotalIndexCount -= mesh.IndexCount;
-                }
-
-                mesh.PositionWorld = position;
-                mesh.World = world;
-                translucence.Populate(mesh);
-
-                TotalVertexCount += mesh.VertexCount;
-                TotalIndexCount += mesh.IndexCount;
-                MaxVertexCount = Math.Max(MaxVertexCount, mesh.VertexCount);
-                MaxIndexCount = Math.Max(MaxIndexCount, mesh.IndexCount);
-            }
+            return updated;
         }
 
         /// <summary>

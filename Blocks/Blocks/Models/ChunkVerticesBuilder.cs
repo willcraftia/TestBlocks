@@ -62,14 +62,16 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        public ChunkVertices GetOpaque(int segmentX, int segmentY, int segmentZ)
+        public ChunkVertices GetVertices(int segmentX, int segmentY, int segmentZ, bool translucence)
         {
-            return opaques[segmentX, segmentY, segmentZ];
-        }
-
-        public ChunkVertices GetTranslucence(int segmentX, int segmentY, int segmentZ)
-        {
-            return translucences[segmentX, segmentY, segmentZ];
+            if (translucence)
+            {
+                return translucences[segmentX, segmentY, segmentZ];
+            }
+            else
+            {
+                return opaques[segmentX, segmentY, segmentZ];
+            }
         }
 
         public bool Initialize(Chunk chunk)
@@ -90,6 +92,23 @@ namespace Willcraftia.Xna.Blocks.Models
 
             // 完了フラグを初期化。
             Completed = false;
+
+            return true;
+        }
+
+        public bool ConsumedAll()
+        {
+            for (int z = 0; z < manager.MeshSegments.Z; z++)
+            {
+                for (int y = 0; y < manager.MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < manager.MeshSegments.X; x++)
+                    {
+                        if (!opaques[x, y, z].Consumed || !translucences[x, y, z].Consumed)
+                            return false;
+                    }
+                }
+            }
 
             return true;
         }

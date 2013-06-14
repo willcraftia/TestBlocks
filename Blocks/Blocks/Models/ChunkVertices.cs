@@ -56,6 +56,14 @@ namespace Willcraftia.Xna.Blocks.Models
         public int IndexCount { get; private set; }
 
         /// <summary>
+        /// バッファへ反映したか否かを示す値を取得します。
+        /// </summary>
+        /// <value>
+        /// true (バッファへ反映した場合)、false (それ以外の場合)。
+        /// </value>
+        public bool Consumed { get; set; }
+
+        /// <summary>
         /// インスタンスを生成します。
         /// </summary>
         public ChunkVertices()
@@ -122,6 +130,7 @@ namespace Willcraftia.Xna.Blocks.Models
             VertexCount = 0;
             IndexCount = 0;
             box = BoundingBoxHelper.Empty;
+            Consumed = false;
         }
     }
 }
