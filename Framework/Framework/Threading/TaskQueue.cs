@@ -10,33 +10,67 @@ namespace Willcraftia.Xna.Framework.Threading
 {
     public sealed class TaskQueue
     {
-        #region Slot
+        #region Task
 
-        class Slot
+        struct Task
         {
-            public Action Task { get; set; }
+            public Action TaskWithoutState;
+
+            public Action<object> TaskWithState;
+
+            public object State;
+
+            public void Execute()
+            {
+                if (TaskWithoutState != null)
+                {
+                    TaskWithoutState();
+                }
+                else
+                {
+                    TaskWithState(State);
+                }
+            }
+
+            public void Clear()
+            {
+                TaskWithoutState = null;
+                TaskWithState = null;
+                State = null;
+            }
         }
 
         #endregion
 
-        public const int DefaultSlotCount = 4;
+        #region Slot
 
-        int slotCount = DefaultSlotCount;
+        class Slot
+        {
+            public Task Task;
+        }
 
-        Queue<Action> queue = new Queue<Action>();
+        #endregion
+
+        public const int DefaultConcurrencyLevel = 10;
+
+        int concurrencyLevel = DefaultConcurrencyLevel;
+
+        Queue<Task> queue = new Queue<Task>();
 
         Stack<Slot> freeSlots = new Stack<Slot>();
 
-        List<Slot> activeSlots = new List<Slot>();
+        Dictionary<Slot, Slot> activeSlots = new Dictionary<Slot, Slot>();
 
-        public int SlotCount
+        WaitCallback waitCallbackDelegate;
+
+        public int ConcurrencyLevel
         {
-            get { return slotCount; }
+            get { return concurrencyLevel; }
             set
             {
                 if (value < 1) throw new ArgumentOutOfRangeException("value");
 
-                slotCount = value;
+                concurrencyLevel = value;
             }
         }
 
@@ -55,51 +89,73 @@ namespace Willcraftia.Xna.Framework.Threading
             get { lock (activeSlots) return activeSlots.Count; }
         }
 
+        public TaskQueue(int concurrencyLevel = DefaultConcurrencyLevel)
+        {
+            this.concurrencyLevel = concurrencyLevel;
+            waitCallbackDelegate = WaitCallback;
+        }
+
         public void Enqueue(Action action)
         {
-            queue.Enqueue(action);
+            var task = new Task
+            {
+                TaskWithoutState = action
+            };
+
+            queue.Enqueue(task);
+        }
+
+        public void Enqueue(Action<object> action, object state)
+        {
+            var task = new Task
+            {
+                TaskWithState = action,
+                State = state
+            };
+
+            queue.Enqueue(task);
         }
 
         public void Update()
         {
-            //
-            // Process one partition per frame.
-            //
-
-            // Pre-check
+            // キューが空ならば即座に終了。
             if (queue.Count == 0) return;
 
-            Slot slot;
-            lock (freeSlots)
+            // スロット数の調整。
+            AdjustSlots();
+
+            while (0 < queue.Count)
             {
-                lock (activeSlots)
+                Slot slot;
+                lock (freeSlots)
                 {
-                    while (slotCount < freeSlots.Count + activeSlots.Count && 0 < freeSlots.Count)
-                        freeSlots.Pop();
-
-                    if (slotCount < freeSlots.Count + activeSlots.Count)
-                        return;
-
-                    // Get a free slot.
-                    if (0 < freeSlots.Count)
+                    lock (activeSlots)
                     {
-                        slot = freeSlots.Pop();
-                    }
-                    else
-                    {
-                        slot = new Slot();
-                    }
+                        // 空きスロットが無いならば処理終了。
+                        if (concurrencyLevel < freeSlots.Count + activeSlots.Count)
+                            return;
 
-                    // Activate this slot.
-                    activeSlots.Add(slot);
+                        // 空きスロットの取得。
+                        if (0 < freeSlots.Count)
+                        {
+                            slot = freeSlots.Pop();
+                        }
+                        else
+                        {
+                            slot = new Slot();
+                        }
+
+                        // スロットを利用中としてマーク。
+                        activeSlots[slot] = slot;
+                    }
                 }
+
+                // タスクを取得してスロットへ関連付け。
+                slot.Task = queue.Dequeue();
+
+                // スロットへスレッドを割り当て。
+                ThreadPool.QueueUserWorkItem(waitCallbackDelegate, slot);
             }
-
-            // Dequeue a task and assign it into the free slot.
-            slot.Task = queue.Dequeue();
-
-            // Assign a thread into this slot.
-            ThreadPool.QueueUserWorkItem(WaitCallback, slot);
         }
 
         public void Clear()
@@ -111,23 +167,31 @@ namespace Willcraftia.Xna.Framework.Threading
         {
             var slot = state as Slot;
 
-            slot.Task();
+            // タスク実行。
+            slot.Task.Execute();
 
-            // Free this slot.
-            slot.Task = null;
+            // スロットからタスクを開放。
+            slot.Task.Clear();
+
             lock (freeSlots)
             {
                 lock (activeSlots)
                 {
-                    // Deactivate this slot.
+                    // 空きスロットとしてマーク。
                     activeSlots.Remove(slot);
-
-                    // Adjust the number of slots.
-                    if (slotCount < freeSlots.Count + activeSlots.Count)
-                        return;
-
-                    // Free this slot.
                     freeSlots.Push(slot);
+                }
+            }
+        }
+
+        void AdjustSlots()
+        {
+            lock (freeSlots)
+            {
+                lock (activeSlots)
+                {
+                    while (concurrencyLevel < freeSlots.Count + activeSlots.Count && 0 < freeSlots.Count)
+                        freeSlots.Pop();
                 }
             }
         }
