@@ -140,7 +140,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public const string MonitorProcessChunkTaskRequests = "ChunkManager.ProcessChunkTaskRequests";
 
-        public const string MonitorUpdateMeshes = "ChunkManager.UpdateMeshes";
+        public const string MonitorUpdateMeshBuffers = "ChunkManager.UpdateMeshBuffers";
 
         /// <summary>
         /// メッシュ サイズ。
@@ -241,7 +241,11 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ConcurrentQueue<ChunkMeshBufferRequest> chunkMeshBufferRequests = new ConcurrentQueue<ChunkMeshBufferRequest>();
 
-        int updateMeshBufferPerFrame = 2;
+        int updateMeshBufferPerFrame = 1;
+
+        int updateMeshBufferFrameDelay = 0;
+
+        int currentUpdateMeshBufferFrame;
 
         /// <summary>
         /// シーン マネージャ。
@@ -534,7 +538,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // 更新完了を監視。
             // 更新中はチャンクの更新ロックを取得したままであるため、
             // クローズ中も完了を監視して更新ロックの解放を試みなければならない。
-            UpdateMesheBuffer();
+            UpdateMeshBuffers();
 
             base.UpdateOverride();
         }
@@ -710,9 +714,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// チャンク メッシュ更新の完了を監視し、
         /// 完了しているならば頂点バッファへの反映を試みます。
         /// </summary>
-        void UpdateMesheBuffer()
+        void UpdateMeshBuffers()
         {
-            Monitor.Begin(MonitorUpdateMeshes);
+            Monitor.Begin(MonitorUpdateMeshBuffers);
 
             // TODO
             // ここが負荷の原因。
@@ -722,6 +726,17 @@ namespace Willcraftia.Xna.Blocks.Models
             // 更新間隔を置くと多少はマシになるが、それでも瞬間的な負荷は発生する。
             // 原因は、複数スレッドによるロックの奪い合いか、
             // 巨大な頂点バッファの連続作成か？
+            //
+            // バッファ更新頻度を下げても負荷があるが、
+            // この負荷はチャンクのアクティブ化と合わさった場合に負荷となるようにみえる。
+            // となると、スレッド間の関係に問題があるのかもしれない。
+
+            if (0 < currentUpdateMeshBufferFrame)
+            {
+                currentUpdateMeshBufferFrame--;
+                Monitor.End(MonitorUpdateMeshBuffers);
+                return;
+            }
 
             int updateCount = 0;
 
@@ -762,7 +777,12 @@ namespace Willcraftia.Xna.Blocks.Models
                     break;
             }
 
-            Monitor.End(MonitorUpdateMeshes);
+            if (0 < updateCount)
+            {
+                currentUpdateMeshBufferFrame = updateMeshBufferFrameDelay;
+            }
+
+            Monitor.End(MonitorUpdateMeshBuffers);
         }
 
         bool UpdateMeshSegmentBuffer(Chunk chunk, int segmentX, int segmentY, int segmentZ, bool translucence)
