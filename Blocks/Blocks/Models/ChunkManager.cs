@@ -909,6 +909,10 @@ namespace Willcraftia.Xna.Blocks.Models
             var chunk = GetChunk(request.Position);
             if (chunk == null) return;
 
+            // TODO
+            //
+            // Borrow したのに、どこからも Return していない。
+
             ChunkTask chunkTask;
             switch (request.Type)
             {
