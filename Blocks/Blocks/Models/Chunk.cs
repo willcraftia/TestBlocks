@@ -374,7 +374,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// リージョンが提供するチャンク ストアに永続化されていない場合、
         /// リージョンが提供するチャンク プロシージャから自動生成します。
         /// </summary>
-        protected override void ActivateOverride()
+        protected override void Activate()
         {
             var newData = new ChunkData(manager);
 
@@ -400,13 +400,13 @@ namespace Willcraftia.Xna.Blocks.Models
             if (data == null)
                 lightState = ChunkLightState.Complete;
 
-            base.ActivateOverride();
+            base.Activate();
         }
 
         /// <summary>
         /// グラフィックス リソースを開放し、チャンクをチャンク ストアへ永続化します。
         /// </summary>
-        protected override void PassivateOverride()
+        protected override void Passivate()
         {
             ReleaseGraphicsResources();
 
@@ -423,7 +423,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            base.PassivateOverride();
+            base.Passivate();
         }
 
         /// <summary>

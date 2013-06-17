@@ -55,10 +55,6 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
 
         CommandManager commandManager = new CommandManager();
 
-        IntVector3 lastPaintPosition;
-
-        byte lastPaintBlockIndex;
-
         #region Trace
 
         TimeRuler timeRuler;

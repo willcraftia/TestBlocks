@@ -1,9 +1,7 @@
 ﻿#region Using
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 
@@ -48,9 +46,8 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションのアクティブ化を試行します。
         /// このメソッドは非同期に呼び出されます。
         /// </summary>
-        internal void Activate()
+        protected internal virtual void Activate()
         {
-            ActivateOverride();
             activationCompleted = true;
         }
 
@@ -58,11 +55,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションの非アクティブ化を試行します。
         /// このメソッドは非同期に呼び出されます。
         /// </summary>
-        internal void Passivate()
+        protected internal virtual void Passivate()
         {
             Debug.Assert(activationCompleted);
-
-            PassivateOverride();
         }
 
         /// <summary>
@@ -94,27 +89,5 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Active = false;
         }
-
-        /// <summary>
-        /// アクティブ化を試行する際に呼び出されます。
-        /// このメソッドをオーバライドしてアクティブ化の詳細を実装します。
-        /// 戻り値では、アクティブ化を完了した場合に true、
-        /// 途中で取り消した場合に false を返すようにします。
-        /// </summary>
-        /// <returns>
-        /// true (アクティブ化を完了した場合)、false (アクティブ化を取り消した場合)。
-        /// </returns>
-        protected virtual void ActivateOverride() { }
-
-        /// <summary>
-        /// 非アクティブ化を試行する際に呼び出されます。
-        /// このメソッドをオーバライドして非アクティブ化の詳細を実装します。
-        /// 戻り値では、非アクティブ化を完了した場合に true、
-        /// 途中で取り消した場合に false を返すようにします。
-        /// </summary>
-        /// <returns>
-        /// true (非アクティブ化を完了した場合)、false (非アクティブ化を取り消した場合)。
-        /// </returns>
-        protected virtual void PassivateOverride() { }
     }
 }
