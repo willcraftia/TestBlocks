@@ -556,23 +556,6 @@ namespace Willcraftia.Xna.Blocks.Models
             base.OnActivated(partition);
         }
 
-        /// <summary>
-        /// このクラスの実装では、以下の処理を行います。
-        /// 
-        /// ・ノード グラフからチャンクのノードを削除。
-        /// 
-        /// </summary>
-        /// <param name="partition"></param>
-        protected override void OnPassivating(Partition partition)
-        {
-            var chunk = partition as Chunk;
-            
-            // ノードを削除。
-            BaseNode.Children.Remove(chunk.Node);
-
-            base.OnPassivating(partition);
-        }
-
         internal SceneNode CreateNode()
         {
             nodeIdSequence++;
@@ -581,8 +564,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         /// <summary>
         /// チャンク メッシュを破棄します。
-        /// ここでは破棄要求をキューに入れるのみであり、
-        /// Dispose メソッド呼び出しは Update メソッド内で処理されます。
         /// </summary>
         /// <param name="chunkMesh">チャンク メッシュ。</param>
         internal void DisposeMesh(ChunkMesh chunkMesh)
@@ -790,12 +771,16 @@ namespace Willcraftia.Xna.Blocks.Models
 
             var vertices = verticesBuilder.GetVertices(segmentX, segmentY, segmentZ, translucence);
 
+            var mesh = chunk.GetMesh(segmentX, segmentY, segmentZ, translucence);
+
             bool updated;
             if (vertices.VertexCount == 0 || vertices.IndexCount == 0)
             {
-                if (chunk.GetMesh(segmentX, segmentY, segmentZ, translucence) != null)
+                if (mesh != null)
                 {
                     chunk.SetMesh(segmentX, segmentY, segmentZ, translucence, null);
+                    TotalVertexCount -= mesh.VertexCount;
+                    TotalIndexCount -= mesh.IndexCount;
                     updated = true;
                 }
                 else
@@ -806,7 +791,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
             else
             {
-                var mesh = chunk.GetMesh(segmentX, segmentY, segmentZ, translucence);
                 if (mesh == null)
                 {
                     mesh = CreateMesh(effect, false, segmentX, segmentY, segmentZ);

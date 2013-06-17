@@ -566,6 +566,12 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // アクティブではない状態にする。
                 clusterManager.RemovePartition(partition.Position);
 
+                // ※重要※
+                //
+                // 描画で利用するオブジェクトが非同期に無効化されないように、
+                // 八分木ノードや頂点バッファなどを非アクティブ化の開始直前で開放しておく。
+                // これは、描画メソッドの呼び出しスレッドと同じスレッドで行わなければならない。
+
                 // 開始を通知。
                 //
                 // 注意！

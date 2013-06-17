@@ -75,7 +75,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected internal virtual void OnNeighborPassivated(Partition neighbor, Side side) { }
 
         /// <summary>
-        /// アクティブ化の完了直後で呼び出されます。
+        /// アクティブ化の完了直後に呼び出されます。
         /// </summary>
         protected internal virtual void OnActivated()
         {

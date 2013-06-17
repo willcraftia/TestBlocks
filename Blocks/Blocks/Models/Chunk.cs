@@ -403,13 +403,24 @@ namespace Willcraftia.Xna.Blocks.Models
             base.Activate();
         }
 
+        protected override void OnPassivating()
+        {
+            // ノード グラフからチャンク ノードを削除。
+            if (Node.Parent != null)
+                Node.Parent.Children.Remove(Node);
+
+            // メッシュ開放はゲーム スレッドで非アクティブ化に先駆けて行う。
+            // 非アクティブ化で行う処理は永続化のみ。
+            DetachAllMeshes();
+
+            base.OnPassivating();
+        }
+
         /// <summary>
         /// グラフィックス リソースを開放し、チャンクをチャンク ストアへ永続化します。
         /// </summary>
         protected override void Passivate()
         {
-            ReleaseGraphicsResources();
-
             lock (blockIndexLock)
             {
                 if (data != null)
@@ -427,9 +438,9 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// グラフィックス リソースを開放します。
+        /// 全てのメッシュを開放します。
         /// </summary>
-        void ReleaseGraphicsResources()
+        void DetachAllMeshes()
         {
             for (int z = 0; z < manager.MeshSegments.Z; z++)
             {
