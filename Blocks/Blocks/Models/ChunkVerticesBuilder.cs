@@ -113,6 +113,13 @@ namespace Willcraftia.Xna.Blocks.Models
             return true;
         }
 
+        // TODO
+        //
+        // 頂点構築中に非アクティブ化が実行されると、
+        // そこでグラフィックス リソースの開放が行われ、
+        // ビルダがまだ実行中であるにも関わらずクリア処理が実行されてしまう。
+        // ビルダはチャンクへ関連付けず、独立してスレッド内で実行可能でなければならない。
+
         public void Clear()
         {
             if (Chunk != null && Chunk.VerticesBuilder != null) Chunk.VerticesBuilder = null;
