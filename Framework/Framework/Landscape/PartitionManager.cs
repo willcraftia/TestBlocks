@@ -706,37 +706,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (activationCandidateFinder.Running)
                     activationCandidateFinder.Stop();
                 activationCandidateFinder.WaitStop();
-
-                DisposeQueue(partitions);
-                // TODO
-                // 整理
-                foreach (var partition in activations.Values)
-                    partition.Dispose();
-                foreach (var partition in passivations.Values)
-                    partition.Dispose();
-                foreach (var partition in finishedActivationTasks)
-                    partition.Dispose();
-                foreach (var partition in finishedPassivationTasks)
-                    partition.Dispose();
             }
 
             disposed = true;
-        }
-
-        void DisposeQueue(Queue<Partition> partitions)
-        {
-            while (0 < partitions.Count)
-                partitions.Dequeue().Dispose();
-        }
-
-        void DisposeConcurrentKeyedQueue(ConcurrentKeyedQueue<IntVector3, Partition> partitions)
-        {
-            while (0 < partitions.Count)
-            {
-                Partition partition;
-                if (partitions.TryDequeue(out partition))
-                    partition.Dispose();
-            }
         }
 
         #endregion

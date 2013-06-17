@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Framework.Landscape
     /// <summary>
     /// パーティションを表すクラスです。
     /// </summary>
-    public abstract class Partition : IDisposable
+    public abstract class Partition
     {
         /// <summary>
         /// パーティション空間におけるパーティションの位置。
@@ -142,47 +142,5 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// true (非アクティブ化を完了した場合)、false (非アクティブ化を取り消した場合)。
         /// </returns>
         protected virtual void PassivateOverride() { }
-
-        /// <summary>
-        /// Dispose() メソッドが呼び出される際に呼び出されます。
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void DisposeOverride(bool disposing) { }
-
-        #region IDisposable
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        bool disposed;
-
-        ~Partition()
-        {
-            Dispose(false);
-        }
-
-        void Dispose(bool disposing)
-        {
-            if (disposed) return;
-
-            // アクティブ化あるいは非アクティブ化の実行完了を待機。
-            asyncCallEvent.WaitOne();
-
-            // ※注意
-            // Dispose 中にパッシベートするのは危険。
-            // パッシベートでファイルへの永続化を行うなどの場合、
-            // 永続化を担うクラス、例えば、StorageContainer などが、
-            // その時点で既に Dispose されている可能性がある。
-            DisposeOverride(disposing);
-
-            asyncCallEvent.Dispose();
-
-            disposed = true;
-        }
-
-        #endregion
     }
 }
