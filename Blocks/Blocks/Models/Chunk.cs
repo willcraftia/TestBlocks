@@ -118,6 +118,7 @@ namespace Willcraftia.Xna.Blocks.Models
         public Chunk(ChunkManager manager, Region region, IntVector3 position)
         {
             if (manager == null) throw new ArgumentNullException("manager");
+            if (region == null) throw new ArgumentNullException("region");
 
             this.manager = manager;
             this.region = region;
@@ -380,8 +381,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void ActivateOverride()
         {
-            Debug.Assert(region != null);
-
             var newData = new ChunkData(manager);
 
             if (manager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, newData))
@@ -414,8 +413,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void PassivateOverride()
         {
-            Debug.Assert(region != null);
-
             ReleaseGraphicsResources();
 
             lock (blockIndexLock)
