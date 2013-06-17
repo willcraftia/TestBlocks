@@ -124,9 +124,9 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public readonly Vector3 PartitionSize;
 
-        readonly Action<object> activatePartitionAsyncAction;
+        readonly Action<object> activatePartitionAction;
 
-        readonly Action<object> passivatePartitionAsyncAction;
+        readonly Action<object> passivatePartitionAction;
 
         /// <summary>
         /// クラスタ マネージャ。
@@ -272,8 +272,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             var minActiveVolume = settings.MinActiveVolume ?? new DefaultActiveVolume(4);
             activationCandidateFinder = new ActivationCandidateFinder(this, minActiveVolume, settings.PriorActiveDistance);
 
-            activatePartitionAsyncAction = new Action<object>(ActivatePartitionAsync);
-            passivatePartitionAsyncAction = new Action<object>(PassivatePartitionAsync);
+            activatePartitionAction = new Action<object>(ActivatePartition);
+            passivatePartitionAction = new Action<object>(PassivatePartition);
         }
 
         /// <summary>
@@ -584,7 +584,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 OnPassivating(partition);
 
                 // タスク実行。
-                Task.Factory.StartNew(passivatePartitionAsyncAction, partition);
+                Task.Factory.StartNew(passivatePartitionAction, partition);
             }
 
             Monitor.End(MonitorPassivate);
@@ -594,12 +594,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// 非アクティブ化タスク処理です。
         /// </summary>
         /// <param name="state">タスク状態としての非アクティブ化対象パーティション。</param>
-        void PassivatePartitionAsync(object state)
+        void PassivatePartition(object state)
         {
             var partition = state as Partition;
 
             // パーティションの非アクティブ化を実行。
-            partition.PassivateAsync();
+            partition.Passivate();
 
             // タスク終了を記録。
             finishedPassivationTasks.Enqueue(partition);
@@ -653,7 +653,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             activations[partition.Position] = partition;
 
             // タスク実行。
-            Task.Factory.StartNew(activatePartitionAsyncAction, partition);
+            Task.Factory.StartNew(activatePartitionAction, partition);
 
             return true;
         }
@@ -662,12 +662,12 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// アクティブ化タスク処理です。
         /// </summary>
         /// <param name="state">タスク状態としてのアクティブ化対象パーティション。</param>
-        void ActivatePartitionAsync(object state)
+        void ActivatePartition(object state)
         {
             var partition = state as Partition;
 
             // パーティションへアクティブ化を要求。
-            partition.ActivateAsync();
+            partition.Activate();
             
             // タスク完了を記録。
             finishedActivationTasks.Enqueue(partition);

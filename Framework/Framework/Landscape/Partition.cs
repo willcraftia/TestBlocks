@@ -48,7 +48,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションのアクティブ化を試行します。
         /// このメソッドは非同期に呼び出されます。
         /// </summary>
-        internal void ActivateAsync()
+        internal void Activate()
         {
             ActivateOverride();
             activationCompleted = true;
@@ -58,7 +58,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// パーティションの非アクティブ化を試行します。
         /// このメソッドは非同期に呼び出されます。
         /// </summary>
-        internal void PassivateAsync()
+        internal void Passivate()
         {
             Debug.Assert(activationCompleted);
 
