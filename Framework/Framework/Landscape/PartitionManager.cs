@@ -202,14 +202,19 @@ namespace Willcraftia.Xna.Framework.Landscape
             const int candidateQueueCapacity = 16 * 16 * 16;
 
             /// <summary>
+            /// アクティブ化スレッド。
+            /// </summary>
+            System.Threading.Thread thread;
+
+            /// <summary>
+            /// アクティブ化スレッド停止イベント。
+            /// </summary>
+            System.Threading.ManualResetEvent stopEvent = new System.Threading.ManualResetEvent(true);
+
+            /// <summary>
             /// パーティション マネージャ。
             /// </summary>
             PartitionManager manager;
-
-            /// <summary>
-            /// 視点位置 (パーティション空間)。
-            /// </summary>
-            IntVector3 eyePositionPartition;
 
             /// <summary>
             /// アクティブ領域。
@@ -232,19 +237,64 @@ namespace Willcraftia.Xna.Framework.Landscape
             RefAction<IntVector3> collectAction;
 
             /// <summary>
-            /// 非同期処理中であるか否かを示す値。
+            /// アクティブ化スレッドが開始しているか否かを示す値。
             /// </summary>
-            volatile bool active;
+            volatile bool running;
 
             /// <summary>
-            /// 非同期処理中であるか否かを示す値を取得します。
+            /// カメラ状態フィールドに対するロック オブジェクト。
+            /// </summary>
+            object cameraLock = new object();
+
+            /// <summary>
+            /// スレッドが次のループで使用するビュー行列。
+            /// </summary>
+            Matrix nextView;
+
+            /// <summary>
+            /// スレッドが次のループで使用する射影行列。
+            /// </summary>
+            Matrix nextProjection;
+
+            /// <summary>
+            /// スレッドが次のループで使用する視点位置 (ワールド空間)。
+            /// </summary>
+            Vector3 nextEyePositionWorld;
+
+            /// <summary>
+            /// スレッドが次のループで使用する視点位置 (パーティション空間)。
+            /// </summary>
+            IntVector3 nextEyePositionPartition;
+
+            /// <summary>
+            /// スレッドが現在のループで使用するビュー行列。
+            /// </summary>
+            Matrix view;
+
+            /// <summary>
+            /// スレッドが現在のループで使用する射影行列。
+            /// </summary>
+            Matrix projection;
+
+            /// <summary>
+            /// スレッドが現在のループで使用する視点位置 (ワールド空間)。
+            /// </summary>
+            Vector3 eyePositionWorld;
+
+            /// <summary>
+            /// スレッドが現在のループで使用する視点位置 (パーティション空間)。
+            /// </summary>
+            IntVector3 eyePositionPartition;
+
+            /// <summary>
+            /// アクティブ化スレッドが開始しているか否かを示す値を取得します。
             /// </summary>
             /// <value>
-            /// true (非同期処理中である場合)、false (それ以外の場合)。
+            /// true (アクティブ化スレッドが開始している場合)、false (それ以外の場合)。
             /// </value>
-            public bool Active
+            public bool Running
             {
-                get { return active; }
+                get { return running; }
             }
 
             /// <summary>
@@ -261,44 +311,96 @@ namespace Willcraftia.Xna.Framework.Landscape
                 collectAction = new RefAction<IntVector3>(Collect);
                 comparer = new CandidateComparer(priorDistance);
                 candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
+
+                thread = new System.Threading.Thread(Run);
             }
 
             /// <summary>
-            /// 非同期処理を開始します。
+            /// アクティブ化スレッドを開始します。
             /// </summary>
             public void Start()
             {
-                if (active) return;
+                if (running)
+                    return;
 
-                // 別スレッドで実行するため、現在のカメラ位置などを複製。
-                eyePositionPartition = manager.eyePosition;
+                // 停止イベントを非シグナル状態に。
+                stopEvent.Reset();
 
-                // 比較オブジェクトの視錐台を更新。
-                Matrix viewProjection;
-                Matrix.Multiply(ref manager.view, ref manager.projection, out viewProjection);
-                comparer.Frustum.Matrix = viewProjection;
-
-                // 比較オブジェクトの視点位置を更新。
-                comparer.EyePositionWorld = manager.eyePositionWorld;
-
-                active = true;
-
-                System.Threading.ThreadPool.QueueUserWorkItem(WaitCallback, null);
+                // スレッドの開始。
+                running = true;
+                thread.Start();
             }
 
             /// <summary>
-            /// スレッド プールのコールバック メソッドです。
+            /// アクティブ化スレッドを停止します。
             /// </summary>
-            /// <param name="state"></param>
-            void WaitCallback(object state)
+            public void Stop()
             {
-                // 候補を探索。
-                volume.ForEach(collectAction);
+                // スレッド ループの停止。
+                running = false;
+            }
 
-                // 候補をアクティブ化。
-                Activate();
+            /// <summary>
+            /// アクティブ化スレッドの停止を待機します。
+            /// </summary>
+            public void WaitStop()
+            {
+                stopEvent.WaitOne();
+            }
 
-                active = false;
+            /// <summary>
+            /// カメラ状態を更新します。
+            /// </summary>
+            /// <param name="view">ビュー行列。</param>
+            /// <param name="projection">射影行列。</param>
+            /// <param name="eyePositionWorld">視点位置 (ワールド空間)。</param>
+            /// <param name="eyePositionPartition">視点位置 (パーティション空間)。</param>
+            public void UpdateCamera(Matrix view, Matrix projection, Vector3 eyePositionWorld, IntVector3 eyePositionPartition)
+            {
+                // 次のループで使用するカメラを更新。
+                lock (cameraLock)
+                {
+                    this.nextView = view;
+                    this.nextProjection = projection;
+                    this.nextEyePositionWorld = eyePositionWorld;
+                    this.nextEyePositionPartition = eyePositionPartition;
+                }
+            }
+
+            /// <summary>
+            /// スレッド内処理を実行します。
+            /// </summary>
+            void Run()
+            {
+                // スレッド ループ。
+                while (running)
+                {
+                    // カメラの反映。
+                    lock (cameraLock)
+                    {
+                        view = nextView;
+                        projection = nextProjection;
+                        eyePositionWorld = nextEyePositionWorld;
+                        eyePositionPartition = nextEyePositionPartition;
+                    }
+
+                    // 比較オブジェクトの視錐台を更新。
+                    Matrix viewProjection;
+                    Matrix.Multiply(ref view, ref projection, out viewProjection);
+                    comparer.Frustum.Matrix = viewProjection;
+
+                    // 比較オブジェクトの視点位置を更新。
+                    comparer.EyePositionWorld = eyePositionWorld;
+
+                    // 候補を探索。
+                    volume.ForEach(collectAction);
+
+                    // 候補をアクティブ化。
+                    Activate();
+                }
+
+                // 停止イベントをシグナル状態に。
+                stopEvent.Set();
             }
 
             /// <summary>
@@ -363,8 +465,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         public const string MonitorPassivate = "PartitionManager.Passivate";
 
-        public const string MonitorActivate = "PartitionManager.Activate";
-
         /// <summary>
         /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
@@ -425,7 +525,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <summary>
         /// 視点位置 (パーティション空間)。
         /// </summary>
-        IntVector3 eyePosition;
+        IntVector3 eyePositionPartition;
 
         /// <summary>
         /// 視点位置 (ワールド空間)。
@@ -537,9 +637,9 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             eyePositionWorld = View.GetPosition(view);
 
-            eyePosition.X = (int) Math.Floor(eyePositionWorld.X / PartitionSize.X);
-            eyePosition.Y = (int) Math.Floor(eyePositionWorld.Y / PartitionSize.Y);
-            eyePosition.Z = (int) Math.Floor(eyePositionWorld.Z / PartitionSize.Z);
+            eyePositionPartition.X = (int) Math.Floor(eyePositionWorld.X / PartitionSize.X);
+            eyePositionPartition.Y = (int) Math.Floor(eyePositionWorld.Y / PartitionSize.Y);
+            eyePositionPartition.Z = (int) Math.Floor(eyePositionWorld.Z / PartitionSize.Z);
 
             if (!Closing)
             {
@@ -547,7 +647,13 @@ namespace Willcraftia.Xna.Framework.Landscape
                 CheckActivations();
 
                 Passivate();
-                Activate();
+
+                // 開始前ならばアクティブ化スレッドを開始。
+                if (!activator.Running)
+                    activator.Start();
+                
+                // アクティブ化スレッドのカメラ状態を更新。
+                activator.UpdateCamera(view, projection, eyePositionWorld, eyePositionPartition);
 
                 // サブクラスにおける追加の更新処理。
                 UpdateOverride();
@@ -561,6 +667,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 非アクティブ化のみを実行。
 
                 Passivate();
+
+                if (activator.Running)
+                    activator.Stop();
 
                 // サブクラスにおける追加の更新処理。
                 // クローズ中に行うべきこともある。
@@ -809,7 +918,7 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 if (!Closing)
                 {
-                    if (maxActiveVolume.Contains(eyePosition, partition.Position))
+                    if (maxActiveVolume.Contains(eyePositionPartition, partition.Position))
                     {
                         // アクティブ状態維持領域内ならばリストへ戻す。
                         partitions.Enqueue(partition);
@@ -854,26 +963,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             // タスク終了を記録。
             finishedPassivationTasks.Enqueue(partition);
-        }
-
-        /// <summary>
-        /// パーティションのアクティブ化を試行します。
-        /// この試行は非同期に実行されます。
-        /// なお、同時にアクティブ化できるパーティションの数には上限があり、
-        /// 上限に到達した場合には、このフレームでのアクティブ化は保留されます。
-        /// </summary>
-        /// <param name="gameTime">ゲーム時間。</param>
-        void Activate()
-        {
-            Monitor.Begin(MonitorActivate);
-
-            if (!activator.Active)
-            {
-                // 非同期処理中ではないならば、アクティベータの実行を開始。
-                activator.Start();
-            }
-
-            Monitor.End(MonitorActivate);
         }
 
         /// <summary>
@@ -960,6 +1049,11 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             if (disposing)
             {
+                // アクティブ化スレッドの停止を待機。
+                if (activator.Running)
+                    activator.Stop();
+                activator.WaitStop();
+
                 DisposeQueue(partitions);
                 // TODO
                 // 整理
