@@ -208,6 +208,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
 
             thread = new Thread(Run);
+            thread.IsBackground = true;
         }
 
         /// <summary>
