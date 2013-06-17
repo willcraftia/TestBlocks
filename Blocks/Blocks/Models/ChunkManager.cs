@@ -168,12 +168,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 通常優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<IntVector3> normalBuildVerticesRequests = new ConcurrentQueue<IntVector3>();
+        ConcurrentQueue<Chunk> normalBuildVerticesRequests = new ConcurrentQueue<Chunk>();
 
         /// <summary>
         /// 高優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<IntVector3> highBuildVerticesRequests = new ConcurrentQueue<IntVector3>();
+        ConcurrentQueue<Chunk> highBuildVerticesRequests = new ConcurrentQueue<Chunk>();
 
         Dictionary<IntVector3, ChunkVerticesBuilder> activeVerticesBuilder;
 
@@ -367,17 +367,17 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <remarks>
         /// 要求はキューで管理され、非同期に順次実行されます。
         /// </remarks>
-        /// <param name="position">チャンクの位置。</param>
+        /// <param name="chunk">チャンク。</param>
         /// <param name="priority">優先度。</param>
-        public void RequestBuildVertices(IntVector3 position, ChunkMeshUpdatePriority priority)
+        public void RequestBuildVertices(Chunk chunk, ChunkMeshUpdatePriority priority)
         {
             switch (priority)
             {
                 case ChunkMeshUpdatePriority.Normal:
-                    normalBuildVerticesRequests.Enqueue(position);
+                    normalBuildVerticesRequests.Enqueue(chunk);
                     break;
                 case ChunkMeshUpdatePriority.High:
-                    highBuildVerticesRequests.Enqueue(position);
+                    highBuildVerticesRequests.Enqueue(chunk);
                     break;
             }
         }
@@ -528,18 +528,16 @@ namespace Willcraftia.Xna.Blocks.Models
             Monitor.End(MonitorProcessProcessBuildVerticesRequests);
         }
 
-        void ProcessBuildVerticesRequests(ConcurrentQueue<IntVector3> requestQueue)
+        void ProcessBuildVerticesRequests(ConcurrentQueue<Chunk> requestQueue)
         {
             for (int i = 0; i < meshUpdateSearchCapacity; i++)
             {
-                IntVector3 position;
-                if (!requestQueue.TryDequeue(out position)) break;
+                Chunk chunk;
+                if (!requestQueue.TryDequeue(out chunk)) break;
 
-                // アクティブ チャンクを取得。
-                var chunk = GetChunk(position);
-                if (chunk == null)
+                if (!chunk.Active)
                 {
-                    // 存在しない場合は要求を無視。
+                    // 非アクティブならば無視。
                     continue;
                 }
 
@@ -550,7 +548,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 // チャンクがメッシュ更新中ならば待機キューへ戻す。
                 if (activeVerticesBuilder.ContainsKey(chunk.Position))
                 {
-                    requestQueue.Enqueue(position);
+                    requestQueue.Enqueue(chunk);
                     continue;
                 }
 
@@ -559,14 +557,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 {
                     // プール枯渇の場合は待機キューへ戻す。
                     // かつ、以降全ての待機を処理しない。
-                    requestQueue.Enqueue(position);
+                    requestQueue.Enqueue(chunk);
                     break;
                 }
 
                 if (!verticesBuilder.Initialize(chunk))
                 {
                     // 構築可能な状態ではないならば待機キューへ戻す。
-                    requestQueue.Enqueue(position);
+                    requestQueue.Enqueue(chunk);
                     verticesBuilderPool.Return(verticesBuilder);
                     continue;
                 }
@@ -843,7 +841,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     break;
                 case ChunkLightState.Complete:
                     if (0 < chunk.SolidCount)
-                        RequestBuildVertices(chunk.Position, ChunkMeshUpdatePriority.Normal);
+                        RequestBuildVertices(chunk, ChunkMeshUpdatePriority.Normal);
                     break;
             }
         }
