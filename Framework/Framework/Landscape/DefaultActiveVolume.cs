@@ -55,7 +55,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         }
 
         // I/F
-        public void ForEach(RefAction<IntVector3> action)
+        public void ForEach(Action<IntVector3> action)
         {
             for (int z = -radius; z < radius; z++)
             {
@@ -66,7 +66,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                         var point = new IntVector3(x, y, z);
                         var lengthSquared = point.LengthSquared();
                         if (lengthSquared <= radiusSquared)
-                            action(ref point);
+                            action(point);
                     }
                 }
             }

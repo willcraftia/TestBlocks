@@ -234,7 +234,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// <summary>
             /// Collect メソッドのデリゲート。
             /// </summary>
-            RefAction<IntVector3> collectAction;
+            Action<IntVector3> collectAction;
 
             /// <summary>
             /// アクティブ化スレッドが開始しているか否かを示す値。
@@ -308,7 +308,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 this.manager = manager;
                 this.volume = volume;
                 
-                collectAction = new RefAction<IntVector3>(Collect);
+                collectAction = new Action<IntVector3>(Collect);
                 comparer = new CandidateComparer(priorDistance);
                 candidates = new PriorityQueue<Candidate>(candidateQueueCapacity, comparer);
 
@@ -419,7 +419,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             /// アクティブ領域に含まれるパーティションを探索して候補キューへ入れます。
             /// </summary>
             /// <param name="offset"></param>
-            void Collect(ref IntVector3 offset)
+            void Collect(IntVector3 offset)
             {
                 var position = eyePositionPartition + offset;
 
