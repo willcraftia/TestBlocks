@@ -129,14 +129,14 @@ namespace Willcraftia.Xna.Blocks.Models
 
         struct ChunkMeshBufferRequest
         {
-            public Chunk Chunk;
+            public ChunkVerticesBuilder VerticesBuilder;
 
             public IntVector3 Segment;
 
             public bool Translucece;
         }
 
-        public const string MonitorProcessUpdateMeshRequests = "ChunkManager.ProcessUpdateMeshRequests";
+        public const string MonitorProcessProcessBuildVerticesRequests = "ChunkManager.ProcessBuildVerticesRequests";
 
         public const string MonitorProcessChunkTaskRequests = "ChunkManager.ProcessChunkTaskRequests";
 
@@ -210,14 +210,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// 通常優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<IntVector3> normalUpdateMeshRequests = new ConcurrentQueue<IntVector3>();
+        ConcurrentQueue<IntVector3> normalBuildVerticesRequests = new ConcurrentQueue<IntVector3>();
 
         /// <summary>
         /// 高優先度のメッシュ更新要求のキュー。
         /// </summary>
-        ConcurrentQueue<IntVector3> highUpdateMeshRequests = new ConcurrentQueue<IntVector3>();
+        ConcurrentQueue<IntVector3> highBuildVerticesRequests = new ConcurrentQueue<IntVector3>();
 
-        Dictionary<IntVector3, Chunk> updatingChunks;
+        Dictionary<IntVector3, ChunkVerticesBuilder> activeVerticesBuilder;
 
         /// <summary>
         /// 頂点ビルダのプール。
@@ -367,7 +367,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             EmptyData = new ChunkData(this);
 
-            updatingChunks = new Dictionary<IntVector3, Chunk>(verticesBuilderCount);
+            activeVerticesBuilder = new Dictionary<IntVector3, ChunkVerticesBuilder>(verticesBuilderCount);
 
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
@@ -414,15 +414,15 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </remarks>
         /// <param name="position">チャンクの位置。</param>
         /// <param name="priority">優先度。</param>
-        public void RequestUpdateMesh(IntVector3 position, ChunkMeshUpdatePriority priority)
+        public void RequestBuildVertices(IntVector3 position, ChunkMeshUpdatePriority priority)
         {
             switch (priority)
             {
                 case ChunkMeshUpdatePriority.Normal:
-                    normalUpdateMeshRequests.Enqueue(position);
+                    normalBuildVerticesRequests.Enqueue(position);
                     break;
                 case ChunkMeshUpdatePriority.High:
-                    highUpdateMeshRequests.Enqueue(position);
+                    highBuildVerticesRequests.Enqueue(position);
                     break;
             }
         }
@@ -521,7 +521,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // ただし、クローズが開始したら行わない。
             if (!Closing)
             {
-                ProcessUpdateMeshRequests();
+                ProcessBuildVerticesRequests();
 
                 ProcessChunkTaskRequests();
             }
@@ -580,18 +580,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 頂点ビルダをプールへ戻します。
-        /// </summary>
-        /// <param name="builder"></param>
-        internal void ReleaseVerticesBuilder(ChunkVerticesBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException("builder");
-
-            builder.Clear();
-            verticesBuilderPool.Return(builder);
-        }
-
-        /// <summary>
         /// チャンク メッシュを破棄します。
         /// ここでは破棄要求をキューに入れるのみであり、
         /// Dispose メソッド呼び出しは Update メソッド内で処理されます。
@@ -610,17 +598,17 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// メッシュ更新が必要なチャンクを探索し、その更新要求を追加します。
         /// </summary>
-        void ProcessUpdateMeshRequests()
+        void ProcessBuildVerticesRequests()
         {
-            Monitor.Begin(MonitorProcessUpdateMeshRequests);
+            Monitor.Begin(MonitorProcessProcessBuildVerticesRequests);
 
-            ProcessUpdateMeshRequests(highUpdateMeshRequests);
-            ProcessUpdateMeshRequests(normalUpdateMeshRequests);
+            ProcessBuildVerticesRequests(highBuildVerticesRequests);
+            ProcessBuildVerticesRequests(normalBuildVerticesRequests);
 
-            Monitor.End(MonitorProcessUpdateMeshRequests);
+            Monitor.End(MonitorProcessProcessBuildVerticesRequests);
         }
 
-        void ProcessUpdateMeshRequests(ConcurrentQueue<IntVector3> requestQueue)
+        void ProcessBuildVerticesRequests(ConcurrentQueue<IntVector3> requestQueue)
         {
             for (int i = 0; i < meshUpdateSearchCapacity; i++)
             {
@@ -640,7 +628,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 更新中であっても更新処理を実行しても良いのでは？
 
                 // チャンクがメッシュ更新中ならば待機キューへ戻す。
-                if (updatingChunks.ContainsKey(chunk.Position))
+                if (activeVerticesBuilder.ContainsKey(chunk.Position))
                 {
                     requestQueue.Enqueue(position);
                     continue;
@@ -663,15 +651,15 @@ namespace Willcraftia.Xna.Blocks.Models
                     continue;
                 }
 
-                // メッシュ更新中としてマーク。
-                updatingChunks[chunk.Position] = chunk;
+                // 実行中としてマーク。
+                activeVerticesBuilder[chunk.Position] = verticesBuilder;
 
                 // タスク実行。
                 Task.Factory.StartNew(verticesBuilder.ExecuteAction);
             }
         }
 
-        internal void OnUpdateMeshFinished(Chunk chunk)
+        internal void RequestUpdateMeshBuffers(ChunkVerticesBuilder verticesBuilder)
         {
             for (int z = 0; z < MeshSegments.Z; z++)
             {
@@ -681,7 +669,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     {
                         var opaqueRequest = new ChunkMeshBufferRequest
                         {
-                            Chunk = chunk,
+                            VerticesBuilder = verticesBuilder,
                             Segment = new IntVector3(x, y, z),
                             Translucece = false
                         };
@@ -689,7 +677,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
                         var translucentRequest = new ChunkMeshBufferRequest
                         {
-                            Chunk = chunk,
+                            VerticesBuilder = verticesBuilder,
                             Segment = new IntVector3(x, y, z),
                             Translucece = true
                         };
@@ -698,7 +686,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            updatingChunks.Remove(chunk.Position);
+            activeVerticesBuilder.Remove(verticesBuilder.Chunk.Position);
         }
 
         /// <summary>
@@ -734,20 +722,21 @@ namespace Willcraftia.Xna.Blocks.Models
             ChunkMeshBufferRequest request;
             while (chunkMeshBufferRequests.TryDequeue(out request))
             {
-                var chunk = request.Chunk;
+                var verticesBuilder = request.VerticesBuilder;
 
                 // チャンクの非アクティブ化は、このメソッドと同じスレッドで処理される。
                 // このため、Active プロパティが示す値は、このメソッドで保証される。
-                if (!chunk.Active)
+                if (!verticesBuilder.Chunk.Active)
                     continue;
 
+                var chunk = verticesBuilder.Chunk;
                 var segment = request.Segment;
                 var translucence = request.Translucece;
 
                 // クローズ中は頂点バッファ反映をスキップ。
                 if (!Closing)
                 {
-                    if (UpdateMeshSegmentBuffer(chunk, segment.X, segment.Y, segment.Z, translucence))
+                    if (UpdateMeshSegmentBuffer(verticesBuilder, segment.X, segment.Y, segment.Z, translucence))
                     {
                         // バッファに変更があったならばチャンクのノードを更新。
                         chunk.Node.Update(false);
@@ -757,12 +746,15 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // バッファを反映済みとしてマーク。
-                var vertices = chunk.VerticesBuilder.GetVertices(segment.X, segment.Y, segment.Z, translucence);
+                var vertices = verticesBuilder.GetVertices(segment.X, segment.Y, segment.Z, translucence);
                 vertices.Consumed = true;
 
                 // 全てのバッファへ反映したならば頂点ビルダを解放。
-                if (chunk.VerticesBuilder.ConsumedAll())
-                    ReleaseVerticesBuilder(chunk.VerticesBuilder);
+                if (verticesBuilder.ConsumedAll())
+                {
+                    verticesBuilder.Clear();
+                    verticesBuilderPool.Return(verticesBuilder);
+                }
 
                 if (updateMeshBufferPerFrame <= updateCount)
                     break;
@@ -776,9 +768,9 @@ namespace Willcraftia.Xna.Blocks.Models
             Monitor.End(MonitorUpdateMeshBuffers);
         }
 
-        bool UpdateMeshSegmentBuffer(Chunk chunk, int segmentX, int segmentY, int segmentZ, bool translucence)
+        bool UpdateMeshSegmentBuffer(ChunkVerticesBuilder verticesBuilder, int segmentX, int segmentY, int segmentZ, bool translucence)
         {
-            var builder = chunk.VerticesBuilder;
+            var chunk = verticesBuilder.Chunk;
 
             // メッシュに設定するワールド座標。
             // メッシュの中心をメッシュの位置とする。
@@ -796,7 +788,7 @@ namespace Willcraftia.Xna.Blocks.Models
             // メッシュに設定するエフェクト。
             var effect = chunk.Region.ChunkEffect;
 
-            var vertices = builder.GetVertices(segmentX, segmentY, segmentZ, translucence);
+            var vertices = verticesBuilder.GetVertices(segmentX, segmentY, segmentZ, translucence);
 
             bool updated;
             if (vertices.VertexCount == 0 || vertices.IndexCount == 0)
@@ -939,7 +931,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 case ChunkLightState.Complete:
                     // TODO
                     if (0 < chunk.SolidCount)
-                        RequestUpdateMesh(chunk.Position, ChunkMeshUpdatePriority.Normal);
+                        RequestBuildVertices(chunk.Position, ChunkMeshUpdatePriority.Normal);
                     break;
             }
 

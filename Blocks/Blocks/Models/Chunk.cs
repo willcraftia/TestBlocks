@@ -93,11 +93,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// メッシュ更新のための頂点ビルダを取得または設定します。
-        /// </summary>
-        public ChunkVerticesBuilder VerticesBuilder { get; internal set; }
-
-        /// <summary>
         /// 非空ブロックの総数を取得します。
         /// </summary>
         public int SolidCount
@@ -454,12 +449,6 @@ namespace Willcraftia.Xna.Blocks.Models
                         }
                     }
                 }
-            }
-
-            if (VerticesBuilder != null)
-            {
-                manager.ReleaseVerticesBuilder(VerticesBuilder);
-                VerticesBuilder = null;
             }
         }
 

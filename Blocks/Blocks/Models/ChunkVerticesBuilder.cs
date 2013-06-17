@@ -25,7 +25,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkVertices[, ,] translucences;
 
-        public Chunk Chunk { get; internal set; }
+        public Chunk Chunk { get; private set; }
 
         public bool Completed
         {
@@ -88,7 +88,6 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             Chunk = chunk;
-            chunk.VerticesBuilder = this;
 
             // 完了フラグを初期化。
             Completed = false;
@@ -113,16 +112,8 @@ namespace Willcraftia.Xna.Blocks.Models
             return true;
         }
 
-        // TODO
-        //
-        // 頂点構築中に非アクティブ化が実行されると、
-        // そこでグラフィックス リソースの開放が行われ、
-        // ビルダがまだ実行中であるにも関わらずクリア処理が実行されてしまう。
-        // ビルダはチャンクへ関連付けず、独立してスレッド内で実行可能でなければならない。
-
         public void Clear()
         {
-            if (Chunk != null && Chunk.VerticesBuilder != null) Chunk.VerticesBuilder = null;
             Chunk = null;
 
             for (int z = 0; z < manager.MeshSegments.Z; z++)
@@ -160,7 +151,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             localWorld.Clear();
 
-            manager.OnUpdateMeshFinished(Chunk);
+            manager.RequestUpdateMeshBuffers(this);
 
             completed = true;
         }

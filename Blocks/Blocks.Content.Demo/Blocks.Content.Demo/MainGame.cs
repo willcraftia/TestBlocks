@@ -170,7 +170,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             monitorListener.CreateMarker(PartitionManager.MonitorCheckActivations, barIndex, Color.Green);
             monitorListener.CreateMarker(PartitionManager.MonitorPassivate, barIndex, Color.Red);
             barIndex++;
-            monitorListener.CreateMarker(ChunkManager.MonitorProcessUpdateMeshRequests, barIndex, Color.Green);
+            monitorListener.CreateMarker(ChunkManager.MonitorProcessProcessBuildVerticesRequests, barIndex, Color.Green);
             barIndex++;
             monitorListener.CreateMarker(ChunkManager.MonitorProcessChunkTaskRequests, barIndex, Color.Yellow);
             barIndex++;

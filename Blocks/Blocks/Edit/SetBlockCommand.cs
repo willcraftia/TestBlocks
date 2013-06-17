@@ -59,7 +59,7 @@ namespace Willcraftia.Xna.Blocks.Edit
             for (int i = 0; i < lightUpdater.AffectedChunkPositions.Count; i++)
             {
                 var p = lightUpdater.AffectedChunkPositions[i];
-                chunkManager.RequestUpdateMesh(p, ChunkMeshUpdatePriority.High);
+                chunkManager.RequestBuildVertices(p, ChunkMeshUpdatePriority.High);
             }
 
             chunkManager.ReturnLightUpdater(lightUpdater);
