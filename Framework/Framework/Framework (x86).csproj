@@ -119,6 +119,7 @@
     <Compile Include="Content\IAsset.cs" />
     <Compile Include="Content\NoCacheContentManager.cs" />
     <Compile Include="IntBoundingBox.cs" />
+    <Compile Include="Landscape\ActivationCandidateFinder.cs" />
     <Compile Include="Side.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TextureDisplay.cs" />
