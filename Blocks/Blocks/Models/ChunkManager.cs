@@ -29,7 +29,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         struct ChunkTaskRequest
         {
-            public IntVector3 Position;
+            public Chunk Chunk;
 
             public ChunkTaskType Type;
 
@@ -388,14 +388,14 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <remarks>
         /// 要求はキューで管理され、非同期に順次実行されます。
         /// </remarks>
-        /// <param name="position">チャンクの位置。</param>
+        /// <param name="chunk">チャンク。</param>
         /// <param name="type">タスク種別。</param>
         /// <param name="priority">優先度。</param>
-        public void RequestChunkTask(IntVector3 position, ChunkTaskType type, ChunkTaskPriority priority)
+        public void RequestChunkTask(Chunk chunk, ChunkTaskType type, ChunkTaskPriority priority)
         {
             var request = new ChunkTaskRequest
             {
-                Position = position,
+                Chunk = chunk,
                 Type = type,
                 Priority = priority
             };
@@ -788,7 +788,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Monitor.Begin(MonitorProcessChunkTaskRequests);
 
             // TODO
-            int capacity = 4;
+            int capacity = 10;
             ChunkTaskRequest request;
 
             while (0 < capacity && highChunkTaskRequests.TryDequeue(out request))
@@ -810,8 +810,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         void ProcessChunkTask(ref ChunkTaskRequest request)
         {
-            var chunk = GetChunk(request.Position);
-            if (chunk == null) return;
+            var chunk = request.Chunk;
+            if (!chunk.Active)
+                return;
 
             var task = chunkTaskPool.Borrow();
 
@@ -835,10 +836,10 @@ namespace Willcraftia.Xna.Blocks.Models
             switch (chunk.LightState)
             {
                 case ChunkLightState.WaitBuildLocal:
-                    RequestChunkTask(chunk.Position, ChunkTaskType.BuildLocalLights, priority);
+                    RequestChunkTask(chunk, ChunkTaskType.BuildLocalLights, priority);
                     break;
                 case ChunkLightState.WaitPropagate:
-                    RequestChunkTask(chunk.Position, ChunkTaskType.PropagateLights, priority);
+                    RequestChunkTask(chunk, ChunkTaskType.PropagateLights, priority);
                     break;
                 case ChunkLightState.Complete:
                     if (0 < chunk.SolidCount)

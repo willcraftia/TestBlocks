@@ -13,8 +13,8 @@
     "Y": 8,
     "Z": 8
   },
-  "ActivationCapacity": 5,
-  "PassivationCapacity": 10,
+  "ActivationCapacity": 10,
+  "PassivationCapacity": 20,
   "PassivationSearchCapacity": 200,
   "PriorActiveDistance": 96.0,
   "ChunkStoreType": 0
