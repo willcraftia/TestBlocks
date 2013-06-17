@@ -418,6 +418,9 @@ namespace Willcraftia.Xna.Framework.Landscape
                 // 既に実行中ならばスキップ。
                 if (manager.activations.ContainsKey(position)) return;
 
+                // 非アクティブ化中ならばスキップ。
+                if (manager.passivations.ContainsKey(position)) return;
+
                 // アクティブ化可能であるかどうか。
                 if (!manager.CanActivate(position)) return;
 
@@ -447,7 +450,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                     var candidate = candidates.Dequeue();
 
                     // 非同期アクティブ化を実行。
-                    manager.RequestActivatePartitionAsync(candidate.Position);
+                    if (!manager.RequestActivatePartitionAsync(candidate.Position))
+                        break;
                 }
 
                 // 実行キューへ追加しなかった全てを取消。
