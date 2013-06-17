@@ -64,9 +64,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <returns>ブロックのインデックス。</returns>
         public byte GetBlockIndex(int x, int y, int z)
         {
-            if ((uint) manager.ChunkSize.X < (uint) x ||
-                (uint) manager.ChunkSize.Y < (uint) y ||
-                (uint) manager.ChunkSize.Z < (uint) z)
+            if ((uint) manager.ChunkSize.X <= (uint) x ||
+                (uint) manager.ChunkSize.Y <= (uint) y ||
+                (uint) manager.ChunkSize.Z <= (uint) z)
                 throw new ArgumentOutOfRangeException("position");
 
             var index = GetArrayIndex(x, y, z);
@@ -82,9 +82,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <param name="blockIndex">ブロックのインデックス。</param>
         public void SetBlockIndex(int x, int y, int z, byte blockIndex)
         {
-            if ((uint) manager.ChunkSize.X < (uint) x ||
-                (uint) manager.ChunkSize.Y < (uint) y ||
-                (uint) manager.ChunkSize.Z < (uint) z)
+            if ((uint) manager.ChunkSize.X <= (uint) x ||
+                (uint) manager.ChunkSize.Y <= (uint) y ||
+                (uint) manager.ChunkSize.Z <= (uint) z)
                 throw new ArgumentOutOfRangeException("position");
 
             var index = GetArrayIndex(x, y, z);

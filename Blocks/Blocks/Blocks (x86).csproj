@@ -90,6 +90,7 @@
     <Compile Include="Edit\Command.cs" />
     <Compile Include="Edit\WorldCommand.cs" />
     <Compile Include="Edit\WorldCommandFactory.cs" />
+    <Compile Include="Models\ChunkBlock.cs" />
     <Compile Include="Models\ChunkData.cs" />
     <Compile Include="Edit\CommandManager.cs" />
     <Compile Include="Models\ChunkLightUpdater.cs" />

@@ -19,8 +19,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
         ChunkManager manager;
 
-        LocalWorld localWorld;
-
         ChunkVertices[, ,] opaques;
 
         ChunkVertices[, ,] translucences;
@@ -41,7 +39,6 @@ namespace Willcraftia.Xna.Blocks.Models
 
             this.manager = manager;
 
-            localWorld = new LocalWorld(manager, new IntVector3(3));
             ExecuteAction = new Action(Execute);
 
             var segmentCount = manager.MeshSegments.X * manager.MeshSegments.Y * manager.MeshSegments.Z;
@@ -133,9 +130,6 @@ namespace Willcraftia.Xna.Blocks.Models
             Debug.Assert(!completed);
             Debug.Assert(Chunk != null);
 
-            // 周囲のチャンクを収集。
-            localWorld.FetchByCenter(Chunk.Position);
-
             // メッシュを更新。
             for (int z = 0; z < manager.MeshSegments.Z; z++)
             {
@@ -147,8 +141,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     }
                 }
             }
-
-            localWorld.Clear();
 
             manager.RequestUpdateMeshBuffers(this);
 
@@ -172,22 +164,24 @@ namespace Willcraftia.Xna.Blocks.Models
         void BuildBlock(int segmentX, int segmentY, int segmentZ, int x, int y, int z)
         {
             // チャンク内相対ブロック位置。
-            var relativeBlockPosition = new IntVector3
+            var blockPosition = new IntVector3
             {
                 X = segmentX * ChunkManager.MeshSize.X + x,
                 Y = segmentY * ChunkManager.MeshSize.Y + y,
                 Z = segmentZ * ChunkManager.MeshSize.Z + z
             };
 
-            // ワールド内絶対ブロック位置。
-            var absoluteBlockPosition = Chunk.GetAbsoluteBlockPosition(relativeBlockPosition);
+            // 現在ブロック インデックス。
+            var blockIndex = Chunk.GetBlockIndex(blockPosition);
 
-            var blockIndex = Chunk.GetBlockIndex(relativeBlockPosition);
-
-            // 空ならば頂点は存在しない。
+            // 空ならば頂点なし。
             if (Block.EmptyIndex == blockIndex) return;
 
+            // 現在ブロック。
             var block = Chunk.Region.BlockCatalog[blockIndex];
+
+            // 現在ブロック位置。
+            var chunkBlock = new ChunkBlock(Chunk, blockPosition);
 
             // MeshPart が必ずしも平面であるとは限らないが、
             // ここでは平面を仮定して隣接状態を考える。
@@ -200,11 +194,11 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 対象面が存在しない場合はスキップ。
                 if (meshPart == null) continue;
 
-                // 面隣接ブロックの座標
-                var absoluteNeighborBlockPosition = absoluteBlockPosition + side.Direction;
+                // 面隣接ブロック位置。
+                var neighborChunkBlock = chunkBlock.GetNeighbor(side);
 
-                // 面隣接ブロックを探索。
-                var neighborBlockIndex = localWorld.GetBlockIndex(absoluteNeighborBlockPosition);
+                // 面隣接ブロック インデックス。
+                var neighborBlockIndex = neighborChunkBlock.GetBlockIndex();
 
                 // 未定の場合は面なしとする。
                 // 正確な描画には面なしとすべきではないが、
@@ -227,24 +221,21 @@ namespace Willcraftia.Xna.Blocks.Models
 
                 float lightIntensity = 1;
 
-                // 面隣接ブロックにおける天空光による光量を取得。
-
+                // 面隣接ブロック天空光。
                 if (Chunk.LightState == ChunkLightState.Complete)
                 {
-                    var skyLight = localWorld.GetSkylightLevel(absoluteNeighborBlockPosition);
+                    var skyLight = neighborChunkBlock.GetSkylightLevel();
 
                     lightIntensity *= (skyLight / 15f);
                 }
 
-                // 環境光遮蔽を計算。
-                var ambientOcclusion = CalculateAmbientOcclusion(ref absoluteNeighborBlockPosition, side);
+                // 面隣接ブロック環境光遮蔽。
+                lightIntensity *= CalculateAmbientOcclusion(ref neighborChunkBlock, side);
 
-                lightIntensity *= ambientOcclusion;
-
-                // 光量に基づいた頂点色を計算。
+                // 光量に基づいた頂点色。
                 var vertexColor = new Color(lightIntensity, lightIntensity, lightIntensity);
 
-                // メッシュを追加。
+                // メッシュ追加。
                 ChunkVertices vertices;
                 if (block.Fluid || block.Translucent)
                 {
@@ -258,7 +249,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        float CalculateAmbientOcclusion(ref IntVector3 absoluteNeighborBlockPosition, Side side)
+        float CalculateAmbientOcclusion(ref ChunkBlock blockLocation, Side side)
         {
             const float occlusionPerFace = 1 / 5f;
 
@@ -275,11 +266,11 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 自身に対する方向はスキップ。
                 if (mySide == s) continue;
 
-                // 遮蔽対象のブロック位置を算出。
-                var occluderPosition = absoluteNeighborBlockPosition + s.Direction;
+                // 遮蔽ブロック位置。
+                var occluderBlockLocation = blockLocation.GetNeighbor(s);
 
-                // 遮蔽対象のブロックのインデックスを取得。
-                var occluderBlockIndex = localWorld.GetBlockIndex(occluderPosition);
+                // 遮蔽ブロック インデックス。
+                var occluderBlockIndex = occluderBlockLocation.GetBlockIndex();
 
                 // 未定と空の場合は非遮蔽。
                 if (occluderBlockIndex == null || occluderBlockIndex == Block.EmptyIndex) continue;
