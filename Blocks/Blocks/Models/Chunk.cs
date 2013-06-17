@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
+using Willcraftia.Xna.Framework.Collections;
 using Willcraftia.Xna.Framework.Graphics;
 using Willcraftia.Xna.Framework.Landscape;
 using Willcraftia.Xna.Blocks.Models;
@@ -61,6 +62,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 添字はセグメント位置です。
         /// </summary>
         ChunkMesh[, ,] translucentMeshes;
+
+        SideCollection<Chunk> neighbors = new SideCollection<Chunk>();
 
         /// <summary>
         /// チャンクのサイズを取得します。
@@ -172,8 +175,10 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public Chunk GetNeighborChunk(Side side)
         {
-            var neighborPosition = Position + side.Direction;
-            return manager.GetChunk(neighborPosition);
+            lock (neighbors)
+            {
+                return neighbors[side];
+            }
         }
 
         public bool Contains(int x, int y, int z)
@@ -435,6 +440,26 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             base.Passivate();
+        }
+
+        protected override void OnNeighborActivated(Partition neighbor, Side side)
+        {
+            lock (neighbors)
+            {
+                neighbors[side] = neighbor as Chunk;
+            }
+
+            base.OnNeighborActivated(neighbor, side);
+        }
+
+        protected override void OnNeighborPassivated(Partition neighbor, Side side)
+        {
+            lock (neighbors)
+            {
+                neighbors[side] = null;
+            }
+
+            base.OnNeighborPassivated(neighbor, side);
         }
 
         /// <summary>

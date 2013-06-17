@@ -80,8 +80,7 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 var side = Side.Items[i];
 
-                var neighborPosition = chunk.Position + side.Direction;
-                if (!manager.ContainsPartition(neighborPosition))
+                if (chunk.GetNeighborChunk(side) == null)
                 {
                     return false;
                 }
