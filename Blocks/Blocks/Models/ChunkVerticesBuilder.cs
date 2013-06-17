@@ -249,7 +249,7 @@ namespace Willcraftia.Xna.Blocks.Models
             }
         }
 
-        float CalculateAmbientOcclusion(ref ChunkBlock blockLocation, Side side)
+        float CalculateAmbientOcclusion(ref ChunkBlock chunkBlock, Side side)
         {
             const float occlusionPerFace = 1 / 5f;
 
@@ -267,7 +267,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 if (mySide == s) continue;
 
                 // 遮蔽ブロック位置。
-                var occluderBlockLocation = blockLocation.GetNeighbor(s);
+                var occluderBlockLocation = chunkBlock.GetNeighbor(s);
 
                 // 遮蔽ブロック インデックス。
                 var occluderBlockIndex = occluderBlockLocation.GetBlockIndex();
