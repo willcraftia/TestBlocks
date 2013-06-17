@@ -106,11 +106,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected internal virtual void OnNeighborPassivated(Partition neighbor, Side side) { }
 
         /// <summary>
-        /// アクティブ化の開始直前で呼び出されます。
-        /// </summary>
-        protected internal virtual void OnActivating() { }
-
-        /// <summary>
         /// アクティブ化の完了直後で呼び出されます。
         /// </summary>
         protected internal virtual void OnActivated()
@@ -125,11 +120,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Active = false;
         }
-
-        /// <summary>
-        /// 非アクティブ化の完了直後で呼び出されます。
-        /// </summary>
-        protected internal virtual void OnPassivated() { }
 
         /// <summary>
         /// アクティブ化を試行する際に呼び出されます。

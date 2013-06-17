@@ -448,9 +448,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 if (!passivations.TryRemove(partition.Position, out removedPartition))
                     continue;
 
-                // 完了を通知。
-                partition.OnPassivated();
-
                 // 隣接パーティションへ通知。
                 NortifyNeighborPassivated(partition);
 
@@ -663,9 +660,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
             // アクティブ化中としてマーク。
             activations[partition.Position] = partition;
-
-            // アクティブ化の開始を通知。
-            partition.OnActivating();
 
             // タスク実行。
             Task.Factory.StartNew(activatePartitionAsyncAction, partition);
