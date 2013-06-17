@@ -175,7 +175,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         ConcurrentQueue<Chunk> highBuildVerticesRequests = new ConcurrentQueue<Chunk>();
 
-        Dictionary<IntVector3, ChunkVerticesBuilder> activeVerticesBuilder;
+        Dictionary<Chunk, ChunkVerticesBuilder> activeVerticesBuilder;
 
         /// <summary>
         /// 頂点ビルダのプール。
@@ -325,7 +325,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             EmptyData = new ChunkData(this);
 
-            activeVerticesBuilder = new Dictionary<IntVector3, ChunkVerticesBuilder>(verticesBuilderCount);
+            activeVerticesBuilder = new Dictionary<Chunk, ChunkVerticesBuilder>(verticesBuilderCount);
 
             verticesBuilderPool = new Pool<ChunkVerticesBuilder>(() => { return new ChunkVerticesBuilder(this); })
             {
@@ -546,7 +546,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 // 更新中であっても更新処理を実行しても良いのでは？
 
                 // チャンクがメッシュ更新中ならば待機キューへ戻す。
-                if (activeVerticesBuilder.ContainsKey(chunk.Position))
+                if (activeVerticesBuilder.ContainsKey(chunk))
                 {
                     requestQueue.Enqueue(chunk);
                     continue;
@@ -570,7 +570,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
 
                 // 実行中としてマーク。
-                activeVerticesBuilder[chunk.Position] = verticesBuilder;
+                activeVerticesBuilder[chunk] = verticesBuilder;
 
                 // タスク実行。
                 Task.Factory.StartNew(verticesBuilder.ExecuteAction);
@@ -604,7 +604,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            activeVerticesBuilder.Remove(verticesBuilder.Chunk.Position);
+            activeVerticesBuilder.Remove(verticesBuilder.Chunk);
         }
 
         /// <summary>
