@@ -148,13 +148,13 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         ActivationCandidateFinder activationCandidateFinder;
 
-        ConcurrentDictionary<IntVector3, Partition> activations;
+        ConcurrentDictionary<IntVector3, Partition> activatingParitions;
 
-        ConcurrentQueue<Partition> finishedActivationTasks = new ConcurrentQueue<Partition>();
+        ConcurrentQueue<Partition> activatedPartitions = new ConcurrentQueue<Partition>();
 
-        ConcurrentDictionary<IntVector3, Partition> passivations;
+        ConcurrentDictionary<IntVector3, Partition> passivatingPartitions;
 
-        ConcurrentQueue<Partition> finishedPassivationTasks = new ConcurrentQueue<Partition>();
+        ConcurrentQueue<Partition> passivatedPartitions = new ConcurrentQueue<Partition>();
 
         /// <summary>
         /// 同時アクティブ化実行許容量。
@@ -235,7 +235,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public int ActivationCount
         {
-            get { return activations.Count; }
+            get { return activatingParitions.Count; }
         }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         public int PassivationCount
         {
-            get { return passivations.Count; }
+            get { return passivatingPartitions.Count; }
         }
 
         /// <summary>
@@ -264,8 +264,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             passivationCapacity = settings.PassivationCapacity;
             passivationSearchCapacity = settings.PassivationSearchCapacity;
 
-            activations = new ConcurrentDictionary<IntVector3, Partition>(activationCapacity, activationCapacity);
-            passivations = new ConcurrentDictionary<IntVector3, Partition>(passivationCapacity, passivationCapacity);
+            activatingParitions = new ConcurrentDictionary<IntVector3, Partition>(activationCapacity, activationCapacity);
+            passivatingPartitions = new ConcurrentDictionary<IntVector3, Partition>(passivationCapacity, passivationCapacity);
 
             maxActiveVolume = settings.MaxActiveVolume ?? new DefaultActiveVolume(8);
 
@@ -328,8 +328,8 @@ namespace Willcraftia.Xna.Framework.Landscape
                 UpdateOverride();
 
                 // 全ての非アクティブ化が完了していればクローズ完了。
-                if (activations.Count == 0 && passivations.Count == 0 && partitions.Count == 0 &&
-                    finishedActivationTasks.Count == 0 && finishedPassivationTasks.Count == 0)
+                if (activatingParitions.Count == 0 && passivatingPartitions.Count == 0 && partitions.Count == 0 &&
+                    activatedPartitions.Count == 0 && passivatedPartitions.Count == 0)
                 {
                     Closing = false;
                     Closed = true;
@@ -432,14 +432,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Monitor.Begin(MonitorCheckPassivations);
 
-            while (!finishedPassivationTasks.IsEmpty)
+            Partition partition;
+            while (passivatedPartitions.TryDequeue(out partition))
             {
-                Partition partition;
-                if (!finishedPassivationTasks.TryDequeue(out partition))
-                    break;
-
                 Partition removedPartition;
-                if (!passivations.TryRemove(partition.Position, out removedPartition))
+                if (!passivatingPartitions.TryRemove(partition.Position, out removedPartition))
                     continue;
 
                 // 隣接パーティションへ通知。
@@ -459,14 +456,11 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             Monitor.Begin(MonitorCheckActivations);
 
-            while (!finishedActivationTasks.IsEmpty)
+            Partition partition;
+            while (activatedPartitions.TryDequeue(out partition))
             {
-                Partition partition;
-                if (!finishedActivationTasks.TryDequeue(out partition))
-                    break;
-
                 Partition removedPartition;
-                if (!activations.TryRemove(partition.Position, out removedPartition))
+                if (!activatingParitions.TryRemove(partition.Position, out removedPartition))
                     continue;
 
                 // アクティブ リストへ追加。
@@ -552,7 +546,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             for (int i = 0; i < count; i++)
             {
                 // 同時実行数を越えるならば終了。
-                if (passivationCapacity <= passivations.Count) break;
+                if (passivationCapacity <= passivatingPartitions.Count) break;
 
                 var partition = partitions.Dequeue();
 
@@ -567,7 +561,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
 
                 // 非アクティブ化中としてマーク。
-                passivations[partition.Position] = partition;
+                passivatingPartitions[partition.Position] = partition;
 
                 // アクティブではない状態にする。
                 clusterManager.RemovePartition(partition.Position);
@@ -602,7 +596,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             partition.Passivate();
 
             // タスク終了を記録。
-            finishedPassivationTasks.Enqueue(partition);
+            passivatedPartitions.Enqueue(partition);
         }
 
         /// <summary>
@@ -623,7 +617,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         internal bool RequestActivatePartition(IntVector3 position)
         {
             // 同時実行許容量を超えるならば終了。
-            if (activationCapacity <= activations.Count)
+            if (activationCapacity <= activatingParitions.Count)
                 return false;
 
             // 既にアクティブならばスキップ。
@@ -631,11 +625,11 @@ namespace Willcraftia.Xna.Framework.Landscape
                 return true;
 
             // 既に実行中ならばスキップ。
-            if (activations.ContainsKey(position))
+            if (activatingParitions.ContainsKey(position))
                 return true;
 
             // 非アクティブ化中ならばスキップ。
-            if (passivations.ContainsKey(position))
+            if (passivatingPartitions.ContainsKey(position))
                 return true;
 
             // アクティブ化不能ならばスキップ。
@@ -650,7 +644,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 return true;
 
             // アクティブ化中としてマーク。
-            activations[partition.Position] = partition;
+            activatingParitions[partition.Position] = partition;
 
             // タスク実行。
             Task.Factory.StartNew(activatePartitionAction, partition);
@@ -670,7 +664,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             partition.Activate();
             
             // タスク完了を記録。
-            finishedActivationTasks.Enqueue(partition);
+            activatedPartitions.Enqueue(partition);
         }
 
         #region IDisposable
@@ -688,7 +682,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             Dispose(false);
         }
 
-        void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposed) return;
 
@@ -696,9 +690,6 @@ namespace Willcraftia.Xna.Framework.Landscape
             // サブクラスにおける破棄。
 
             DisposeOverride(disposing);
-
-            //----------------------------------------------------------------
-            // 全パーティションの破棄。
 
             if (disposing)
             {
