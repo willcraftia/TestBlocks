@@ -395,8 +395,20 @@ namespace Willcraftia.Xna.Framework.Landscape
                     // 候補を探索。
                     volume.ForEach(collectAction);
 
-                    // 候補をアクティブ化。
-                    Activate();
+                    // 候補をマネージャへ通知。
+                    while (0 < candidates.Count)
+                    {
+                        // 候補を取得。
+                        var candidate = candidates.Dequeue();
+
+                        // 非同期アクティブ化を実行。
+                        // マネージャが実行許容量を超えた場合は通知を停止。
+                        if (!manager.RequestActivatePartition(candidate.Position))
+                            break;
+                    }
+
+                    // 候補キューをリセット。
+                    candidates.Clear();
                 }
 
                 // 停止イベントをシグナル状態に。
@@ -404,25 +416,12 @@ namespace Willcraftia.Xna.Framework.Landscape
             }
 
             /// <summary>
-            /// 指定のオフセット位置にあるパーティションが候補となるか否かを検査し、
-            /// 候補となる場合には候補キューへ入れます。
+            /// アクティブ領域に含まれるパーティションを探索して候補キューへ入れます。
             /// </summary>
             /// <param name="offset"></param>
             void Collect(ref IntVector3 offset)
             {
                 var position = eyePositionPartition + offset;
-
-                // 既にアクティブならばスキップ。
-                if (manager.ContainsPartition(position)) return;
-
-                // 既に実行中ならばスキップ。
-                if (manager.activations.ContainsKey(position)) return;
-
-                // 非アクティブ化中ならばスキップ。
-                if (manager.passivations.ContainsKey(position)) return;
-
-                // アクティブ化可能であるかどうか。
-                if (!manager.CanActivate(position)) return;
 
                 var candidate = new Candidate();
                 candidate.Position = position;
@@ -437,25 +436,6 @@ namespace Willcraftia.Xna.Framework.Landscape
                 candidate.CenterWorld = candidate.BoxWorld.GetCenter();
 
                 candidates.Enqueue(candidate);
-            }
-
-            /// <summary>
-            /// 候補を順にアクティブ化します。
-            /// </summary>
-            void Activate()
-            {
-                while (0 < candidates.Count)
-                {
-                    // 候補を取得。
-                    var candidate = candidates.Dequeue();
-
-                    // 非同期アクティブ化を実行。
-                    if (!manager.RequestActivatePartitionAsync(candidate.Position))
-                        break;
-                }
-
-                // 実行キューへ追加しなかった全てを取消。
-                candidates.Clear();
             }
         }
 
@@ -984,18 +964,34 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// <returns>
         /// true (アクティブ化要求を許可した場合)、false (それ以外の場合)。
         /// </returns>
-        internal bool RequestActivatePartitionAsync(IntVector3 position)
+        internal bool RequestActivatePartition(IntVector3 position)
         {
             // 同時実行許容量を越えるならば終了。
             if (activationCapacity <= activations.Count)
                 return false;
+
+            // 既にアクティブならばスキップ。
+            if (ContainsPartition(position))
+                return true;
+
+            // 既に実行中ならばスキップ。
+            if (activations.ContainsKey(position))
+                return true;
+
+            // 非アクティブ化中ならばスキップ。
+            if (passivations.ContainsKey(position))
+                return true;
+
+            // アクティブ化可能であるかどうか。
+            if (!CanActivate(position))
+                return true;
 
             // インスタンス生成。
             var partition = Create(position);
 
             // 生成が拒否されたら終了。
             if (partition == null)
-                return false;
+                return true;
 
             // アクティブ化中としてマーク。
             activations[partition.Position] = partition;
