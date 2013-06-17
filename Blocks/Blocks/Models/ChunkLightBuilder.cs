@@ -9,6 +9,10 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class ChunkLightBuilder
     {
+        public static readonly Action<Chunk> BuildLocalLightsAction = new Action<Chunk>(BuildLocalLights);
+
+        public static readonly Action<Chunk> PropagateLightsAction = new Action<Chunk>(PropagateLights);
+
         public static bool CanPenetrateLight(Block block)
         {
             return block == null || block.Translucent;
