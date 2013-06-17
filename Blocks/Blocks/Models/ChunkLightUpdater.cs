@@ -59,7 +59,14 @@ namespace Willcraftia.Xna.Blocks.Models
                 return;
             }
 
-            localWorld.SetSkylightLevel(absoluteBlockPosition, (byte) (level - 1));
+            if (level == Chunk.MaxSkylightLevel)
+            {
+                localWorld.SetSkylightLevel(absoluteBlockPosition, level);
+            }
+            else
+            {
+                localWorld.SetSkylightLevel(absoluteBlockPosition, (byte) (level - 1));
+            }
 
             PushSkylight(ref absoluteBlockPosition, level);
 
