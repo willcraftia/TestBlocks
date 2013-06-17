@@ -26,7 +26,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         RefAction<IntVector3> rediffuseSkylightLevelAction;
 
-        public List<IntVector3> AffectedChunkPositions { get; private set; }
+        public List<Chunk> AffectedChunks { get; private set; }
 
         public ChunkLightUpdater(ChunkManager manager)
         {
@@ -36,20 +36,20 @@ namespace Willcraftia.Xna.Blocks.Models
 
             localWorld = new LocalWorld(manager, new IntVector3(3));
             lightUpdatedPositions = new List<IntVector3>(manager.ChunkSize.Y);
-            AffectedChunkPositions = new List<IntVector3>(3 * 3 * 3);
+            AffectedChunks = new List<Chunk>(3 * 3 * 3);
             clearSkylightLevelAction = new RefAction<IntVector3>(ClearSkylightLevel);
             rediffuseSkylightLevelAction = new RefAction<IntVector3>(RediffuseSkylightLevel);
         }
 
         public void UpdateSkylightLevelByBlockRemoved(ref IntVector3 absoluteBlockPosition)
         {
-            AffectedChunkPositions.Clear();
+            AffectedChunks.Clear();
 
             var chunkPosition = manager.GetChunkPositionByBlockPosition(absoluteBlockPosition);
 
             localWorld.FetchByCenter(chunkPosition);
 
-            AffectedChunkPositions.Add(chunkPosition);
+            AddAffectedChunk(ref absoluteBlockPosition);
 
             var level = GetMaxNeighborSkylightLevel(ref absoluteBlockPosition);
 
@@ -68,13 +68,13 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void UpdateSkylightLevelByBlockCreated(ref IntVector3 absoluteBlockPosition)
         {
-            AffectedChunkPositions.Clear();
+            AffectedChunks.Clear();
 
             var chunkPosition = manager.GetChunkPositionByBlockPosition(absoluteBlockPosition);
 
             localWorld.FetchByCenter(chunkPosition);
 
-            AffectedChunkPositions.Add(chunkPosition);
+            AddAffectedChunk(ref absoluteBlockPosition);
 
             var oldLevel = localWorld.GetSkylightLevel(absoluteBlockPosition);
 
@@ -229,9 +229,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     lightUpdatedPositions.Add(bottomNeighborPosition);
 
                     // 影響のあったチャンクを記録。
-                    var chunkPosition = manager.GetChunkPositionByBlockPosition(bottomNeighborPosition);
-                    if (!AffectedChunkPositions.Contains(chunkPosition))
-                        AffectedChunkPositions.Add(chunkPosition);
+                    AddAffectedChunk(ref bottomNeighborPosition);
                 }
             }
 
@@ -269,9 +267,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 DiffuseSkylight(ref neighborBlockPosition);
 
                 // 影響のあったチャンクを記録。
-                var chunkPosition = manager.GetChunkPositionByBlockPosition(neighborBlockPosition);
-                if (!AffectedChunkPositions.Contains(chunkPosition))
-                    AffectedChunkPositions.Add(chunkPosition);
+                AddAffectedChunk(ref neighborBlockPosition);
             }
         }
 
@@ -301,9 +297,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 DiffuseSkylight(ref neighborBlockPosition, ref bounds);
 
                 // 影響のあったチャンクを記録。
-                var chunkPosition = manager.GetChunkPositionByBlockPosition(neighborBlockPosition);
-                if (!AffectedChunkPositions.Contains(chunkPosition))
-                    AffectedChunkPositions.Add(chunkPosition);
+                AddAffectedChunk(ref neighborBlockPosition);
             }
         }
 
@@ -311,6 +305,14 @@ namespace Willcraftia.Xna.Blocks.Models
         {
             var block = localWorld.GetBlock(absoluteBlockPosition);
             return ChunkLightBuilder.CanPenetrateLight(block);
+        }
+
+        void AddAffectedChunk(ref IntVector3 absoluteBlockPosition)
+        {
+            var affectedChunk = localWorld.GetChunk(absoluteBlockPosition);
+
+            if (!AffectedChunks.Contains(affectedChunk))
+                AffectedChunks.Add(affectedChunk);
         }
     }
 }

@@ -56,11 +56,10 @@ namespace Willcraftia.Xna.Blocks.Edit
                 lightUpdater.UpdateSkylightLevelByBlockCreated(ref BlockPosition);
             }
 
-            for (int i = 0; i < lightUpdater.AffectedChunkPositions.Count; i++)
+            for (int i = 0; i < lightUpdater.AffectedChunks.Count; i++)
             {
-                var p = lightUpdater.AffectedChunkPositions[i];
-                var c = chunkManager.GetChunk(p);
-                chunkManager.RequestBuildVertices(c, ChunkMeshUpdatePriority.High);
+                var affectedChunk = lightUpdater.AffectedChunks[i];
+                chunkManager.RequestBuildVertices(affectedChunk, ChunkMeshUpdatePriority.High);
             }
 
             chunkManager.ReturnLightUpdater(lightUpdater);
