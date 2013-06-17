@@ -508,15 +508,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// チャンクのグラフィックス リソースを解放します。
-        /// </summary>
-        protected override void Release(Partition partition)
-        {
-            var chunk = partition as Chunk;
-            chunk.ReleaseGraphicsResources();
-        }
-
-        /// <summary>
         /// このクラスの実装では、以下の処理を行います。
         /// 
         /// ・新たなメッシュ更新の開始。

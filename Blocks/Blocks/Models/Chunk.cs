@@ -130,38 +130,6 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// グラフィックス リソースを開放します。
-        /// </summary>
-        public void ReleaseGraphicsResources()
-        {
-            for (int z = 0; z < manager.MeshSegments.Z; z++)
-            {
-                for (int y = 0; y < manager.MeshSegments.Y; y++)
-                {
-                    for (int x = 0; x < manager.MeshSegments.X; x++)
-                    {
-                        if (opaqueMeshes[x, y, z] != null)
-                        {
-                            DetachMesh(opaqueMeshes[x, y, z]);
-                            opaqueMeshes[x, y, z] = null;
-                        }
-                        if (translucentMeshes[x, y, z] != null)
-                        {
-                            DetachMesh(translucentMeshes[x, y, z]);
-                            translucentMeshes[x, y, z] = null;
-                        }
-                    }
-                }
-            }
-
-            if (VerticesBuilder != null)
-            {
-                manager.ReleaseVerticesBuilder(VerticesBuilder);
-                VerticesBuilder = null;
-            }
-        }
-
-        /// <summary>
         /// 指定のチャンク サイズで起こりうる最大の頂点数を計算します。
         /// </summary>
         /// <param name="chunkSize">チャンク サイズ。</param>
@@ -442,11 +410,13 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// チャンクをチャンク ストアへ永続化します。
+        /// グラフィックス リソースを開放し、チャンクをチャンク ストアへ永続化します。
         /// </summary>
         protected override void PassivateOverride()
         {
             Debug.Assert(region != null);
+
+            ReleaseGraphicsResources();
 
             lock (blockIndexLock)
             {
@@ -462,6 +432,38 @@ namespace Willcraftia.Xna.Blocks.Models
             }
 
             base.PassivateOverride();
+        }
+
+        /// <summary>
+        /// グラフィックス リソースを開放します。
+        /// </summary>
+        void ReleaseGraphicsResources()
+        {
+            for (int z = 0; z < manager.MeshSegments.Z; z++)
+            {
+                for (int y = 0; y < manager.MeshSegments.Y; y++)
+                {
+                    for (int x = 0; x < manager.MeshSegments.X; x++)
+                    {
+                        if (opaqueMeshes[x, y, z] != null)
+                        {
+                            DetachMesh(opaqueMeshes[x, y, z]);
+                            opaqueMeshes[x, y, z] = null;
+                        }
+                        if (translucentMeshes[x, y, z] != null)
+                        {
+                            DetachMesh(translucentMeshes[x, y, z]);
+                            translucentMeshes[x, y, z] = null;
+                        }
+                    }
+                }
+            }
+
+            if (VerticesBuilder != null)
+            {
+                manager.ReleaseVerticesBuilder(VerticesBuilder);
+                VerticesBuilder = null;
+            }
         }
 
         void AttachMesh(ChunkMesh mesh)

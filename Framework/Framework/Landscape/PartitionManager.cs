@@ -400,12 +400,6 @@ namespace Willcraftia.Xna.Framework.Landscape
         protected abstract Partition Create(IntVector3 position);
 
         /// <summary>
-        /// 非アクティブ化でパーティションを解放する際に呼び出されます。
-        /// </summary>
-        /// <param name="partition">パーティション。</param>
-        protected abstract void Release(Partition partition);
-
-        /// <summary>
         /// パーティションがアクティブ化可能であるか否かを検査します。
         /// パーティション マネージャは、
         /// アクティブ領域からアクティブ化対象のパーティションの位置を決定しますが、
@@ -453,9 +447,6 @@ namespace Willcraftia.Xna.Framework.Landscape
 
                 // サブクラスへも通知。
                 OnPassivated(partition);
-
-                // 解放。
-                Release(partition);
             }
 
             Monitor.End(MonitorCheckPassivations);
