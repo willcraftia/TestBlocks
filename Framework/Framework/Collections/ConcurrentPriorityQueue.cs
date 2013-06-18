@@ -109,7 +109,7 @@ namespace Willcraftia.Xna.Framework.Collections
         /// </returns>
         public bool TryDequeue(out T result)
         {
-            lock (this)
+            lock (queue)
             {
                 if (queue.Count == 0)
                 {
@@ -135,7 +135,7 @@ namespace Willcraftia.Xna.Framework.Collections
         /// </returns>
         public bool TryPeek(out T result)
         {
-            lock (this)
+            lock (queue)
             {
                 if (queue.Count == 0)
                 {
