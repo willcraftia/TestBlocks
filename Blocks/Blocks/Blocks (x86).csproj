@@ -109,7 +109,6 @@
     <Compile Include="Models\ChunkEffect.cs" />
     <Compile Include="Models\GraphicsSettings.cs" />
     <Compile Include="Models\ChunkSettings.cs" />
-    <Compile Include="Models\ChunkNeighbors.cs" />
     <Compile Include="Models\SceneSettings.cs" />
     <Compile Include="Models\TerrainDensityTest.cs" />
     <Compile Include="Models\TimeColor.cs" />
