@@ -11,7 +11,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 {
     public sealed class Scanline : PostProcessor
     {
-        public const string MonitorProcess = "Scanline.Process";
+        public const string InstrumentProcess = "Scanline.Process";
 
         Effect effect;
 
@@ -34,7 +34,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             var height = context.Destination.Height;
 
@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
     }
 }

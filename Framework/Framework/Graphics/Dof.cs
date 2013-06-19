@@ -129,11 +129,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const string MonitorProcess = "Dof.Process";
+        public const string InstrumentProcess = "Dof.Process";
 
-        public const string MonitorDrawDepth = "Dof.DrawDepth";
+        public const string InstrumentDrawDepth = "Dof.DrawDepth";
 
-        public const string MonitorFilter = "Dof.Filter";
+        public const string InstrumentFilter = "Dof.Filter";
 
         BasicCamera internalCamera = new BasicCamera("DofInternal");
 
@@ -209,7 +209,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             DrawDepth(context);
             Filter(context);
@@ -217,12 +217,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             TextureDisplay.Add(depthMap);
             TextureDisplay.Add(bluredSceneMap);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
 
         void DrawDepth(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorDrawDepth);
+            Instrument.Begin(InstrumentDrawDepth);
 
             var viewerCamera = context.ActiveCamera;
 
@@ -277,12 +277,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorDrawDepth);
+            Instrument.End();
         }
 
         void Filter(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorFilter);
+            Instrument.Begin(InstrumentFilter);
 
             //================================================================
             // シーンにブラーを適用
@@ -312,7 +312,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorFilter);
+            Instrument.End();
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

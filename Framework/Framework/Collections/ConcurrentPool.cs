@@ -75,6 +75,14 @@ namespace Willcraftia.Xna.Framework.Collections
             }
         }
 
+        public bool TryBorrow(out T result)
+        {
+            lock (this)
+            {
+                return pool.TryBorrow(out result);
+            }
+        }
+
         public void Return(T obj)
         {
             lock (this)

@@ -20,7 +20,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class RegionManager : IDisposable
     {
-        public const string MonitorUpdate = "RegionManager.Update";
+        public const string InstrumentUpdate = "RegionManager.Update";
 
         static readonly Logger logger = new Logger(typeof(RegionManager).Name);
 
@@ -196,7 +196,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
-            Monitor.Begin(MonitorUpdate);
+            Instrument.Begin(InstrumentUpdate);
 
             //----------------------------------------------------------------
             // シーン設定
@@ -245,7 +245,7 @@ namespace Willcraftia.Xna.Blocks.Models
                 }
             }
 
-            Monitor.End(MonitorUpdate);
+            Instrument.End();
         }
 
         public void PrepareChunkEffects()

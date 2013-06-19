@@ -8,25 +8,31 @@ using System.Diagnostics;
 
 namespace Willcraftia.Xna.Framework.Diagnostics
 {
-    public sealed class Monitor
+    public sealed class Instrument
     {
-        public static List<IMonitorListener> Listeners { get; private set; }
+        static readonly Stack<string> stack = new Stack<string>(4);
 
-        static Monitor()
+        public static List<IInstrumentListener> Listeners { get; private set; }
+
+        static Instrument()
         {
-            Listeners = new List<IMonitorListener>();
+            Listeners = new List<IInstrumentListener>();
         }
 
         [Conditional("DEBUG"), Conditional("TRACE")]
         public static void Begin(string name)
         {
+            stack.Push(name);
+
             for (int i = 0; i < Listeners.Count; i++)
                 Listeners[i].Begin(name);
         }
 
         [Conditional("DEBUG"), Conditional("TRACE")]
-        public static void End(string name)
+        public static void End()
         {
+            var name = stack.Pop();
+
             for (int i = 0; i < Listeners.Count; i++)
                 Listeners[i].End(name);
         }

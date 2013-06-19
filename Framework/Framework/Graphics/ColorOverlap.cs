@@ -14,7 +14,7 @@ namespace Willcraftia.Xna.Framework.Graphics
     /// </summary>
     public sealed class ColorOverlap : PostProcessor, IDisposable
     {
-        public const string MonitorProcess = "ColorOverlap.Process";
+        public const string InstrumentProcess = "ColorOverlap.Process";
 
         Texture2D fillTexture;
 
@@ -38,7 +38,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             GraphicsDevice.SetRenderTarget(context.Destination);
             SpriteBatch.Begin();
@@ -47,7 +47,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
 
         #region IDisposable

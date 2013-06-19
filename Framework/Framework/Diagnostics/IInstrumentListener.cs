@@ -6,7 +6,7 @@ using System;
 
 namespace Willcraftia.Xna.Framework.Diagnostics
 {
-    public interface IMonitorListener
+    public interface IInstrumentListener
     {
         void Begin(string name);
 

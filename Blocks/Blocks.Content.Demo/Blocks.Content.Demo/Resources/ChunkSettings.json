@@ -4,8 +4,8 @@
     "Y": 32,
     "Z": 32
   },
-  "MeshUpdateSearchCapacity": 100,
-  "VerticesBuilderCount": 5,
+  "VertexBuildConcurrencyLevel": 2,
+  "UpdateBufferCountPerFrame": 32,
   "MinActiveRange": 8,
   "MaxActiveRange": 9,
   "ClusterSize": {
@@ -13,7 +13,7 @@
     "Y": 8,
     "Z": 8
   },
-  "ActivationCapacity": 10,
+  "ActivationCapacity": 2,
   "PassivationCapacity": 20,
   "PassivationSearchCapacity": 200,
   "PriorActiveDistance": 96.0,

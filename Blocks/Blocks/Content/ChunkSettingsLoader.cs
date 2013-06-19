@@ -23,8 +23,8 @@ namespace Willcraftia.Xna.Blocks.Content
             var settings = new ChunkSettings
             {
                 ChunkSize = definition.ChunkSize,
-                MeshUpdateSearchCapacity = definition.MeshUpdateSearchCapacity,
-                VerticesBuilderCount = definition.VerticesBuilderCount,
+                VertexBuildConcurrencyLevel = definition.VertexBuildConcurrencyLevel,
+                UpdateBufferCountPerFrame = definition.UpdateBufferCountPerFrame,
                 MinActiveVolume = definition.MinActiveRange,
                 MaxActiveVolume = definition.MaxActiveRange,
                 ChunkStoreType = definition.ChunkStoreType
@@ -50,8 +50,8 @@ namespace Willcraftia.Xna.Blocks.Content
             var definition = new ChunkSettingsDefinition
             {
                 ChunkSize = settings.ChunkSize,
-                MeshUpdateSearchCapacity = settings.MeshUpdateSearchCapacity,
-                VerticesBuilderCount = settings.VerticesBuilderCount,
+                VertexBuildConcurrencyLevel = settings.VertexBuildConcurrencyLevel,
+                UpdateBufferCountPerFrame = settings.UpdateBufferCountPerFrame,
                 MinActiveRange = settings.MinActiveVolume,
                 MaxActiveRange = settings.MaxActiveVolume,
                 ClusterSize = settings.PartitionManager.ClusterSize,

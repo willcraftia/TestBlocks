@@ -30,7 +30,12 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// チャンク マネージャ。
         /// </summary>
-        ChunkManager manager;
+        ChunkManager chunkManager;
+
+        /// <summary>
+        /// メッシュ マネージャ。
+        /// </summary>
+        ChunkMeshManager meshManager;
 
         /// <summary>
         /// チャンクが属するリージョン。
@@ -48,8 +53,6 @@ namespace Willcraftia.Xna.Blocks.Models
         /// 空 (そら) を表すチャンクに対する大幅なメモリ節減を目的としています。
         /// </remarks>
         ChunkData data;
-
-        volatile ChunkLightState lightState;
 
         /// <summary>
         /// 不透明メッシュ配列。
@@ -70,7 +73,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public IntVector3 Size
         {
-            get { return manager.ChunkSize; }
+            get { return chunkManager.ChunkSize; }
         }
 
         /// <summary>
@@ -87,15 +90,6 @@ namespace Willcraftia.Xna.Blocks.Models
         public SceneNode Node { get; private set; }
 
         /// <summary>
-        /// 光レベルの構築状態を取得します。
-        /// </summary>
-        public ChunkLightState LightState
-        {
-            get { return lightState; }
-            set { lightState = value; }
-        }
-
-        /// <summary>
         /// 非空ブロックの総数を取得します。
         /// </summary>
         public int SolidCount
@@ -110,22 +104,23 @@ namespace Willcraftia.Xna.Blocks.Models
         /// <summary>
         /// インスタンスを生成します。
         /// </summary>
-        /// <param name="manager">チャンク マネージャ。</param>
+        /// <param name="chunkManager">チャンク マネージャ。</param>
         /// <param name="position">チャンクの位置。</param>
         /// <param name="region">リージョン。</param>
-        public Chunk(ChunkManager manager, Region region, IntVector3 position)
+        public Chunk(ChunkManager chunkManager, ChunkMeshManager meshManager, Region region, IntVector3 position)
         {
-            if (manager == null) throw new ArgumentNullException("manager");
+            if (chunkManager == null) throw new ArgumentNullException("manager");
             if (region == null) throw new ArgumentNullException("region");
 
-            this.manager = manager;
+            this.chunkManager = chunkManager;
+            this.meshManager = meshManager;
             this.region = region;
             Position = position;
 
-            opaqueMeshes = new ChunkMesh[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
-            translucentMeshes = new ChunkMesh[manager.MeshSegments.X, manager.MeshSegments.Y, manager.MeshSegments.Z];
+            opaqueMeshes = new ChunkMesh[meshManager.MeshSegments.X, meshManager.MeshSegments.Y, meshManager.MeshSegments.Z];
+            translucentMeshes = new ChunkMesh[meshManager.MeshSegments.X, meshManager.MeshSegments.Y, meshManager.MeshSegments.Z];
 
-            Node = manager.CreateNode();
+            Node = chunkManager.CreateNode();
         }
 
         /// <summary>
@@ -183,9 +178,9 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public bool Contains(int x, int y, int z)
         {
-            return 0 <= x && x < manager.ChunkSize.X &&
-                0 <= y && y < manager.ChunkSize.Y &&
-                0 <= z && z < manager.ChunkSize.Z;
+            return 0 <= x && x < chunkManager.ChunkSize.X &&
+                0 <= y && y < chunkManager.ChunkSize.Y &&
+                0 <= z && z < chunkManager.ChunkSize.Z;
         }
 
         public bool Contains(IntVector3 position)
@@ -232,7 +227,7 @@ namespace Willcraftia.Xna.Blocks.Models
                     if (blockIndex == Block.EmptyIndex) return;
 
                     // 非空ブロックを設定しようとする場合はデータを新規生成。
-                    data = new ChunkData(manager);
+                    data = new ChunkData(chunkManager);
                 }
 
                 // 同じインデックスならば更新しない。
@@ -255,54 +250,19 @@ namespace Willcraftia.Xna.Blocks.Models
             SetBlockIndex(position.X, position.Y, position.Z, blockIndex);
         }
 
-        public byte GetSkylightLevel(int x, int y, int z)
-        {
-            if (data == null) return MaxSkylightLevel;
-
-            return data.GetSkylightLevel(x, y, z);
-        }
-
-        public byte GetSkylightLevel(IntVector3 position)
-        {
-            return GetSkylightLevel(position.X, position.Y, position.Z);
-        }
-
-        public void SetSkylightLevel(int x, int y, int z, byte value)
-        {
-            // 完全空チャンクの場合、光量データは不要。
-            if (data == null) return;
-
-            data.SetSkylightLevel(x, y, z, value);
-        }
-
-        public void SetSkylightLevel(IntVector3 position, byte value)
-        {
-            SetSkylightLevel(position.X, position.Y, position.Z, value);
-        }
-
-        public void FillSkylightLevels(byte level)
-        {
-            if (data != null) data.FillSkylightLevels(level);
-        }
-
-        public void ClearSkylightLevels()
-        {
-            if (data != null) data.ClearSkylightLevels();
-        }
-
         public int GetRelativeBlockPositionX(int absoluteBlockPositionX)
         {
-            return absoluteBlockPositionX - (Position.X * manager.ChunkSize.X);
+            return absoluteBlockPositionX - (Position.X * chunkManager.ChunkSize.X);
         }
 
         public int GetRelativeBlockPositionY(int absoluteBlockPositionY)
         {
-            return absoluteBlockPositionY - (Position.Y * manager.ChunkSize.Y);
+            return absoluteBlockPositionY - (Position.Y * chunkManager.ChunkSize.Y);
         }
 
         public int GetRelativeBlockPositionZ(int absoluteBlockPositionZ)
         {
-            return absoluteBlockPositionZ - (Position.Z * manager.ChunkSize.Z);
+            return absoluteBlockPositionZ - (Position.Z * chunkManager.ChunkSize.Z);
         }
 
         public IntVector3 GetRelativeBlockPosition(IntVector3 absoluteBlockPosition)
@@ -317,17 +277,17 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public int GetAbsoluteBlockPositionX(int relativeBlockPositionX)
         {
-            return Position.X * manager.ChunkSize.X + relativeBlockPositionX;
+            return Position.X * chunkManager.ChunkSize.X + relativeBlockPositionX;
         }
 
         public int GetAbsoluteBlockPositionY(int relativeBlockPositionY)
         {
-            return Position.Y * manager.ChunkSize.Y + relativeBlockPositionY;
+            return Position.Y * chunkManager.ChunkSize.Y + relativeBlockPositionY;
         }
 
         public int GetAbsoluteBlockPositionZ(int relativeBlockPositionZ)
         {
-            return Position.Z * manager.ChunkSize.Z + relativeBlockPositionZ;
+            return Position.Z * chunkManager.ChunkSize.Z + relativeBlockPositionZ;
         }
 
         public IntVector3 GetAbsoluteBlockPosition(IntVector3 relativeBlockPosition)
@@ -381,9 +341,9 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         protected override void Activate()
         {
-            var newData = new ChunkData(manager);
+            var newData = new ChunkData(chunkManager);
 
-            if (manager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, newData))
+            if (chunkManager.ChunkStore.GetChunk(region.ChunkStoreKey, Position, newData))
             {
                 if (newData.SolidCount == 0)
                 {
@@ -400,10 +360,6 @@ namespace Willcraftia.Xna.Blocks.Models
                 for (int i = 0; i < region.ChunkProcesures.Count; i++)
                     region.ChunkProcesures[i].Generate(this);
             }
-
-            // 空チャンクは光レベル構築が不要 (全位置の光レベルが最大)。
-            if (data == null)
-                lightState = ChunkLightState.Complete;
 
             base.Activate();
         }
@@ -430,12 +386,12 @@ namespace Willcraftia.Xna.Blocks.Models
             {
                 if (data != null)
                 {
-                    manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, data);
+                    chunkManager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, data);
                 }
                 else
                 {
                     // 空データで永続化。
-                    manager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, manager.EmptyData);
+                    chunkManager.ChunkStore.AddChunk(region.ChunkStoreKey, Position, chunkManager.EmptyData);
                 }
             }
 
@@ -447,6 +403,23 @@ namespace Willcraftia.Xna.Blocks.Models
             lock (neighbors)
             {
                 neighbors[side] = neighbor as Chunk;
+
+                bool allNeighborsExist = true;
+                for (int i = 0; i < neighbors.Count; i++)
+                {
+                    if (neighbors[i] == null)
+                    {
+                        allNeighborsExist = false;
+                        break;
+                    }
+                }
+
+                if (allNeighborsExist)
+                {
+                    // 隣接チャンクが揃ってからメッシュ構築を要求するが、
+                    // 実際にはメッシュ構築の最中に隣接チャンクが非アクティブ化されることもある。
+                    chunkManager.RequestUpdateMesh(this, ChunkMeshUpdatePriority.Normal);
+                }
             }
 
             base.OnNeighborActivated(neighbor, side);
@@ -467,11 +440,11 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         void DetachAllMeshes()
         {
-            for (int z = 0; z < manager.MeshSegments.Z; z++)
+            for (int z = 0; z < meshManager.MeshSegments.Z; z++)
             {
-                for (int y = 0; y < manager.MeshSegments.Y; y++)
+                for (int y = 0; y < meshManager.MeshSegments.Y; y++)
                 {
-                    for (int x = 0; x < manager.MeshSegments.X; x++)
+                    for (int x = 0; x < meshManager.MeshSegments.X; x++)
                     {
                         if (opaqueMeshes[x, y, z] != null)
                         {
@@ -500,7 +473,7 @@ namespace Willcraftia.Xna.Blocks.Models
             Node.Objects.Remove(mesh);
 
             // マネージャへ削除要求。
-            manager.DisposeMesh(mesh);
+            chunkManager.DisposeMesh(mesh);
         }
     }
 }

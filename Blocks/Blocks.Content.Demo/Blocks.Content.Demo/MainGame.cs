@@ -21,13 +21,11 @@ using Willcraftia.Xna.Blocks.Models;
 
 namespace Willcraftia.Xna.Blocks.Content.Demo
 {
-    using DiagnosticsMonitor = Willcraftia.Xna.Framework.Diagnostics.Monitor;
-
     public class MainGame : Game
     {
-        public const string MonitorUpdate = "MainGame.Update";
+        public const string InstrumentUpdate = "MainGame.Update";
 
-        public const string MonitorDraw = "MainGame.Draw";
+        public const string InstrumentDraw = "MainGame.Draw";
 
         static readonly Logger logger = new Logger(typeof(MainGame).Name);
 
@@ -153,40 +151,40 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             #region モニタ
             
             monitorListener = new TimeRulerMonitorListener(timeRuler);
-            DiagnosticsMonitor.Listeners.Add(monitorListener);
+            Instrument.Listeners.Add(monitorListener);
 
             int barIndex = 0;
 
-            monitorListener.CreateMarker(MonitorUpdate, barIndex, Color.White);
+            monitorListener.CreateMarker(InstrumentUpdate, barIndex, Color.White);
 
             barIndex++;
-            monitorListener.CreateMarker(PartitionManager.MonitorUpdate, barIndex, Color.Cyan);
+            monitorListener.CreateMarker(PartitionManager.InstrumentUpdate, barIndex, Color.Cyan);
             barIndex++;
-            monitorListener.CreateMarker(PartitionManager.MonitorCheckPassivations, barIndex, Color.Orange);
-            monitorListener.CreateMarker(PartitionManager.MonitorCheckActivations, barIndex, Color.Green);
-            monitorListener.CreateMarker(PartitionManager.MonitorPassivate, barIndex, Color.Red);
+            monitorListener.CreateMarker(PartitionManager.InstrumentCheckPassivations, barIndex, Color.Orange);
+            monitorListener.CreateMarker(PartitionManager.InstrumentCheckActivations, barIndex, Color.Green);
+            monitorListener.CreateMarker(PartitionManager.InstrumentPassivate, barIndex, Color.Red);
             barIndex++;
-            monitorListener.CreateMarker(ChunkManager.MonitorProcessProcessBuildVerticesRequests, barIndex, Color.Green);
+            monitorListener.CreateMarker(ChunkManager.InstrumentProcessProcessBuildVerticesRequests, barIndex, Color.Green);
             barIndex++;
-            monitorListener.CreateMarker(ChunkManager.MonitorProcessChunkTaskRequests, barIndex, Color.Yellow);
+            monitorListener.CreateMarker(ChunkManager.InstrumentProcessChunkTaskRequests, barIndex, Color.Yellow);
             barIndex++;
-            monitorListener.CreateMarker(ChunkManager.MonitorUpdateMeshBuffers, barIndex, Color.Magenta);
+            monitorListener.CreateMarker(ChunkManager.InstrumentUpdateMeshBuffers, barIndex, Color.Magenta);
 
             barIndex++;
-            monitorListener.CreateMarker(RegionManager.MonitorUpdate, barIndex, Color.White);
+            monitorListener.CreateMarker(RegionManager.InstrumentUpdate, barIndex, Color.White);
 
             barIndex++;
-            monitorListener.CreateMarker(MonitorDraw, barIndex, Color.White);
+            monitorListener.CreateMarker(InstrumentDraw, barIndex, Color.White);
 
             barIndex++;
-            monitorListener.CreateMarker(SceneManager.MonitorDraw, barIndex, Color.Cyan);
+            monitorListener.CreateMarker(SceneManager.InstrumentDraw, barIndex, Color.Cyan);
             barIndex++;
-            monitorListener.CreateMarker(SceneManager.MonitorDrawShadowMap, barIndex, Color.Cyan);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawScene, barIndex, Color.Orange);
-            monitorListener.CreateMarker(SceneManager.MonitorOcclusionQuery, barIndex, Color.Green);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawSceneObjects, barIndex, Color.Red);
-            monitorListener.CreateMarker(SceneManager.MonitorDrawParticles, barIndex, Color.Yellow);
-            monitorListener.CreateMarker(SceneManager.MonitorPostProcess, barIndex, Color.Magenta);
+            monitorListener.CreateMarker(SceneManager.InstrumentDrawShadowMap, barIndex, Color.Cyan);
+            monitorListener.CreateMarker(SceneManager.InstrumentDrawScene, barIndex, Color.Orange);
+            monitorListener.CreateMarker(SceneManager.InstrumentOcclusionQuery, barIndex, Color.Green);
+            monitorListener.CreateMarker(SceneManager.InstrumentDrawSceneObjects, barIndex, Color.Red);
+            monitorListener.CreateMarker(SceneManager.InstrumentDrawParticles, barIndex, Color.Yellow);
+            monitorListener.CreateMarker(SceneManager.InstrumentPostProcess, barIndex, Color.Magenta);
 
             #endregion
 
@@ -276,7 +274,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             if (!IsActive) return;
 
             // モニタ
-            DiagnosticsMonitor.Begin(MonitorUpdate);
+            Instrument.Begin(InstrumentUpdate);
 
             //----------------------------------------------------------------
             // マウスとキーボード状態の取得
@@ -414,13 +412,13 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             base.Update(gameTime);
 
             // モニタ
-            DiagnosticsMonitor.End(MonitorUpdate);
+            Instrument.End();
         }
 
         protected override void Draw(GameTime gameTime)
         {
             // モニタ
-            DiagnosticsMonitor.Begin(MonitorDraw);
+            Instrument.Begin(InstrumentDraw);
 
             // ワールドの描画
             worldManager.Draw(gameTime);
@@ -429,7 +427,7 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             DrawHelp();
 
             // モニタ
-            DiagnosticsMonitor.End(MonitorDraw);
+            Instrument.End();
 
             base.Draw(gameTime);
         }
@@ -470,17 +468,19 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.AppendNumber(graphics.PreferredBackBufferHeight).AppendLine();
 
 #if WINDOWS
-            sb.Append("Memory(MB): ");
-            sb.Append("GC(").AppendNumber(ByteToMegabyte(GC.GetTotalMemory(false)), 0).Append(") ");
-            sb.Append("Process(").AppendNumber(ByteToMegabyte(Process.GetCurrentProcess().PrivateMemorySize64), 0).Append(")").AppendLine();
+            // どうやら GC 関連の情報を取得するとオブジェクトを作りまくる模様。
 
-            sb.Append("GC: ");
-            for (int i = 0; i < GC.MaxGeneration; i++)
-            {
-                sb.Append("(").AppendNumber(i).Append(":");
-                sb.AppendNumber(GC.CollectionCount(i)).Append(") ");
-            }
-            sb.AppendLine();
+            //sb.Append("Memory(MB): ");
+            //sb.Append("GC(").AppendNumber(ByteToMegabyte(GC.GetTotalMemory(false)), 0).Append(") ");
+            //sb.Append("Process(").AppendNumber(ByteToMegabyte(Process.GetCurrentProcess().PrivateMemorySize64), 0).Append(")").AppendLine();
+
+            //sb.Append("GC: ");
+            //for (int i = 0; i < GC.MaxGeneration; i++)
+            //{
+            //    sb.Append("(").AppendNumber(i).Append(":");
+            //    sb.AppendNumber(GC.CollectionCount(i)).Append(") ");
+            //}
+            //sb.AppendLine();
 #endif
 
             var chunkManager = worldManager.ChunkManager;
@@ -491,8 +491,8 @@ namespace Willcraftia.Xna.Blocks.Content.Demo
             sb.Append("P(").AppendNumber(chunkManager.PassivationCount).Append(")").AppendLine();
 
             sb.Append("Mesh: ").AppendNumber(chunkManager.MeshCount).Append(" ");
-            sb.Append("Inter: ").AppendNumber(chunkManager.ActiveVerticesBuilderCount).Append("/");
-            sb.AppendNumber(chunkManager.TotalVerticesBuilderCount).AppendLine();
+            sb.Append("Inter: ").AppendNumber(chunkManager.ActiveVertexBuilderCount).Append("/");
+            sb.AppendNumber(chunkManager.TotalVertexBuilderCount).AppendLine();
 
             sb.Append("ChunkVertex: ");
             sb.Append("Max(").AppendNumber(chunkManager.MaxVertexCount).Append(") ");

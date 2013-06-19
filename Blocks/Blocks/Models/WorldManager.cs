@@ -19,7 +19,7 @@ namespace Willcraftia.Xna.Blocks.Models
 {
     public sealed class WorldManager
     {
-        public const string MonitorUpdate = "WorldManager.Update";
+        public const string InstrumentUpdate = "WorldManager.Update";
 
         IServiceProvider serviceProvider;
 
@@ -288,7 +288,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
         public void Update(GameTime gameTime)
         {
-            Monitor.Begin(MonitorUpdate);
+            Instrument.Begin(InstrumentUpdate);
 
             //----------------------------------------------------------------
             // カメラ更新
@@ -337,7 +337,7 @@ namespace Willcraftia.Xna.Blocks.Models
 
             RegionManager.Update(gameTime);
 
-            Monitor.End(MonitorUpdate);
+            Instrument.End();
         }
 
         public void Draw(GameTime gameTime)

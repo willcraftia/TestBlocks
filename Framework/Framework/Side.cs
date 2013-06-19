@@ -13,13 +13,14 @@ namespace Willcraftia.Xna.Framework
         [Flags]
         public enum Flags
         {
-            None = 0x0,
-            Top = 0x1,
-            Bottom = 0x2,
-            Front = 0x4,
-            Back = 0x8,
-            Left = 0x10,
-            Right = 0x20
+            None    = 0,
+            Top     = (1 << 0),
+            Bottom  = (1 << 1),
+            Front   = (1 << 2),
+            Back    = (1 << 3),
+            Left    = (1 << 4),
+            Right   = (1 << 5),
+            All     = Top | Bottom | Front | Back | Left | Right
         }
 
         public const int Count = 6;

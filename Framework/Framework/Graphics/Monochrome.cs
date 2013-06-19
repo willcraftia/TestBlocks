@@ -44,7 +44,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const string MonitorProcess = "Monochrome.Process";
+        public const string InstrumentProcess = "Monochrome.Process";
 
         public static Vector2 Grayscale
         {
@@ -74,7 +74,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             monochromeEffect.Cb = cbCr.X;
             monochromeEffect.Cr = cbCr.Y;
@@ -85,7 +85,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
     }
 }

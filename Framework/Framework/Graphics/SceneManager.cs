@@ -161,19 +161,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const int InitialPostProcessorCapacity = 10;
 
-        public const string MonitorDraw = "SceneManager.Draw";
+        public const string InstrumentDraw = "SceneManager.Draw";
 
-        public const string MonitorDrawShadowMap = "SceneManager.DrawShadowMap";
+        public const string InstrumentDrawShadowMap = "SceneManager.DrawShadowMap";
         
-        public const string MonitorDrawScene = "SceneManager.DrawScene";
+        public const string InstrumentDrawScene = "SceneManager.DrawScene";
         
-        public const string MonitorOcclusionQuery = "SceneManager.OcclusionQuery";
+        public const string InstrumentOcclusionQuery = "SceneManager.OcclusionQuery";
         
-        public const string MonitorDrawSceneObjects = "SceneManager.DrawSceneObjects";
+        public const string InstrumentDrawSceneObjects = "SceneManager.DrawSceneObjects";
         
-        public const string MonitorDrawParticles = "SceneManager.DrawParticles";
+        public const string InstrumentDrawParticles = "SceneManager.DrawParticles";
         
-        public const string MonitorPostProcess = "SceneManager.PostProcess";
+        public const string InstrumentPostProcess = "SceneManager.PostProcess";
 
         static readonly BlendState colorWriteDisable = new BlendState
         {
@@ -417,7 +417,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             if (gameTime == null) throw new ArgumentNullException("gameTime");
             if (activeCamera == null) throw new InvalidOperationException("ActiveCamera is null.");
 
-            Monitor.Begin(MonitorDraw);
+            Instrument.Begin(InstrumentDraw);
 
             activeCamera.Frustum.GetCorners(frustumCorners);
             frustumSphere = BoundingSphere.CreateFromPoints(frustumCorners);
@@ -498,7 +498,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             translucentObjects.Clear();
             shadowCasters.Clear();
 
-            Monitor.End(MonitorDraw);
+            Instrument.End();
         }
 
         public void UpdateEffect(Effect effect)
@@ -607,7 +607,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         void DrawShadowMap()
         {
-            Monitor.Begin(MonitorDrawShadowMap);
+            Instrument.Begin(InstrumentDrawShadowMap);
 
             //----------------------------------------------------------------
             // 準備
@@ -626,12 +626,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             var lightDirection = activeDirectionalLight.Direction;
             ShadowMap.Draw(ref lightDirection);
 
-            Monitor.End(MonitorDrawShadowMap);
+            Instrument.End();
         }
 
         void DrawScene(ShadowMap shadowMap)
         {
-            Monitor.Begin(MonitorDrawScene);
+            Instrument.Begin(InstrumentDrawScene);
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
@@ -643,7 +643,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             // オクルージョン クエリ
             //
 
-            Monitor.Begin(MonitorOcclusionQuery);
+            Instrument.Begin(InstrumentOcclusionQuery);
 
             GraphicsDevice.BlendState = colorWriteDisable;
 
@@ -653,14 +653,14 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < translucentObjects.Count; i++)
                 translucentObjects[i].UpdateOcclusion();
 
-            Monitor.End(MonitorOcclusionQuery);
+            Instrument.End();
 
             //================================================================
             //
             // 描画
             //
 
-            Monitor.Begin(MonitorDrawSceneObjects);
+            Instrument.Begin(InstrumentDrawSceneObjects);
 
             //----------------------------------------------------------------
             // 不透明オブジェクト
@@ -709,16 +709,16 @@ namespace Willcraftia.Xna.Framework.Graphics
             //if (skySphere != null && skySphere.Visible)
             //    skySphere.Draw();
 
-            Monitor.End(MonitorDrawSceneObjects);
+            Instrument.End();
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorDrawScene);
+            Instrument.End();
         }
 
         void DrawParticles(GameTime gameTime)
         {
-            Monitor.Begin(MonitorDrawParticles);
+            Instrument.Begin(InstrumentDrawParticles);
 
             GraphicsDevice.SetRenderTarget(RenderTarget);
 
@@ -731,12 +731,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorDrawParticles);
+            Instrument.End();
         }
 
         void PostProcess()
         {
-            Monitor.Begin(MonitorPostProcess);
+            Instrument.Begin(InstrumentPostProcess);
 
             for (int i = 0; i < PostProcessors.Count; i++)
             {
@@ -748,7 +748,7 @@ namespace Willcraftia.Xna.Framework.Graphics
                 }
             }
 
-            Monitor.End(MonitorPostProcess);
+            Instrument.End();
         }
 
         void SwapRenderTargets()

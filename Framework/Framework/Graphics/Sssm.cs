@@ -282,11 +282,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const string MonitorProcess = "Sssm.Process";
+        public const string InstrumentProcess = "Sssm.Process";
 
-        public const string MonitorDrawShadowScene = "Sssm.DrawShadowScene";
+        public const string InstrumentDrawShadowScene = "Sssm.DrawShadowScene";
 
-        public const string MonitorFilter = "Sssm.Filter";
+        public const string InstrumentFilter = "Sssm.Filter";
 
         ShadowSceneEffect shadowSceneEffect;
 
@@ -374,19 +374,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             DrawShadowScene(context);
             Filter(context);
 
             TextureDisplay.Add(shadowSceneMap);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
 
         void DrawShadowScene(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorDrawShadowScene);
+            Instrument.Begin(InstrumentDrawShadowScene);
 
             var camera = context.ActiveCamera;
             var shadowMap = context.ShadowMap;
@@ -423,12 +423,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorDrawShadowScene);
+            Instrument.End();
         }
 
         void Filter(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorFilter);
+            Instrument.Begin(InstrumentFilter);
 
             if (blur != null) blur.Filter(shadowSceneMap);
 
@@ -449,7 +449,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorFilter);
+            Instrument.End();
         }
 
         #region IDisposable

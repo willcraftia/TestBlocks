@@ -12,13 +12,18 @@ namespace Willcraftia.Xna.Blocks.Models
     public enum ChunkMeshUpdatePriority
     {
         /// <summary>
-        /// 通常優先度。
-        /// </summary>
-        Normal,
-
-        /// <summary>
         /// 高優先度。
         /// </summary>
-        High
+        High    = 0,
+
+        /// <summary>
+        /// 通常優先度。
+        /// </summary>
+        Normal  = 1,
+
+        /// <summary>
+        /// 低優先度。
+        /// </summary>
+        Low     = 2,
     }
 }

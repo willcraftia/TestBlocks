@@ -123,8 +123,8 @@
     <Compile Include="Side.cs" />
     <Compile Include="Diagnostics\BoundingBoxDrawer.cs" />
     <Compile Include="Diagnostics\TextureDisplay.cs" />
-    <Compile Include="Diagnostics\IMonitorListener.cs" />
-    <Compile Include="Diagnostics\Monitor.cs" />
+    <Compile Include="Diagnostics\IInstrumentListener.cs" />
+    <Compile Include="Diagnostics\Instrument.cs" />
     <Compile Include="Diagnostics\TimeRuler.cs" />
     <Compile Include="Diagnostics\TimeRulerMarker.cs" />
     <Compile Include="Diagnostics\TimeRulerMonitorListener.cs" />

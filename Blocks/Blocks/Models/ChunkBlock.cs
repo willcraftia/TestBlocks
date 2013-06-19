@@ -61,13 +61,5 @@ namespace Willcraftia.Xna.Blocks.Models
 
             return chunk.GetBlockIndex(position);
         }
-
-        public byte GetSkylightLevel()
-        {
-            if (chunk == null)
-                return Chunk.MaxSkylightLevel;
-
-            return chunk.GetSkylightLevel(position);
-        }
     }
 }

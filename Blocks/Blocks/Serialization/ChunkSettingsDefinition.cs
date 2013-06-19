@@ -12,9 +12,9 @@ namespace Willcraftia.Xna.Blocks.Serialization
     {
         public IntVector3 ChunkSize;
 
-        public int MeshUpdateSearchCapacity;
+        public int VertexBuildConcurrencyLevel;
 
-        public int VerticesBuilderCount;
+        public int UpdateBufferCountPerFrame;
 
         public int MinActiveRange;
 

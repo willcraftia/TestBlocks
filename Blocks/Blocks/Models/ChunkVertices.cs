@@ -68,7 +68,7 @@ namespace Willcraftia.Xna.Blocks.Models
         /// </summary>
         public ChunkVertices()
         {
-            VertexCapacity = Chunk.CalculateMaxVertexCount(ChunkManager.MeshSize);
+            VertexCapacity = Chunk.CalculateMaxVertexCount(ChunkMeshManager.MeshSize);
             IndexCapacity = Chunk.CalculateIndexCount(VertexCapacity);
 
             if (ushort.MaxValue < IndexCapacity)

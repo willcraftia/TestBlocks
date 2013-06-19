@@ -136,7 +136,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultBaseSaturation = 1;
 
-        public const string MonitorProcess = "Bloom.Process";
+        public const string InstrumentProcess = "Bloom.Process";
 
         Settings settings;
 
@@ -248,7 +248,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             //----------------------------------------------------------------
             // ブルーム エクストラクト マップ
@@ -281,7 +281,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
 
         #region IDisposable

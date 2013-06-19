@@ -45,24 +45,19 @@ namespace Willcraftia.Xna.Blocks.Edit
 
             chunk.SetBlockIndex(relativePosition, blockIndex);
 
-            var lightUpdater = chunkManager.BorrowLightUpdater();
+            // メッシュ再構築。
+            chunkManager.RequestUpdateMesh(chunk, ChunkMeshUpdatePriority.High);
 
-            if (blockIndex == Block.EmptyIndex)
+            // 影響を受ける隣接チャンクがあるならば、それらもメッシュ再構築。
+            var chunkBlock = new ChunkBlock(chunk, relativePosition);
+            for (int i = 0; i < Side.Count; i++)
             {
-                lightUpdater.UpdateSkylightLevelByBlockRemoved(ref BlockPosition);
+                var neighborChunkBlock = chunkBlock.GetNeighbor(Side.Items[i]);
+                if (neighborChunkBlock.Chunk != null && neighborChunkBlock.Chunk != chunkBlock.Chunk)
+                {
+                    chunkManager.RequestUpdateMesh(neighborChunkBlock.Chunk, ChunkMeshUpdatePriority.High);
+                }
             }
-            else
-            {
-                lightUpdater.UpdateSkylightLevelByBlockCreated(ref BlockPosition);
-            }
-
-            for (int i = 0; i < lightUpdater.AffectedChunks.Count; i++)
-            {
-                var affectedChunk = lightUpdater.AffectedChunks[i];
-                chunkManager.RequestBuildVertices(affectedChunk, ChunkMeshUpdatePriority.High);
-            }
-
-            chunkManager.ReturnLightUpdater(lightUpdater);
         }
     }
 }

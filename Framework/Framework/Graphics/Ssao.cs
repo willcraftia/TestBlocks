@@ -161,11 +161,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         #endregion
 
-        public const string MonitorProcess = "Ssao.Process";
+        public const string InstrumentProcess = "Ssao.Process";
 
-        public const string MonitorDrawSsaoMap = "Ssao.DrawSsaoMap";
+        public const string InstrumentDrawSsaoMap = "Ssao.DrawSsaoMap";
 
-        public const string MonitorFilter = "Ssao.Filter";
+        public const string InstrumentFilter = "Ssao.Filter";
 
         public const float DefaultTotalStrength = 5;
 
@@ -317,7 +317,7 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             DrawSsaoMap(context);
             Filter(context);
@@ -325,12 +325,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             TextureDisplay.Add(normalDepthMap);
             TextureDisplay.Add(ssaoMap);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
 
         void DrawSsaoMap(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorDrawSsaoMap);
+            Instrument.Begin(InstrumentDrawSsaoMap);
 
             var viewerCamera = context.ActiveCamera;
 
@@ -422,12 +422,12 @@ namespace Willcraftia.Xna.Framework.Graphics
             for (int i = 0; i < 3; i++)
                 blur.Filter(ssaoMap, normalDepthMap);
 
-            Monitor.End(MonitorDrawSsaoMap);
+            Instrument.End();
         }
 
         void Filter(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorFilter);
+            Instrument.Begin(InstrumentFilter);
 
             //----------------------------------------------------------------
             // エフェクト
@@ -443,7 +443,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorFilter);
+            Instrument.End();
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

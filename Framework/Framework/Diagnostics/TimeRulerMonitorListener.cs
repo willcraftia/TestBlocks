@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace Willcraftia.Xna.Framework.Diagnostics
 {
-    public sealed class TimeRulerMonitorListener : IMonitorListener
+    public sealed class TimeRulerMonitorListener : IInstrumentListener
     {
         TimeRuler timeRuler;
 

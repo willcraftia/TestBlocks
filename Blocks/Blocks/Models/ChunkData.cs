@@ -21,11 +21,6 @@ namespace Willcraftia.Xna.Blocks.Models
         byte[] blockIndices;
 
         /// <summary>
-        /// 天空光レベルの配列。
-        /// </summary>
-        HalfByteArray3 skylightLevels;
-
-        /// <summary>
         /// ブロックの総数を取得します。
         /// </summary>
         public int Count
@@ -49,10 +44,6 @@ namespace Willcraftia.Xna.Blocks.Models
             this.manager = manager;
 
             blockIndices = new byte[manager.ChunkSize.X * manager.ChunkSize.Y * manager.ChunkSize.Z];
-            skylightLevels = new HalfByteArray3(manager.ChunkSize.X, manager.ChunkSize.Y, manager.ChunkSize.Z);
-            
-            // 初期状態は空チャンクであるため、最大光レベルで充満させる。
-            ClearSkylightLevels();
         }
 
         /// <summary>
@@ -103,82 +94,45 @@ namespace Willcraftia.Xna.Blocks.Models
         }
 
         /// <summary>
-        /// 天空光レベルを取得します。
-        /// </summary>
-        /// <param name="x">ブロックの X 位置。</param>
-        /// <param name="y">ブロックの Y 位置。</param>
-        /// <param name="z">ブロックの Z 位置。</param>
-        /// <returns>天空光レベル。</returns>
-        public byte GetSkylightLevel(int x, int y, int z)
-        {
-            return skylightLevels[x, y, z];
-        }
-
-        /// <summary>
-        /// 天空光レベルを設定します。
-        /// </summary>
-        /// <param name="x">ブロックの X 位置。</param>
-        /// <param name="y">ブロックの Y 位置。</param>
-        /// <param name="z">ブロックの Z 位置。</param>
-        /// <param name="value">天空光レベル。</param>
-        public void SetSkylightLevel(int x, int y, int z, byte value)
-        {
-            skylightLevels[x, y, z] = value;
-        }
-
-        /// <summary>
-        /// 全ての位置に指定の天空光レベルを設定します。
-        /// </summary>
-        /// <param name="value">天空光レベル。</param>
-        public void FillSkylightLevels(byte level)
-        {
-            skylightLevels.Fill(level);
-        }
-
-        /// <summary>
-        /// 全ての位置の天空光レベルを 0 に設定します。
-        /// </summary>
-        public void ClearSkylightLevels()
-        {
-            FillSkylightLevels(Chunk.MaxSkylightLevel);
-        }
-
-        /// <summary>
         /// 初期化します。
         /// </summary>
         public void Clear()
         {
             Array.Clear(blockIndices, 0, blockIndices.Length);
             SolidCount = 0;
-
-            ClearSkylightLevels();
         }
 
         public void Read(BinaryReader reader)
         {
-            //var p = new VectorI3();
+            SolidCount = reader.ReadInt32();
 
-            //p.X = reader.ReadInt32();
-            //p.Y = reader.ReadInt32();
-            //p.Z = reader.ReadInt32();
-
-            for (int i = 0; i < blockIndices.Length; i++)
+            if (0 < SolidCount)
             {
-                var value = reader.ReadByte();
-                blockIndices[i] = value;
+                int solidCountValidation = 0;
 
-                if (value != Block.EmptyIndex) SolidCount++;
+                for (int i = 0; i < blockIndices.Length; i++)
+                {
+                    var value = reader.ReadByte();
+                    blockIndices[i] = value;
+
+                    if (value != Block.EmptyIndex)
+                        solidCountValidation++;
+                }
+
+                if (solidCountValidation != SolidCount)
+                    throw new InvalidDataException("Data corrupted.");
             }
         }
 
         public void Write(BinaryWriter writer)
         {
-            //writer.Write(position.X);
-            //writer.Write(position.Y);
-            //writer.Write(position.Z);
+            writer.Write(SolidCount);
 
-            for (int i = 0; i < blockIndices.Length; i++)
-                writer.Write(blockIndices[i]);
+            if (0 < SolidCount)
+            {
+                for (int i = 0; i < blockIndices.Length; i++)
+                    writer.Write(blockIndices[i]);
+            }
         }
 
         /// <summary>

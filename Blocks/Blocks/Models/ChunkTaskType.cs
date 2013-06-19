@@ -11,6 +11,8 @@ namespace Willcraftia.Xna.Blocks.Models
     /// </summary>
     public enum ChunkTaskType
     {
+        CheckState,
+
         /// <summary>
         /// チャンク ローカルで光レベルを構築。
         /// </summary>
@@ -23,6 +25,8 @@ namespace Willcraftia.Xna.Blocks.Models
         /// PropagateLights の要求は、
         /// BuildLocalLights を終えた後で無ければなりません。
         /// </remarks>
-        PropagateLights
+        PropagateLights,
+
+        BuildMesh
     }
 }

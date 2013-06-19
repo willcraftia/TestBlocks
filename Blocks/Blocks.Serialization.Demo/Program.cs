@@ -1564,8 +1564,8 @@ namespace Willcraftia.Xna.Blocks.Serialization.Demo
                 var definition = new ChunkSettingsDefinition
                 {
                     ChunkSize = new IntVector3(16),
-                    MeshUpdateSearchCapacity = 100,
-                    VerticesBuilderCount = 10,
+                    VertexBuildConcurrencyLevel = 10,
+                    UpdateBufferCountPerFrame = 16,
                     MinActiveRange = 16,
                     MaxActiveRange = 17,
                     ClusterSize = new IntVector3(8),

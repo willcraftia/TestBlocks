@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Threading.Tasks;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Willcraftia.Xna.Framework;
 using Willcraftia.Xna.Framework.Collections;
@@ -111,22 +111,22 @@ namespace Willcraftia.Xna.Framework.Landscape
 
         #endregion
 
-        public const string MonitorUpdate = "PartitionManager.Update";
+        public const string InstrumentUpdate = "PartitionManager.Update";
 
-        public const string MonitorCheckPassivations = "PartitionManager.CheckPassivations";
+        public const string InstrumentCheckPassivations = "PartitionManager.CheckPassivations";
 
-        public const string MonitorCheckActivations = "PartitionManager.CheckActivations";
+        public const string InstrumentCheckActivations = "PartitionManager.CheckActivations";
 
-        public const string MonitorPassivate = "PartitionManager.Passivate";
+        public const string InstrumentPassivate = "PartitionManager.Passivate";
 
         /// <summary>
         /// ワールド空間におけるパーティションのサイズ。
         /// </summary>
         public readonly Vector3 PartitionSize;
 
-        readonly Action<object> activatePartitionAction;
+        readonly WaitCallback activatePartitionAction;
 
-        readonly Action<object> passivatePartitionAction;
+        readonly WaitCallback passivatePartitionAction;
 
         /// <summary>
         /// クラスタ マネージャ。
@@ -272,8 +272,8 @@ namespace Willcraftia.Xna.Framework.Landscape
             var minActiveVolume = settings.MinActiveVolume ?? new DefaultActiveVolume(4);
             activationCandidateFinder = new ActivationCandidateFinder(this, minActiveVolume, settings.PriorActiveDistance);
 
-            activatePartitionAction = new Action<object>(ActivatePartition);
-            passivatePartitionAction = new Action<object>(PassivatePartition);
+            activatePartitionAction = new WaitCallback(ActivatePartition);
+            passivatePartitionAction = new WaitCallback(PassivatePartition);
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         {
             if (Closed) return;
 
-            Monitor.Begin(MonitorUpdate);
+            Instrument.Begin(InstrumentUpdate);
 
             this.view = view;
             this.projection = projection;
@@ -337,7 +337,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 }
             }
 
-            Monitor.End(MonitorUpdate);
+            Instrument.End();
         }
 
         /// <summary>
@@ -430,7 +430,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void CheckPassivations()
         {
-            Monitor.Begin(MonitorCheckPassivations);
+            Instrument.Begin(InstrumentCheckPassivations);
 
             Partition partition;
             while (passivatedPartitions.TryDequeue(out partition))
@@ -446,7 +446,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 OnPassivated(partition);
             }
 
-            Monitor.End(MonitorCheckPassivations);
+            Instrument.End();
         }
 
         /// <summary>
@@ -454,7 +454,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void CheckActivations()
         {
-            Monitor.Begin(MonitorCheckActivations);
+            Instrument.Begin(InstrumentCheckActivations);
 
             Partition partition;
             while (activatedPartitions.TryDequeue(out partition))
@@ -477,7 +477,7 @@ namespace Willcraftia.Xna.Framework.Landscape
                 OnActivated(partition);
             }
 
-            Monitor.End(MonitorCheckActivations);
+            Instrument.End();
         }
 
         /// <summary>
@@ -534,7 +534,7 @@ namespace Willcraftia.Xna.Framework.Landscape
         /// </summary>
         void Passivate()
         {
-            Monitor.Begin(MonitorPassivate);
+            Instrument.Begin(InstrumentPassivate);
 
             // メモ
             //
@@ -584,10 +584,10 @@ namespace Willcraftia.Xna.Framework.Landscape
                 OnPassivating(partition);
 
                 // タスク実行。
-                Task.Factory.StartNew(passivatePartitionAction, partition);
+                ThreadPool.QueueUserWorkItem(passivatePartitionAction, partition);
             }
 
-            Monitor.End(MonitorPassivate);
+            Instrument.End();
         }
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace Willcraftia.Xna.Framework.Landscape
             activatingParitions[partition.Position] = partition;
 
             // タスク実行。
-            Task.Factory.StartNew(activatePartitionAction, partition);
+            ThreadPool.QueueUserWorkItem(activatePartitionAction, partition);
 
             return true;
         }

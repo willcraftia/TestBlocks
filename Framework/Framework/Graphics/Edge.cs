@@ -190,11 +190,11 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public const float DefaultDepthSensitivity = 1;
 
-        public const string MonitorProcess = "Edge.Process";
+        public const string InstrumentProcess = "Edge.Process";
 
-        public const string MonitorDrawNormalDepth = "Edge.DrawNormalDepth";
+        public const string InstrumentDrawNormalDepth = "Edge.DrawNormalDepth";
 
-        public const string MonitorFilter = "Edge.Filter";
+        public const string InstrumentFilter = "Edge.Filter";
 
         NormalDepthMapEffect normalDepthMapEffect;
 
@@ -346,19 +346,19 @@ namespace Willcraftia.Xna.Framework.Graphics
 
         public override void Process(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorProcess);
+            Instrument.Begin(InstrumentProcess);
 
             DrawNormalDepth(context);
             Filter(context);
 
             TextureDisplay.Add(normalDepthMap);
 
-            Monitor.End(MonitorProcess);
+            Instrument.End();
         }
 
         void DrawNormalDepth(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorDrawNormalDepth);
+            Instrument.Begin(InstrumentDrawNormalDepth);
 
             var viewerCamera = context.ActiveCamera;
 
@@ -404,12 +404,12 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorDrawNormalDepth);
+            Instrument.End();
         }
 
         void Filter(IPostProcessorContext context)
         {
-            Monitor.Begin(MonitorFilter);
+            Instrument.Begin(InstrumentFilter);
 
             //----------------------------------------------------------------
             // エフェクト
@@ -432,7 +432,7 @@ namespace Willcraftia.Xna.Framework.Graphics
             SpriteBatch.End();
             GraphicsDevice.SetRenderTarget(null);
 
-            Monitor.End(MonitorFilter);
+            Instrument.End();
         }
 
         bool IsVisibleObject(SceneObject sceneObject)

@@ -93,12 +93,13 @@
     <Compile Include="Models\ChunkBlock.cs" />
     <Compile Include="Models\ChunkData.cs" />
     <Compile Include="Edit\CommandManager.cs" />
-    <Compile Include="Models\ChunkLightUpdater.cs" />
-    <Compile Include="Models\ChunkLightState.cs" />
+    <Compile Include="Models\ChunkMeshManager.cs" />
     <Compile Include="Models\ChunkMeshUpdatePriority.cs" />
+    <Compile Include="Models\ChunkTaskManager.cs" />
     <Compile Include="Models\ChunkTaskPriority.cs" />
+    <Compile Include="Models\ChunkTaskRequest.cs" />
     <Compile Include="Models\ChunkTaskType.cs" />
-    <Compile Include="Models\ChunkLightBuilder.cs" />
+    <Compile Include="Models\ChunkTask.cs" />
     <Compile Include="Models\LocalWorld.cs" />
     <Compile Include="Models\MaxVerticesChunkProcedure.cs" />
     <Compile Include="Models\BiomeCatalog.cs" />
@@ -127,7 +128,7 @@
     <Compile Include="Models\IBiome.cs" />
     <Compile Include="Models\IBiomeManager.cs" />
     <Compile Include="Models\Image2D.cs" />
-    <Compile Include="Models\ChunkVerticesBuilder.cs" />
+    <Compile Include="Models\ChunkVertexBuilder.cs" />
     <Compile Include="Models\ChunkVertices.cs" />
     <Compile Include="Models\NoiseHelper.cs" />
     <Compile Include="Models\NullChunkStore.cs" />
