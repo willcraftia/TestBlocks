@@ -36,12 +36,6 @@ namespace Willcraftia.Xna.Blocks.Models
                     value.Z % ChunkMeshManager.MeshSize.Z != 0)
                     throw new ArgumentOutOfRangeException("value");
 
-                // 最大配置で ushort の限界を越えるようなサイズは拒否。
-                var maxVertices = Chunk.CalculateMaxVertexCount(chunkSize);
-                var maxIndices = Chunk.CalculateIndexCount(maxVertices);
-                if (ushort.MaxValue < maxIndices)
-                    throw new ArgumentException("The indices over the limit of ushort needed.", "value");
-
                 chunkSize = value;
             }
         }
