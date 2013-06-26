@@ -633,7 +633,7 @@ namespace Willcraftia.Xna.Framework.Graphics
         {
             Instrument.Begin(InstrumentDrawScene);
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            //GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 
             GraphicsDevice.SetRenderTarget(RenderTarget);
             GraphicsDevice.Clear(new Color(BackgroundColor));
@@ -645,7 +645,9 @@ namespace Willcraftia.Xna.Framework.Graphics
 
             Instrument.Begin(InstrumentOcclusionQuery);
 
+            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
             GraphicsDevice.BlendState = colorWriteDisable;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             for (int i = 0; i < opaqueObjects.Count; i++)
                 opaqueObjects[i].UpdateOcclusion();
@@ -661,6 +663,9 @@ namespace Willcraftia.Xna.Framework.Graphics
             //
 
             Instrument.Begin(InstrumentDrawSceneObjects);
+
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
             //----------------------------------------------------------------
             // 不透明オブジェクト
